@@ -5,6 +5,7 @@ import { Chip } from '@rotra/ui/chip'
 import { COURT_POSITIONS } from '@rotra/ui/court-position-card'
 import { FAVORITE_PLAYERS } from '@rotra/ui/favorite-player-chips'
 import { Icon } from '@rotra/ui/icon'
+const GENDER_LABEL = { male: 'Male', female: 'Female' } as const
 export type PlayerAboutCardProps = { profile: PlayerProfile; isOwn?: boolean }
 const PROVIDERS = {
   facebook: 'Facebook',
@@ -36,6 +37,16 @@ export function PlayerAboutCard({ profile, isOwn = false }: PlayerAboutCardProps
     <Card asChild>
       <section className="flex flex-col gap-3">
         <h2>About</h2>
+        {profile.gender || isOwn ? (
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
+              Gender
+            </span>
+            <p className={profile.gender ? undefined : 'text-fg2'}>
+              {profile.gender ? GENDER_LABEL[profile.gender] : 'Not added'}
+            </p>
+          </div>
+        ) : null}
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
             Where they play

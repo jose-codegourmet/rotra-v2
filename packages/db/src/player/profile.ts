@@ -26,6 +26,7 @@ const PUBLIC_PLAYER_SELECT = {
   id: true,
   fullName: true,
   nickname: true,
+  gender: true,
   avatarRef: true,
   bannerId: true,
   banner: { select: { id: true, image: true } },
@@ -121,6 +122,8 @@ function publicProfileDto(row: PublicPlayerRow, own = false) {
     rtrId: row.idAllocation.rtrId,
     fullName: masked ? maskPublicName(row.fullName) : (savingClub?.displayName ?? row.fullName),
     nickname: masked ? null : savingClub ? savingClub.nickname : row.nickname,
+    // Public (D-2026-11-19-01); an always-private profile hides it with the name. Null = not added.
+    gender: masked ? null : row.gender,
     picture: row.avatarRef,
     bannerId: row.bannerId,
     profileVisibility: visibility,
@@ -232,6 +235,7 @@ async function readEntryProfile(entryId: string, viewerId: string | null) {
     rtrId: entry.rtrId,
     fullName: first.displayName,
     nickname: first.nickname,
+    gender: null,
     picture: first.avatarRef,
     bannerId: null,
     profileVisibility: 'public' as ProfileVisibility,
@@ -499,6 +503,32 @@ export async function setStatsVisibility(
       await tx.player.update({
         where: { id: player.id },
         data: { ...data, revision: { increment: 1 } },
+      })
+    }
+    const row = await tx.player.findUniqueOrThrow({
+      where: { id: player.id },
+      select: PUBLIC_PLAYER_SELECT,
+    })
+    return ownProfile(tx, await profileWithBanner(tx, row, true))
+  })
+}
+
+/**
+ * Edit profile › Name › Gender (D-2026-11-19-01): the player sets or clears (null) their own gender
+ * under the loaded account revision. Setting the same value again is not a write. Returns the saved
+ * own profile.
+ */
+export async function setMyGender(
+  context: PlayerContext,
+  input: { gender: 'male' | 'female' | null; expectedRevision: string },
+) {
+  return prisma.$transaction(async (tx) => {
+    const player = await tx.player.findUniqueOrThrow({ where: { id: context.playerId } })
+    if (input.gender !== player.gender) {
+      requireRevision(player.revision, input.expectedRevision)
+      await tx.player.update({
+        where: { id: player.id },
+        data: { gender: input.gender, revision: { increment: 1 } },
       })
     }
     const row = await tx.player.findUniqueOrThrow({

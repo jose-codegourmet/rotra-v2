@@ -30,6 +30,11 @@ export type AdminPlayer = {
   /** The public nickname, else the first nickname a club saved for the player */
   nickname: string | null
   /**
+   * The player's own public gender (D-2026-11-19-01); read-only for Admin. Null or missing = "Not
+   * added yet" (every existing account, unclaimed records and shared entries).
+   */
+  gender?: 'male' | 'female' | null
+  /**
    * The RTR ID. An unclaimed player gets one when a club saves their email (D-2026-11-16-04); only
    * Admin can change it, by changing the registration place or date. Null for an older club record
    * with a phone and no email (Details required): such a row's `id` is the club player id.

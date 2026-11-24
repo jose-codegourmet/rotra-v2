@@ -4,4 +4,5 @@ import type { EditProfileValues } from './EditProfileForm.schema'
 export const editProfileDefaultValues: EditProfileValues = {
   ...personalDetailsDefaultValues,
   ...gettingToKnowDefaultValues,
+  gender: '',
 }

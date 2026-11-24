@@ -228,6 +228,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
               <AdminPlayerIdentityCard
                 fullName={player.name}
                 nickname={player.nickname}
+                gender={player.gender}
                 rtrId={player.rtrId}
                 createdOn={player.createdOn}
                 createdBy={createdBy}

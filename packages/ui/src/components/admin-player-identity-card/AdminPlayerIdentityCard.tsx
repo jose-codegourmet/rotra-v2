@@ -5,9 +5,13 @@ import { KeyValueList } from '@rotra/ui/key-value-list'
 import { formatYmd } from '@rotra/ui/license-access-chip/variants'
 import { useId } from 'react'
 
+const GENDER_LABEL = { male: 'Male', female: 'Female' } as const
+
 export type AdminPlayerIdentityCardProps = {
   fullName: string
   nickname?: string | null
+  /** The player's own public gender (D-2026-11-19-01); read-only. Missing or null shows "Not added yet". */
+  gender?: 'male' | 'female' | null
   /** The permanent RTR ID; null for a club's unclaimed record, which gets one when they register */
   rtrId: string | null
   /** 'YYYY-MM-DD' the profile was first created (the date in the RTR ID, or when the club saved it) */
@@ -28,6 +32,7 @@ export type AdminPlayerIdentityCardProps = {
 export function AdminPlayerIdentityCard({
   fullName,
   nickname,
+  gender,
   rtrId,
   createdOn,
   createdBy,
@@ -42,6 +47,14 @@ export function AdminPlayerIdentityCard({
           items={[
             { label: 'Name', value: fullName },
             { label: 'Nickname', value: nickname || '—' },
+            {
+              label: 'Gender',
+              value: gender ? (
+                GENDER_LABEL[gender]
+              ) : (
+                <span className="text-fg2">Not added yet</span>
+              ),
+            },
             {
               label: 'RTR ID',
               value: rtrId ? <span className="font-mono">{rtrId}</span> : 'Not registered yet',

@@ -46,6 +46,7 @@ export function adminPlayerOf(state: MockState, player: Player): AdminPlayer {
     id: player.id,
     name: player.fullName,
     nickname: player.nickname ?? clubRecords.find((entry) => entry.nickname)?.nickname ?? null,
+    gender: state.playerProfiles.find((p) => p.playerId === player.id)?.gender ?? null,
     rtrId: player.rtrId,
     createdByClubId: state.adminPlayerRecords[player.id]?.adminCreated
       ? (state.adminPlayerRecords[player.id]?.createdByClubId ?? null)
@@ -132,6 +133,7 @@ export function clubOnlyAdminPlayerOf(state: MockState, record: ClubPlayer): Adm
     id: record.id,
     name: record.fullName,
     nickname: record.nickname,
+    gender: record.gender ?? null,
     rtrId: null,
     createdByClubId: record.clubId,
     createdOn: addedOn,

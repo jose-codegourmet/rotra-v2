@@ -13,7 +13,11 @@ const meta = {
   title: 'Player/EditProfileForm',
   component: EditProfileForm,
   args: {
-    defaultValues: { ...personalDetailsFromProfile(jose), ...gettingToKnowFromProfile(jose) },
+    defaultValues: {
+      ...personalDetailsFromProfile(jose),
+      ...gettingToKnowFromProfile(jose),
+      gender: jose.gender ?? '',
+    },
     account: { phone: account.phone, email: account.email, playerId: jose.rtrId },
     onSubmit: fn(),
     onCancel: fn(),
@@ -35,6 +39,16 @@ const openSection =
     await userEvent.click(await within(canvasElement).findByRole('tab', { name: new RegExp(name) }))
   }
 export const NameSection: Story = {}
+/** A gender already added */
+export const WithGender: Story = {
+  args: {
+    defaultValues: {
+      ...personalDetailsFromProfile(jose),
+      ...gettingToKnowFromProfile(jose),
+      gender: 'male',
+    },
+  },
+}
 export const NameSectionLight: Story = { globals: { theme: 'light' } }
 /** The Name preview with the Night banner and initials (no picture) */
 export const NightBannerInitials: Story = { args: { bannerKey: 'night', picture: null } }

@@ -16,6 +16,9 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Full: Story = {}
+/** Gender shows on others' profiles only when set; an own profile without one says Not added. */
+export const WithGender: Story = { args: { profile: { ...empty, gender: 'female' } } }
+export const WithGenderLight: Story = { ...WithGender, globals: { theme: 'light' } }
 export const EmptyPublic: Story = { args: { profile: empty } }
 export const EmptyOwn: Story = { args: { profile: empty, isOwn: true } }
 export const LinksOnly: Story = { args: { profile: linksOnly } }

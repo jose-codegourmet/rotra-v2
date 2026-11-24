@@ -212,6 +212,7 @@ export async function readAdminPlayerDirectory(
       id: true,
       fullName: true,
       nickname: true,
+      gender: true,
       avatarRef: true,
       profileState: true,
       hidePhoneFromClubs: true,
@@ -261,6 +262,8 @@ export async function readAdminPlayerDirectory(
         id: player.id,
         name: player.fullName,
         nickname: player.nickname ?? player.clubPlayers.find((p) => p.nickname)?.nickname ?? null,
+        // D-2026-11-19-01: public, set by the player; read-only for Admin. Null = Not added yet.
+        gender: player.gender,
         rtrId: allocation.rtrId,
         createdByClubId: allocation.creatingClubId,
         createdOn,

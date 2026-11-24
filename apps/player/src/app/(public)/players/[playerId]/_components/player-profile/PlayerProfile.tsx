@@ -317,6 +317,20 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                 them. The profile is public until they register with ROTRA.
               </Notice>
             ) : null}
+            {isOwn && !player.gender ? (
+              <Notice
+                tone="warn"
+                title="Add your gender."
+                action={
+                  <Button size="xs" onClick={() => router.push('/profile/edit')}>
+                    Add gender
+                  </Button>
+                }
+              >
+                Clubs use it to name your matches: Men&apos;s, Women&apos;s or Mixed Doubles. Until
+                you add it, your matches count as Genderless.
+              </Notice>
+            ) : null}
             {missingDetails ? (
               <Notice
                 tone="info"

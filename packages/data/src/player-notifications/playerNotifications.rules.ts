@@ -66,7 +66,7 @@ export function genderReminder(readAt: string | null, now: number): PlayerNotifi
     kind: 'account',
     title: 'Add your gender',
     body: "Clubs use it to name your matches: Men's, Women's or Mixed Doubles. Until you add it, your matches count as Genderless.",
-    // The Name section is chosen by the Edit profile screen ticket; this opens Edit profile.
+    // Edit profile always opens on its Name section, where Gender lives.
     target: '/profile/edit',
     createdAt: new Date(now - 5 * 60_000).toISOString(),
     readAt,

@@ -22,6 +22,7 @@ import {
   realGetPlayerGames,
   realGetPlayerProfile,
   realGetPlayerRank,
+  realSetMyGender,
   realSetMyProfileBanner,
   realSetMyProfilePicture,
   realUpdateMyProfile,
@@ -306,14 +307,12 @@ export async function setMyProfileBanner(bannerId: string): Promise<PlayerProfil
 }
 
 /**
- * Sets (or clears, with null) the signed-in player's own gender (D-2026-11-19-01). Mock mode only:
- * real mode has no gender column yet (#1089), so it says this isn't connected to saved data.
+ * Sets (or clears, with null) the signed-in player's own gender (D-2026-11-19-01).
  */
 export async function setMyGender(gender: Gender | null): Promise<PlayerProfile> {
-  if (isRealDataMode())
-    throw new MockError('permission', NOT_CONNECTED_MESSAGE)
   if (gender !== null && gender !== 'male' && gender !== 'female')
     throw new MockError('conflict', 'Choose Male or Female.')
+  if (isRealDataMode()) return realSetMyGender(gender)
   await delay(900)
   if (getConnectivity() === 'offline')
     throw new MockError('offline', "You're offline. Reconnect and try again.")

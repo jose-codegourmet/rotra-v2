@@ -3,6 +3,7 @@ import { MockError } from '@rotra/data/mock/errors'
 import type { OnboardingAnswers } from '@rotra/data/player/onboarding-answers'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { useSaveMyOnboardingAnswers } from '@rotra/data/player/useSaveMyOnboardingAnswers'
+import { useSetMyGender } from '@rotra/data/player/useSetMyGender'
 import { useUpdateMyProfile } from '@rotra/data/player/useUpdateMyProfile'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { isRealDataMode } from '@rotra/data/real/mode'
@@ -45,6 +46,7 @@ export function EditProfile() {
   const myAccount = useMyAccount(account ? playerId : null)
   const update = useUpdateMyProfile()
   const saveAnswers = useSaveMyOnboardingAnswers()
+  const saveGender = useSetMyGender()
   const pictureEditor = useProfilePictureSheet(profile.data)
   const bannerEditor = useBannerSheet(profile.data)
   // Opens over the edit page, so the profile draft stays.
@@ -58,7 +60,9 @@ export function EditProfile() {
   const defaultValues = useMemo(
     () =>
       profile.data
-        ? { ...personalDetailsFromProfile(profile.data), ...gettingToKnowFromProfile(profile.data) }
+        ? { ...personalDetailsFromProfile(profile.data), ...gettingToKnowFromProfile(profile.data),
+            gender: profile.data.gender ?? ('' as const),
+          }
         : undefined,
     [profile.data],
   )
@@ -173,7 +177,7 @@ export function EditProfile() {
           email: myAccount.data.email,
           playerId: profile.data.rtrId,
         }}
-        isPending={update.isPending || saveAnswers.isPending}
+        isPending={update.isPending || saveAnswers.isPending || saveGender.isPending}
         serverError={serverError}
         onDirtyChange={onDirtyChange}
         onCancel={() => leave(profilePath)}
@@ -182,8 +186,15 @@ export function EditProfile() {
         onSubmit={(values) => {
           setServerError(undefined)
           // The pickers are saved beside the personal fields (D-2026-11-19-11); both must succeed.
-          const { playStyle, shots, shotsOther, favoritePlayer, favoritePlayerOther, ...personal } =
-            values
+          const {
+            playStyle,
+            shots,
+            shotsOther,
+            favoritePlayer,
+            favoritePlayerOther,
+            gender,
+            ...personal
+          } = values
           const answers: OnboardingAnswers = {
             playStyle: playStyle === '' ? null : playStyle,
             shots: shots as OnboardingAnswers['shots'],
@@ -193,6 +204,12 @@ export function EditProfile() {
                 ? null
                 : (favoritePlayer as OnboardingAnswers['favoritePlayer']),
             favoritePlayerOther,
+          }
+          // Gender (D-2026-11-19-01) saves last, only when it changed; setting it clears the reminder.
+          const nextGender = gender === '' ? null : gender
+          const saveGenderThen = (done: () => void) => {
+            if (nextGender === (profile.data?.gender ?? null)) return done()
+            saveGender.mutate(nextGender, { onSuccess: done, onError: failed })
           }
           const saved = () => {
             setDirty(false)
@@ -214,8 +231,11 @@ export function EditProfile() {
           update.mutate(personal, {
             onSuccess: () => {
               // Real mode has nowhere to store the answers yet (D-2026-11-19-11).
-              if (isRealDataMode()) return saved()
-              saveAnswers.mutate(answers, { onSuccess: saved, onError: failed })
+              if (isRealDataMode()) return saveGenderThen(saved)
+              saveAnswers.mutate(answers, {
+                onSuccess: () => saveGenderThen(saved),
+                onError: failed,
+              })
             },
             onError: failed,
           })

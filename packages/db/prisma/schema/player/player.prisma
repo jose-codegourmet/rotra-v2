@@ -27,10 +27,20 @@ enum PlayerVerificationOverride {
   @@map("player_verification_override")
 }
 
+/// Optional, self-reported, public (D-2026-11-19-01). Null = not added; every existing row.
+enum PlayerGender {
+  male
+  female
+
+  @@map("player_gender")
+}
+
 model Player {
   id                    String             @id @default(uuid(7)) @db.Uuid
   fullName              String             @map("full_name")
   nickname              String?
+  /// Set by the player (registration, Edit profile). Public. Null = not added.
+  gender                PlayerGender?
   avatarRef             String?            @map("avatar_ref")
   /// Picture before the most recent Admin picture change.
   avatarPreviousRef     String?            @map("avatar_previous_ref")

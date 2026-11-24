@@ -191,8 +191,8 @@ export async function realGetMyAccount(signal?: AbortSignal) {
 
 /**
  * Strict like the mock: phone, email, the RTR ID or rank in the input are rejected.
- * The real profile read carries no `gender` or getting-to-know answers yet: there is no gender column
- * (#1089) and the answers' storage shape is open (D-2026-11-19-11). Those optional fields stay unset.
+ * The real profile read carries no getting-to-know answers yet: their storage shape is open
+ * (D-2026-11-19-11), so those optional fields stay unset. Gender saves through realSetMyGender.
  */
 export async function realUpdateMyProfile(input: PersonalProfileValues) {
   const values = personalProfileSchema.parse(input)
@@ -217,6 +217,20 @@ export async function realUpdateMyProfile(input: PersonalProfileValues) {
       },
       fields: { experience: 'experienceYears' },
     },
+  )
+  loadedRevision = revision
+  return profile
+}
+
+/**
+ * Edit profile › Name › Gender (D-2026-11-19-01), under the account revision the screen loaded. The
+ * player's own gender only; null clears it. The saved profile comes back.
+ */
+export async function realSetMyGender(gender: 'male' | 'female' | null) {
+  if (!loadedRevision) await realGetMyAccount()
+  const { profile, revision } = await realRequest<{ profile: PlayerProfile; revision: string }>(
+    '/api/me/gender',
+    { method: 'POST', body: { gender, expectedRevision: loadedRevision } },
   )
   loadedRevision = revision
   return profile

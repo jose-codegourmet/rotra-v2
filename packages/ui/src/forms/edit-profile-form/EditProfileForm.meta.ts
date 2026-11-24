@@ -7,6 +7,7 @@ export const editProfileFormMeta = {
     'The container owns useUpdateMyProfile, toasts, navigation and D-DISCARD; onDirtyChange tells it when to guard.',
     'Name opens with a live preview of the profile card (ProfileHero placement="preview"): the 5:2 banner with its pencil (onChangeBanner), the picture with its pencil (onChangePicture), the name and nickname as typed, then the helper line “This is how the top of your profile card looks. Tap a pencil to change your picture or banner.”',
     'Both pencils open dialogs the container owns (ProfilePictureSheet, BannerSheet); their saves are outside the draft and Save changes. There is no inline banner picker (#765). bannerKey / bannerImageUrl are the saved banner.',
+    'Name also holds Gender · public, a select (Not added yet, Male, Female; optional for existing accounts, D-2026-11-19-01). The submitted values carry gender (\'\' = not added); the container saves it with useSetMyGender, apart from the personal fields.',
     'Links stack one per row at every width.',
     'Playing style holds the three getting-to-know pickers (GettingToKnowFields) and Experience; the free-text field is gone (D-2026-11-19-11). The submitted values carry the answers beside the personal fields; the container saves them with useSaveMyOnboardingAnswers.',
     'Phone, email and the RTR ID are display-only; the submitted values never contain them.',

@@ -3,8 +3,10 @@ import { toggleBaggingGame } from '@rotra/data/match/auto-queue-rules'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { expect, fn, within } from 'storybook/test'
+import type { ExemptionPlayer } from '../player-picker-sheet/PlayerPickerSheet'
 import {
   type AutoQueueBaggingProps,
+  type AutoQueueExemptionProps,
   type AutoQueueCount,
   type AutoQueueMode,
   AutoQueueWorkspace,
@@ -13,6 +15,22 @@ import {
 
 const fixture = matchLineupFixtures.autoQueueWorkspace
 const baggingFixture = matchLineupFixtures.bagging
+
+/** Every present roster player with a few games each; one is away. */
+const exemptionPlayers: ExemptionPlayer[] = baggingFixture.players.map((p, i) => ({
+  id: p.id,
+  name: p.name,
+  shortName: p.shortName,
+  level: p.level,
+  games: i % 5,
+  present: i % 7 !== 6,
+}))
+/** The Exemption list card with the list held in story state. */
+const exemptionArgs = (exemptIds: string[] = []): AutoQueueExemptionProps => ({
+  players: exemptionPlayers,
+  exemptIds,
+  onSave: fn(),
+})
 
 /** Bagging mode props with the switch and the pairs list held in story state. */
 function useBaggingDemo(initial: AutoQueueBaggingProps | undefined) {
@@ -71,10 +89,20 @@ function Demo(args: AutoQueueWorkspaceProps) {
   const [batches, setBatches] = useState(args.batches)
   const [selected, setSelected] = useState(args.selectedIds)
   const bagging = useBaggingDemo(args.bagging)
+  const [exemptIds, setExemptIds] = useState(args.exemption?.exemptIds ?? [])
+  const exemption = args.exemption && {
+    ...args.exemption,
+    exemptIds,
+    onSave: (ids: string[]) => {
+      args.exemption?.onSave(ids)
+      setExemptIds(ids)
+    },
+  }
   return (
     <AutoQueueWorkspace
       {...args}
       bagging={bagging}
+      exemption={exemption}
       mode={mode}
       onModeChange={setMode}
       count={count}
@@ -292,4 +320,38 @@ export const BaggingAddPair: Story = {
     await userEvent.click(sheet.getByRole('button', { name: 'Add pair' }))
     await expect(canvas.getByRole('heading', { name: 'Bagging pairs · 1' })).toBeVisible()
   },
+}
+
+/** From 1280 px: strategy card on the left, Exemption list (and Bagging pairs when on) on the right. */
+export const TwoColumns: Story = {
+  args: { count: 2, exemption: exemptionArgs(exemptionPlayers.slice(0, 3).map((p) => p.id)) },
+  globals: { viewport: { value: 'desktop' } },
+}
+export const TwoColumnsBaggingOn: Story = {
+  args: {
+    count: 2,
+    bagging: baggingArgs(true),
+    exemption: exemptionArgs(exemptionPlayers.slice(0, 3).map((p) => p.id)),
+  },
+  globals: { viewport: { value: 'desktop' } },
+}
+/** Bagging off, nobody exempt, no drafts yet: the side column is only the empty Exemption list. */
+export const TwoColumnsEmpty: Story = {
+  args: { count: 2, batches: {}, bagging: baggingArgs(false), exemption: exemptionArgs() },
+  globals: { viewport: { value: 'desktop' } },
+}
+export const TwoColumnsCatchUp: Story = {
+  args: {
+    mode: 'catchup',
+    count: 2,
+    catchUpTarget: '3',
+    bagging: baggingArgs(true),
+    exemption: exemptionArgs(exemptionPlayers.slice(0, 2).map((p) => p.id)),
+  },
+  globals: { viewport: { value: 'desktop' } },
+}
+/** Under 1280 px the columns stack with the side column first. */
+export const StackedPhone: Story = {
+  args: { count: 2, exemption: exemptionArgs(exemptionPlayers.slice(0, 3).map((p) => p.id)) },
+  globals: { viewport: { value: 'phone' } },
 }

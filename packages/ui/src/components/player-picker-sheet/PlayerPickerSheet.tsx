@@ -1,9 +1,13 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
+import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
+import { cn } from '@rotra/ui/cn'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { Field } from '@rotra/ui/field'
+import { Icon } from '@rotra/ui/icon'
+import { levelLabel, levelRingClass } from '@rotra/ui/level-pill'
 import { PlayerTile, type PlayerTileStatus } from '@rotra/ui/player-tile'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Sheet } from '@rotra/ui/sheet'
@@ -101,7 +105,40 @@ export type PlayerPickerMatchRequestProps = {
   onBack: () => void
 }
 
-export type PlayerPickerSheetProps = PlayerPickerLineupProps | PlayerPickerMatchRequestProps
+/** One roster player as the exemption picker and the Exemption list card's chips show them. */
+export type ExemptionPlayer = {
+  /** The SessionPlayer id */
+  id: string
+  /** Full name: the picture's description and the accessible names */
+  name: string
+  /** Nickname or first name: the tile and the chip */
+  shortName: string
+  /** The level locked for this session; null when none was set. Its band colours the ring. */
+  level: PlayingLevel | null
+  photoUrl?: string
+  /** Counted games so far */
+  games: number
+  /** Not present players read "· away" */
+  present: boolean
+}
+
+export type PlayerPickerExemptionProps = {
+  /** The Exemption list sheet (Generate Queue, 2026-11-19-queue-exemption-picker) */
+  variant: 'exemption'
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  /** Every roster player */
+  players: ExemptionPlayer[]
+  /** The saved list the sheet opens with; Cancel leaves it unchanged */
+  exemptIds: string[]
+  /** "Save list · N": the container stores the ids */
+  onSave: (ids: string[]) => void
+}
+
+export type PlayerPickerSheetProps =
+  | PlayerPickerLineupProps
+  | PlayerPickerMatchRequestProps
+  | PlayerPickerExemptionProps
 
 const FILTERS: { value: PlayerPickerFilter; label: string }[] = [
   { value: 'available', label: 'Available now' },
@@ -358,13 +395,158 @@ function MatchRequestPicker({
 }
 
 /**
- * Q-PICK-PLAYER for the Queue Master (default variant) or the match-request partner / opponent
- * picker (`variant="matchRequest"`).
+ * The Exemption list sheet: search, a level filter, and a grid of tiles (picture with the level ring,
+ * short name, games, "· away"). Exempt players come first; a tap toggles a tile (accent border, check
+ * badge). "N exempt · Clear all", Cancel and "Save list · N". The picks are held here until Save, so
+ * Cancel leaves the saved list unchanged; they reset each time the sheet opens.
+ */
+function ExemptionPicker({
+  open,
+  onOpenChange,
+  players,
+  exemptIds,
+  onSave,
+}: PlayerPickerExemptionProps) {
+  const [sel, setSel] = useState<string[]>(exemptIds)
+  const [query, setQuery] = useState('')
+  const [band, setBand] = useState<MatchRequestSkill>('all')
+  const [wasOpen, setWasOpen] = useState(open)
+  if (open !== wasOpen) {
+    setWasOpen(open)
+    if (open) {
+      setSel(exemptIds)
+      setQuery('')
+      setBand('all')
+    }
+  }
+  const q = query.trim().toLowerCase()
+  const list = players
+    .filter(
+      (p) =>
+        (!q || `${p.name} ${p.shortName}`.toLowerCase().includes(q)) &&
+        (band === 'all' || p.level?.split('_')[0] === band),
+    )
+    .sort(
+      (a, b) =>
+        Number(sel.includes(b.id)) - Number(sel.includes(a.id)) || a.name.localeCompare(b.name),
+    )
+  const toggle = (id: string) =>
+    setSel((current) => (current.includes(id) ? current.filter((x) => x !== id) : [...current, id]))
+
+  return (
+    <Sheet
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Exemption list"
+      footer={
+        <>
+          <Button onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              onSave(sel.filter((id) => players.some((p) => p.id === id)))
+              onOpenChange(false)
+            }}
+          >
+            Save list{sel.length ? ` · ${sel.length}` : ''}
+          </Button>
+        </>
+      }
+    >
+      <p className="m-0 text-[13px] text-fg2">
+        Tap players to leave them out of Generate Queue. Tap again to include them.
+      </p>
+      <Field label="Search players">
+        <TextInput
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search players by name"
+          autoComplete="off"
+          autoFocus
+        />
+      </Field>
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <SegmentedControl
+          aria-label="Skill level"
+          options={SKILLS}
+          value={band}
+          onChange={(value) => setBand(value as MatchRequestSkill)}
+        />
+        <span className="text-[13px] text-fg">
+          <b>{sel.length}</b> exempt
+          {sel.length ? (
+            <>
+              {' · '}
+              <button
+                type="button"
+                onClick={() => setSel([])}
+                className="cursor-pointer border-0 bg-transparent p-0 font-semibold text-accent underline underline-offset-[3px]"
+              >
+                Clear all
+              </button>
+            </>
+          ) : null}
+        </span>
+      </div>
+      {list.length ? (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,88px),1fr))] gap-2">
+          {list.map((p) => {
+            const on = sel.includes(p.id)
+            return (
+              <button
+                key={p.id}
+                type="button"
+                aria-pressed={on}
+                aria-label={`${p.name}, ${levelLabel(p.level)}, ${p.games} games${on ? ', exempt' : ''}`}
+                onClick={() => toggle(p.id)}
+                className={cn(
+                  'relative flex min-w-0 cursor-pointer flex-col items-center gap-0.5 rounded-lg border border-border-strong bg-bg px-1 pt-2.5 pb-2 text-center text-fg',
+                  'hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+                  'aria-pressed:border-accent aria-pressed:bg-accent-subtle aria-pressed:shadow-[inset_0_0_0_1px_var(--accent)]',
+                  'touch:min-h-[60px]',
+                )}
+              >
+                {on ? (
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-1.5 right-1.5 grid size-5 place-items-center rounded-full bg-accent text-on-accent"
+                  >
+                    <Icon name="check" size={12} />
+                  </span>
+                ) : null}
+                <span
+                  title={levelLabel(p.level)}
+                  className={cn('mb-1 inline-flex rounded-full', levelRingClass(p.level))}
+                >
+                  <Avatar
+                    name={p.name}
+                    src={p.photoUrl}
+                    size={44}
+                    className="outline-2 outline-offset-1 outline-(--ring)"
+                  />
+                </span>
+                <span className="max-w-full truncate text-[13px] font-bold">{p.shortName}</span>
+                <span className="whitespace-nowrap text-[11px] text-fg2">
+                  {p.games} games{p.present ? '' : ' · away'}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      ) : (
+        <EmptyState>No player matches.</EmptyState>
+      )}
+    </Sheet>
+  )
+}
+
+/**
+ * Q-PICK-PLAYER for the Queue Master (default variant), the match-request partner / opponent
+ * picker (`variant="matchRequest"`), or the Generate Queue Exemption list (`variant="exemption"`).
  */
 export function PlayerPickerSheet(props: PlayerPickerSheetProps) {
-  return props.variant === 'matchRequest' ? (
-    <MatchRequestPicker {...props} />
-  ) : (
-    <LineupPicker {...props} />
-  )
+  if (props.variant === 'matchRequest') return <MatchRequestPicker {...props} />
+  if (props.variant === 'exemption') return <ExemptionPicker {...props} />
+  return <LineupPicker {...props} />
 }

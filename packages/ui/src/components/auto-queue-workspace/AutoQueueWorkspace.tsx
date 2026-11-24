@@ -11,17 +11,19 @@ import {
 } from '@rotra/ui/bagging-pairs-card'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { cn } from '@rotra/ui/cn'
 import { Chip } from '@rotra/ui/chip'
+import { ExemptionListCard } from '@rotra/ui/exemption-list-card'
 import { Field } from '@rotra/ui/field'
 import { MatchCard, type MatchCardPlayer, type MatchCardPlayerChip } from '@rotra/ui/match-card'
 import { Notice } from '@rotra/ui/notice'
 import { OverflowMenu } from '@rotra/ui/overflow-menu'
+import type { ExemptionPlayer } from '@rotra/ui/player-picker-sheet'
 import { SelectionBar } from '@rotra/ui/selection-bar'
 import { Sheet } from '@rotra/ui/sheet'
 import { Switch } from '@rotra/ui/switch'
 import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { TextInput } from '@rotra/ui/text-input'
-import { DRAFT_TILE_MIN, useQueueColumns } from '@rotra/ui/upcoming-queue-row'
 import { useEffect, useId, useRef, useState } from 'react'
 
 export type AutoQueueMode = 'available' | 'ahead' | 'wait' | 'fewest' | 'catchup'
@@ -83,6 +85,19 @@ export type AutoQueueBaggingProps = {
   onRemovePair: (pairId: string) => void
 }
 
+/**
+ * The Exemption list (Q27.4): the players Generate Queue leaves out, shown as a card in the side column.
+ * Leave the prop out to hide the card. Persisting the list and filtering generation are the container's.
+ */
+export type AutoQueueExemptionProps = {
+  /** Every roster player: the picker's tiles and the chips */
+  players: ExemptionPlayer[]
+  /** The saved list */
+  exemptIds: string[]
+  /** "Save list · N" in the picker, or a chip's ×; an empty list clears it */
+  onSave: (ids: string[]) => void
+}
+
 export type AutoQueueWorkspaceProps = {
   mode: AutoQueueMode
   onModeChange: (mode: AutoQueueMode) => void
@@ -110,6 +125,8 @@ export type AutoQueueWorkspaceProps = {
   pendingMessage?: string
   /** Bagging mode; omitted when the session has no doubles */
   bagging?: AutoQueueBaggingProps
+  /** Exemption list card (side column, below Bagging pairs); omitted to hide it */
+  exemption?: AutoQueueExemptionProps
 }
 
 const MODE_ITEMS: { value: AutoQueueMode; label: string; shortLabel: string }[] = [
@@ -182,10 +199,11 @@ export function AutoQueueWorkspace({
   isPending = false,
   pendingMessage,
   bagging,
+  exemption,
 }: AutoQueueWorkspaceProps) {
   const hintId = useId()
+  const hasSide = Boolean(bagging?.enabled || exemption)
   const [addPairOpen, setAddPairOpen] = useState(false)
-  const [gridRef, columns] = useQueueColumns<HTMLDivElement>(DRAFT_TILE_MIN)
   const [reviewIds, setReviewIds] = useState<string[] | null>(null)
   const reviewErrorRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -275,241 +293,271 @@ export function AutoQueueWorkspace({
             Drafts are suggestions. Nothing joins the Main Queue until you add it.
           </span>
         </div>
-        {bagging?.enabled ? (
-          <BaggingPairsCard
-            pairs={bagging.pairs}
-            minimumGames={minimumGames}
-            disabled={isPending}
-            onAddPair={() => setAddPairOpen(true)}
-            onToggleGame={bagging.onToggleGame}
-            onRemove={bagging.onRemovePair}
-          />
-        ) : null}
-        <Tabs
-          aria-label="Generation strategy"
-          items={MODE_ITEMS.map((item) => ({
-            ...item,
-            badges: batches[item.value]?.drafts.length
-              ? [{ text: String(batches[item.value]?.drafts.length) }]
-              : undefined,
-          }))}
-          value={mode}
-          onChange={(next) => onModeChange(next as AutoQueueMode)}
+        <div
+          className={cn(
+            'grid min-w-0 grid-cols-1 items-start gap-5',
+            hasSide && 'min-[1280px]:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]',
+          )}
         >
-          {MODE_ITEMS.map(({ value }) => (
-            <TabsContent key={value} value={value} className="flex min-w-0 flex-col gap-4">
-              <p className="m-0 text-[13px] text-fg2">{MODE_DESCRIPTIONS[value]}</p>
-              <fieldset className="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
-                <legend className="mb-2 text-[13px] font-semibold text-fg2">
-                  How many matches?
-                </legend>
-                <div className="flex flex-wrap gap-2">
-                  {COUNTS.map((n) => (
-                    <Button
-                      key={n}
-                      size="sm"
-                      aria-pressed={count === n}
-                      disabled={isPending}
-                      title={isPending ? busyHint : undefined}
-                      aria-describedby={isPending ? `${hintId}-pending` : undefined}
-                      onClick={() => onCountChange(n)}
-                      className="min-w-11 tabular-nums"
-                    >
-                      {n}
-                    </Button>
-                  ))}
-                </div>
-              </fieldset>
-              {value === 'catchup' ? (
-                <Field
-                  label="Games each player should reach"
-                  hint={`Players below this number get matches first. Games already played and games already planned in the Main Queue both count. Earlier drafts in this batch count too. Example: with 3, a player who has played 1 and is queued for 1 needs 1 more match. This is separate from the session minimum (Min ${minimumGames} game${minimumGames === 1 ? '' : 's'}).`}
-                  error={
-                    catchUpTarget !== '' && !validTarget
-                      ? 'Enter a whole number of games, 1 or more.'
-                      : undefined
-                  }
-                >
-                  <TextInput
-                    type="number"
-                    min={1}
-                    step={1}
-                    placeholder={`e.g. ${minimumGames}`}
-                    value={catchUpTarget}
-                    disabled={isPending}
-                    invalid={catchUpTarget !== '' && !validTarget}
-                    className="max-w-xs"
-                    onChange={(event) => onCatchUpTargetChange(event.target.value)}
-                  />
-                </Field>
-              ) : null}
-              {!isPending && generationHint ? (
-                <p id={`${hintId}-generation`} className="m-0 text-[13px] text-fg2">
-                  {generationHint}
-                </p>
-              ) : null}
-              {!isPending && draftsHint ? (
-                <p id={`${hintId}-drafts`} className="m-0 text-[13px] text-fg2">
-                  {draftsHint}
-                </p>
-              ) : null}
-              {/* One primary: Generate, or Generate again once this tab has drafts. The rest is in ⋯. */}
-              <div className="flex flex-wrap items-center gap-2">
-                {batch.drafts.length ? (
-                  <Button
-                    key="again"
-                    variant="primary"
-                    disabled={!canGenerate || isPending}
-                    title={replaceReason || undefined}
-                    aria-describedby={replaceReason ? replaceHintId : undefined}
-                    onClick={() => {
-                      if (count !== null) onRegenerate(mode, count, catchUpTarget)
-                    }}
-                  >
-                    Generate again
-                  </Button>
-                ) : (
-                  <Button
-                    key="generate"
-                    variant="primary"
-                    disabled={!canGenerate || isPending}
-                    title={generationReason || undefined}
-                    aria-describedby={generationReason ? generationHintId : undefined}
-                    onClick={() => {
-                      if (count !== null) onGenerate(mode, count, catchUpTarget)
-                    }}
-                  >
-                    {count === null ? 'Generate matches' : `Generate ${count} matches`}
-                  </Button>
-                )}
-                {batch.drafts.length ? (
-                  <OverflowMenu
-                    label="More draft actions"
-                    align="start"
-                    items={[
-                      {
-                        label: 'Replace unselected',
-                        description: 'Keeps the drafts you picked and makes new ones for the rest.',
-                        disabledReason: replaceReason || undefined,
-                        onSelect: () => {
-                          if (count !== null) onRegenerateUnselected(mode, count, catchUpTarget)
-                        },
-                      },
-                      {
-                        label: 'Remove unselected',
-                        description: 'Keeps only the drafts you picked.',
-                        disabledReason: clearReason || undefined,
-                        onSelect: () => {
-                          onClearUnselected(mode)
-                          headingRef.current?.focus()
-                        },
-                      },
-                      {
-                        label: 'Clear this tab',
-                        description: 'Removes every draft in this tab.',
-                        disabledReason: clearReason || undefined,
-                        destructive: true,
-                        onSelect: () => {
-                          onClear(mode)
-                          headingRef.current?.focus()
-                        },
-                      },
-                    ]}
-                  />
-                ) : null}
-              </div>
-              {isPending ? (
-                <div id={`${hintId}-pending`}>
-                  <Notice tone="info">{busyHint}</Notice>
-                </div>
-              ) : null}
-              {batch.error ? <Notice tone="error">{batch.error}</Notice> : null}
-              {batch.stale ? (
-                <Notice tone="warn">
-                  The Main Queue changed since these were made. Check them before adding, or
-                  generate again.
-                </Notice>
-              ) : null}
-              {batch.stopReason ? (
-                isFullBatch(batch.stopReason) ? (
-                  <div>
-                    <Chip>{batch.stopReason}</Chip>
-                  </div>
-                ) : (
-                  <Notice tone="info">{batch.stopReason}</Notice>
-                )
-              ) : null}
-              {batch.drafts.length ? (
-                <div
-                  ref={gridRef}
-                  className="grid min-w-0 gap-2.5"
-                  style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
-                >
-                  {batch.drafts.map((draft, i) => {
-                    const pick = selectedIds.indexOf(draft.id) + 1
-                    return (
-                      <MatchCard
-                        key={draft.id}
-                        position={i + 1}
-                        matchNo={i + 1}
-                        format={draft.format}
-                        origin="auto"
-                        manualProtected={false}
-                        status={
-                          draft.attentionReason
-                            ? { kind: 'needs-attention', reason: draft.attentionReason }
-                            : { kind: 'blocked', reason: draft.blockedReason ?? draft.reason }
-                        }
-                        teamA={draft.teamA.map(cardPlayer)}
-                        teamB={draft.teamB.map(cardPlayer)}
-                        draft={{
-                          selected: pick > 0,
-                          pickOrder: pick || undefined,
-                          disabled: isPending,
-                          onToggle: () => onSelect(draft.id, pick === 0),
-                          playerChips: Object.fromEntries(
-                            [...draft.teamA, ...draft.teamB].map((p) => [
-                              p.id,
-                              draftPlayerChips(p),
-                            ]),
-                          ),
-                        }}
-                      />
-                    )
-                  })}
-                </div>
-              ) : isPending || (hasEligiblePlayers && (batch.stopReason || batch.error)) ? null : (
-                <Card className="text-center text-fg2">{emptyMessage}</Card>
-              )}
-              {selectedIds.length || batch.drafts.length ? (
-                <SelectionBar
-                  ariaLabel="Selected drafts"
-                  players={selectedPlayers}
-                  count={selectedIds.length}
-                  label={
-                    selectedIds.length ? 'added in the order you picked' : 'tap drafts to pick them'
-                  }
-                  valid={selectedIds.length > 0 && !isPending}
-                  onClear={onUnselectAll}
-                  primaryLabel={`Add ${selectedIds.length} to Main Queue`}
-                  onMakeMatch={() => setReviewIds([...selectedIds])}
-                  actions={
-                    batch.drafts.length ? (
-                      <Button
-                        size="sm"
-                        disabled={isPending}
-                        title={isPending ? busyHint : undefined}
-                        onClick={() => setReviewIds(batch.drafts.map((draft) => draft.id))}
-                      >
-                        Add all {batch.drafts.length}
-                      </Button>
-                    ) : null
-                  }
+          {hasSide ? (
+            <aside
+              aria-label="Who Generate Queue uses"
+              className="order-first flex min-w-0 flex-col gap-3.5 min-[1280px]:order-none min-[1280px]:col-start-2 min-[1280px]:row-start-1"
+            >
+              {bagging?.enabled ? (
+                <BaggingPairsCard
+                  pairs={bagging.pairs}
+                  minimumGames={minimumGames}
+                  disabled={isPending}
+                  onAddPair={() => setAddPairOpen(true)}
+                  onToggleGame={bagging.onToggleGame}
+                  onRemove={bagging.onRemovePair}
                 />
               ) : null}
-            </TabsContent>
-          ))}
-        </Tabs>
+              {exemption ? (
+                <ExemptionListCard
+                  players={exemption.players}
+                  exemptIds={exemption.exemptIds}
+                  disabled={isPending}
+                  onSave={exemption.onSave}
+                />
+              ) : null}
+            </aside>
+          ) : null}
+          <Card
+            asChild
+            className="flex min-w-0 flex-col gap-3.5 p-4 min-[1280px]:col-start-1 min-[1280px]:row-start-1"
+          >
+            <section aria-label="Generate matches">
+              <Tabs
+                aria-label="Generation strategy"
+                items={MODE_ITEMS.map((item) => ({
+                  ...item,
+                  badges: batches[item.value]?.drafts.length
+                    ? [{ text: String(batches[item.value]?.drafts.length) }]
+                    : undefined,
+                }))}
+                value={mode}
+                onChange={(next) => onModeChange(next as AutoQueueMode)}
+              >
+                {MODE_ITEMS.map(({ value }) => (
+                  <TabsContent key={value} value={value} className="flex min-w-0 flex-col gap-4">
+                    <p className="m-0 text-[13px] text-fg2">{MODE_DESCRIPTIONS[value]}</p>
+                    <fieldset className="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
+                      <legend className="mb-2 text-[13px] font-semibold text-fg2">
+                        How many matches?
+                      </legend>
+                      <div className="flex flex-wrap gap-2">
+                        {COUNTS.map((n) => (
+                          <Button
+                            key={n}
+                            size="sm"
+                            aria-pressed={count === n}
+                            disabled={isPending}
+                            title={isPending ? busyHint : undefined}
+                            aria-describedby={isPending ? `${hintId}-pending` : undefined}
+                            onClick={() => onCountChange(n)}
+                            className="min-w-11 tabular-nums"
+                          >
+                            {n}
+                          </Button>
+                        ))}
+                      </div>
+                    </fieldset>
+                    {value === 'catchup' ? (
+                      <Field
+                        label="Games each player should reach"
+                        hint={`Players below this number get matches first. Games already played and games already planned in the Main Queue both count. Earlier drafts in this batch count too. Example: with 3, a player who has played 1 and is queued for 1 needs 1 more match. This is separate from the session minimum (Min ${minimumGames} game${minimumGames === 1 ? '' : 's'}).`}
+                        error={
+                          catchUpTarget !== '' && !validTarget
+                            ? 'Enter a whole number of games, 1 or more.'
+                            : undefined
+                        }
+                      >
+                        <TextInput
+                          type="number"
+                          min={1}
+                          step={1}
+                          placeholder={`e.g. ${minimumGames}`}
+                          value={catchUpTarget}
+                          disabled={isPending}
+                          invalid={catchUpTarget !== '' && !validTarget}
+                          className="max-w-xs"
+                          onChange={(event) => onCatchUpTargetChange(event.target.value)}
+                        />
+                      </Field>
+                    ) : null}
+                    {!isPending && generationHint ? (
+                      <p id={`${hintId}-generation`} className="m-0 text-[13px] text-fg2">
+                        {generationHint}
+                      </p>
+                    ) : null}
+                    {!isPending && draftsHint ? (
+                      <p id={`${hintId}-drafts`} className="m-0 text-[13px] text-fg2">
+                        {draftsHint}
+                      </p>
+                    ) : null}
+                    {/* One primary: Generate, or Generate again once this tab has drafts. The rest is in ⋯. */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {batch.drafts.length ? (
+                        <Button
+                          key="again"
+                          variant="primary"
+                          disabled={!canGenerate || isPending}
+                          title={replaceReason || undefined}
+                          aria-describedby={replaceReason ? replaceHintId : undefined}
+                          onClick={() => {
+                            if (count !== null) onRegenerate(mode, count, catchUpTarget)
+                          }}
+                        >
+                          Generate again
+                        </Button>
+                      ) : (
+                        <Button
+                          key="generate"
+                          variant="primary"
+                          disabled={!canGenerate || isPending}
+                          title={generationReason || undefined}
+                          aria-describedby={generationReason ? generationHintId : undefined}
+                          onClick={() => {
+                            if (count !== null) onGenerate(mode, count, catchUpTarget)
+                          }}
+                        >
+                          {count === null ? 'Generate matches' : `Generate ${count} matches`}
+                        </Button>
+                      )}
+                      {batch.drafts.length ? (
+                        <OverflowMenu
+                          label="More draft actions"
+                          align="start"
+                          items={[
+                            {
+                              label: 'Replace unselected',
+                              description:
+                                'Keeps the drafts you picked and makes new ones for the rest.',
+                              disabledReason: replaceReason || undefined,
+                              onSelect: () => {
+                                if (count !== null)
+                                  onRegenerateUnselected(mode, count, catchUpTarget)
+                              },
+                            },
+                            {
+                              label: 'Remove unselected',
+                              description: 'Keeps only the drafts you picked.',
+                              disabledReason: clearReason || undefined,
+                              onSelect: () => {
+                                onClearUnselected(mode)
+                                headingRef.current?.focus()
+                              },
+                            },
+                            {
+                              label: 'Clear this tab',
+                              description: 'Removes every draft in this tab.',
+                              disabledReason: clearReason || undefined,
+                              destructive: true,
+                              onSelect: () => {
+                                onClear(mode)
+                                headingRef.current?.focus()
+                              },
+                            },
+                          ]}
+                        />
+                      ) : null}
+                    </div>
+                    {isPending ? (
+                      <div id={`${hintId}-pending`}>
+                        <Notice tone="info">{busyHint}</Notice>
+                      </div>
+                    ) : null}
+                    {batch.error ? <Notice tone="error">{batch.error}</Notice> : null}
+                    {batch.stale ? (
+                      <Notice tone="warn">
+                        The Main Queue changed since these were made. Check them before adding, or
+                        generate again.
+                      </Notice>
+                    ) : null}
+                    {batch.stopReason ? (
+                      isFullBatch(batch.stopReason) ? (
+                        <div>
+                          <Chip>{batch.stopReason}</Chip>
+                        </div>
+                      ) : (
+                        <Notice tone="info">{batch.stopReason}</Notice>
+                      )
+                    ) : null}
+                    {batch.drafts.length ? (
+                      <div className="grid min-w-0 grid-cols-[repeat(auto-fill,minmax(min(100%,230px),1fr))] gap-2.5">
+                        {batch.drafts.map((draft, i) => {
+                          const pick = selectedIds.indexOf(draft.id) + 1
+                          return (
+                            <MatchCard
+                              key={draft.id}
+                              position={i + 1}
+                              matchNo={i + 1}
+                              format={draft.format}
+                              origin="auto"
+                              manualProtected={false}
+                              status={
+                                draft.attentionReason
+                                  ? { kind: 'needs-attention', reason: draft.attentionReason }
+                                  : { kind: 'blocked', reason: draft.blockedReason ?? draft.reason }
+                              }
+                              teamA={draft.teamA.map(cardPlayer)}
+                              teamB={draft.teamB.map(cardPlayer)}
+                              draft={{
+                                selected: pick > 0,
+                                pickOrder: pick || undefined,
+                                disabled: isPending,
+                                onToggle: () => onSelect(draft.id, pick === 0),
+                                playerChips: Object.fromEntries(
+                                  [...draft.teamA, ...draft.teamB].map((p) => [
+                                    p.id,
+                                    draftPlayerChips(p),
+                                  ]),
+                                ),
+                              }}
+                            />
+                          )
+                        })}
+                      </div>
+                    ) : isPending ||
+                      (hasEligiblePlayers && (batch.stopReason || batch.error)) ? null : (
+                      <Card className="text-center text-fg2">{emptyMessage}</Card>
+                    )}
+                    {selectedIds.length || batch.drafts.length ? (
+                      <SelectionBar
+                        ariaLabel="Selected drafts"
+                        players={selectedPlayers}
+                        count={selectedIds.length}
+                        label={
+                          selectedIds.length
+                            ? 'added in the order you picked'
+                            : 'tap drafts to pick them'
+                        }
+                        valid={selectedIds.length > 0 && !isPending}
+                        onClear={onUnselectAll}
+                        primaryLabel={`Add ${selectedIds.length} to Main Queue`}
+                        onMakeMatch={() => setReviewIds([...selectedIds])}
+                        actions={
+                          batch.drafts.length ? (
+                            <Button
+                              size="sm"
+                              disabled={isPending}
+                              title={isPending ? busyHint : undefined}
+                              onClick={() => setReviewIds(batch.drafts.map((draft) => draft.id))}
+                            >
+                              Add all {batch.drafts.length}
+                            </Button>
+                          ) : null
+                        }
+                      />
+                    ) : null}
+                  </TabsContent>
+                ))}
+              </Tabs>
+            </section>
+          </Card>
+        </div>
       </div>
       {bagging ? (
         <BaggingPairSheet

@@ -12,6 +12,8 @@ export const autoQueueWorkspaceMeta = {
     'Main Queue regeneration stays in the Main Queue tab; the Generate controls only affect drafts.',
     'Drafts render as MatchCard draft tiles in the queue grid; picking a tile calls onSelect, and the SelectionBar Clear calls onUnselectAll. One primary at a time: Generate (then Generate again) in the controls, Add N to Main Queue in the bar; the other draft actions are in an OverflowMenu.',
     'Bagging mode (#739): pass `bagging` on doubles sessions for the header switch, the Bagging pairs card while on, and the Add bagging pair sheet; leave it out when the session has no doubles. A draft a pair shaped carries the reason "Bagging pair: A and B are partners".',
+    'Layout (Q27.4): the heading, Bagging switch and intro are full width. From 1280 px there are two columns: the strategy card (tabs, description, How many matches, Catch Up target, Generate, result line, drafts, selection bar) and a 300-360 px aside with Bagging pairs (when on) above the Exemption list. Under 1280 px they stack with the aside first. Drafts use a 230 px minimum auto-fill grid.',
+    'Exemption list: pass `exemption` ({ players, exemptIds, onSave(ids) }) for the card and its picker sheet; leave it out to hide the card. With neither Bagging on nor `exemption` there is no aside and the strategy card is full width. The container persists the list; filtering generation is not done here.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
@@ -20,6 +22,7 @@ export const autoQueueWorkspaceMeta = {
   docs: [
     'docs/screens/product/modules/queue/match-queue.md',
     'docs/business_logic/product/queue/modules/queueing/README.md',
+    'docs/mockup-changes/2026-11-23-queue-generate-two-columns.md',
   ],
   variants: [
     'empty',
@@ -37,8 +40,12 @@ export const autoQueueWorkspaceMeta = {
     'bagging-off',
     'bagging-on',
     'bagging-hidden',
+    'two-columns',
+    'stacked',
   ],
   related: [
+    'ExemptionListCard',
+    'PlayerPickerSheet',
     'AutoQueueSheet',
     'RegenerateQueueSheet',
     'BaggingPairsCard',

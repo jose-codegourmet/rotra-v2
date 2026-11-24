@@ -7,6 +7,7 @@ import { BaggingGamesRow } from '@rotra/ui/bagging-games-row'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
+import { levelLabel, levelRingClass } from '@rotra/ui/level-pill'
 
 /** A present roster player as the bagging surfaces draw them. */
 export type BaggingPlayer = {
@@ -77,13 +78,24 @@ export function BaggingPairsCard({
                   className="flex flex-wrap items-center gap-2.5 rounded-lg border border-border bg-bg px-3 py-2.5"
                 >
                   <span className="flex flex-none">
-                    <Avatar name={pair.a.name} src={pair.a.photoUrl} size={28} />
-                    <Avatar
-                      name={pair.b.name}
-                      src={pair.b.photoUrl}
-                      size={28}
-                      className="-ml-1.5 shadow-[0_0_0_2px_var(--bg)]"
-                    />
+                    {[pair.a, pair.b].map((player, i) => (
+                      <span
+                        key={player.id}
+                        title={player.levelLabel ?? levelLabel(player.level)}
+                        className={cn(
+                          'inline-flex rounded-full',
+                          levelRingClass(player.level),
+                          i === 1 && '-ml-0.5',
+                        )}
+                      >
+                        <Avatar
+                          name={player.name}
+                          src={player.photoUrl}
+                          size={28}
+                          className="outline-2 outline-offset-1 outline-(--ring)"
+                        />
+                      </span>
+                    ))}
                   </span>
                   <b className="min-w-0 flex-1 text-fg [overflow-wrap:anywhere]">{names}</b>
                   <BaggingGamesRow

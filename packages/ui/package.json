@@ -70,6 +70,7 @@
     "./eligibility-card": "./src/components/eligibility-card/EligibilityCard.tsx",
     "./empty-state": "./src/components/empty-state/EmptyState.tsx",
     "./error-state": "./src/components/error-state/ErrorState.tsx",
+    "./exemption-list-card": "./src/components/exemption-list-card/ExemptionListCard.tsx",
     "./facebook-post-editor": "./src/components/facebook-post-editor/FacebookPostEditor.tsx",
     "./facebook-post-sheet": "./src/components/facebook-post-sheet/FacebookPostSheet.tsx",
     "./field": "./src/components/field/Field.tsx",

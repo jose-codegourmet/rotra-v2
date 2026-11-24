@@ -57,7 +57,12 @@ export function PlayerShell({ children }: { children: ReactNode }) {
     <>
       <TopBar
         product="Players"
-        onBrandClick={() => (unsavedDraft ? dispatch(requestLeave('/')) : router.push('/'))}
+        onBrandClick={() => {
+          // P-HOME: the logo is Home when signed in; visitors keep the leaderboard.
+          const home = account ? '/home' : '/'
+          if (unsavedDraft) dispatch(requestLeave(home))
+          else router.push(home)
+        }}
       >
         <PlayerNav
           signedIn={Boolean(account)}

@@ -24,15 +24,14 @@ export type CountPillsProps = {
  * badge. The picked pill is solid accent (badge a lighter tint); the rest are outlined and
  * brighten on hover. Wraps onto a second line on narrow screens.
  */
-export function CountPills({
-  items,
-  value,
-  onChange,
-  className,
-  ...aria
-}: CountPillsProps) {
+export function CountPills({ items, value, onChange, className, ...aria }: CountPillsProps) {
   return (
-    <div role="group" aria-label={aria['aria-label']} className={cn('flex flex-wrap gap-2', className)}>
+    // biome-ignore lint/a11y/useSemanticElements: a group div; a fieldset would change the drawn layout
+    <div
+      role="group"
+      aria-label={aria['aria-label']}
+      className={cn('flex flex-wrap gap-2', className)}
+    >
       {items.map((item) => {
         const picked = item.value === value
         return (

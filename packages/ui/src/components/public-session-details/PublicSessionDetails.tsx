@@ -4,7 +4,6 @@ import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { CourtCard } from '@rotra/ui/court-card'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
-import { KeyValueList } from '@rotra/ui/key-value-list'
 import type { ReactNode } from 'react'
 
 /**
@@ -27,28 +26,37 @@ export type PublicSessionCourtNow = {
 }
 
 export type PublicSessionDetailsProps = {
-  /** "Sun, Oct 26, 6:00 PM–9:00 PM (3 h)": date, start–end and duration, already formatted */
-  when: string
+  /** The When card's bold line: "Sun, Oct 26", already formatted */
+  dateLabel: string
+  /** The When card's second line: "6:00 PM–9:00 PM · 3 h" (start–end · duration), already formatted */
+  timeLabel: string
   venueName: string
   /** Shown under the venue name; omit when the venue has no address */
   venueAddress?: string | null
-  /** Court labels in order, e.g. ["Court 1", "Court 2"]; the row reads "N · labels" */
+  /** Court labels in order, e.g. ["Court 1", "Court 2"]; the tile reads "N courts" over the labels */
   courtLabels: string[]
   formats: { singles: boolean; doubles: boolean }
   /** "Fair" */
   modeLabel: string
   /** "Mainly level-matched games, roughly 10% easy games." */
   modeDescription: string
+  /**
+   * The Levels tile (restrictions, D-2026-11-19-12): the bold value ("All levels", "Intermediate and
+   * up"). Omit to leave the tile out; the restrictions ticket fills it from `levelRestriction`.
+   */
+  levelsLabel?: string
+  /** The Levels tile's muted line; omit when the session takes every level */
+  levelsDescription?: string
   /** The scoring mode's label ("16/31", "11/21 × 3"); omitted reads as 16/31 */
   scoringLabel?: string
   /** The scoring mode's rule (SCORING[key].text), shown after the label like the Mode row */
   scoringDescription?: string
-  /** Record games; false adds the Results row "Not recorded". Omitted reads as on. */
+  /** Record games; false adds the Results tile "Not recorded". Omitted reads as on. */
   recorded?: boolean
   minimumGames: number
   /**
    * Payment per player in centavos (the custom amount or the break-even share): shown as the
-   * Payment row after Minimum; 0 reads "Free"; null or omitted means no estimate is saved, so the
+   * Payment tile after Minimum; 0 reads "Free"; null or omitted means no estimate is saved, so the
    * row is left out. Shown to every audience.
    */
   amountDuePerPlayer?: number | null
@@ -79,20 +87,38 @@ function formatsLabel({ singles, doubles }: PublicSessionDetailsProps['formats']
   return parts.length ? parts.join(' + ') : 'No standard format'
 }
 
+/** The small uppercase label over a card or tile (.pf-l). */
+const labelClass = 'text-[11px] font-bold tracking-[0.6px] text-fg3 uppercase'
+
+/** A fact tile (.pf-tile): small uppercase label, bold value and one muted line. */
+function FactTile({ label, value, sub }: { label: string; value: ReactNode; sub?: ReactNode }) {
+  return (
+    <div className="flex min-w-0 flex-col gap-[3px] rounded-lg border border-border bg-surface px-3.5 py-3 shadow-card">
+      <span className={labelClass}>{label}</span>
+      <b className="text-[15px] [overflow-wrap:anywhere]">{value}</b>
+      {sub ? <span className="text-[13px] text-fg2 [overflow-wrap:anywhere]">{sub}</span> : null}
+    </div>
+  )
+}
+
 /**
- * The public page's Details tab (Q-PUBLIC-DETAILS): When, Venue, Courts, Formats, Mode, Minimum and
- * Payment (per player, never costs or paid states), the notes, and the "Slots are confirmed with
- * the Queue Master directly" footer with the last sync time. For signed-in viewers of a live
- * session it continues with Courts now and the Queue slot.
+ * The public page's Details tab (Q-PUBLIC-DETAILS) as cards (2026-11-19-queue-public-details-cards):
+ * the lead cards When and Where, fact tiles (Courts, Formats, Mode, Levels, Scoring, Minimum,
+ * Payment and Results when not recorded; per player, never costs or paid states), the Notes card,
+ * and the "Slots are confirmed with the Queue Master directly" footer with the last sync time. For
+ * signed-in viewers of a live session it continues with Courts now and the Queue slot.
  */
 export function PublicSessionDetails({
-  when,
+  dateLabel,
+  timeLabel,
   venueName,
   venueAddress,
   courtLabels,
   formats,
   modeLabel,
   modeDescription,
+  levelsLabel,
+  levelsDescription,
   scoringLabel = SCORING['31'].label,
   scoringDescription,
   recorded = true,
@@ -107,86 +133,60 @@ export function PublicSessionDetails({
   className,
 }: PublicSessionDetailsProps) {
   const details = (
-    <Card asChild className={cn('flex flex-col gap-3', className)}>
-      <section aria-label="Details">
-        <KeyValueList
-          items={[
-            { label: 'When', value: when },
-            {
-              label: 'Venue',
-              value: (
-                <>
-                  {venueName}
-                  {venueAddress ? (
-                    <>
-                      <br />
-                      <span className="text-[13px] text-fg2">{venueAddress}</span>
-                    </>
-                  ) : null}
-                </>
-              ),
-            },
-            { label: 'Courts', value: `${courtLabels.length} · ${courtLabels.join(', ')}` },
-            { label: 'Formats', value: formatsLabel(formats) },
-            {
-              label: 'Mode',
-              value: (
-                <>
-                  {modeLabel} · <span className="text-fg2">{modeDescription}</span>
-                </>
-              ),
-            },
-            {
-              label: 'Scoring',
-              value: scoringDescription ? (
-                <>
-                  {scoringLabel} · <span className="text-fg2">{scoringDescription}</span>
-                </>
-              ) : (
-                scoringLabel
-              ),
-            },
-            ...(recorded
-              ? []
-              : [
-                  {
-                    label: 'Results',
-                    value: (
-                      <>
-                        Not recorded ·{' '}
-                        <span className="text-fg2">
-                          No results, standings or awards for this session.
-                        </span>
-                      </>
-                    ),
-                  },
-                ]),
-            { label: 'Minimum', value: `${minimumGames} games per player` },
-            ...(amountDuePerPlayer == null
-              ? []
-              : [
-                  {
-                    label: 'Payment',
-                    value:
-                      amountDuePerPlayer === 0 ? (
-                        'Free'
-                      ) : (
-                        <>
-                          {formatPeso(amountDuePerPlayer)} per player{' '}
-                          <span className="text-[13px] text-fg2">· paid at the venue</span>
-                        </>
-                      ),
-                  },
-                ]),
-          ]}
+    <section aria-label="Details" className={cn('flex flex-col gap-3', className)}>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-3">
+        <Card className="flex flex-col gap-1">
+          <span className={labelClass}>When</span>
+          <b className="text-lg">{dateLabel}</b>
+          <span>{timeLabel}</span>
+        </Card>
+        <Card className="flex flex-col gap-1">
+          <span className={labelClass}>Where</span>
+          <b className="text-lg [overflow-wrap:anywhere]">{venueName}</b>
+          {venueAddress ? (
+            <span className="text-fg2 [overflow-wrap:anywhere]">{venueAddress}</span>
+          ) : null}
+        </Card>
+      </div>
+      <div className="grid grid-cols-2 gap-2.5 min-[481px]:grid-cols-[repeat(auto-fill,minmax(min(100%,170px),1fr))]">
+        <FactTile
+          label="Courts"
+          value={`${courtLabels.length} ${courtLabels.length === 1 ? 'court' : 'courts'}`}
+          sub={courtLabels.join(', ')}
         />
-        {notes ? <p className="m-0 [overflow-wrap:anywhere]">{notes}</p> : null}
-        <p className="m-0 text-[13px] text-fg2">
-          Slots are confirmed with the Queue Master directly. Last updated {lastUpdatedLabel}.
-          {hasPendingChanges ? " Recent changes from the venue haven't synced yet." : null}
-        </p>
-      </section>
-    </Card>
+        <FactTile label="Formats" value={formatsLabel(formats)} />
+        <FactTile label="Mode" value={modeLabel} sub={modeDescription} />
+        {levelsLabel ? (
+          <FactTile label="Levels" value={levelsLabel} sub={levelsDescription} />
+        ) : null}
+        <FactTile label="Scoring" value={scoringLabel} sub={scoringDescription} />
+        <FactTile label="Minimum" value={`${minimumGames} games`} sub="per player" />
+        {amountDuePerPlayer == null ? null : (
+          <FactTile
+            label="Payment"
+            value={amountDuePerPlayer === 0 ? 'Free' : formatPeso(amountDuePerPlayer)}
+            sub={amountDuePerPlayer === 0 ? undefined : 'per player · paid at the venue'}
+          />
+        )}
+        {recorded ? null : (
+          <FactTile
+            label="Results"
+            value="Not recorded"
+            sub="No results, standings or awards for this session."
+          />
+        )}
+      </div>
+      {notes ? (
+        <Card className="flex flex-col gap-1">
+          <span className={labelClass}>Notes</span>
+          <p className="m-0 [overflow-wrap:anywhere]">{notes}</p>
+        </Card>
+      ) : null}
+      <p className="m-0 text-[13px] text-fg2">
+        Slots are confirmed with the Queue Master directly. Last updated {lastUpdatedLabel}.
+        {hasPendingChanges ? " Recent changes from the venue haven't synced yet." : null}
+      </p>
+    </section>
   )
   const courts = courtsNow ?? []
   const showCourts = courts.length > 0

@@ -12,6 +12,7 @@ import {
   waitMinutes,
 } from '../match/match.rules'
 import type { Match } from '../match/match.types'
+import { matchLabel } from '../match/matchCategory.rules'
 import { allowedRequestFormats } from '../match-request/matchRequest.rules'
 import { requireOnline } from '../mock/bridge'
 import { MockError } from '../mock/errors'
@@ -406,12 +407,20 @@ function projectQueue(
   session: MockState['sessions'][number],
   viewer: Viewer,
 ): PublicQueuedMatch[] {
+  // The match's name ("Mixed Doubles") reads each player's gender from their saved record.
+  const genders = state.roster
+    .filter((r) => r.sessionId === session.id)
+    .map((r) => ({
+      id: r.id,
+      gender: state.clubPlayers.find((c) => c.id === r.clubPlayerId)?.gender ?? null,
+    }))
   return waitingMatches(state, session.id).map((m, i) => ({
     matchNo: m.matchNo,
     position: i + 1,
     format: m.format,
     teamA: m.teamA.map((id) => matchPlayerOf(state, id, viewer)),
     teamB: m.teamB.map((id) => matchPlayerOf(state, id, viewer)),
+    label: matchLabel(m, genders),
   }))
 }
 

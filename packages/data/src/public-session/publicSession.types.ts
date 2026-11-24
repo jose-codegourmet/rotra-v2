@@ -271,6 +271,11 @@ export type PublicQueuedMatch = {
   format: MatchFormat
   teamA: PublicMatchPlayer[]
   teamB: PublicMatchPlayer[]
+  /**
+   * The match's name for the View match dialog's title ("Mixed Doubles", D-2026-11-19-07). Missing
+   * reads as the format's own label ("Doubles"): real mode stores no gender yet.
+   */
+  label?: string
 }
 
 /**
@@ -434,6 +439,16 @@ export type MyJoinRequest = {
 /** Why a signed-in Player can't request a slot, and their level at the club ("Your level here is …"). */
 export type PlayerLevelBlock = { reason: string; level: PlayingLevel }
 
+/** A face in a queued match on the read-only Queue: first name, level ring band, picture. */
+export type PublicQueueFace = {
+  name: string
+  level: PlayingLevel | null
+  pictureUrl?: string | null
+  /** True when the name is masked (guest or unclaimed profile) */
+  masked?: boolean
+  participant?: number
+}
+
 /** Narrow Player-hosted projection; never a club session or operator data. */
 export type PlayerSessionAccess = {
   playerId: string
@@ -475,9 +490,14 @@ export type PlayerSessionAccess = {
   queue: {
     matchNo: number
     format: MatchFormat
-    /** participant: index in the signed-in read's participants (the face opens their card) */
-    teamA: { name: string; level: PlayingLevel | null; participant?: number }[]
-    teamB: { name: string; level: PlayingLevel | null; participant?: number }[]
+    /** The View match dialog's match name ("Mixed Doubles"); missing reads as the format's label */
+    label?: string
+    /**
+     * participant: index in the signed-in read's participants (the face opens their card).
+     * level: the ring's band (grey when null); pictureUrl: the face's picture; masked: the name is masked.
+     */
+    teamA: PublicQueueFace[]
+    teamB: PublicQueueFace[]
   }[]
 }
 

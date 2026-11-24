@@ -250,6 +250,8 @@ function queueAccess(playerId: string, queue: PublicQueuedMatch[]): PlayerSessio
     players.map((player) => ({
       name: player.name,
       level: player.level,
+      pictureUrl: player.pictureUrl,
+      masked: player.masked,
       participant: player.participant,
     }))
   // Only the queue is read here; the join fields come from the signed-in read's own data.
@@ -264,6 +266,7 @@ function queueAccess(playerId: string, queue: PublicQueuedMatch[]): PlayerSessio
     queue: queue.map((match) => ({
       matchNo: match.matchNo,
       format: match.format,
+      label: match.label,
       teamA: side(match.teamA),
       teamB: side(match.teamB),
     })),
@@ -782,7 +785,8 @@ export function PublicSession({
             >
               <TabsContent value="details" className="flex flex-col gap-5">
                 <PublicSessionDetails
-                  when={`${date(p.start)}, ${time(p.start)}–${time(p.end)} (${duration(p.start, p.end)})`}
+                  dateLabel={date(p.start)}
+                  timeLabel={`${time(p.start)}–${time(p.end)} · ${duration(p.start, p.end)}`}
                   venueName={p.venue.name}
                   venueAddress={p.venue.address}
                   courtLabels={p.courts}

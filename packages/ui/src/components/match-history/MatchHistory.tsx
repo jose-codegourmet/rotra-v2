@@ -111,7 +111,11 @@ export function MatchHistory({
           label: 'Singles and doubles',
           badges: [{ text: String(counts.counted) }],
         },
-        { value: 'other', label: 'Fun, partial and not ranked', badges: [{ text: String(counts.other) }] },
+        {
+          value: 'other',
+          label: 'Fun, partial and not ranked',
+          badges: [{ text: String(counts.other) }],
+        },
       ]}
     >
       {(['counted', 'other'] as const).map((tab) => {

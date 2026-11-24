@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { type GenderValue, GenderField } from './GenderField'
+import { GenderField, type GenderValue } from './GenderField'
 
 const meta = {
   title: 'Shared/GenderField',

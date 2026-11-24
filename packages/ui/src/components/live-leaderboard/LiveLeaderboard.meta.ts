@@ -7,6 +7,7 @@ export const liveLeaderboardMeta = {
   usage: [
     'Rows are { position, players, wins, losses, games }: one row per position, best first. Players with the same wins and losses share a row (positions 1, 1, 3) and their names follow the standings order. Compute positions upstream (Q23.4); this component never does. Only players with at least one counted game are included.',
     'A shared position stacks its faces (the first on top) over every name, joined by commas; the level line lists the distinct levels. Each face is its own profile button. W and L are the shared values; games is one number or {min, max} shown "5–6". The rank badge and top-three tint follow the position, so a position 3 shared by three players is tinted. Win % is wins over wins plus losses. Long names wrap inside the Player column and never push into W, L or Games.',
+    "On the live variant every face has a 3 px ring in its player's level band (Beginner blue, Intermediate yellow, Advanced red, grey with no level), stacked faces included. The record variant has no rings.",
     'Partial (substituted) and invalid games are left out by the standings rules, never here. Official results exist only after a valid Session done.',
     "Each player's face opens their profile through onOpenProfile. At 760 px and below the table becomes one labelled card per row.",
     'Shows the empty card when there are no rows: "No completed games yet. Standings appear after the first confirmed result."',

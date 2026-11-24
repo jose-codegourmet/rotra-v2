@@ -8,6 +8,7 @@ import { EmptyState } from '@rotra/ui/empty-state'
 import { levelLabel } from '@rotra/ui/level-pill'
 import {
   formatStandingsGames,
+  type StandingsFaceBand,
   type StandingsGames,
   StandingsPlayerCell,
 } from '@rotra/ui/standings-faces'
@@ -69,6 +70,10 @@ export type LiveLeaderboardProps = LiveLeaderboardBaseProps &
 
 const column = createColumnHelper<LiveLeaderboardRow>()
 
+/** "intermediate_mid" → "intermediate"; no level → "none" (grey ring). */
+const bandOf = (level: PlayingLevel | null): StandingsFaceBand =>
+  level ? (level.split('_')[0] as StandingsFaceBand) : 'none'
+
 const profileLabelOf = (name: string) => `${name}. View profile`
 
 /** The prototype's .rank: a 26 px circle; first is filled, second and third are outlined. */
@@ -127,6 +132,7 @@ export function LiveLeaderboard({
                 id: p.playerId,
                 name: p.name,
                 pictureUrl: p.photoUrl,
+                band: record ? undefined : bandOf(p.level),
                 onOpen: () => onOpenProfile(p.playerId),
               }))}
               profileLabel={record ? profileLabelOf : undefined}

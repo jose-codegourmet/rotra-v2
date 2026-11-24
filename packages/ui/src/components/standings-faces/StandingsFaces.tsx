@@ -18,7 +18,23 @@ export type StandingsFace = {
   pictureUrl?: string | null
   /** Opens this player's profile */
   onOpen?: () => void
+  /**
+   * The level band drawn as a 3 px ring around the picture (Beginner, Intermediate, Advanced; none
+   * is grey). Leave it out for no ring (the session record's Results tab).
+   */
+  band?: StandingsFaceBand
 }
+
+export type StandingsFaceBand = 'beginner' | 'intermediate' | 'advanced' | 'none'
+
+const BAND_RING: Record<StandingsFaceBand, string> = {
+  beginner: '[--ring:var(--lv-beg)]',
+  intermediate: '[--ring:var(--lv-int)]',
+  advanced: '[--ring:var(--lv-adv)]',
+  none: '[--ring:var(--lv-none)]',
+}
+const BAND_OUTLINE =
+  '[&>:first-child]:outline-[3px] [&>:first-child]:outline-offset-1 [&>:first-child]:outline-(--ring)'
 
 export type StandingsFacesProps = {
   faces: StandingsFace[]
@@ -31,7 +47,7 @@ export type StandingsFacesProps = {
 
 /**
  * The prototype's .lb-stack: a shared standings position shows its players' faces overlapping,
- * the first on top, each ringed in the surface colour; hovering or focusing a face lifts it. Each
+ * the first on top, each separated by a surface-colour edge and, with a band, ringed in its level colour; hovering or focusing a face lifts it. Each
  * face with onOpen is its own profile button. Wraps onto a second line for a big tie.
  */
 export function StandingsFaces({
@@ -46,7 +62,10 @@ export function StandingsFaces({
         const avatar = (
           <Avatar key={face.id} name={face.name} src={face.pictureUrl ?? undefined} size={size} />
         )
-        const ring = '-ml-2.5 relative rounded-full shadow-[0_0_0_2px_var(--surface)]'
+        const ring = cn(
+          '-ml-2.5 relative rounded-full shadow-[0_0_0_2px_var(--surface)]',
+          face.band && [BAND_RING[face.band], BAND_OUTLINE],
+        )
         const style = { zIndex: Math.max(1, 6 - index) }
         return face.onOpen ? (
           <button

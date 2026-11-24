@@ -152,3 +152,63 @@ export const SharedRecordSixPhone: Story = {
   args: { variant: 'record', rows: sharing(6, { min: 5, max: 6 }) },
   globals: { theme: 'dark', viewport: { value: 'phone' } },
 }
+
+/** Every picture has a ring in its level band: Beginner blue, Intermediate yellow, Advanced red, grey with no level. */
+export const Rings: Story = {
+  args: {
+    rows: [
+      {
+        position: 1,
+        players: [
+          { playerId: 'r1', name: 'Maya Santos', level: 'beginner_mid' },
+          { playerId: 'r2', name: 'Ben Cruz', level: null },
+        ],
+        wins: 4,
+        losses: 1,
+        games: 5,
+      },
+      {
+        position: 3,
+        players: [{ playerId: 'r3', name: 'Ana Lim', level: 'intermediate_mid' }],
+        wins: 3,
+        losses: 2,
+        games: 5,
+      },
+      {
+        position: 4,
+        players: [{ playerId: 'r4', name: 'Carlo Reyes', level: 'advanced_low' }],
+        wins: 2,
+        losses: 3,
+        games: 5,
+      },
+    ],
+  },
+  globals: { theme: 'dark' },
+}
+export const RingsLight: Story = { ...Rings, globals: { theme: 'light' } }
+
+/** A tied row: each stacked picture keeps its own level ring. */
+export const TiedStacked: Story = {
+  args: {
+    rows: [
+      {
+        position: 1,
+        players: [
+          { playerId: 't1', name: 'Maya Santos', level: 'beginner_low' },
+          { playerId: 't2', name: 'Ben Cruz', level: 'intermediate_high' },
+          { playerId: 't3', name: 'Jose Buctuanon', level: 'advanced_low' },
+          { playerId: 't4', name: 'Ana Lim', level: null },
+        ],
+        wins: 4,
+        losses: 0,
+        games: 4,
+      },
+    ],
+  },
+  globals: { theme: 'dark' },
+}
+export const TiedStackedLight: Story = { ...TiedStacked, globals: { theme: 'light' } }
+export const TiedStackedPhone: Story = {
+  ...TiedStacked,
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}

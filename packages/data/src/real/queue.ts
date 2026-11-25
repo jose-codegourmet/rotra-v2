@@ -171,6 +171,38 @@ export async function realRegenerateClubInvite() {
   return accepted({ inviteCode: result.inviteCode }, 'Club invite link regenerated')
 }
 
+/** Q-CLUB › Request name change: one pending request per club; the platform owner decides. */
+export async function realRequestClubNameChange(input: { requestedName: string }) {
+  await realRequest('/api/club/name-change', {
+    method: 'POST',
+    body: { commandId: crypto.randomUUID(), name: input.requestedName },
+  })
+  return accepted(null, 'Name change requested')
+}
+
+/** Q-CLUB › Cancel the pending name-change request. */
+export async function realCancelClubNameChange() {
+  await realRequest('/api/club/name-change', { method: 'DELETE' })
+  return accepted(null, 'Name-change request cancelled')
+}
+
+/** Q-CLUB › Session defaults: players per court and the usual entrance fee. */
+export async function realUpdateSessionDefaults(input: {
+  defaultPlayersPerCourt: number
+  defaultEntranceFeeMinor: number | null
+}) {
+  const { revision } = await realGetClub()
+  await realRequest('/api/club', {
+    method: 'PATCH',
+    body: {
+      defaultPlayersPerCourt: input.defaultPlayersPerCourt,
+      defaultEntranceFeeMinor: input.defaultEntranceFeeMinor,
+      expectedRevision: revision,
+    },
+  })
+  return accepted(null, 'Session defaults saved')
+}
+
 /** Q-CLUB Facebook post: saves the given fields; `template: null` restores the default template. */
 export async function realSaveFacebookPost(input: {
   template?: string | null

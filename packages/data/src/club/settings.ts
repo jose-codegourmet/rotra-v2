@@ -10,10 +10,13 @@ import { queueMutation, requireClubAccess } from '../mock/transaction'
 import { realGetFacebookPost, realGetPostPreview } from '../real/facebook-post'
 import { isRealDataMode } from '../real/mode'
 import {
+  realCancelClubNameChange,
   realRegenerateClubInvite,
+  realRequestClubNameChange,
   realSaveFacebookPost,
   realUpdateClubLogo,
   realUpdateSelfCheckIn,
+  realUpdateSessionDefaults,
 } from '../real/queue'
 import { clubInitials, composeFacebookPost } from './club.rules'
 import { MOCK_INVITE_CODE_LENGTH, newClubInviteCode } from './inviteCode'
@@ -76,17 +79,22 @@ export const updateSelfCheckIn = (input: { enabled: boolean }) => {
     }
   })
 }
-export const requestClubNameChange = (input: { requestedName: string }) =>
-  changeClub((state) => {
+export const requestClubNameChange = (input: { requestedName: string }) => {
+  if (isRealDataMode())
+    return realRequestClubNameChange({ requestedName: nameField.parse(input.requestedName) })
+  return changeClub((state) => {
     const name = nameField.parse(input.requestedName)
     clubIn(state).pendingNameChange = { requestedName: name, requestedAt: Date.now() }
     return { data: null, text: 'Name change requested' }
   })
-export const cancelClubNameChange = () =>
-  changeClub((state) => {
+}
+export const cancelClubNameChange = () => {
+  if (isRealDataMode()) return realCancelClubNameChange()
+  return changeClub((state) => {
     clubIn(state).pendingNameChange = null
     return { data: null, text: 'Name-change request cancelled' }
   })
+}
 /** Queue DevMenu only: acts as the platform owner approving the club's own pending request. */
 export const simulateClubNameApproval = () =>
   changeClub((state) => {
@@ -100,8 +108,9 @@ export const simulateClubNameApproval = () =>
 export const updateSessionDefaults = (input: {
   defaultPlayersPerCourt: number
   defaultEntranceFeeMinor: number | null
-}) =>
-  changeClub((state) => {
+}) => {
+  if (isRealDataMode()) return realUpdateSessionDefaults(input)
+  return changeClub((state) => {
     if (
       !Number.isInteger(input.defaultPlayersPerCourt) ||
       input.defaultPlayersPerCourt < 2 ||
@@ -118,6 +127,7 @@ export const updateSessionDefaults = (input: {
         : moneyField.parse(input.defaultEntranceFeeMinor)
     return { data: null, text: 'Session defaults saved' }
   })
+}
 export const saveFacebookPost = (input: {
   template?: string
   description?: string

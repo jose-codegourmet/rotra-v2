@@ -903,9 +903,6 @@ func (s *server) completeMatch(r *http.Request, club pgtype.UUID) (writes.Result
 		hold = []string{id}
 	}
 	return s.decide(r, club, body.Text("operationId"), func(sess sqlcgen.LockQueueSessionRow) (outcome, error) {
-		if !sess.RecordGames {
-			return outcome{kind: sqlcgen.MatchDecisionKindCompleted}, nil
-		}
 		in := match.ResultInput{Winner: winner}
 		if hasA {
 			in.ScoreA = &scoreA

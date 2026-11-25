@@ -4,16 +4,16 @@
   "type": "chore",
   "priority": "high",
   "order": 16,
-  "status": "pending",
+  "status": "in_review",
   "created": "2026-11-25",
   "updated": "2026-11-25",
   "depends_on": "go-writes-queue, go-sign-in-catch-up",
   "phases": {
     "total": 5,
-    "completed": 0
+    "completed": 5
   },
   "tasks": {
     "total": 22,
-    "completed": 0
+    "completed": 22
   }
 }

@@ -171,3 +171,18 @@ func TestRateLimitMiddlewareIsOneBucketPerLimiter(t *testing.T) {
 		t.Fatalf("two = %d: routes sharing a limiter share the per-IP budget", rec.Code)
 	}
 }
+
+// The regression suite resets its test clock to real time after a run that jumped hours ahead. A window
+// opened on the jumped clock starts in the future, and must not keep blocking its key until real time catches up.
+func TestRateLimiterWindowFromTheFutureIsOverWhenTimeGoesBack(t *testing.T) {
+	clock := &fakeClock{t: time.Now().Add(3 * time.Hour)}
+	l := NewRateLimiter(1, clock.Now)
+	l.Allow("a")
+	if _, ok := l.Allow("a"); ok {
+		t.Fatal("second request in the window must be blocked")
+	}
+	clock.Advance(-3 * time.Hour)
+	if _, ok := l.Allow("a"); !ok {
+		t.Fatal("a window that starts after now is not a window we are in: a new one must open")
+	}
+}

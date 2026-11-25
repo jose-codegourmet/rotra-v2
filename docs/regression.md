@@ -1,17 +1,39 @@
 # Regression suite (apps/e2e)
 
-A Playwright suite that runs whole club nights through the three apps in **real mode**, against a
-throwaway **local** Supabase. It checks that every player gets their fair share of games when
-real-life disruptions happen. Decision: [D-2026-11-12-05](mvp/decisions/2026-11-12.md#d-2026-11-12-05).
+A Playwright suite that runs whole club nights through the three apps in **real mode**, with every
+`/api` call forwarded to the **Go API**, on a throwaway **local Postgres**. It checks that every player
+gets their fair share of games when real-life disruptions happen. Decisions:
+[D-2026-11-12-05](mvp/decisions/2026-11-12.md#d-2026-11-12-05) (the suite),
+[D-2026-11-25-01](mvp/decisions/2026-11-25.md#d-2026-11-25-01) (Go and plain Postgres instead of Supabase).
 
-- Apps run on ports 9100 (Queue), 9101 (Player) and 9102 (Admin).
-- Database: `rotra_disposable_e2e` on `127.0.0.1:54322`. Supabase: `http://127.0.0.1:54321`. The
-  guard (`apps/e2e/src/guard.ts`) refuses anything else. Never a hosted project.
-- The server test clock loads only through the e2e runner, only with `ROTRA_E2E_CLOCK=1`, and never
-  runs earlier than real time.
+- Servers: Queue 9100, Player 9101, Admin 9102 and the Go API 9103. The Go API counts as ready when
+  `/readyz` answers (checked in `global-setup.ts` with the proxy secret).
+- Database: `rotra_disposable_e2e` in the Docker container `rotra-e2e-pg` on `127.0.0.1:54329`
+  (`postgres:16-alpine`). The guard (`apps/e2e/src/guard.ts`) refuses anything else, and refuses any
+  Supabase variable that carries a value. There is no override. Never a hosted database.
+- The apps run with `ROTRA_GO_API_URL`, `ROTRA_GO_MOVED_AREAS=/api`, a fixed local proxy secret and no
+  Supabase variable. A route that exists only in TypeScript answers 404 from Go and shows up as a finding.
+- Accounts: the seed writes the first admin's sign-in row (`auth_identities`, argon2id from Node's
+  `crypto.argon2Sync`, Go's default parameters) and its `admin_accounts` row as SQL. The club and the
+  players are created through the product's own routes, which write their sign-in rows in Go.
+- Clocks: the three app servers and the Go API each have a virtual clock, and `setClock`, `advanceClock`
+  and `resetClock` move all four together. The Go clock exists only in the binary built with
+  `go build -tags e2e` (done by `prepare`), only with `ROTRA_E2E_CLOCK=1`, only when `DATABASE_URL` is the
+  local throwaway database, and its control endpoint is on `127.0.0.1:9193`. Every clock never runs
+  earlier than real time. The Go HTTP rate limiter and snapshot cache treat a window that starts in the future as
+  over, so a reset does not leave a key blocked.
+- The simulation client does what the real apps do: on 401 `expired` (the access pass lives 15 minutes
+  on the test clock) it refreshes once and retries.
+- When a test fails, the Go API's log since the test started is attached as `go-api-log`, and a failed
+  call's error carries `[request <id>]`, the Go `request_id` to look for in that slice. The whole log is
+  `apps/e2e/.e2e/go-api.log`.
 - The apps run **built** (`next build` + `next start`, into `.next-e2e`), locally and on GitHub, so
   the suite tests what ships. Each run builds first (a few minutes). `E2E_DEV=1` runs `next dev`
   instead, for fast restarts while writing a test.
+- Skipped: the four `ui` tests (UI-01, UI-08, UI-12, UI-17) create a Session in the browser, and the
+  trusted-hosts routes the session form loads are not in Go yet ([BL-22](../conductor/tracks.md#backlog)).
+  The `sim` scenarios use the API and are not affected. Known defects are marked with `knownDefect` and
+  pass only while their exact failure happens (REG-08 is [#1098](https://github.com/jose-codegourmet/rotra-v2/issues/1098)).
 - Not part of `make check`. Run it on demand. Offline mode is not covered.
 
 ## Pass rules
@@ -23,10 +45,10 @@ real-life disruptions happen. Decision: [D-2026-11-12-05](mvp/decisions/2026-11-
 ## Commands
 
 ```bash
-make e2e                                     # start or reuse local Supabase, reseed, run all
+make e2e                                     # start or reuse the Postgres container, reseed, run all
 make e2e E2E_ARGS="--project sim -g REG-08"  # one project, one scenario
 make e2e-ui                                  # Playwright UI mode, watch mode on
-make e2e-down                                # stop the local stack
+make e2e-down                                # remove the Postgres container
 E2E_SEEDS=5 make e2e                         # number of random seeds for REG-09
 E2E_SEED=2189437517 make e2e E2E_ARGS="-g REG-09"   # replay one seed
 E2E_DEV=1 make e2e E2E_ARGS="-g REG-01"      # next dev instead of the built apps
@@ -57,9 +79,8 @@ long (REG-01: about 56 s against 21 s) and its trace is 50-180 MB.
 
 ## Prerequisites
 
-- Docker, running.
-- Supabase CLI 2.34.x.
-- `psql`.
+- Docker, running (the only database tool: SQL runs through `docker exec`, so no `psql` is needed).
+- Go (the version in `apps/api/go.mod`), to build the API with the test clock.
 - Chromium for Playwright: `nvm use && pnpm --filter @rotra/e2e exec playwright install chromium`.
 
 ## Running on GitHub

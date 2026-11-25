@@ -1,11 +1,10 @@
-import { execFileSync } from 'node:child_process'
 import { randomBytes, randomUUID } from 'node:crypto'
 import { type SeededAccounts, writeAccounts } from '../accounts.ts'
 import { anonymous } from '../api/client.ts'
 import { signIn } from '../api/sign-in.ts'
-import { assertE2eEnv, assertLocalDbUrl } from '../guard.ts'
-import { E2E_DB_URL, e2eEnv, psqlPath, readStackKeys } from '../stack.ts'
-import { createAuthUser } from './auth-admin.ts'
+import { assertE2eEnv } from '../guard.ts'
+import { sql } from '../postgres.ts'
+import { e2eEnv } from '../stack.ts'
 import {
   ADMIN,
   CLUB,
@@ -15,34 +14,30 @@ import {
   playerPhone,
   TEST_PASSWORD,
 } from './config.ts'
+import { argon2idHash } from './password.ts'
 import { ensureRankingPolicy } from './ranking-policy.ts'
-
-/** Runs one SQL statement on the e2e app database and returns the first column of the first row. */
-function sql(statement: string, vars: Record<string, string>) {
-  assertLocalDbUrl('DATABASE_URL', E2E_DB_URL)
-  const args = [E2E_DB_URL, '-v', 'ON_ERROR_STOP=1', '-qtA']
-  for (const [key, value] of Object.entries(vars)) args.push('-v', `${key}=${value}`)
-  return execFileSync(psqlPath(), args, { input: statement, encoding: 'utf8' }).trim()
-}
 
 const today = () => new Date().toISOString().slice(0, 10)
 
 /**
  * Seeds the freshly rebuilt `rotra_disposable_e2e` through the real stack:
- * 1. Admin: a Supabase Auth user (Admin API) + its `admin_accounts` row (SQL; there is no route).
+ * 1. Admin: a Go sign-in identity (`auth_identities`, argon2id) + its `admin_accounts` row, written as
+ *    SQL because no route makes the first admin (the pattern of apps/api/internal/writetest).
  * 2. Club + club login: Admin `POST /api/clubs`, then a license: `POST /api/clubs/:id/licenses`.
  * 3. Players: the club invite code from Queue `GET /api/club/invite`, then Player Information
  *    `POST /api/register/:clubId?k=<code>` per player, which also saves each one to the club.
  */
 export async function seed(): Promise<SeededAccounts> {
-  const keys = readStackKeys()
-  assertE2eEnv(e2eEnv(keys))
+  assertE2eEnv(e2eEnv())
 
-  const subject = await createAuthUser(keys, ADMIN.email, TEST_PASSWORD)
+  const subject = randomUUID()
   const adminId = sql(
-    `INSERT INTO admin_accounts (id, auth_provider, auth_subject, display_name, updated_at)
-     VALUES (gen_random_uuid(), 'supabase', :'subject'::uuid, :'name', now()) RETURNING id`,
-    { subject, name: ADMIN.displayName },
+    `INSERT INTO auth_identities (id, audience, login_key, password_hash, password_scheme, password_changed_at)
+     VALUES (:'subject'::uuid, 'admin', lower(:'login'), :'hash', 'argon2id', now());
+     INSERT INTO admin_accounts (id, auth_provider, auth_subject, display_name, updated_at)
+     VALUES (gen_random_uuid(), 'rotra', :'subject'::uuid, :'name', now()) RETURNING id`,
+    'app',
+    { subject, login: ADMIN.email, hash: argon2idHash(TEST_PASSWORD), name: ADMIN.displayName },
   )
 
   const admin = await signIn('admin', ADMIN.email, TEST_PASSWORD)

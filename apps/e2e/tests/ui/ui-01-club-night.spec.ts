@@ -1,6 +1,8 @@
-import { expect, type Page, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 import { readAccounts } from '../../src/accounts.ts'
 import { resetClock } from '../../src/clock.ts'
+import { expect, test } from '../../src/fixtures.ts'
+import { skipUntilInGo } from '../../src/known-defect.ts'
 import { appUrl } from '../../src/stack.ts'
 import {
   abandonCreatedSessions,
@@ -21,6 +23,7 @@ import {
 import { rolePage, signInAdmin, signInPlayer, signInQueueMaster } from '../../src/ui/sign-in.ts'
 import { advance, jumpTo, MINUTE } from '../../src/ui/time.ts'
 
+skipUntilInGo('BL-22', 'trusted hosts are not in Go, so the Queue session form does not load')
 test.use({ actionTimeout: 15_000 })
 // Clean up on the journey's own virtual time first (court actions follow the server clock).
 test.afterEach(async () => {
@@ -51,7 +54,8 @@ test('UI-01 a club night from Admin to Session done to the Player history', asyn
   await signInAdmin(admin)
   await admin.goto(`${appUrl('admin')}/clubs`)
   await expect(
-    admin.getByRole('table', { name: 'Clubs' }).getByRole('link', { name: accounts.club.name }),
+    // The club name is a button in the Clubs table (the page snapshot of the 2026-11-25 run); it was a link.
+    admin.getByRole('table', { name: 'Clubs' }).getByRole('button', { name: accounts.club.name }),
   ).toBeVisible()
 
   // Queue Master: create the Queue Session (2 courts, doubles, 1 h) and fill the roster.

@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto'
-import { expect, test } from '@playwright/test'
 import { readAccounts } from '../../src/accounts.ts'
 import { type AppClient, anonymous } from '../../src/api/client.ts'
 import { firstFreeStart } from '../../src/api/schedule.ts'
 import { asQueueMaster } from '../../src/api/sign-in.ts'
 import { readClock } from '../../src/clock.ts'
+import { expect, test } from '../../src/fixtures.ts'
 import { QueueMasterApi } from '../../src/sim/api.ts'
 import { Engine } from '../../src/sim/engine.ts'
 import { PlayerPool, playerClient, slugOf } from '../../src/sim/requests.ts'
@@ -207,7 +207,8 @@ test("REG-33 a name-only guest's invite link registers onto the same club player
       const visitor = await anonymous('player')
       try {
         const read = await visitor.get<{ link: { status: string } }>(`/api/claim/${link.token}`)
-        expect(read.link.status).toBe('active')
+        // 'valid' is the contract (ClaimLinkStatus: valid | claimed | expired | processing); 'active' was a stale expectation.
+        expect(read.link.status).toBe('valid')
         // The person types their own email and phone; the password is the seed's test value.
         const unique = Date.now() % 10_000_000
         const result = await visitor.post<{ playerId: string }>(`/api/claim/${link.token}`, {

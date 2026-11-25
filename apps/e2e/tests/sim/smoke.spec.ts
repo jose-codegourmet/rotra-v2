@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto'
-import { expect, test } from '@playwright/test'
 import { readAccounts } from '../../src/accounts.ts'
 import { busyWindows, ensureVenue, firstFreeStart } from '../../src/api/schedule.ts'
 import { asAdmin, asQueueMaster } from '../../src/api/sign-in.ts'
 import { readClock, resetClock, setClock } from '../../src/clock.ts'
+import { expect, test } from '../../src/fixtures.ts'
 import { QueueMasterApi } from '../../src/sim/api.ts'
 import { finishRunningSessions } from '../../src/sim/engine.ts'
 

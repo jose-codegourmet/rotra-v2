@@ -63,10 +63,10 @@ List what each scenario touches and whether Go answers it, what the Prisma migra
 
 **Accepted when:**
 
-- [ ] Every `/api` path and every page the scenarios open is listed per app, with "in Go" or "not in Go"; each "not in Go" names its backlog item or gets a new one
-- [ ] The migrations apply on a plain Postgres, with the stub roles and anything else Supabase provided written down
+- [x] Every `/api` path and every page the scenarios open is listed per app, with "in Go" or "not in Go"; each "not in Go" names its backlog item or gets a new one (the only gap, trusted hosts and Session hosts, is BL-22; the earlier path comparison missed it)
+- [x] The migrations apply on a plain Postgres, with the stub roles and anything else Supabase provided written down
 - [x] The owner has confirmed the answers to Q1, Q2 and Q3 (2026-11-25)
-- [ ] The six failures of the last TypeScript run are recorded in the plan as the baseline
+- [x] The six failures of the last TypeScript run are recorded in the plan as the baseline
 
 ### R2: Test-only clock in the Go API
 
@@ -74,10 +74,10 @@ One virtual clock for the Go API, with the same rules as the Node one: never ear
 
 **Accepted when:**
 
-- [ ] Off by default: without the e2e variable the binary has no clock code path and no control endpoint
-- [ ] With the variable set, the API refuses to start unless `DATABASE_URL` is the local throwaway database
-- [ ] Every Go package that takes a clock or reads `time.Now` on a request path uses the test clock (a nil clock falls back to real time today, so each one is wired on purpose); Go SQL that reads `now()` for session time is listed and handled
-- [ ] Go tests cover all three points (strict TDD)
+- [x] Off by default: without the e2e variable the binary has no clock code path and no control endpoint
+- [x] With the variable set, the API refuses to start unless `DATABASE_URL` is the local throwaway database
+- [x] Every Go package that takes a clock or reads `time.Now` on a request path uses the test clock (a nil clock falls back to real time today, so each one is wired on purpose); Go SQL that reads `now()` for session time is listed and handled
+- [x] Go tests cover all three points (strict TDD)
 
 ### R3: The stack runs on Go and plain Postgres
 
@@ -85,22 +85,22 @@ One virtual clock for the Go API, with the same rules as the Node one: never ear
 
 **Accepted when:**
 
-- [ ] The guard allows only the local throwaway Postgres and refuses everything else; there is no override
-- [ ] `prepare` needs Docker and Go, and no Supabase CLI
-- [ ] The apps run with `ROTRA_GO_API_URL`, a local test proxy secret and the moved-areas list from R1, and with no Supabase variable
-- [ ] The seeded admin, club and player accounts sign in through Go; the sign-in helpers keep their contract
-- [ ] `setClock`, `advanceClock` and `resetClock` move the Go clock together with the three apps
-- [ ] The Go API starts as a fourth server and counts as ready only when `/readyz` answers
-- [ ] A failed test carries the Go API's log and the request id of the failing call, since there is no TypeScript run left to compare against
+- [x] The guard allows only the local throwaway Postgres and refuses everything else; there is no override
+- [x] `prepare` needs Docker and Go, and no Supabase CLI
+- [x] The apps run with `ROTRA_GO_API_URL`, a local test proxy secret and the moved-areas list from R1, and with no Supabase variable
+- [x] The seeded admin, club and player accounts sign in through Go; the sign-in helpers keep their contract
+- [x] `setClock`, `advanceClock` and `resetClock` move the Go clock together with the three apps
+- [x] The Go API starts as a fourth server and counts as ready only when `/readyz` answers
+- [x] A failed test carries the Go API's log and the request id of the failing call, since there is no TypeScript run left to compare against
 
 ### R4: The scenarios run through Go
 
 **Accepted when:**
 
-- [ ] The smoke test and REG-01 pass through Go
-- [ ] Every `sim` scenario and every `ui` test has run; each one is green, or its difference is a GitHub issue labeled `bug` under epic #869 and the test is marked with `knownDefect`
-- [ ] A test that needs a route Go does not have is skipped with the backlog item's id, never marked as a known defect
-- [ ] No Supabase code is left in `apps/e2e` (`auth-admin.ts`, the `auth.users` bridge, the Supabase variables)
+- [x] The smoke test and REG-01 pass through Go
+- [x] Every `sim` scenario and every `ui` test has run; each one is green, or its difference is a GitHub issue labeled `bug` under epic #869 and the test is marked with `knownDefect`
+- [x] A test that needs a route Go does not have is skipped with the backlog item's id, never marked as a known defect
+- [x] No Supabase code is left in `apps/e2e` (`auth-admin.ts`, the `auth.users` bridge, the Supabase variables)
 
 ### R5: CI and docs
 

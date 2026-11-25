@@ -394,3 +394,20 @@ func TestDefaultsAreTenSecondsAndABoundedCache(t *testing.T) {
 		t.Fatalf("defaults ttl=%v entries=%d bytes=%d timeout=%v now set=%v", c.ttl, c.maxEntries, c.maxBytes, c.loadTimeout, c.now != nil)
 	}
 }
+
+// A copy built on a test clock that jumped ahead must not outlive a reset to real time.
+func TestSnapshotBuiltInTheFutureIsReloadedWhenTimeGoesBack(t *testing.T) {
+	clk := newFakeClock()
+	c := newTestCache(clk)
+	l := &countingLoader{}
+	ctx := context.Background()
+	clk.Advance(3 * time.Hour)
+	if _, err := c.get(ctx, visitorKey, l.load); err != nil {
+		t.Fatal(err)
+	}
+	clk.Advance(-3 * time.Hour)
+	body, err := c.get(ctx, visitorKey, l.load)
+	if err != nil || string(body) != "body-2" {
+		t.Fatalf("body = %q, err = %v; want a reload (body-2)", body, err)
+	}
+}

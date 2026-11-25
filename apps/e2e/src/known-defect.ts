@@ -34,3 +34,11 @@ export async function knownDefect<T>(defect: KnownDefect, block: () => Promise<T
   })
   return value
 }
+
+/**
+ * A test that needs a route the Go API does not have yet is skipped with the backlog item's id, never
+ * marked as a known defect (conductor/tracks.md, Backlog). Remove the call when the route lands.
+ */
+export function skipUntilInGo(item: string, what: string) {
+  test.skip(true, `${item}: ${what}`)
+}

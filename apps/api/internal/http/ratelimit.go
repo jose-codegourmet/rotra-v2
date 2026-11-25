@@ -46,7 +46,8 @@ func (l *RateLimiter) Allow(key string) (retryAfter int, ok bool) {
 	l.pruneLocked(now)
 
 	w := l.windows[key]
-	if w == nil || now.Sub(w.start) >= rateWindow {
+	// A window that starts after now (the test clock went back) is over as well.
+	if w == nil || now.Before(w.start) || now.Sub(w.start) >= rateWindow {
 		w = &window{start: now}
 		l.windows[key] = w
 	}
@@ -61,12 +62,12 @@ func (l *RateLimiter) Allow(key string) (retryAfter int, ok bool) {
 // pruneLocked drops windows that have ended. It scans at most once a minute, so a busy route does not
 // pay for the whole map on every request.
 func (l *RateLimiter) pruneLocked(now time.Time) {
-	if now.Sub(l.lastPrune) < rateWindow {
+	if now.Sub(l.lastPrune) < rateWindow && !now.Before(l.lastPrune) {
 		return // an ended window left in the map is harmless: Allow starts a new one for its key
 	}
 	l.lastPrune = now
 	for k, w := range l.windows {
-		if now.Sub(w.start) >= rateWindow {
+		if now.Before(w.start) || now.Sub(w.start) >= rateWindow {
 			delete(l.windows, k)
 		}
 	}

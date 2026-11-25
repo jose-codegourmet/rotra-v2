@@ -72,7 +72,7 @@ Status: [docs/mvp/README.md](docs/mvp/README.md). Keep UI/hook contracts stable.
 ```text
 apps/                     queue · player · admin (Next.js 16); each has its own AGENTS.md for Next 16 docs
 apps/mockup/             canonical editable HTML prototypes and notes
-apps/e2e/                Playwright regression suite (real mode, local Supabase only)
+apps/e2e/                Playwright regression suite (real mode, through the Go API, on a throwaway local Postgres)
 apps/landingpage/        rotra.club marketing site: Next.js 16 static export (one page, hash routes) + Higgsfield/Rive art
 packages/
   ui/                     every visual component and form + the one Storybook (see its AGENTS.md)
@@ -159,7 +159,7 @@ nvm use && pnpm lint                         # Biome
 nvm use && pnpm type-check
 nvm use && pnpm build
 make check                                   # lint, type-check, build, decided-math tests; errors only
-make e2e                                     # regression suite on a local Supabase; on demand only
+make e2e                                     # regression suite on Go + a local Postgres container; on demand only
 ```
 
 ---

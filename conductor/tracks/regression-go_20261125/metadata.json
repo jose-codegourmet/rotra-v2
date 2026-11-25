@@ -4,7 +4,7 @@
   "type": "chore",
   "priority": "high",
   "order": 16,
-  "status": "in_review",
+  "status": "complete",
   "created": "2026-11-25",
   "updated": "2026-11-25",
   "depends_on": "go-writes-queue, go-sign-in-catch-up",

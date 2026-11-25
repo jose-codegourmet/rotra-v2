@@ -1,6 +1,7 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
+import { type HandicapSpot, handicapText } from '@rotra/data/session-roster/handicap'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
@@ -36,6 +37,11 @@ export type PlayerPoolCardProps = {
   level: PlayingLevel | null
   /** Counted games so far */
   games: number
+  /**
+   * Handicap · tonight (D-2026-11-25-03): the marked spots; any shows a small warning icon after the
+   * name, titled "Handicap: left knee, lower back". Queue Master only.
+   */
+  handicapSpots?: readonly HandicapSpot[]
   /** Games played plus queued matches. */
   forTheNight: number
   selfCheckedInAt?: number | null
@@ -117,6 +123,7 @@ export function PlayerPoolCard({
   photoUrl,
   level,
   games,
+  handicapSpots,
   forTheNight,
   selfCheckedInAt,
   leftAt,
@@ -204,14 +211,24 @@ export function PlayerPoolCard({
             />
           </span>
         )}
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 items-center gap-1">
           {/* One name; the full name is the hover text and the card's screen-reader label keeps it. */}
           <div
             title={name}
-            className="line-clamp-2 overflow-hidden text-[13px] leading-tight font-bold [overflow-wrap:anywhere]"
+            className="line-clamp-2 min-w-0 overflow-hidden text-[13px] leading-tight font-bold [overflow-wrap:anywhere]"
           >
             {shownName}
           </div>
+          {handicapSpots?.length ? (
+            <span
+              role="img"
+              title={handicapText(handicapSpots)}
+              aria-label={handicapText(handicapSpots)}
+              className="inline-flex flex-none text-warn"
+            >
+              <Icon name="alert" size={14} />
+            </span>
+          ) : null}
         </div>
         {onEdit ? (
           // The pencil sits inside the card: stop its clicks and keys from selecting the card.

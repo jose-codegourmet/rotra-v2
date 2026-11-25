@@ -252,6 +252,7 @@
     "./share-card": "./src/components/share-card/ShareCard.tsx",
     "./short-on-players-banner": "./src/components/short-on-players-banner/ShortOnPlayersBanner.tsx",
     "./edit-live-player-sheet": "./src/components/edit-live-player-sheet/EditLivePlayerSheet.tsx",
+    "./handicap-picker": "./src/components/handicap-picker/HandicapPicker.tsx",
     "./edit-live-player-sheet/default-values": "./src/components/edit-live-player-sheet/EditLivePlayerSheet.defaultValues.ts",
     "./edit-live-player-sheet/schema": "./src/components/edit-live-player-sheet/EditLivePlayerSheet.schema.ts",
     "./set-games-sheet": "./src/components/set-games-sheet/SetGamesSheet.tsx",

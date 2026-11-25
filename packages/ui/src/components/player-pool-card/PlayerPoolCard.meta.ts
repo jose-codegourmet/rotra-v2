@@ -5,6 +5,7 @@ export const playerPoolCardMeta = {
   description:
     'One player in the live Players view: the picture in a level-band ring (no level text), one name (club nickname, nickname, full name; two lines at most), the Current | Total games strip, the status pill (Wait Nm, In queue Nm, Playing Nm, Getting ready, Away) and the Present switch. Tapping the card picks the player for the next match and shows the pick order.',
   usage: [
+    'handicapSpots (D-2026-11-25-03): any marked spot shows a small warning icon after the name; title and accessible name "Handicap: left knee, lower back" (handicapText).',
     'The status is a StatusPill (owner, November 25, 2026, docs/mockup-changes/2026-11-25-queue-status-pills.md): Wait Nm (free), In queue Nm (queued; waitMinutes), Playing Nm (status.minutes since the match began; hover names the court), Getting ready (status.minutes null) or Away. The queue position no longer shows on the card.',
     'Pass onNoShow only on the live Players view for a player who is away, has played no games and is in no match: "No show (cancelled)" opens the Mark NAME as No show? confirmation.',
     'There is no Move to waitlist on the live card: the session is already running (2026-11-19-queue-live-no-move-to-waitlist).',
@@ -24,6 +25,7 @@ export const playerPoolCardMeta = {
     screen: 'Live console › Players › playersPane() (.pc3)',
   },
   docs: [
+    'docs/mockup-changes/2026-11-25-queue-handicap-tonight.md',
     'docs/screens/product/modules/queue/session-console.md#q-pool--players-view',
     'docs/business_logic/product/queue/modules/players/README.md#presence',
   ],

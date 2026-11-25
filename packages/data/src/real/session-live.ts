@@ -372,6 +372,30 @@ export async function realSetGamesPlayed(input: {
   )
 }
 
+/** Handicap · tonight (D-2026-11-25-03): `PATCH …/roster/handicap` with the whole set of spots. */
+export async function realSetHandicap(input: {
+  sessionId: string
+  rosterId: string
+  spots: string[]
+  operationId?: string
+}) {
+  const result = await realRequest<{ rosterId: string; name: string; spots: string[] }>(
+    `${sessionPath(input.sessionId)}/roster/handicap`,
+    {
+      method: 'PATCH',
+      body: {
+        operationId: input.operationId ?? crypto.randomUUID(),
+        rosterId: input.rosterId,
+        spots: input.spots,
+      },
+    },
+  )
+  return accepted(
+    { rosterId: result.rosterId, spots: result.spots },
+    `Handicap saved · ${result.name}`,
+  )
+}
+
 export async function realSetAllPresence(input: { sessionId: string; present: boolean }) {
   await realRequest(`${sessionPath(input.sessionId)}/presence`, {
     method: 'POST',

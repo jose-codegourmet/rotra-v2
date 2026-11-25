@@ -149,6 +149,7 @@ const COMMAND_AREAS: Record<CommandName, OutboxCommand['area']> = {
   'roster.presenceAll': 'Roster',
   'roster.stepDown': 'Roster',
   'roster.gamesPlayed': 'Roster',
+  'roster.handicap': 'Roster',
   'roster.giveSlot': 'Roster',
   'roster.fillOpenSlots': 'Roster',
   'roster.removeFromWaitlist': 'Roster',

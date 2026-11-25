@@ -210,6 +210,8 @@ async function run(
           now = Date.now()
         s.state = 'completed'
         s.finalizedAt = now
+        // Handicap · tonight is session only (D-2026-11-25-03): Session done clears it.
+        for (const p of draft.roster) if (p.sessionId === sessionId) p.handicapSpots = []
         // #1008: the hosts current at the end are this session's hosts from now on.
         freezeSessionHosts(draft, sessionId, now)
         // Finishing closes pending join requests, drop-out notices and match requests (kept, hidden).

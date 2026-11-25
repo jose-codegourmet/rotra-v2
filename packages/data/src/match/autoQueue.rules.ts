@@ -21,6 +21,18 @@ import {
 } from './match.rules'
 import type { MatchLineup } from './match.types'
 import {
+  compareKeys,
+  freshPick,
+  lastTwoGames,
+  matchesRested,
+  nightGames,
+  partnersIn,
+  restAfter,
+  streakOf,
+  tonightLevel,
+  whoseTurnText,
+} from './matchMaking.rules'
+import {
   comparePlanAhead,
   notEnoughPlayersText,
   planAheadEligible,
@@ -259,7 +271,10 @@ export function generateAutoQueueMatches({
    */
   exempt?: readonly string[]
 }): {
-  /** `reason` is set only when a bagging pair shaped the lineup. */
+  /**
+   * `reason`: what drove each draft (D-2026-11-25-01), e.g. "Rested 2 matches · Avoided repeat
+   * partners", or the bagging pair.
+   */
   matches: (MatchLineup & { reason?: string })[]
   stopReason: string
   error: string | null
@@ -319,6 +334,47 @@ export function generateAutoQueueMatches({
   const pairs = activeBaggingPairs(bagging, session, ctx)
   let stopReason = ''
   const matches: (MatchLineup & { reason?: string })[] = []
+  // Match making factors (D-2026-11-25-01). 1. Whose turn: games in a row so far and matches rested;
+  // kept drafts count first, in order (a player left out of a draft sat it out).
+  const streak = new Map(players.map((p) => [p.id, streakOf(p.id, ctx.matches)]))
+  const sitOut = new Map(
+    players.map((p) => [p.id, matchesRested(p, ctx.matches, session.startedAt, now)]),
+  )
+  const restMinutes = new Map(
+    players.map((p) => [p.id, waitMinutes(p, ctx.matches, session.startedAt, now)]),
+  )
+  const night = new Map(players.map((p) => [p.id, nightGames(p.id, ctx.matches)]))
+  const planDraft = (m: MatchLineup) => {
+    const inDraft = new Set(allPlayers(m))
+    for (const p of players)
+      if (inDraft.has(p.id)) {
+        streak.set(p.id, (streak.get(p.id) ?? 0) + 1)
+        sitOut.set(p.id, 0)
+      } else {
+        streak.set(p.id, 0)
+        sitOut.set(p.id, (sitOut.get(p.id) ?? 0) + 1)
+      }
+  }
+  for (const m of retained) planDraft(m)
+  const tired = (p: SessionPlayer) => (streak.get(p.id) ?? 0) >= restAfter(session, p)
+  // 2. Fresh faces: anyone the player partnered or faced in either of their last 2 games
+  // (completed, On court, Playing, or an earlier draft in this batch), unless they are a bagging pair.
+  const metIn = (a: string, b: string) =>
+    lastTwoGames(a, night.get(a) ?? [], [...retained, ...matches]).find((m) =>
+      allPlayers(m).includes(b),
+    )
+  const bagPair = (a: string, b: string) =>
+    pairs.some((pair) => (pair.a === a && pair.b === b) || (pair.a === b && pair.b === a))
+  const clash = (a: SessionPlayer, b: SessionPlayer) => !!metIn(a.id, b.id) && !bagPair(a.id, b.id)
+  const clashes = (group: readonly SessionPlayer[]) =>
+    group.flatMap((x, i) =>
+      group
+        .slice(i + 1)
+        .filter((y) => clash(x, y))
+        .map((y) => [x.id, y.id] as const),
+    )
+  // 3. Even game: teams split by tonight's level.
+  const levelTonight = (p: SessionPlayer) => tonightLevel(p, ctx.matches)
   // A player already in a draft of this batch (kept or new) is not free for a pair.
   const drafted = () => new Set([...retained, ...matches].flatMap(allPlayers))
   for (let i = 0; i < limit; i++) {
@@ -345,53 +401,74 @@ export function generateAutoQueueMatches({
         stopReason: '',
         error: queuedNote(notEnoughPlayersText(0, limit, mode), 0),
       }
-    const sorted = [...players].sort((a, b) => {
-      const wait =
-        waitMinutes(b, ctx.matches, session.startedAt, now) -
-        waitMinutes(a, ctx.matches, session.startedAt, now)
-      const left = load.get(a.id) ?? 0,
-        right = load.get(b.id) ?? 0
-      const priority =
-        mode === 'catchup'
-          ? Number(left >= target) - Number(right >= target) || left - right
+    // Whose turn: rested players first (an exhausted player is used only when the match can't be
+    // made otherwise), then each tab's own order (load = games played + planned).
+    const turnKey = (p: SessionPlayer): number[] => {
+      const l = load.get(p.id) ?? 0
+      return [
+        tired(p) ? 1 : 0,
+        ...(mode === 'catchup'
+          ? [l < target ? 0 : 1, l]
           : mode === 'wait'
-            ? left - (played.get(a.id) ?? 0) - (right - (played.get(b.id) ?? 0)) || wait
-            : mode === 'ahead'
-              ? // Free and finishing-soon players rank together by load; ties to the soonest free.
-                comparePlanAhead(
-                  { load: left, minutesLeft: minutesLeft.get(a.id) ?? 0 },
-                  { load: right, minutesLeft: minutesLeft.get(b.id) ?? 0 },
-                )
-              : left - right
-      return priority || wait || (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0)
-    })
-    const pick = sorted.slice(0, size)
-    if (mode === 'catchup' && !pick.some((p) => (load.get(p.id) ?? 0) < target)) {
+            ? [l - (played.get(p.id) ?? 0), -(sitOut.get(p.id) ?? 0)]
+            : [l]),
+      ]
+    }
+    const sorted = [...players].sort(
+      (a, b) =>
+        compareKeys(turnKey(a), turnKey(b)) ||
+        (mode === 'ahead' ? (minutesLeft.get(a.id) ?? 0) - (minutesLeft.get(b.id) ?? 0) : 0) ||
+        (restMinutes.get(b.id) ?? 0) - (restMinutes.get(a.id) ?? 0) ||
+        (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0),
+    )
+    // The pair beats fairness (owner answer, November 11, 2026): an applicable pair with both
+    // players free leads the next doubles draft, and wins over Fresh faces for that pair.
+    const taken = drafted()
+    const free = sorted.filter((p) => !taken.has(p.id))
+    const lead =
+      format === 'doubles'
+        ? pairs.find(
+            (pair) => free.some((p) => p.id === pair.a) && free.some((p) => p.id === pair.b),
+          )
+        : undefined
+    const must = lead ? sorted.filter((p) => p.id === lead.a || p.id === lead.b) : []
+    const { group, avoided } = freshPick(sorted, size, must, turnKey, clash)
+    if (mode === 'catchup' && !group.some((p) => (load.get(p.id) ?? 0) < target)) {
       stopReason = `Made ${matches.length} of ${limit}: no other match helps anyone reach ${target} game${target === 1 ? '' : 's'}.`
       break
     }
-    let chosen = pick
-    let reason: string | undefined
-    if (format === 'doubles' && pairs.length) {
-      const taken = drafted()
-      const free = sorted.filter((p) => !taken.has(p.id))
-      // The pair beats fairness (owner answer, November 11, 2026): an applicable pair with both
-      // players free leads the next doubles draft.
-      const lead = pairs.find(
-        (pair) => free.some((p) => p.id === pair.a) && free.some((p) => p.id === pair.b),
-      )
-      const seeded = lead
-        ? [
-            ...free.filter((p) => p.id === lead.a || p.id === lead.b),
-            ...sorted.filter((p) => p.id !== lead.a && p.id !== lead.b).slice(0, size - 2),
-          ]
-        : pick
-      chosen = fillBaggingPartners(seeded, pairs, free)
-      const teamed = partnerBaggingTeams(splitTeams(session, chosen, format, rng), pairs)
-      if (teamed.kept.length) reason = baggingReason(teamed.kept, ctx.roster)
-      matches.push(reason ? { ...teamed.lineup, reason } : teamed.lineup)
-    } else matches.push(splitTeams(session, pick, format, rng))
+    const chosen =
+      format === 'doubles' && pairs.length ? fillBaggingPartners(group, pairs, free) : group
+    const split = splitTeams(session, chosen, format, rng, levelTonight)
+    const teamed =
+      format === 'doubles' && pairs.length
+        ? partnerBaggingTeams(split, pairs)
+        : { lineup: split, kept: [] as BaggingPair[] }
+    // The reason line says what drove the draft: the bagging pair or Whose turn, then Fresh faces.
+    const left = clashes(chosen),
+      dodged = avoided ? clashes(avoided) : []
+    const turn = teamed.kept.length
+      ? baggingReason(teamed.kept, ctx.roster)
+      : whoseTurnText({
+          tired: chosen.some(tired),
+          rested: Math.min(...chosen.map((p) => sitOut.get(p.id) ?? 0)),
+          mode,
+          catchUpTarget: target,
+        })
+    const fresh = left.length
+      ? "Couldn't avoid a repeat"
+      : dodged.length
+        ? dodged.some(([x, y]) => {
+            const met = metIn(x, y)
+            return !!met && partnersIn(met, x, y)
+          })
+          ? 'Avoided repeat partners'
+          : 'Avoided repeat opponents'
+        : ''
+    const draft = { ...teamed.lineup, reason: [turn, fresh].filter(Boolean).join(' · ') }
+    matches.push(draft)
     for (const p of chosen) load.set(p.id, (load.get(p.id) ?? 0) + 1)
+    planDraft(draft)
   }
   stopReason ||= `Made ${matches.length} of ${limit} match${limit === 1 ? '' : 'es'}.`
   if (mode === 'catchup') {

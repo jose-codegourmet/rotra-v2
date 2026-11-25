@@ -66,7 +66,7 @@ describe('Bagging mode in Generate matches (#739)', () => {
       limit: 1,
       bagging: on(pair(a, b)),
     })
-    expect(singles.matches[0]?.reason).toBeUndefined()
+    expect(singles.matches[0]?.reason ?? '').not.toMatch(/^Bagging pair/)
   })
   it('an applicable pair with both players free leads the next doubles draft, on one team, with the reason', () => {
     const input = scenario()
@@ -146,10 +146,11 @@ describe('Bagging mode in Generate matches (#739)', () => {
     })
     expect(allPlayers(result.matches[0]!)).toContain(a)
     expect(allPlayers(result.matches[0]!)).not.toContain(b)
-    expect(result.matches[0]?.reason).toBeUndefined()
+    expect(result.matches[0]?.reason ?? '').not.toMatch(/^Bagging pair/)
 
-    // Six players: the pair leads draft 1; in draft 2 the first player is picked again but the
-    // partner is already in a draft, so no swap happens and the draft carries no bagging reason.
+    // Six players: the pair leads draft 1. Draft 2 (Match making factors, D-2026-11-25-01) takes the
+    // two players who sat draft 1 out first; Fresh faces then avoids everyone else from draft 1,
+    // and a bagging pair never counts as a repeat, so the pair plays together again.
     const drafted = scenario(6)
     const [c, d] = [id(drafted.ctx, 0), id(drafted.ctx, 5)]
     const two = generateAutoQueueMatches({
@@ -160,9 +161,11 @@ describe('Bagging mode in Generate matches (#739)', () => {
     })
     expect(two.matches).toHaveLength(2)
     expect(sameTeam(two.matches[0]!, c, d)).toBe(true)
-    expect(allPlayers(two.matches[1]!)).toContain(c)
-    expect(allPlayers(two.matches[1]!)).not.toContain(d)
-    expect(two.matches[1]?.reason).toBeUndefined()
+    const rested = drafted.ctx.roster
+      .map((p) => p.id)
+      .filter((p) => !allPlayers(two.matches[0]!).includes(p))
+    expect(allPlayers(two.matches[1]!)).toEqual(expect.arrayContaining([...rested, c, d]))
+    expect(two.matches[1]?.reason).toMatch(/^Bagging pair/)
   })
   it('applies a game-number pattern to the pair’s next game together, counted on games played with the adjustment', () => {
     const input = scenario()
@@ -194,7 +197,7 @@ describe('Bagging mode in Generate matches (#739)', () => {
       limit: 1,
       bagging: on(pair(a, b, [2])),
     })
-    expect(skipped.matches[0]?.reason).toBeUndefined()
+    expect(skipped.matches[0]?.reason ?? '').not.toMatch(/^Bagging pair/)
     const applied = generateAutoQueueMatches({
       ...input,
       ctx: games(1, 2),

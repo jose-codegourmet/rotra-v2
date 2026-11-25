@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { ClubPlayerPictureState } from '@rotra/data/club-player/types'
 import type { PlayingLevel } from '@rotra/data/player/types'
+import type { HandicapSpot } from '@rotra/data/session-roster/handicap'
 import { NICKNAME_MAX } from '@rotra/schema/personal-details'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
@@ -11,6 +12,7 @@ import { type ClubPictureChoice, ClubPictureField } from '@rotra/ui/club-picture
 import { cn } from '@rotra/ui/cn'
 import { CountStepper } from '@rotra/ui/count-stepper'
 import { Field } from '@rotra/ui/field'
+import { HandicapPicker } from '@rotra/ui/handicap-picker'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
@@ -61,6 +63,8 @@ export type EditLivePlayerSheetProps = {
   games: number
   /** Whether they are present now */
   present: boolean
+  /** Handicap · tonight (D-2026-11-25-03): the spots marked now; omit for none */
+  handicapSpots?: readonly HandicapSpot[]
   /** Unclaimed players only: the picture editor from Edit details */
   picture?: EditLivePlayerPicture
   /** Save changes: the parent saves and closes on success; nothing is claimed as saved here */
@@ -80,6 +84,7 @@ const RING = {
   none: '[--ring:var(--border-strong)]',
 } as const
 
+const NO_SPOTS: readonly HandicapSpot[] = []
 const KIND_LABEL = { registered: 'Registered', unclaimed: 'Unclaimed', guest: 'Guest' } as const
 const GAMES_COPY = 'Auto Queue, Catch Up and fewest-games sorting use the new count right away.'
 
@@ -102,7 +107,8 @@ function Section({ id, title, children }: { id: string; title: string; children:
  * Players card. A header (picture in its level ring, the shown name, the full name when it
  * differs, chips for level, account kind and tonight's state), a **Profile** section (club
  * nickname for registered players, the picture editor for unclaimed players; left out for a guest)
- * and a **Tonight** section (Games played with "Now N", Availability Present · Not here).
+ * , a **Tonight** section (Games played with "Now N", Availability Present · Not here) and a
+ * **Handicap · tonight** section (D-2026-11-25-03: HandicapPicker).
  * Cancel / Save changes; no confirmation step.
  */
 export function EditLivePlayerSheet({
@@ -117,6 +123,7 @@ export function EditLivePlayerSheet({
   accountNickname = null,
   games,
   present,
+  handicapSpots = NO_SPOTS,
   picture,
   onSave,
   onCancel,
@@ -126,15 +133,24 @@ export function EditLivePlayerSheet({
   const formId = useId()
   const profileId = useId()
   const nightId = useId()
+  const handicapId = useId()
   const gamesLabelId = useId()
   const form = useForm<EditLivePlayerFormInput, unknown, EditLivePlayerFormValues>({
     resolver: zodResolver(editLivePlayerSchema),
-    defaultValues: editLivePlayerDefaultValues({ clubNickname, games, present }),
+    defaultValues: editLivePlayerDefaultValues({
+      clubNickname,
+      games,
+      present,
+      spots: handicapSpots,
+    }),
   })
   // Start from the player's current values each time the sheet opens.
   useEffect(() => {
-    if (open) form.reset(editLivePlayerDefaultValues({ clubNickname, games, present }))
-  }, [open, clubNickname, games, present, form.reset])
+    if (open)
+      form.reset(
+        editLivePlayerDefaultValues({ clubNickname, games, present, spots: handicapSpots }),
+      )
+  }, [open, clubNickname, games, present, handicapSpots, form.reset])
 
   const band = level ? (level.split('_')[0] as 'beginner' | 'intermediate' | 'advanced') : 'none'
   const watched = form.watch()
@@ -300,6 +316,21 @@ export function EditLivePlayerSheet({
               {shownName} is in a match now. Marking them not here doesn't take them off it.
             </span>
           ) : null}
+        </Section>
+
+        <Section id={handicapId} title="Handicap · tonight">
+          <Controller
+            control={form.control}
+            name="spots"
+            render={({ field }) => (
+              <HandicapPicker
+                value={field.value}
+                onChange={field.onChange}
+                who={shownName}
+                disabled={isPending}
+              />
+            )}
+          />
         </Section>
       </form>
     </Sheet>

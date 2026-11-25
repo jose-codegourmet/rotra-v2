@@ -1,5 +1,6 @@
 import type { Gender } from '../club-player/clubPlayer.types'
 import type { PlayingLevel } from '../player/player.types'
+import type { HandicapSpot } from './handicap.rules'
 export type SessionPlayer = {
   id: string
   sessionId: string
@@ -42,6 +43,11 @@ export type SessionPlayer = {
    * missing or 0 means no override.
    */
   gamesAdjustment?: number
+  /**
+   * Handicap · tonight (D-2026-11-25-03): spot codes the Queue Master marked; any spot shortens the
+   * games-in-a-row limit in Generate matches. Session only; missing or empty means no handicap.
+   */
+  handicapSpots?: HandicapSpot[]
 }
 /**
  * No show (cancelled): a live roster player who was away, played no games and was in no match,

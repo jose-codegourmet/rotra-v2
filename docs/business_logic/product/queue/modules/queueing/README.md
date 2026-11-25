@@ -73,7 +73,7 @@ Balanced teams matter, but reaching the minimum-game target takes priority over 
 
 ### Match making factors
 
-**Owner decision, November 25, 2026 ([D-2026-11-25-01](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-01); mockup only; [log](../../../../../mockup-changes/2026-11-25-queue-match-making-factors.md)).** Generate matches picks each draft with three checks, in this priority order. It is a **ladder, not a points score**: a higher check always wins over a lower one. It applies in all five tabs, Catch Up included.
+**Owner decision, November 25, 2026 ([D-2026-11-25-01](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-01); built in the mock app and real mode, `@rotra/data` match/matchMaking.rules.ts; [log](../../../../../mockup-changes/2026-11-25-queue-match-making-factors.md)).** Generate matches picks each draft with three checks, in this priority order. It is a **ladder, not a points score**: a higher check always wins over a lower one. It applies in all five tabs, Catch Up included.
 
 1. **Whose turn** (fair turns win over close games).
    - Each tab's own order, as before: load = games played plus planned (earlier drafts in this batch and kept drafts), with longest wait or rest breaking ties; Longest Wait puts the most matches rested first; Catch Up puts players below the target first; Plan Ahead breaks ties by the soonest free.

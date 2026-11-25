@@ -71,7 +71,10 @@ describe('Auto Queue generation', () => {
     input.session.allowDoubles = false
     const wait = generateAutoQueueMatches({ ...input, mode: 'wait', limit: 1 })
     const fewest = generateAutoQueueMatches({ ...input, mode: 'fewest', limit: 1 })
-    expect(allPlayers(wait.matches[0]!)).toEqual(players.slice(0, 2).map((p) => p.id))
+    // Fresh faces (D-2026-11-25-01): players 0 and 1 just played each other, so the longest-waiting
+    // player gets the next most due player who isn't from their last game.
+    expect(allPlayers(wait.matches[0]!)).toEqual([players[0]!.id, players[2]!.id])
+    expect(wait.matches[0]?.reason).toBe('Longest wait · Avoided repeat opponents')
     expect(allPlayers(fewest.matches[0]!)).toEqual(players.slice(2).map((p) => p.id))
     expect(generateAutoQueueMatches({ ...input, mode: 'fewest', limit: 1 })).toEqual(fewest)
   })

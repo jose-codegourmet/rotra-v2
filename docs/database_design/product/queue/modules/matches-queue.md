@@ -28,7 +28,7 @@ Queue position is advisory: any ready waiting match may be placed regardless of 
 
 Standard formats that are off for the session (`allow_singles`/`allow_doubles` false) are rejected for new or edited matches by command validation. Fun formats are always accepted for manual matches and never produced by generation.
 
-**Match making factors** ([D-2026-11-25-01](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-01), November 25, 2026; mockup only) need no new match columns: games in a row, matches sat out, the last 2 games' partners and opponents, and tonight's wins and losses are all derived from `matches` (`state`, `started_at`, `placed_at`, `ended_at`), `match_participations` and `match_decisions` at generation time, plus the proposed `session_players.handicap_spots`. Drafts stay outside these tables until transferred.
+**Match making factors** ([D-2026-11-25-01](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-01), November 25, 2026; built in the mock app and real mode) need no new match columns: games in a row, matches sat out, the last 2 games' partners and opponents, and tonight's wins and losses are all derived from `matches` (`state`, `started_at`, `placed_at`, `ended_at`), `match_participations` and `match_decisions` at generation time, plus the proposed `session_players.handicap_spots`. Drafts stay outside these tables until transferred.
 
 At Session done, waiting matches and `on_court` matches that never started are excluded from results (on_court ones settled November 6, 2026). Whether they are kept (state waiting, frozen) or marked removed is part of the open closure policy; either way they produce no facts.
 

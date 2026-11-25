@@ -31,6 +31,7 @@ import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { sameHandicap } from '@rotra/data/session-roster/handicap'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
@@ -42,6 +43,7 @@ import {
 import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetGamesPlayed } from '@rotra/data/session-roster/useSetGamesPlayed'
+import { useSetHandicap } from '@rotra/data/session-roster/useSetHandicap'
 import { useSetPresence } from '@rotra/data/session-roster/useSetPresence'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { Avatar } from '@rotra/ui/avatar'
@@ -174,6 +176,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const fillOpenSlots = useFillOpenSlots()
   const removeFromWaitlist = useRemoveFromWaitlist()
   const setGamesPlayed = useSetGamesPlayed()
+  const setHandicap = useSetHandicap()
   const setPresenceOne = useSetPresence()
   const setClubNickname = useSetClubNickname()
   const setPicture = useSetClubPlayerPicture()
@@ -441,6 +444,16 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
         })
         changed = true
       }
+      // Handicap · tonight (D-2026-11-25-03): the whole set, only when it changed.
+      if (!sameHandicap(values.spots, editPlayer.handicapSpots ?? [])) {
+        await setHandicap.mutateAsync({
+          sessionId,
+          rosterId: editPlayer.id,
+          spots: values.spots,
+          operationId: crypto.randomUUID(),
+        })
+        changed = true
+      }
       if (values.present !== editPlayer.present) {
         await setPresence.flush()
         await setPresenceOne.mutateAsync({
@@ -564,6 +577,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
                 photoUrl={photoFor(row.player)}
                 level={row.player.level}
                 games={row.games}
+                handicapSpots={row.player.handicapSpots}
                 forTheNight={row.games + queuedCount(row.player.id, all)}
                 waitMinutes={row.minutes}
                 status={row.status}
@@ -756,6 +770,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           accountNickname={editClubPlayer?.nickname ?? null}
           games={Math.min(99, editRowData.games)}
           present={editPlayer.present}
+          handicapSpots={editPlayer.handicapSpots}
           picture={
             editKind === 'unclaimed' && pictureDetails.data?.picture && editClubPlayer
               ? {

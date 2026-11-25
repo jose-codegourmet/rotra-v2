@@ -1,5 +1,6 @@
 import { resetClock } from '../../src/clock.ts'
 import { expect, test } from '../../src/fixtures.ts'
+import { skipUntilInGo } from '../../src/known-defect.ts'
 import { liveSession } from '../../src/ui/journeys.ts'
 import {
   abandonCreatedSessions,
@@ -12,6 +13,7 @@ import {
 } from '../../src/ui/queue.ts'
 import { advance, MINUTE } from '../../src/ui/time.ts'
 
+skipUntilInGo('BL-22', 'trusted hosts are not in Go, so the Queue session form does not load')
 test.use({ actionTimeout: 15_000 })
 // Clean up on the journey's own virtual time first (court actions follow the server clock).
 test.afterEach(async () => {

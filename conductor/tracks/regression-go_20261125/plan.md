@@ -34,7 +34,7 @@ Order of work: get one test through the whole new stack first (Phase 2, no clock
 ## Phase 4: Scenarios through Go
 
 - [x] **4.1** Run every `sim` scenario. A difference in behavior is a `bug` issue under #869 and the test is marked with `knownDefect`. A route that is missing in Go is a backlog item, not a bug, and the test is skipped with that item's id
-- [ ] **4.2** Run the `ui` tests the same way
+- [x] **4.2** Run the `ui` tests the same way (GitHub run 45531969580, since this Mac has no Chromium: 4 failed, all four triaged below; UI-01, UI-08, UI-12 and UI-17 are skipped with BL-22)
 - [x] **4.3** Delete the Supabase leftovers in `apps/e2e` (`seed/auth-admin.ts`, the `auth.users` bridge, unused keys)
 
 ## Phase 5: CI and docs
@@ -49,8 +49,8 @@ Order of work: get one test through the whole new stack first (Phase 2, no clock
 |---|---|---|
 | REG-08 | P14 at 7 games against 8; spread 3 (seed 3505436714) | Same numbers: real queue-rules defect, not Go. [#1098](https://github.com/jose-codegourmet/rotra-v2/issues/1098), `knownDefect` |
 | REG-33 | claim link status `valid`, test expects `active` | Stale test expectation (`ClaimLinkStatus` is `valid`), fixed in the test. Passes |
-| UI-01 | Admin Clubs table never shows the seeded club | Not run locally (no Chromium on this Mac); see CI run |
-| UI-08, UI-12, UI-17 | Start session never reaches the live session console | Not run locally; see CI run |
+| UI-01 | Admin Clubs table never shows the seeded club | The page did show the club, as a `button`; the test looked for a `link`. Locator fixed (not run: it goes on to create a Session, which BL-22 blocks). Skipped, BL-22 |
+| UI-08, UI-12, UI-17 | Start session never reaches the live session console | The form never opens: `GET /api/club/trusted-hosts` is 404 in Go (not in Go, [BL-22](../../tracks.md#backlog)), so the Session title field is never rendered. Skipped, BL-22 |
 
 ## Findings
 
@@ -59,6 +59,9 @@ Order of work: get one test through the whole new stack first (Phase 2, no clock
 | 2026-11-25 | REG-08 | A player present all night ends one game under the floor, spread 3. Identical to the TypeScript baseline, so a queue-rules defect. Test marked `knownDefect` | [#1098](https://github.com/jose-codegourmet/rotra-v2/issues/1098) |
 | 2026-11-25 | REG-33 | Stale test expectation: the claim link status is `valid`, not `active`. Fixed in the test | none |
 | 2026-11-25 | all `sim` | 45 passed through Go (REG-09 #3 and REG-DEF-01 were already `knownDefect`), 100 refreshes on `expired` all answered 200, no 429 | none |
+| 2026-11-25 | UI-01, UI-08, UI-12, UI-17 | Trusted club hosts and Session hosts (`/api/club/trusted-hosts`, `/api/sessions/{id}/hosts`) have no Go route, so the Queue session form shows "Couldn't load your trusted hosts. Not found." The cookies work in Chromium (Admin signed in, Clubs listed). A missing route, so a backlog item and a skip, not a bug. Spec 1.1 missed it: D-2026-11-22-01 landed after the 215-route comparison | BL-22 |
+| 2026-11-25 | UI-01 | The Clubs table lists the club name as a `button`; the test used a `link` (a stale locator, fixed) | none |
+| 2026-11-25 | all Go tests | `go test ./...` is red on `go-stack` itself in five tests: `TestSessionStandings` and `TestResultSnapshotGolden` (`sessionresult`), `TestEveryCaseThroughTheEnvelope` (`ruleswasm`), `TestMatchControlGolden` and `TestFinalizeGolden` (`queuewrites`). Unchanged by this track (checked on a clean `go-stack` worktree) and already BL-20. `make check` does not run them | BL-20 |
 | 2026-11-25 | Next.js | `next build` of Queue stops under an AI agent with a security-upgrade nudge for Next.js 16.4.3 (the agent check, not CI). Not part of this track; the owner decides whether to upgrade | none |
 
 ## Deviations log

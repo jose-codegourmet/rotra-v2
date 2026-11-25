@@ -30,6 +30,10 @@ gets their fair share of games when real-life disruptions happen. Decisions:
 - The apps run **built** (`next build` + `next start`, into `.next-e2e`), locally and on GitHub, so
   the suite tests what ships. Each run builds first (a few minutes). `E2E_DEV=1` runs `next dev`
   instead, for fast restarts while writing a test.
+- Skipped: the four `ui` tests (UI-01, UI-08, UI-12, UI-17) create a Session in the browser, and the
+  trusted-hosts routes the session form loads are not in Go yet ([BL-22](../conductor/tracks.md#backlog)).
+  The `sim` scenarios use the API and are not affected. Known defects are marked with `knownDefect` and
+  pass only while their exact failure happens (REG-08 is [#1098](https://github.com/jose-codegourmet/rotra-v2/issues/1098)).
 - Not part of `make check`. Run it on demand. Offline mode is not covered.
 
 ## Pass rules

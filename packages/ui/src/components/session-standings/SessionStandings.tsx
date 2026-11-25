@@ -10,7 +10,7 @@ import {
   type StandingsGames,
   StandingsPlayerCell,
 } from '@rotra/ui/standings-faces'
-import { useRef } from 'react'
+import { type ReactNode, useRef } from 'react'
 
 /** One player inside a standings position. */
 export type SessionStandingsPlayer = {
@@ -45,6 +45,8 @@ export type SessionStandingsProps = {
   /** Your position › Share: the system share sheet with “I finished #N of M …” */
   onShareFinish: () => void
   onShareLeaderboard: () => void
+  /** The session's TopThreePodium, between the players count and the table (D-2026-11-25-04) */
+  podium?: ReactNode
 }
 
 const flash = (row: HTMLElement) => {
@@ -72,6 +74,7 @@ export function SessionStandings({
   viewer,
   onShareFinish,
   onShareLeaderboard,
+  podium,
 }: SessionStandingsProps) {
   const mineRef = useRef<HTMLTableRowElement>(null)
   const mine = rows.find((row) => row.players.some((player) => player.isViewer))
@@ -164,6 +167,7 @@ export function SessionStandings({
           Share leaderboard
         </Button>
       </div>
+      {podium}
       <Card padding="none" className="overflow-x-auto px-2 py-1">
         <table className="w-full border-collapse text-sm">
           <thead>

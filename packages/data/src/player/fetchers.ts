@@ -6,7 +6,7 @@ import type { Gender } from '../club-player/clubPlayer.types'
 import { clubPictureState, takesClubPicture } from '../club-player/clubPlayerPicture.rules'
 import { getConnectivity } from '../connectivity/connectivity'
 import { unclaimedClubCount } from '../leaderboard/identity'
-import { LEADERBOARD_LIMIT } from '../leaderboard/leaderboard.types'
+import { leaderboardTop } from '../leaderboard/leaderboard.rules'
 import { mockLeaderboard } from '../leaderboard/projection'
 import { playerRequest } from '../leaderboard/request'
 import { checkMockSave } from '../mock/bridge'
@@ -48,10 +48,9 @@ export async function getPlayerRank(
   await playerRequest(signal)
   await requireProfileAccess(playerId)
   const state = readMockState()
-  const annual = mockLeaderboard(state)
-    .standings('year')
-    .slice(0, LEADERBOARD_LIMIT)
-    .find((row) => row.id === playerId)
+  const annual = leaderboardTop(mockLeaderboard(state).standings('year')).find(
+    (row) => row.id === playerId,
+  )
   const rank = playerProjection(state).ranks[playerId]
   return rank ? { ...rank, position: annual?.position ?? null } : null
 }

@@ -1,6 +1,6 @@
 # Player app: four leaderboard periods, shared places, an always-on podium with stacked places, full names, and a club leaderboard
 
-Status: NEW
+Status: IN MOCK APP — #1106 (PR #1107)
 Date: 2026-11-25
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › P-LEADERBOARD block (`LB_PERIODS`, `lbWhen`, `periodList`, `lbSort`, `playedAtClub`, `topPlace`, `topRow`, `topPlaces`, `lbRow`, `meCard`, `lbTabs`, `lbShown`, `viewBoard`, `podium`, `lbPlaceSheet`, `clubBoardCard`, `clubBoardBody`, `viewClubBoard`), `.pod-stack`, `.pod-more`, `.pod.empty`, `.pod-none`, `viewClub` (Leaderboard card), `viewAccount` (Profile visibility hint), `SHEETS.lbPlace`, actions `clubLbPeriod`, `openClubBoard`, `openLbPlace`, routes `/player/clubs/<id>/leaderboard`

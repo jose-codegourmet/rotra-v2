@@ -5,6 +5,7 @@ export const liveLeaderboardMeta = {
   description:
     "Tonight's standings on the console's Leaderboard view: position with the top three highlighted, player faces (stacked when players share a position), names and levels, W, L, games against the session minimum and win %. A working view for the Queue Master, not official history.",
   usage: [
+    "podium: the session's TopThreePodium (D-2026-11-25-04), rendered after the copy and before the table or the empty card; the record variant has no copy, so its container may place the podium itself.",
     'Rows are { position, players, wins, losses, games }: one row per position, best first. Players with the same wins and losses share a row (positions 1, 1, 2) and their names follow the standings order. Compute positions upstream (Q23.4); this component never does. Only players with at least one counted game are included.',
     'A shared position stacks its faces (the first on top) over every name, joined by commas; the level line lists the distinct levels. Each face is its own profile button. W and L are the shared values; games is one number or {min, max} shown "5–6". The rank badge and top-three tint follow the position, so a position 3 shared by three players is tinted. Win % is wins over wins plus losses. Long names wrap inside the Player column and never push into W, L or Games.',
     "On the live variant every face has a 3 px ring in its player's level band (Beginner blue, Intermediate yellow, Advanced red, grey with no level), stacked faces included. The record variant has no rings.",

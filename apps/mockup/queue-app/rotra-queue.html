@@ -6063,7 +6063,7 @@ function podiumHtml(o) {
   const step = (k) => {
     const pl = o.places.find((x) => x.pos === k + 1), rows = pl ? pl.rows : [];
     const block = `<span class="pod-step" aria-hidden="true"><b>${k + 1}</b><small>${POD_SHORT[k]}</small></span>`;
-    if (!rows.length) return `<div class="pod p${k + 1} empty" role="group" aria-label="${POD_PLACE[k]} place, no one yet"><span class="pod-who"><span class="avatar pod-none" aria-hidden="true"></span><b class="pod-name" aria-hidden="true">—</b><span class="pod-lv" aria-hidden="true">&nbsp;</span></span>${block}</div>`;
+    if (!rows.length) return `<div class="pod p${k + 1} empty" role="group" aria-label="${POD_PLACE[k]} place, no one yet"><span class="pod-who"><span class="avatar pod-none" aria-hidden="true"></span><b class="pod-name" aria-hidden="true">No one yet</b><span class="pod-lv" aria-hidden="true">&nbsp;</span></span>${block}</div>`;
     const fire = k === 0 ? `${(setTimeout(ppFireStart), '')}<canvas class="pp-fire pod-fire" width="48" height="40" data-heat="34" aria-hidden="true"></canvas>` : '';
     const one = rows.length === 1, names = rows.map((r) => r.p.name);
     // Past three, two pictures and a "+N" bubble keep the stack inside its step on a 375 px phone.

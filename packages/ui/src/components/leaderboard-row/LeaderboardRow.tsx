@@ -18,6 +18,12 @@ export type LeaderboardRowProps = LeaderboardRowVariants & {
   unclaimed?: boolean
   picture?: Pick<AvatarProps, 'src' | 'initials'>
   isMe?: boolean
+  /** Another player has the same place: the accessible name adds ", shared" */
+  shared?: boolean
+  /** The player's club under the name (the Queue ROTRA board) */
+  club?: string
+  /** With `period`: "P% win rate" under the wins (the Queue Leaderboards page) */
+  winRate?: number
   masked?: boolean
   /** The profile box jumps to this row, which flashes for about 1.6 seconds. */
   flash?: boolean
@@ -51,6 +57,9 @@ export function LeaderboardRow({
   unclaimed = false,
   picture,
   isMe = false,
+  shared = false,
+  club,
+  winRate,
   variant,
   onSelect,
   masked = false,
@@ -63,10 +72,12 @@ export function LeaderboardRow({
   const movement = hasMovement ? leaderboardMovement(period, position, previousPosition) : undefined
   const detail = period ? winLabel : levelLabel
   const identity = [
-    positionLabel(position, rowVariant),
+    `${positionLabel(position, rowVariant)}${shared ? ', shared' : ''}`,
     `${fullName}${isMe ? ' (you)' : ''}`,
+    club,
     unclaimed ? 'not registered yet' : undefined,
     detail,
+    period && winRate !== undefined ? `${winRate}% win rate` : undefined,
   ]
     .filter(Boolean)
     .join(', ')
@@ -132,8 +143,16 @@ export function LeaderboardRow({
         {!masked && nickname ? <span className="text-[13px] text-fg2">“{nickname}”</span> : null}
         {isMe ? <Chip tone="accent">You</Chip> : null}
         {unclaimed ? <Chip tone="warn">Not registered yet</Chip> : null}
+        {club ? <span className="basis-full text-[13px] text-fg2">{club}</span> : null}
       </span>
-      {period ? (
+      {period && winRate !== undefined ? (
+        <span className="flex flex-col items-end gap-px text-right max-[560px]:col-start-4 max-[560px]:flex-row max-[560px]:items-baseline max-[560px]:gap-1.5 max-[560px]:justify-self-start max-[560px]:text-left">
+          <b className="font-mono text-[15px] whitespace-nowrap tabular-nums max-[560px]:text-[13px]">
+            {winLabel}
+          </b>
+          <span className="text-xs text-fg2">{winRate}% win rate</span>
+        </span>
+      ) : period ? (
         <b className="justify-self-end font-mono text-[15px] whitespace-nowrap tabular-nums max-[560px]:col-start-4 max-[560px]:justify-self-start max-[560px]:text-[13px]">
           {winLabel}
         </b>

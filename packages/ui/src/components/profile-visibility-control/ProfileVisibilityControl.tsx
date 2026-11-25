@@ -69,6 +69,9 @@ export function ProfileVisibilityControl({
           disabled={isPending}
           aria-busy={isPending}
         />
+        <p className="m-0 text-[13px] text-fg2">
+          Leaderboards always show your full name and picture, whatever this is set to.
+        </p>
         <p className="m-0 text-sm" aria-live="polite">
           {isPending
             ? 'Saving…'

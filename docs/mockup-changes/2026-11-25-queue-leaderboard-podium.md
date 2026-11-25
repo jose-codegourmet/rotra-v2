@@ -1,6 +1,6 @@
 # Queue leaderboards get the ROTRA Player podium, and a Leaderboards page joins the left nav
 
-Status: NEW
+Status: IN MOCK APP — #1106 (PR #1107)
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `podiumHtml`, `sessionPodium`, `boardPane` (console Leaderboard tab), `histResultsPane` (record › Results), `pubLeaderboard` (public page › Leaderboard), sheet `podiumPlace`, `viewLeaderboards`, `navRail`
@@ -16,7 +16,7 @@ Superseded by: none
   “Top three” card lit from below in the accent with an 8 px grid and drifting ember pixels, pixel-notched steps
   (2nd–1st–3rd), the pixel font (Silkscreen, added to the Queue mockup's font link) and pixel fire behind 1st.
   - Before: a podium only on ROTRA Player, showing exactly three single players. After: the podium **always shows**.
-    A place with no one yet keeps its step with an empty dashed circle and “—”; with no one in 1st there is no fire.
+    A place with no one yet keeps its step with an empty dashed circle and “No one yet”; with no one in 1st there is no fire.
   - A **shared place** stacks its pictures on the step (up to three; past three, two and a “+N” bubble), reads
     the first two names and “+N more” with the record line ending in “each”, and opens the new **Podium place** dialog.
   - A one-player place opens that player's profile (club profile sheet; on the public page the profile card for a

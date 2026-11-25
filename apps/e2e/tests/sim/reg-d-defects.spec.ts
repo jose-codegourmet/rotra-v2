@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test'
 import { asQueueMaster } from '../../src/api/sign-in.ts'
+import { expect, test } from '../../src/fixtures.ts'
 import { knownDefect } from '../../src/known-defect.ts'
 import { QueueMasterApi } from '../../src/sim/api.ts'
 import { Engine } from '../../src/sim/engine.ts'

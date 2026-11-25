@@ -1,4 +1,4 @@
-import { test } from '@playwright/test'
+import { test } from '../../src/fixtures.ts'
 import {
   baggingKept,
   injuryInQueue,

@@ -54,7 +54,8 @@ func (c *ttlCache[V]) get(id uuid.UUID) (V, bool) {
 	if !ok {
 		return zero, false
 	}
-	if !c.now().Before(e.until) {
+	// An entry that ends more than one TTL ahead was put on a clock that has since gone back (the test clock).
+	if now := c.now(); !now.Before(e.until) || e.until.Sub(now) > c.ttl {
 		delete(c.m, id)
 		return zero, false
 	}

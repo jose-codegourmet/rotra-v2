@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test'
 import { asQueueMaster } from '../../src/api/sign-in.ts'
+import { expect, test } from '../../src/fixtures.ts'
 import { QueueMasterApi } from '../../src/sim/api.ts'
 import { Engine, finishSession } from '../../src/sim/engine.ts'
 import { PlayerPool, qmRequests, storedStatus, waitingInOrder } from '../../src/sim/requests.ts'

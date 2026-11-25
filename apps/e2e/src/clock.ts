@@ -1,12 +1,16 @@
-import { APPS, type AppName } from './stack.ts'
+import { APPS, type AppName, GO_CLOCK_URL } from './stack.ts'
 
-/** What each app server's clock control (src/server-clock.mjs) reports. */
+/** What each server's clock control (src/server-clock.mjs, or the Go API's test clock) reports. */
 export type ClockState = { nowMs: number; offsetMs: number; realNowMs: number }
 
 const APP_NAMES = Object.keys(APPS) as AppName[]
-const clockUrl = (app: AppName) => `http://127.0.0.1:${APPS[app].clockPort}/clock`
+/** The three apps' clock controls and the Go API's (apps/api/internal/testclock): the same contract. */
+type ClockTarget = AppName | 'go'
+const CLOCK_TARGETS: ClockTarget[] = [...APP_NAMES, 'go']
+const clockUrl = (target: ClockTarget) =>
+  target === 'go' ? GO_CLOCK_URL : `http://127.0.0.1:${APPS[target].clockPort}/clock`
 
-async function control(app: AppName, body?: unknown): Promise<ClockState> {
+async function control(app: ClockTarget, body?: unknown): Promise<ClockState> {
   const response = await fetch(clockUrl(app), {
     method: body === undefined ? 'GET' : 'POST',
     ...(body === undefined
@@ -19,12 +23,12 @@ async function control(app: AppName, body?: unknown): Promise<ClockState> {
 }
 
 /**
- * Sets the server clock of all three apps to `nowMs` (epoch ms); it then keeps ticking in real
+ * Sets the server clock of all three apps and the Go API to `nowMs` (epoch ms); it then keeps ticking in real
  * time. Never earlier than real time (the database keeps real time). Browser time is separate: use
  * Playwright's `page.clock` for that.
  */
 export async function setClock(nowMs: number) {
-  return Promise.all(APP_NAMES.map((app) => control(app, { nowMs })))
+  return Promise.all(CLOCK_TARGETS.map((target) => control(target, { nowMs })))
 }
 
 /** Moves every server clock `ms` ahead of the Queue app's current virtual now. */
@@ -33,11 +37,11 @@ export async function advanceClock(ms: number) {
   return setClock(nowMs + ms)
 }
 
-/** Back to real time on all three apps. */
+/** Back to real time on all three apps and the Go API. */
 export async function resetClock() {
-  return Promise.all(APP_NAMES.map((app) => control(app, { reset: true })))
+  return Promise.all(CLOCK_TARGETS.map((target) => control(target, { reset: true })))
 }
 
-export async function readClock(app: AppName = 'queue') {
+export async function readClock(app: ClockTarget = 'queue') {
   return control(app)
 }

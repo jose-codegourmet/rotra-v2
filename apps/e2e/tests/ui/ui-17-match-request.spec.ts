@@ -1,5 +1,6 @@
-import { expect, type Page, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 import { resetClock } from '../../src/clock.ts'
+import { expect, test } from '../../src/fixtures.ts'
 import { liveSession } from '../../src/ui/journeys.ts'
 import { abandonCreatedSessions, consoleTab } from '../../src/ui/queue.ts'
 import { rolePage, signInPlayer } from '../../src/ui/sign-in.ts'

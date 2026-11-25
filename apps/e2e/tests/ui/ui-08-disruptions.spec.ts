@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test'
 import { resetClock } from '../../src/clock.ts'
+import { expect, test } from '../../src/fixtures.ts'
 import { knownDefect } from '../../src/known-defect.ts'
 import { liveSession } from '../../src/ui/journeys.ts'
 import {

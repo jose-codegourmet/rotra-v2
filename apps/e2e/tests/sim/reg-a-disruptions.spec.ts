@@ -1,4 +1,4 @@
-import { test } from '@playwright/test'
+import { test } from '../../src/fixtures.ts'
 import { knownDefect } from '../../src/known-defect.ts'
 import { eating, injured, invalidMatches, late, subbed, tired } from '../../src/sim/disruptions.ts'
 import { matchRequests } from '../../src/sim/requests.ts'

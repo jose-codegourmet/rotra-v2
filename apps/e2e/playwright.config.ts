@@ -1,9 +1,19 @@
 import { defineConfig, devices, type Project } from '@playwright/test'
 import { assertE2eEnv } from './src/guard.ts'
-import { APPS, type AppName, appServerEnv, appUrl, e2eEnv, readStackKeys } from './src/stack.ts'
+import {
+  APPS,
+  type AppName,
+  appServerEnv,
+  appUrl,
+  e2eEnv,
+  GO_API_URL,
+  GO_BINARY,
+  GO_LOG,
+  goApiEnv,
+} from './src/stack.ts'
 
 /**
- * ROTRA regression suite: the three apps in REAL data mode against the throwaway local Supabase.
+ * ROTRA regression suite: the three apps in REAL data mode with every `/api` call forwarded to the Go API, on a throwaway local Postgres.
  * Run through `make e2e` (prepare + Playwright). Projects:
  *   sim  API-only simulations, one worker, in order (the server clock is global)
  *   ui   Chromium
@@ -12,8 +22,7 @@ import { APPS, type AppName, appServerEnv, appUrl, e2eEnv, readStackKeys } from 
  * so the suite tests what ships. E2E_DEV=1 runs `next dev` instead for fast restarts while writing
  * a test (ignored on CI).
  */
-const keys = readStackKeys()
-const env = e2eEnv(keys)
+const env = e2eEnv()
 assertE2eEnv(env)
 // The runner and its workers use the same explicit values (no NODE_OPTIONS: no clock in here).
 Object.assign(process.env, env)
@@ -22,6 +31,23 @@ const ci = process.env.CI === 'true'
 const suite = process.env.E2E_SUITE
 const watch = process.env.E2E_WATCH === '1'
 const dev = process.env.E2E_DEV === '1' && !ci
+
+/**
+ * The Go API (built by prepare with `-tags e2e`) as a fourth server. Playwright polls /healthz, which
+ * the proxy secret does not guard; global-setup then waits for /readyz with the secret, so the suite
+ * starts only when Go can reach the database. Its log goes to .e2e/go-api.log (see src/go-log.ts).
+ */
+function goApiServer() {
+  return {
+    name: 'go-api',
+    command: `exec ${GO_BINARY} > ${GO_LOG} 2>&1`,
+    url: `${GO_API_URL}/healthz`,
+    env: goApiEnv(),
+    reuseExistingServer: false,
+    timeout: 60_000,
+    gracefulShutdown: { signal: 'SIGTERM' as const, timeout: 10_000 },
+  }
+}
 
 function webServer(app: AppName) {
   const { dir, port } = APPS[app]
@@ -35,7 +61,7 @@ function webServer(app: AppName) {
       ? `${next} dev ${host}`
       : `ROTRA_E2E_CLOCK=0 ${next} build && ${next} start ${host}`,
     url: `${appUrl(app)}/api/auth/session`,
-    env: appServerEnv(keys, app),
+    env: appServerEnv(app),
     reuseExistingServer: false,
     timeout: dev ? 180_000 : 600_000,
     stdout: 'pipe' as const,
@@ -78,5 +104,5 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
   projects: [setup, ...projects.filter((project) => !suite || project.name === suite)],
-  webServer: (Object.keys(APPS) as AppName[]).map(webServer),
+  webServer: [goApiServer(), ...(Object.keys(APPS) as AppName[]).map(webServer)],
 })

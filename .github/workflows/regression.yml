@@ -1,6 +1,7 @@
-# Manual regression run: the three apps in REAL data mode against a throwaway local Supabase stack
-# started on the runner (`supabase start`). It uses NO secrets and NO environment: nothing here
-# reaches a hosted Supabase project or Vercel. Same steps as `make e2e`, without nvm.
+# Manual regression run: the three apps in REAL data mode, every `/api` call forwarded to the Go API,
+# on a throwaway Postgres container on the runner (127.0.0.1:54329). It uses NO secrets and NO
+# environment: nothing here reaches a hosted database, Supabase or Vercel. Same steps as `make e2e`,
+# without nvm. `prepare` starts the container itself (docker) when it is not there.
 name: Regression
 
 on:
@@ -47,12 +48,11 @@ jobs:
       # packages/db has no postinstall; the apps' `next build` needs the Prisma client.
       - run: pnpm --filter @rotra/db db:generate
 
-      - uses: supabase/setup-cli@v1
+      # Go builds the API (`go build -tags e2e`, with the test clock) in `prepare`; the cache keeps it quick.
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
-          version: 2.34.3
-
-      - name: Ensure psql
-        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+          go-version-file: apps/api/go.mod
+          cache-dependency-path: apps/api/go.sum
 
       - name: Install Chromium
         if: inputs.suite != 'sim'
@@ -79,6 +79,15 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
+      - name: Upload the Go API log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-api-log
+          path: apps/e2e/.e2e/go-api.log
+          retention-days: 14
+          if-no-files-found: ignore
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -88,6 +97,6 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
-      - name: Stop local Supabase
+      - name: Stop the throwaway Postgres
         if: always()
-        run: supabase stop --no-backup || true
+        run: docker rm -f rotra-e2e-pg || true

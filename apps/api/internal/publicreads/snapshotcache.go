@@ -157,7 +157,8 @@ func (c *snapshotCache) usableLocked(e *snapshotEntry, min int64, now time.Time)
 	if o, ok := c.latest[e.session]; ok && e.version < o.version {
 		return false
 	}
-	return now.Before(e.expires)
+	// An entry that expires more than one TTL ahead was built on a clock that has since gone back (the test clock).
+	return now.Before(e.expires) && e.expires.Sub(now) <= c.ttl
 }
 
 // get returns the shared body for key, building it with load when there is none or it has expired. It is getAt with no

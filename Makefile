@@ -47,16 +47,17 @@ observability-up:
 observability-down:
 	@docker compose -f docker-compose.observability.yml down
 
-# Playwright regression suite (apps/e2e): REAL data mode against a throwaway LOCAL Supabase.
-# Starts or reuses the local stack, rebuilds + migrates + seeds rotra_disposable_e2e, then runs
-# Playwright (apps on :9100-9102). Not part of `make check`. Pass Playwright args with
-# E2E_ARGS="--project sim" (or E2E_SUITE=sim|ui).
+# Playwright regression suite (apps/e2e): REAL data mode, every /api call through the Go API, on a
+# throwaway Postgres container (rotra-e2e-pg, 127.0.0.1:54329). Needs Docker and Go; no Supabase.
+# Starts or reuses the container, rebuilds + migrates rotra_disposable_e2e, builds the Go API with the
+# test clock (-tags e2e), seeds, then runs Playwright (apps on :9100-9102, Go on :9103).
+# Not part of `make check`. Pass Playwright args with E2E_ARGS="--project sim" (or E2E_SUITE=sim|ui).
 e2e:
 	@$(NVM) && pnpm --filter @rotra/e2e e2e $(E2E_ARGS)
 
 e2e-ui:
 	@$(NVM) && pnpm --filter @rotra/e2e e2e:ui $(E2E_ARGS)
 
-# Stops the local Supabase stack (never a hosted project)
+# Removes the throwaway e2e Postgres container (never a hosted database)
 e2e-down:
-	@supabase stop
+	@docker rm -f rotra-e2e-pg

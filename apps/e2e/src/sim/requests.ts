@@ -1,11 +1,11 @@
-import { execFileSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import { request } from '@playwright/test'
 import { readAccounts } from '../accounts.ts'
 import { type ApiReply, AppClient } from '../api/client.ts'
 import { asPlayer } from '../api/sign-in.ts'
 import { assertLocalDbUrl } from '../guard.ts'
-import { appUrl, E2E_DB_URL, psqlPath } from '../stack.ts'
+import { sql } from '../postgres.ts'
+import { appUrl, E2E_DB_URL } from '../stack.ts'
 import { matchOf } from './api.ts'
 import type { Engine } from './engine.ts'
 import type { Rng } from './prng.ts'
@@ -112,10 +112,7 @@ export function qmRequests(engine: Engine) {
 export function storedStatus(requestId: string) {
   assertLocalDbUrl('DATABASE_URL', E2E_DB_URL)
   if (!/^[0-9a-f-]{36}$/i.test(requestId)) throw new Error(`bad request id ${requestId}`)
-  return execFileSync(psqlPath(), [E2E_DB_URL, '-qtA'], {
-    input: `select status from session_match_requests where id = '${requestId}';`,
-    encoding: 'utf8',
-  }).trim()
+  return sql(`select status from session_match_requests where id = '${requestId}';`)
 }
 
 /** Roster id → seeded player number, for the roster entries that are registered players. */

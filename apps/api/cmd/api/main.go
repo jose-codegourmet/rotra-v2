@@ -71,6 +71,11 @@ func run() error {
 		defer cancel()
 		_ = tracing.Shutdown(ctx)
 	}()
+	// The clock every business time reads. It is time.Now, except in the regression suite's binary (build tag e2e).
+	now, serveClock, err := testClock(os.LookupEnv, cfg.DatabaseURL, log)
+	if err != nil {
+		return err
+	}
 	if cfg.ProxySecret == "" {
 		log.Warn("ROTRA_PROXY_SECRET is not set: only /healthz and the stream routes answer")
 	}
@@ -78,15 +83,15 @@ func run() error {
 
 	ready := httpapi.NewReadiness()
 	// One budget per trusted client IP for every public-read route (B-43); later tracks pass the same limiter.
-	publicLimiter := httpapi.NewRateLimiter(httpapi.PublicReadsPerMinute, nil)
+	publicLimiter := httpapi.NewRateLimiter(httpapi.PublicReadsPerMinute, now)
 	// The session snapshot cache is shared with the live-update publisher, which tells it every version it pushes (B-25).
-	snapshots := publicreads.NewSnapshots(publicreads.SnapshotSettings{})
-	routes := []func(*http.ServeMux){publicreads.Register(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log, Snapshots: snapshots})}
+	snapshots := publicreads.NewSnapshots(publicreads.SnapshotSettings{Now: now})
+	routes := []func(*http.ServeMux){publicreads.Register(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log, Snapshots: snapshots, Now: now})}
 	var authenticator *session.Authenticator // set where sign-in is configured; nil leaves every stream viewer a visitor
 	if cfg.AuthSigningKey == nil {
 		log.Warn("ROTRA_AUTH_SIGNING_KEY is not set: no auth routes are served")
 		// With no sign-in every caller is a visitor, so the reads that depend on the viewer are served as the visitor's.
-		routes = append(routes, publicreads.RegisterVisitorOnly(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log, Snapshots: snapshots}))
+		routes = append(routes, publicreads.RegisterVisitorOnly(publicreads.Deps{Pool: pool.Raw(), Limiter: publicLimiter, Logger: log, Snapshots: snapshots, Now: now}))
 	} else {
 		current := cfg.AuthSigningKey.Public().(ed25519.PublicKey)
 		keys, err := pass.NewKeySet(current, cfg.AuthExtraPublicKeys...)
@@ -110,26 +115,26 @@ func run() error {
 		authStore := authstore.New(pool.Raw())
 		svc, err := session.New(session.Deps{
 			Store: authStore, Signer: signer, Verifier: verifier, Hasher: hasher,
-			Tuning: cfg.AuthTuning, SigningKey: cfg.AuthSigningKey, Logger: log,
+			Tuning: cfg.AuthTuning, SigningKey: cfg.AuthSigningKey, Logger: log, Clock: now,
 		})
 		if err != nil {
 			return err
 		}
 		authenticator = svc.Authenticator()
-		signInRoutes, err := signin.Register(signin.Deps{Service: svc, Store: authStore, Verifier: verifier, Logger: log, PlayerSession: playerGateHint(pool.Raw(), log, time.Now)})
+		signInRoutes, err := signin.Register(signin.Deps{Service: svc, Store: authStore, Verifier: verifier, Logger: log, PlayerSession: playerGateHint(pool.Raw(), log, now), Clock: now})
 		if err != nil {
 			return err
 		}
 		routes = append(routes, signInRoutes)
 		// The registration link shares the public-read budget for its read and the sign-in limits for its submit.
-		claimRoutes, err := claim.Register(claim.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, ReadLimiter: publicLimiter, Logger: log})
+		claimRoutes, err := claim.Register(claim.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, ReadLimiter: publicLimiter, Logger: log, Clock: now})
 		if err != nil {
 			return err
 		}
 		routes = append(routes, claimRoutes)
 		// Guest registration through a club or session link (POST only; its page read stays in Next.js). It finishes a claim,
 		// so it takes the claim's dependencies and counts against the claim's per-address limit.
-		registerRoutes, err := register.Register(register.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log})
+		registerRoutes, err := register.Register(register.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log, Clock: now})
 		if err != nil {
 			return err
 		}
@@ -138,7 +143,7 @@ func run() error {
 		// Without a Google client (GOOGLE_OAUTH_*) the routes still exist and Continue with Google answers "unavailable".
 		var googleClient *google.Client
 		if cfg.Google.Set() {
-			googleClient = google.NewClient(cfg.Google.ClientID, cfg.Google.ClientSecret, google.Production, nil, nil)
+			googleClient = google.NewClient(cfg.Google.ClientID, cfg.Google.ClientSecret, google.Production, nil, now)
 		} else if cfg.Google.Problem != "" {
 			log.Warn("Google sign-in is off: "+cfg.Google.Problem, "effect", "Continue with Google answers unavailable")
 		} else {
@@ -146,47 +151,47 @@ func run() error {
 		}
 		googleHandlers, err := google.New(google.Deps{
 			Pool: pool.Raw(), Service: svc, Store: authStore, Client: googleClient, Sealer: google.NewSealer(cfg.AuthSigningKey),
-			RedirectBase: cfg.Google.RedirectBase, Logger: log,
+			RedirectBase: cfg.Google.RedirectBase, Logger: log, Clock: now,
 		})
 		if err != nil {
 			return err
 		}
 		routes = append(routes, googleHandlers.Routes())
-		registerGoogleRoutes, err := register.RegisterGoogle(register.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log}, googleHandlers)
+		registerGoogleRoutes, err := register.RegisterGoogle(register.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log, Clock: now}, googleHandlers)
 		if err != nil {
 			return err
 		}
 		routes = append(routes, registerGoogleRoutes)
 		// Admin-reviewed password recovery: the two public Player routes. The Admin list (signedin) and review
 		// (adminwrites) routes call the same service.
-		recoveryService, err := recovery.New(recovery.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log})
+		recoveryService, err := recovery.New(recovery.Deps{Pool: pool.Raw(), Service: svc, Store: authStore, Logger: log, Clock: now})
 		if err != nil {
 			return err
 		}
 		routes = append(routes, recoveryService.Routes())
 		// The Admin app's writes (go-writes-admin-player). They go on the signed-in router: the apps share paths, and
 		// net/http registers a pattern once, so every write package adds its routes there.
-		adminWrites, err := adminwrites.Routes(adminwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Hasher: hasher, Logger: log, PasswordResets: recoveryService})
+		adminWrites, err := adminwrites.Routes(adminwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Hasher: hasher, Logger: log, PasswordResets: recoveryService, Now: now})
 		if err != nil {
 			return err
 		}
 		// The Player app's own writes: the profile, the privacy switches, notifications, clubs and the contact-change request.
-		playerWrites, err := playerwrites.Routes(playerwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log})
+		playerWrites, err := playerwrites.Routes(playerwrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, Now: now})
 		if err != nil {
 			return err
 		}
 		// The Queue app's writes (go-writes-queue): the roster burst batch so far.
 		// The Player's sign-out on a public Queue Session page is the sign-in package's own sign-out for the Player app.
-		playerSignOut, err := signin.SignOut(signin.Deps{Service: svc, Verifier: verifier, Logger: log}, authstore.AudiencePlayer)
+		playerSignOut, err := signin.SignOut(signin.Deps{Service: svc, Verifier: verifier, Logger: log, Clock: now}, authstore.AudiencePlayer)
 		if err != nil {
 			return err
 		}
-		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, QueueOrigins: cfg.QueueOrigins, VisitorReceiptSecret: cfg.VisitorReceiptSecret, PlayerSignOut: playerSignOut})
+		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, QueueOrigins: cfg.QueueOrigins, VisitorReceiptSecret: cfg.VisitorReceiptSecret, PlayerSignOut: playerSignOut, Now: now})
 		if err != nil {
 			return err
 		}
 		// GET finalization runs the projection jobs of a committed Session done before it reads, as the Route Handler does.
-		driveFinalization, err := queuewrites.DriveFinalization(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log})
+		driveFinalization, err := queuewrites.DriveFinalization(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, Now: now})
 		if err != nil {
 			return err
 		}
@@ -194,7 +199,7 @@ func run() error {
 		// they are served only where sign-in is.
 		signedInRoutes, err := signedin.Register(signedin.Deps{
 			Routes: []func(*signedin.Router){adminWrites, playerWrites, queueWrites},
-			Pool:   pool.Raw(), Auth: svc.Authenticator(), Logger: log,
+			Pool:   pool.Raw(), Auth: svc.Authenticator(), Logger: log, Now: now,
 			// The viewer-aware public reads share the public-read budget; the stats read allows the same exact app origins
 			// as the stream routes (the paired Queue pages).
 			Limiter: publicLimiter, QueueOrigins: cfg.QueueOrigins, DriveFinalization: driveFinalization,
@@ -227,7 +232,7 @@ func run() error {
 		ProxySecret: cfg.ProxySecret, AllowedOrigins: cfg.AllowedOrigins,
 		Stream: httpapi.StreamOptions{
 			Backend: liveService, Metrics: liveMetrics,
-			MaxStreamsPerIP: cfg.Stream.MaxPerIP, MaxStreams: cfg.Stream.MaxTotal, TicketsPerMinute: cfg.Stream.TicketsPerMinute,
+			Now: now, MaxStreamsPerIP: cfg.Stream.MaxPerIP, MaxStreams: cfg.Stream.MaxTotal, TicketsPerMinute: cfg.Stream.TicketsPerMinute,
 		},
 	}, routes...))
 	srv := &http.Server{
@@ -251,6 +256,7 @@ func run() error {
 	hk.Register(liveupdates.Cleanup(cfg.Housekeeping.LiveUpdateEventsDays))
 	hk.Register(authstore.AuthEventsCleanup(cfg.Housekeeping.AuthEventsDays))
 	hk.Register(authstore.AuthSessionsCleanup(cfg.Housekeeping.AuthSessionsDays))
+	go serveClock(ctx)
 	hkDone := make(chan struct{})
 	go func() {
 		defer close(hkDone)

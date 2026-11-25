@@ -1,6 +1,7 @@
-import { expect, type Page, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 import { readAccounts } from '../../src/accounts.ts'
 import { resetClock } from '../../src/clock.ts'
+import { expect, test } from '../../src/fixtures.ts'
 import { appUrl } from '../../src/stack.ts'
 import {
   abandonCreatedSessions,

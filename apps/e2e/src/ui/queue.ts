@@ -261,6 +261,19 @@ export async function matchDoneOn(page: Page, label: string, winner: 'A' | 'B' =
   const confirm = page.getByRole('dialog', { name: 'Confirm match result' })
   await confirm.getByRole('button', { name: `Confirm Team ${winner} wins`, ...exact }).click()
   await expect(confirm).toBeHidden({ timeout: 30_000 })
+  // The court is free once its match is gone. Q-NEXT-MATCH may then offer "Next on COURT" over the console;
+  // Skip for now (Close when no match is ready) places nothing and leaves the court to Auto Queue.
+  await expect(card.getByRole('button', { name: 'Open match', ...exact })).toBeHidden({
+    timeout: 30_000,
+  })
+  const next = page.getByRole('dialog', { name: /^Next on / })
+  if (await next.isVisible()) {
+    await next
+      .getByRole('button', { name: /^(Skip for now|Close)$/ })
+      .last()
+      .click()
+    await expect(next).toBeHidden()
+  }
 }
 
 /** Session done › Continue (or Review shortfalls › Continue to finish session) › Confirm Session done. */
@@ -302,26 +315,32 @@ export async function sessionLink(page: Page, sessionId: string) {
 }
 
 /**
- * Session › COURT (Playing) › Open match › Substitute player: the player at `outIndex` in the
- * lineup (Team A then Team B, as the court card lists them) comes off, the only free present
- * player comes in, Who gets this game? = Nobody, Review substitution › Confirm substitution.
- * Tiles show short names (every seeded player reads "E2E"), so they are picked by position.
+ * Session › COURT (Playing) › Open match › tap the player at `outIndex` in the lineup (Team A then
+ * Team B, as the court card lists them) › Change NAME? › Substitute: the tapped player comes off,
+ * the only free present player comes in (Suggested), Who gets this game? = Nobody, Review
+ * substitution › Confirm substitution.
  */
 export async function substituteNobody(page: Page, label: string, outIndex: number) {
   await consoleTab(page, 'Session').click()
   await court(page, label)
     .getByRole('button', { name: 'Open match', ...exact })
     .click()
-  await page.getByRole('button', { name: 'Substitute player', ...exact }).click()
-  const sheet = page.getByRole('dialog', { name: /^Substitute in match \d+$/ })
-  await sheet
-    .getByRole('group', { name: "Who's coming off?" })
-    .getByRole('button')
+  const match = page.getByRole('dialog', { name: /^Match \d+ · / })
+  await match
+    .getByRole('button', { name: /\. Substitute or replace$/ })
     .nth(outIndex)
     .click()
-  const replacements = sheet.getByRole('group', { name: 'Replacement' }).getByRole('button')
-  await expect(replacements).toHaveCount(1)
-  await replacements.first().click()
+  await page
+    .getByRole('dialog', { name: /^Change .+\?$/ })
+    .getByRole('button', { name: /^Substitute:/ })
+    .click()
+  const sheet = page.getByRole('dialog', { name: /^Substitute in match \d+$/ })
+  const free = sheet
+    .getByRole('region', { name: 'Suggested' })
+    .getByRole('button')
+    .filter({ hasNotText: 'Other' })
+  await expect(free).toHaveCount(1)
+  await free.click()
   await sheet.getByRole('radio', { name: /^Nobody/ }).click()
   await sheet.getByRole('button', { name: 'Review substitution', ...exact }).click()
   const confirm = page.getByRole('dialog', { name: 'Confirm substitution' })

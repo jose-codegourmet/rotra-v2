@@ -58,18 +58,20 @@ test('UI-12 injury On court: Start match waits for a replacement', async ({ brow
   await expect(card.getByText(reason as string, { exact: true })).toBeVisible()
 
   // Open match › Replace player › the hurt player (first in the lineup) out, the only free player
-  // in. The tiles show short names (every seeded player reads "E2E"), so they go by position.
+  // in. 
   await card.getByRole('button', { name: 'Open match', exact: true }).click()
   const sheet = qm.getByRole('dialog', { name: /^Match \d+ · Court 1 · Getting ready$/ })
   await expect(sheet.getByRole('button', { name: 'Start match', exact: true })).toBeDisabled()
   await sheet.getByRole('button', { name: 'Replace player', exact: true }).click()
   const replace = qm.getByRole('dialog', { name: /^Replace a player in match \d+$/ })
   await replace
-    .getByRole('group', { name: "Who's coming out?" })
-    .getByRole('button')
-    .first()
+    .getByRole('region', { name: "Who's coming out?" })
+    .getByRole('button', { name: new RegExp(`^${hurt.fullName}, `) })
     .click()
-  const replacements = replace.getByRole('group', { name: 'Replacement' }).getByRole('button')
+  const replacements = replace
+    .getByRole('region', { name: 'Suggested' })
+    .getByRole('button')
+    .filter({ hasNotText: 'Other' })
   await expect(replacements).toHaveCount(1)
   await replacements.first().click()
   await replace.getByRole('button', { name: 'Replace player', exact: true }).click()

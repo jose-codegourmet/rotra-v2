@@ -4,6 +4,7 @@ import { expect, test } from '../../src/fixtures.ts'
 import { liveSession } from '../../src/ui/journeys.ts'
 import { abandonCreatedSessions, consoleTab } from '../../src/ui/queue.ts'
 import { rolePage, signInPlayer } from '../../src/ui/sign-in.ts'
+import { appUrl } from '../../src/stack.ts'
 
 test.use({ actionTimeout: 15_000 })
 // Clean up on the journey's own virtual time first (court actions follow the server clock).
@@ -56,6 +57,13 @@ test('UI-17 Request a match: added to the queue, then a second one declined', as
   })
   const me = roster[0]
   if (!me) throw new Error('[e2e] No seeded player 1.')
+
+  // The clocks jumped to the session, so the Player's access pass has expired in Go's virtual time. The Queue
+  // page reads Player access across origins and cannot refresh it; the Player app does, when it loads.
+  await player.goto(appUrl('player'))
+  await expect(player.getByRole('link', { name: 'My profile', exact: true })).toBeVisible()
+  await player.reload()
+  await expect(player.getByRole('link', { name: 'My profile', exact: true })).toBeVisible()
 
   // The Player's own night on the Queue session page (the Player app's sign-in, real mode).
   await player.goto(link)

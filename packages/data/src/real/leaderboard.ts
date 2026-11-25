@@ -18,6 +18,22 @@ export function realGetLeaderboardPage(
   )
 }
 
+/** The club's leaderboard; the Player and Queue apps both serve `/api/clubs/[clubId]/leaderboard`. */
+export function realGetClubLeaderboardPage(
+  {
+    clubId,
+    offset,
+    limit,
+    period,
+  }: { clubId: string; offset: number; limit: number; period: LeaderboardPeriod },
+  signal?: AbortSignal,
+) {
+  return realRequest<LeaderboardPage>(
+    `/api/clubs/${encodeURIComponent(clubId)}/leaderboard?offset=${offset}&limit=${limit}&period=${period}`,
+    { signal },
+  )
+}
+
 export function realSearchLeaderboard(
   query: string,
   signal?: AbortSignal,

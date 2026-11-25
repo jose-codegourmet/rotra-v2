@@ -1,55 +1,146 @@
 import { leaderboardEntries } from '@rotra/data/fixtures/leaderboard-players'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { type PodiumEntry, TopThreePodium } from './TopThreePodium'
+import { type PodiumPlace, type PodiumPlayer, TopThreePodium } from './TopThreePodium'
 
-const [first, second, third] = leaderboardEntries
-if (!first || !second || !third) throw new Error('Missing leaderboard fixtures.')
-
-function podiumEntry(entry: (typeof leaderboardEntries)[number], wins: number): PodiumEntry {
-  return {
+function players(from: number, count: number, stat: string): PodiumPlayer[] {
+  return leaderboardEntries.slice(from, from + count).map((entry) => ({
     id: entry.id,
-    fullName: entry.fullName,
+    name: entry.fullName,
     nickname: entry.nickname,
-    picture: { src: entry.pictureUrl ?? undefined },
-    wins,
-  }
+    pictureUrl: entry.pictureUrl,
+    stat,
+  }))
 }
 
-const annual = [podiumEntry(first, 118), podiumEntry(second, 117), podiumEntry(third, 116)] as const
-const monthly = [podiumEntry(first, 14), podiumEntry(second, 13), podiumEntry(third, 12)] as const
-const weekly = [podiumEntry(first, 5), podiumEntry(second, 4), podiumEntry(third, 4)] as const
+const singles: PodiumPlace[] = [
+  { position: 1, players: players(0, 1, '7 wins') },
+  { position: 2, players: players(1, 1, '6 wins') },
+  { position: 3, players: players(2, 1, '5 wins') },
+]
+const weekly = 'Top weekly · Nov 23 to Nov 29 · top 50'
 
 const meta = {
   title: 'Player/TopThreePodium',
   component: TopThreePodium,
-  args: { entries: annual, period: 'year', dateLabel: '2026', onSelect: () => undefined },
+  args: {
+    places: singles,
+    caption: weekly,
+    onOpenPlayer: () => undefined,
+    onOpenPlace: () => undefined,
+  },
+  globals: { theme: 'dark' },
 } satisfies Meta<typeof TopThreePodium>
 
 export default meta
 type Story = StoryObj<typeof meta>
-export const Annual: Story = {}
-export const Monthly: Story = {
-  args: { entries: monthly, period: 'month', dateLabel: 'November 2026' },
-}
-export const Weekly: Story = {
-  args: { entries: weekly, period: 'week', dateLabel: 'Nov 16 to Nov 22' },
-}
+
+export const ThreeSingles: Story = {}
+export const ThreeSinglesLight: Story = { globals: { theme: 'light' } }
+export const ThreeSinglesPhone: Story = { globals: { theme: 'dark', viewport: { value: 'phone' } } }
+
 export const MeInFirst: Story = {
-  args: { entries: [{ ...annual[0], isMe: true }, annual[1], annual[2]] },
-}
-export const Masked: Story = {
   args: {
-    entries: [
+    places: [
       {
-        ...annual[0],
-        fullName: 'J*** A***',
-        nickname: null,
-        picture: undefined,
-        masked: true,
-        disabled: true,
+        position: 1,
+        players: players(0, 1, '7 wins').map((player) => ({ ...player, isMe: true })),
       },
-      annual[1],
-      annual[2],
+      singles[1] as PodiumPlace,
+      singles[2] as PodiumPlace,
+    ],
+  },
+}
+
+const sharedTwo: PodiumPlace[] = [
+  { position: 1, players: players(0, 1, '7 wins') },
+  { position: 2, players: players(1, 2, '6 wins') },
+  { position: 3, players: players(3, 1, '5 wins') },
+]
+export const SharedTwo: Story = { args: { places: sharedTwo } }
+export const SharedTwoLight: Story = { args: { places: sharedTwo }, globals: { theme: 'light' } }
+
+const sharedThree: PodiumPlace[] = [
+  { position: 1, players: players(0, 1, '7 wins') },
+  { position: 2, players: players(1, 1, '6 wins') },
+  { position: 3, players: players(2, 3, '5 wins') },
+]
+export const SharedThree: Story = { args: { places: sharedThree } }
+export const SharedThreeLight: Story = {
+  args: { places: sharedThree },
+  globals: { theme: 'light' },
+}
+
+const sharedFour: PodiumPlace[] = [
+  { position: 1, players: players(0, 4, '7 wins') },
+  { position: 2, players: players(4, 7, '6 wins') },
+  { position: 3, players: players(11, 3, '5 wins') },
+]
+export const SharedFourAndMore: Story = { args: { places: sharedFour } }
+export const SharedFourAndMoreLight: Story = {
+  args: { places: sharedFour },
+  globals: { theme: 'light' },
+}
+export const SharedFourAndMorePhone: Story = {
+  args: { places: sharedFour },
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}
+
+const fewer: PodiumPlace[] = [
+  { position: 1, players: players(0, 1, '2 wins') },
+  { position: 2, players: players(1, 1, '1 win') },
+]
+export const FewerThanThree: Story = { args: { places: fewer } }
+export const FewerThanThreeLight: Story = { args: { places: fewer }, globals: { theme: 'light' } }
+
+export const Empty: Story = { args: { places: [] } }
+export const EmptyLight: Story = { args: { places: [] }, globals: { theme: 'light' } }
+
+/** The Queue session podium: record lines and a muted session line. */
+const session: PodiumPlace[] = [
+  {
+    position: 1,
+    players: players(0, 1, '3 W · 1 L').map((player) => ({
+      ...player,
+      nickname: null,
+      statSpoken: '3 wins, 1 loss',
+    })),
+  },
+  {
+    position: 2,
+    players: players(1, 2, '2 W · 1 L').map((player) => ({
+      ...player,
+      statSpoken: '2 wins, 1 loss',
+    })),
+  },
+  { position: 3, players: [] },
+]
+export const SessionRecord: Story = {
+  args: { places: session, caption: 'This session · 8 players' },
+}
+export const SessionRecordLight: Story = {
+  args: { places: session, caption: 'This session · 8 players' },
+  globals: { theme: 'light' },
+}
+
+/** No callbacks: every place is a plain group, nothing opens. */
+export const NonInteractive: Story = {
+  args: { places: sharedTwo, onOpenPlayer: undefined, onOpenPlace: undefined },
+}
+export const NonInteractiveLight: Story = {
+  args: { places: sharedTwo, onOpenPlayer: undefined, onOpenPlace: undefined },
+  globals: { theme: 'light' },
+}
+
+/** A profile the viewer may not open: that single place is not a button. */
+export const PlaceNotOpenable: Story = {
+  args: {
+    places: [
+      {
+        position: 1,
+        players: players(0, 1, '7 wins').map((player) => ({ ...player, canOpen: false })),
+      },
+      singles[1] as PodiumPlace,
+      singles[2] as PodiumPlace,
     ],
   },
 }

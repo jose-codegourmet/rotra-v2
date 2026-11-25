@@ -294,6 +294,7 @@
     "./this-device-panel": "./src/components/this-device-panel/ThisDevicePanel.tsx",
     "./time-field": "./src/components/time-field/TimeField.tsx",
     "./toaster": "./src/components/toaster/Toaster.tsx",
+    "./podium-place-dialog": "./src/components/podium-place-dialog/PodiumPlaceDialog.tsx",
     "./top-three-podium": "./src/components/top-three-podium/TopThreePodium.tsx",
     "./upcoming-queue-row": "./src/components/upcoming-queue-row/UpcomingQueueRow.tsx",
     "./venue-card": "./src/components/venue-card/VenueCard.tsx",

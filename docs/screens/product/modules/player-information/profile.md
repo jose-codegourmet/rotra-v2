@@ -22,8 +22,8 @@ RTR ID retains the original club founding-city/date context. Do not display it a
 |---|---|
 | Newly created, sparse history | Real identity plus provisional/no-calculation explanation; no invented numeric rating |
 | Not in any top 50 | The shared rank stays visible without a leaderboard heading or places ([D-2026-11-16-05](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-05)) |
-| In one, two or three top 50 lists | Show the shared rank and one box per list |
-| Needs reassessment | Keep the previous skill label visible with that status. The three leaderboard places follow their own calendar periods. |
+| In one to four top 50 lists | Show the shared rank and one box per list (Top annual, Top quarterly, Top monthly, Top weekly; quarterly added by [D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)) |
+| Needs reassessment | Keep the previous skill label visible with that status. The four leaderboard places follow their own calendar periods. |
 | Rank update processing | Distinguish last calculated data from pending session update |
 | Not found | Neutral unavailable profile; never redirect to a same-name player automatically |
 | Offline cached | Show cached age; no edits claimed saved to server |

@@ -64,8 +64,11 @@
   border: 0;
   background: none;
   color: inherit;
-  cursor: pointer;
+  cursor: default;
   font: inherit;
+}
+button.rotra-pod {
+  cursor: pointer;
 }
 .rotra-pod.p1 {
   --glow: 100%;
@@ -199,12 +202,12 @@
 .rotra-pod.p3 .rotra-pod-step {
   height: 76px;
 }
-.rotra-pod:not([aria-disabled]):hover .rotra-pod-name,
-.rotra-pod:not([aria-disabled]):focus-visible .rotra-pod-name {
+button.rotra-pod:hover .rotra-pod-name,
+button.rotra-pod:focus-visible .rotra-pod-name {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.rotra-pod:not([aria-disabled]):hover .rotra-pod-step {
+button.rotra-pod:hover .rotra-pod-step {
   filter: brightness(1.12);
 }
 .rotra-pod.me .rotra-pod-name::after {
@@ -303,10 +306,72 @@
   }
 }
 
-.rotra-pod[aria-disabled] {
-  cursor: default;
+/* D-2026-11-25-04: a place several players share stacks their pictures on its step (overlapping,
+   two or three, or two and "+N"); a place no one holds keeps its step with an empty dashed circle. */
+.rotra-pod-stack {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
 }
-
-.rotra-pod[aria-disabled="true"] {
-  cursor: default;
+.rotra-pod-who .rotra-pod-stack .avatar {
+  width: 48px;
+  height: 48px;
+  font-size: 16px;
+  margin-bottom: 0;
+}
+.rotra-pod-stack .avatar + .avatar {
+  margin-left: -16px;
+}
+.rotra-pod.p1 .rotra-pod-who .rotra-pod-stack .avatar {
+  width: 60px;
+  height: 60px;
+  font-size: 20px;
+  margin-bottom: 0;
+}
+.rotra-pod-more {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--fg);
+  background: var(--elev);
+}
+.rotra-pod.stacked .rotra-pod-name {
+  font-size: 13px;
+}
+.rotra-pod.p1.stacked .rotra-pod-name {
+  font-size: 14px;
+}
+.rotra-pod.empty .rotra-pod-name {
+  color: var(--fg2);
+  font-weight: 600;
+}
+.rotra-pod-who .avatar.rotra-pod-none {
+  display: inline-block;
+  flex: none;
+  background: transparent;
+  border: 2px dashed var(--border-strong);
+  box-shadow: none;
+}
+@media (max-width: 560px) {
+  .rotra-pod-who .rotra-pod-stack .avatar {
+    width: 38px;
+    height: 38px;
+    font-size: 13px;
+  }
+  .rotra-pod-stack .avatar + .avatar {
+    margin-left: -14px;
+  }
+  .rotra-pod.p1 .rotra-pod-who .rotra-pod-stack .avatar {
+    width: 46px;
+    height: 46px;
+    font-size: 15px;
+  }
+  .rotra-pod.stacked .rotra-pod-name,
+  .rotra-pod.p1.stacked .rotra-pod-name {
+    font-size: 12px;
+  }
 }

@@ -3,10 +3,10 @@ import {
   type LeaderboardFact,
   leaderboardPeriodStart,
   leaderboardStandings,
+  leaderboardTop,
   ownPeriodPosition,
 } from '@rotra/data/leaderboard/rules'
 import {
-  LEADERBOARD_LIMIT,
   LEADERBOARD_PERIODS,
   type LeaderboardPage,
   type LeaderboardPeriod,
@@ -14,29 +14,65 @@ import {
   type LeaderboardRow,
 } from '@rotra/data/leaderboard/types'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
-import { maskPublicName } from '@rotra/data/public-session/rules'
 import { readShownProfileBanners } from '../admin/profile-banners'
 import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
 import { levelCodeFor } from '../queue/session-store'
 import { ServiceError } from '../service/errors'
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export function parseLeaderboardPeriod(value: string | null): LeaderboardPeriod {
   if (value === null) return 'year'
-  if (value === 'year' || value === 'month' || value === 'week') return value
-  throw new ServiceError('invalid')
+  const period = LEADERBOARD_PERIODS.find((p) => p === value)
+  if (!period) throw new ServiceError('invalid')
+  return period
 }
 
-/** Load the two relevant periods once. A profile or Compare loads the annual window for all three. */
+/** `?offset=&limit=&period=` of a leaderboard page read: pages of 1 to 50 rows. */
+export function parseLeaderboardPage(params: URLSearchParams) {
+  const offset = Number(params.get('offset') ?? 0)
+  const limit = Number(params.get('limit') ?? 25)
+  if (
+    !Number.isSafeInteger(offset) ||
+    offset < 0 ||
+    !Number.isInteger(limit) ||
+    limit < 1 ||
+    limit > 50
+  )
+    throw new ServiceError('invalid')
+  return { offset, limit, period: parseLeaderboardPeriod(params.get('period')) }
+}
+
+/** A club's leaderboard (D-2026-11-25-04) needs a club that exists; anything else is not found. */
+export async function requireLeaderboardClub(
+  clubId: string,
+  db: Prisma.TransactionClient = prisma,
+) {
+  if (!UUID.test(clubId)) throw new ServiceError('not_found')
+  const club = await db.club.findUnique({ where: { id: clubId }, select: { id: true } })
+  if (!club) throw new ServiceError('not_found')
+}
+
+/**
+ * Load the two relevant periods once. A profile or Compare loads the annual window for all four
+ * (a quarter, month or week and the one before it always fall inside this year and last year).
+ * `clubId` reads that club's leaderboard: only facts of its own sessions (D-2026-11-25-04).
+ * Names, nicknames and pictures are never masked on a leaderboard (same decision).
+ */
 export async function readPeriodLeaderboard(
   period: LeaderboardPeriod,
-  now = Date.now(),
-  db: Prisma.TransactionClient = prisma,
+  {
+    now = Date.now(),
+    db = prisma,
+    clubId,
+  }: { now?: number; db?: Prisma.TransactionClient; clubId?: string } = {},
 ) {
   const start = leaderboardPeriodStart(period, now)
   const previousStart = leaderboardPeriodStart(period, start - 1)
   const records = await db.playerMatchFact.findMany({
     where: {
+      ...(clubId ? { clubId } : {}),
       playedAt: { gte: new Date(previousStart), lte: new Date(now) },
       format: { in: ['singles', 'doubles'] },
       fullParticipation: true,
@@ -105,7 +141,7 @@ export async function readPeriodLeaderboard(
   })
   const identity = new Map(candidates.map((player) => [player.id, player]))
   const standings = leaderboardStandings(period, now, candidates, facts)
-  const top = standings.slice(0, LEADERBOARD_LIMIT)
+  const top = leaderboardTop(standings)
   const entries = async (rows: typeof top, viewerId: string | null): Promise<LeaderboardRow[]> => {
     if (!rows.length) return []
     const banners = await readShownProfileBanners(db)
@@ -115,15 +151,16 @@ export async function readPeriodLeaderboard(
       const unclaimed = player.unclaimedClubCount === 1
       const levelHidden =
         !unclaimed && player.profileVisibility === 'always_private' && viewerId !== row.id
+      // Only what a tap opens: the row keeps the full name, nickname and picture.
       const masked =
         levelHidden || (!unclaimed && !viewerId && player.profileVisibility === 'private')
       return [
         {
           ...row,
-          fullName: masked ? maskPublicName(player.fullName) : player.fullName,
-          nickname: masked ? null : player.nickname,
+          fullName: player.fullName,
+          nickname: player.nickname,
           playingLevel: levelHidden ? null : levelCodeFor(player.rankCurrent?.skillLevelId ?? null),
-          pictureUrl: masked && !levelHidden ? null : player.avatarRef,
+          pictureUrl: player.avatarRef,
           ...resolveProfileBanner(
             player.banner?.id ?? null,
             () => player.banner ?? undefined,
@@ -149,21 +186,18 @@ export async function readPeriodLeaderboard(
       const hits = q
         ? (await entries(top, viewerId)).filter(
             (row) =>
-              !row.masked &&
-              (row.fullName.toLowerCase().includes(q) || row.nickname?.toLowerCase().includes(q)),
+              row.fullName.toLowerCase().includes(q) || row.nickname?.toLowerCase().includes(q),
           )
         : []
       return { hits, total: hits.length }
     },
     own: (playerId: string) => ownPeriodPosition(standings, playerId),
-    /** Call on the annual window so all three periods have their complete history. */
+    /** Call on the ROTRA annual window so all four periods have their complete history. */
     places(playerIds: readonly string[]) {
       const result = new Map<string, LeaderboardPlace[]>(playerIds.map((id) => [id, []]))
       for (const p of LEADERBOARD_PERIODS) {
         const list =
-          p === period
-            ? top
-            : leaderboardStandings(p, now, candidates, facts).slice(0, LEADERBOARD_LIMIT)
+          p === period ? top : leaderboardTop(leaderboardStandings(p, now, candidates, facts))
         for (const row of list)
           result.get(row.id)?.push({ period: p, position: row.position, wins: row.wins })
       }

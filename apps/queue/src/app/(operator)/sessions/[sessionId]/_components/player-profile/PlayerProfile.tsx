@@ -21,7 +21,7 @@ export type PlayerProfileProps = {
   clubPlayerId: string | null
   onClose: () => void
   /** Opened from a dialog (Suggested match, Start match, payments): the footer offers Back to it instead of Close */
-  backLabel?: 'suggestion' | 'match' | 'payments' | 'games'
+  backLabel?: 'suggestion' | 'match' | 'payments' | 'games' | 'place'
   onBack?: () => void
 }
 

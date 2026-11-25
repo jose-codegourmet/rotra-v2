@@ -1,6 +1,6 @@
 # Assessments, rank evidence, and rolling eligibility
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-25 for the period leaderboards ([D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Status:** Proposed persistence model, **partly superseded on November 11, 2026** by [D-2026-11-11-05](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-05): rank is a **rating by wins, weighted by who you beat**, projected from the game facts. The assessment-vote model below (`club_assessments` as rank input, the 70/30 `RankingPolicyVersion` weights) no longer feeds the rank; the level for the night stays a per-session value and seeds a new player's starting rating only. The rating constants are chosen in #247; this file is redrawn there.
 
@@ -63,12 +63,13 @@ Accepted assessments, valid finalizations, confirmed identity changes and ageing
 
 ## Period leaderboards
 
-The owner approved computing both periods from recorded matches on November 18, 2026 (#918). Use the existing tables without a migration or stored places.
+The owner approved computing both periods from recorded matches on November 18, 2026 (#918). Use the existing tables without a migration or stored places. The four periods, club leaderboards, shared places and full names of [D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04) (November 25, 2026) need **no new table or column**: they are reads over the same facts.
 
 - Read `player_match_facts` for full participation in singles and doubles standard matches. Require a completed match decision and a committed finalization of a completed session. A win is agreement between the participant's team and the winning team. A score and a published session page are optional.
-- Use `played_at` for both periods. Bound each request to the beginning of the previous requested period through the request time. The earliest boundary needed for all three profile places is January 1 of the previous year. Late uploads change the previous standings on the next read.
+- Use `played_at` for every period. Bound each request to the beginning of the previous requested period through the request time. The earliest boundary needed for all four profile places is January 1 of the previous year. Late uploads change the previous standings on the next read.
 - Credit the identity recorded at finalization or a confirmed, unrevoked `player_history_attributions` link scoped by club and saved player. Count each participant fact once per identity. Include a global unclaimed player only when exactly one active `club_players` row links them to a club. Legacy club-only records have no shared identity until the identity work in #900.
-- Apply the same calendar and ordering function as mock mode. Periods start at midnight in Asia/Manila on January 1, the first of the month or Monday. Order by wins, exact win rate, nickname (full name fallback) and stable player ID. One qualifying match, including a loss, establishes a place.
-- Publish up to 50 rows. Movement compares with the previous top 50. Mask private names before search or serialization. Return other players' places only within the public top 50, subject to profile visibility. The verified owner's period read can also report their place below 50, their wins and the wins at place 50.
+- Apply the same calendar and ordering function as mock mode. Periods start at midnight in Asia/Manila on January 1, the first day of a quarter (January 1, April 1, July 1, October 1), the first of the month or Monday. Order by wins, then exact win rate. Players with the same wins and the same exact win rate share a place, numbered without gaps (1, 1, 2); inside a shared place, order by nickname (full name fallback), then stable player ID.
+- Publish the first 50 rows and anyone who shares the 50th row's place (open: D-2026-11-25-04). Movement compares with the previous period's top 50. **Do not mask names on leaderboard reads**: serialize the full name, nickname and picture of every listed player whatever their profile visibility, and let the name search match them. Profile reads keep masking. Return other players' places only within the public top 50. The verified owner's period read can also report their place below 50, their wins and the wins of the last row in the top 50.
+- **Club leaderboard:** the same read, restricted to facts whose session belongs to the club (the session's `club_id`). Anyone with a counted fact in that club's sessions can appear; club membership is not required. It needs no table of its own.
 
 Business source: [ranking](../../../../business_logic/product/player-information/modules/ranking/README.md).

@@ -94,7 +94,10 @@ export type PublicSkillMix = {
   advanced: number
   unrated: number
 }
-/** A published standings row: position and counts only, no internal ids. */
+/**
+ * A published standings row: position and counts only, no internal ids. A leaderboard: the full name
+ * and picture for every viewer, never masked (D-2026-11-25-04); positions shared without gaps.
+ */
 export type PublicStandingRow = PublicResultFace & {
   position: number
   wins: number

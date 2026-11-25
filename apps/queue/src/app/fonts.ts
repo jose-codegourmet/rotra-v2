@@ -1,4 +1,4 @@
-import { JetBrains_Mono, Manrope } from 'next/font/google'
+import { JetBrains_Mono, Manrope, Silkscreen } from 'next/font/google'
 
 export const manrope = Manrope({
   subsets: ['latin'],
@@ -14,4 +14,12 @@ export const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 })
 
-export const fontVariables = `${manrope.variable} ${jetbrainsMono.variable}`
+/** Leaderboard podium only (D-2026-11-25-04: the Queue podium matches the Player one) */
+export const silkscreen = Silkscreen({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--pixel',
+  display: 'swap',
+})
+
+export const fontVariables = `${manrope.variable} ${jetbrainsMono.variable} ${silkscreen.variable}`

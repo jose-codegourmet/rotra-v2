@@ -13,7 +13,7 @@ import {
   StandingsPlayerCell,
 } from '@rotra/ui/standings-faces'
 import { createColumnHelper } from '@tanstack/react-table'
-import { useMemo } from 'react'
+import { type ReactNode, useMemo } from 'react'
 
 /** One player inside a standings position. */
 export type LiveLeaderboardPlayer = {
@@ -47,6 +47,8 @@ type LiveLeaderboardBaseProps = {
   rows: LiveLeaderboardRow[]
   /** The player's picture opens their profile */
   onOpenProfile: (playerId: string) => void
+  /** The session's TopThreePodium, between the copy and the table (D-2026-11-25-04) */
+  podium?: ReactNode
   className?: string
 }
 
@@ -106,6 +108,7 @@ export function LiveLeaderboard({
   rows,
   minimumGames,
   onOpenProfile,
+  podium,
   className,
 }: LiveLeaderboardProps) {
   const record = variant === 'record'
@@ -208,6 +211,7 @@ export function LiveLeaderboard({
           </p>
         </div>
       )}
+      {podium}
       {rows.length ? (
         <Card padding="none" className="overflow-hidden px-1.5 max-[760px]:px-4">
           <DataTable

@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 3 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 272 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 3 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 274 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -478,9 +478,11 @@ NEW: 3 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 272 · CANCELLED: 4 · 
 | [2026-11-23-queue-unclaimed-name-search](2026-11-23-queue-unclaimed-name-search.md) | Player Information finds unclaimed players by name and shows their name and picture | add-player-sheet, player-confirm-card | IN MOCK APP — PR #1030 |
 | [2026-11-23-queue-waitlist-strict-order](2026-11-23-queue-waitlist-strict-order.md) | The waitlist is strictly first come, first served | waitlist-panel, session-setup-form (setup-courts-section) | IN MOCK APP — #1036 |
 | [2026-11-25-admin-bulk-set-gender](2026-11-25-admin-bulk-set-gender.md) | Admin app: Set gender for the selected players, plus a Gender filter | admin-player-bulk-bar, admin-player-filters, admin-player-gender-form (new) | IN MOCK APP — PR #1101 |
+| [2026-11-25-player-leaderboard-podium](2026-11-25-player-leaderboard-podium.md) | Player app: four leaderboard periods, shared places, an always-on podium with stacked places, full names, and a club leaderboard | top-three-podium, leaderboard-row, leaderboard-list, leaderboard-period-switch, leaderboard-search, leaderboard-rules-card, my-position-card, profile-leaderboard-chips, profile-ranking-card, club-member-profile-sheet, sheet, club-page-hero (page layout only) | IN MOCK APP — #1106 (PR #1107) |
 | [2026-11-25-player-match-page](2026-11-25-player-match-page.md) | A public match page for every game, opened from any game court and from Share game | game-row (game court), share sheet, page head / back button, profile card (reused) | IN MOCK APP — PR #1103 |
 | [2026-11-25-queue-almost-done-switch](2026-11-25-queue-almost-done-switch.md) | Queue app: an Almost done switch on the Playing court card | court-card, switch, match-card | NEW |
 | [2026-11-25-queue-handicap-tonight](2026-11-25-queue-handicap-tonight.md) | Queue app: Handicap · tonight in the live Edit player sheet | edit-live-player-sheet, player-pool-card, chip | NEW |
+| [2026-11-25-queue-leaderboard-podium](2026-11-25-queue-leaderboard-podium.md) | Queue leaderboards get the ROTRA Player podium, and a Leaderboards page joins the left nav | top-three-podium, live-leaderboard, session-standings, standings-faces, leaderboard-list, leaderboard-row, leaderboard-move, leaderboard-period-switch, leaderboard-rules-card | IN MOCK APP — #1106 (PR #1107) |
 | [2026-11-25-queue-match-making-factors](2026-11-25-queue-match-making-factors.md) | Queue app: Generate matches picks drafts by Whose turn, Fresh faces and Even game | auto-queue-workspace, match-card | NEW |
 | [2026-11-25-queue-settings-courts-arrange](2026-11-25-queue-settings-courts-arrange.md) | Queue app: the Settings tab's courts reorder by drag, rename from the label, and show how long they've been playing or free | settings-courts-box, settings-court-card, add-court-tile, court-label-form, chip | IN MOCK APP — #1105 |
 <!-- status-index:end -->

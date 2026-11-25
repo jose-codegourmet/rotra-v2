@@ -129,9 +129,10 @@ function sessionBySlug(state: MockState, slug: string) {
 type Viewer = { playerId: string }
 
 /**
- * Only the published slides; Off Day only when that publication explicitly included it. Names and
- * pictures follow the page's masking rule (2026-11-13-queue-awards-faces-share), like every other
- * face on the page; award lines carry the winner's standing tonight.
+ * Only the published slides; Off Day only when that publication explicitly included it. Award and
+ * Off Day names and pictures follow the page's masking rule (2026-11-13-queue-awards-faces-share);
+ * award lines carry the winner's standing tonight. The standings are a leaderboard: full names and
+ * pictures for everyone (D-2026-11-25-04).
  */
 function publishedResults(
   state: MockState,
@@ -183,11 +184,17 @@ function publishedResults(
     standing: standingOf(row.sessionPlayerId),
   })
   const results: PublicSessionResults = {}
+  // The Leaderboard tab shows full names to everyone, guests and always-private players too
+  // (D-2026-11-25-04); awards and Off Day keep the page's masking rule.
+  const fullName = (sessionPlayerId: string, fallbackName: string) =>
+    roster.find((r) => r.id === sessionPlayerId)?.nameSnapshot ?? fallbackName
   if (publication.publishedSlides.includes('standings'))
     results.standings = snapshot.standings.map((r) => {
       const { isViewer: _viewer, ...person } = face(r.sessionPlayerId, r.clubPlayerId, r.name)
       return {
         ...person,
+        name: fullName(r.sessionPlayerId, r.name),
+        masked: false,
         position: r.position,
         wins: r.wins,
         losses: r.losses,

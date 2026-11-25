@@ -16,6 +16,7 @@ const noop = () => undefined
 
 const WINS = {
   year: [115, 114, 114, 113, 112],
+  quarter: [38, 37, 37, 36, 35],
   month: [14, 14, 13, 13, 12],
   week: [4, 4, 4, 3, 3],
 } as const

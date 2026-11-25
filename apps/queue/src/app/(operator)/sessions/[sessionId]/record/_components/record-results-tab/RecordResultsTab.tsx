@@ -22,6 +22,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
+import { SessionPodium } from '@/app/(operator)/sessions/[sessionId]/_components/session-podium/SessionPodium'
 import { ExportImagesSheetContainer } from '@/app/(operator)/sessions/[sessionId]/results/_components/export-images-sheet/ExportImagesSheetContainer'
 
 export type RecordResultsTabProps = {
@@ -38,7 +39,9 @@ const date = (at: number) =>
  * (2026-11-13-share-leaderboard: ShareDialog with LeaderboardShareCard, no viewer row), Result
  * slides (the results route) and Download images (the export sheet), then the official standings
  * as the LiveLeaderboard record variant. An invalid session shows only the no-official-result notice;
- * a session with Record games off adds the Not ranked notice above the standings.
+ * a session with Record games off adds the Not ranked notice above the standings. The session's
+ * podium (D-2026-11-25-04) sits between the heading row and the table; a shared place's dialog
+ * opens the profile with Back to place.
  */
 export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
   const invalid = record.state === 'invalid'
@@ -49,6 +52,7 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
   const [exportOpen, setExportOpen] = useState(false)
   const [sharing, setSharing] = useState(false)
   const [profileId, setProfileId] = useState<string | null>(null)
+  const [placeBack, setPlaceBack] = useState<(() => void) | null>(null)
 
   if (invalid)
     return <InvalidSessionNotice variant="results" reason={record.invalidReason ?? undefined} />
@@ -82,6 +86,10 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
         photoUrl: pictureOf(r.playerId) ?? undefined,
       }))
     : undefined
+  const openFromPodium = (sessionPlayerId: string, back?: () => void) => {
+    openProfile(sessionPlayerId)
+    setPlaceBack(back ? () => back : null)
+  }
   const c = club.data
   const slug = session.data?.publicSlug
   const link =
@@ -122,7 +130,28 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
       {standings.isError ? (
         <QueryError query={standings} title="Couldn't load the standings." />
       ) : rows ? (
-        <LiveLeaderboard variant="record" rows={boardRows ?? []} onOpenProfile={openProfile} />
+        <>
+          <SessionPodium
+            rows={rows.map((r) => ({
+              id: r.playerId,
+              name: r.name,
+              pictureUrl: pictureOf(r.playerId),
+              position: r.position,
+              wins: r.wins,
+              losses: r.losses,
+              games: r.games,
+            }))}
+            onOpenPlayer={openFromPodium}
+          />
+          <LiveLeaderboard
+            variant="record"
+            rows={boardRows ?? []}
+            onOpenProfile={(id) => {
+              setPlaceBack(null)
+              openProfile(id)
+            }}
+          />
+        </>
       ) : (
         <div role="status" aria-busy aria-label="Loading the standings">
           <Skeleton className="h-56 rounded-lg" />
@@ -154,7 +183,23 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
         open={exportOpen}
         onOpenChange={setExportOpen}
       />
-      <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />
+      <PlayerProfile
+        clubPlayerId={profileId}
+        onClose={() => {
+          setProfileId(null)
+          setPlaceBack(null)
+        }}
+        backLabel={placeBack ? 'place' : undefined}
+        onBack={
+          placeBack
+            ? () => {
+                setProfileId(null)
+                setPlaceBack(null)
+                placeBack()
+              }
+            : undefined
+        }
+      />
     </div>
   )
 }

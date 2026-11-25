@@ -1,6 +1,6 @@
 # Workstream — Ranking
 
-**Last verified:** 2026-11-07 (code audit of `main` @ `51abb94f`; traced, not run) · [MVP hub](../README.md)
+**Last verified:** 2026-11-25 (current-state row for D-2026-11-25-04 added); 2026-11-07 (code audit of `main` @ `51abb94f`; traced, not run) · [MVP hub](../README.md)
 
 Paths: `db/` = `packages/db/`. Rules: [ranking module](../../business_logic/product/player-information/modules/ranking/README.md).
 
@@ -24,6 +24,7 @@ and generation weights.
 | Capability | Status | Evidence | Tickets |
 |---|---|---|---|
 | Annual, monthly and weekly leaderboards | implemented in source, batch verification pending | #918 reads finalized game facts by playing date and recomputes previous top-50 places on read | #891 |
+| Quarterly list, club leaderboards, shared places (1, 1, 2), always-on podium with stacked places, full names on leaderboards | mockup only ([D-2026-11-25-04](../decisions/2026-11-25.md#d-2026-11-25-04), [log](../../mockup-changes/2026-11-25-player-leaderboard-podium.md)); the real app still has three lists, the old tie order and leaderboard masking | — | needed |
 | Saved ranking settings | implemented | `RankingPolicyVersion` (`db/prisma/schema/admin/configuration.prisma:29`), append-only versions | #402 closed |
 | Rank projection job on finalization | partially connected | `apps/queue/src/app/api/sessions/[sessionId]/finalization/route.ts:34,57` → `driveFinalizationJobs` (`db/src/player/projections.ts:343`) → `recomputeRank` (`:65`); `APPROVED_RANK_ALGORITHMS` empty (`:24`) → rank, level null, `leaderboardEligible: false` | #247 open |
 | Rank formula (blend, normalization, ties) | not implemented | Business doc says the engine is not specified (`ranking/README.md:3,39,70`) | #247 open (blocked) |

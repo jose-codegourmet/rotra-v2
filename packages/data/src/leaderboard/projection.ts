@@ -4,23 +4,26 @@ import { getMockDevState } from '../mock/bridge'
 import type { MockState } from '../mock/store'
 import { PLAYING_LEVELS } from '../player/player.types'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
-import { maskPublicName } from '../public-session/publicSession.rules'
 import { leaderboardHistoryFacts } from './history'
 import { unclaimedClubCount } from './identity'
 import {
   type LeaderboardFact,
+  type LeaderboardScope,
   leaderboardPeriodStart,
   leaderboardStandings,
+  leaderboardTop,
 } from './leaderboard.rules'
 import {
-  LEADERBOARD_LIMIT,
   LEADERBOARD_PERIODS,
   type LeaderboardPeriod,
   type LeaderboardPlace,
   type LeaderboardRow,
 } from './leaderboard.types'
 
-/** Read the fixture clock once per projection, just as real mode reads the request's clock once. */
+/**
+ * Read the fixture clock once per projection, just as real mode reads the request's clock once.
+ * `scope.clubId` gives that club's leaderboard: the same rules over its own sessions' games.
+ */
 export function mockLeaderboard(
   state: MockState,
   scenario = getMockDevState().leaderboardScenario,
@@ -35,6 +38,7 @@ export function mockLeaderboard(
       unclaimedClubCount: unclaimedClubCount(state, profile.playerId),
     }))
   const facts: LeaderboardFact[] = []
+  const clubIds = new Map(state.clubs.map((club) => [club.name, club.id]))
   const weekStart = leaderboardPeriodStart('week', now)
   if (scenario === 'in-top-50' || scenario === 'below-top-50') {
     const ids = candidates
@@ -42,45 +46,47 @@ export function mockLeaderboard(
       .map((p) => p.id)
     facts.push(...myPlaceFixture(ids, scenario === 'below-top-50'))
   } else if (scenario !== 'empty') {
-    for (const fact of leaderboardHistoryFacts(state.playerGames)) {
+    for (const fact of leaderboardHistoryFacts(state.playerGames, clubIds)) {
       if (scenario !== 'empty-week' || Number(fact.playedAt) < weekStart) facts.push(fact)
     }
   }
-  const standings = (period: LeaderboardPeriod) =>
-    leaderboardStandings(period, now, candidates, facts)
+  const standings = (period: LeaderboardPeriod, scope?: LeaderboardScope) =>
+    leaderboardStandings(period, now, candidates, facts, scope)
+  /** Profiles name ROTRA places only, never club places. */
   const places = (playerId: string): LeaderboardPlace[] =>
     LEADERBOARD_PERIODS.flatMap((period) => {
-      const row = standings(period)
-        .slice(0, LEADERBOARD_LIMIT)
-        .find((entry) => entry.id === playerId)
+      const row = leaderboardTop(standings(period)).find((entry) => entry.id === playerId)
       return row ? [{ period, position: row.position, wins: row.wins }] : []
     })
-  const entries = (period: LeaderboardPeriod, viewerId: string | null): LeaderboardRow[] =>
-    standings(period)
-      .slice(0, LEADERBOARD_LIMIT)
-      .flatMap((row) => {
-        const profile = state.playerProfiles.find((p) => p.playerId === row.id)
-        if (!profile) return []
-        const unclaimed = candidates.find((p) => p.id === row.id)?.unclaimedClubCount === 1
-        const alwaysPrivate =
-          !unclaimed && profile.profileVisibility === 'always_private' && viewerId !== row.id
-        const masked =
-          alwaysPrivate || (!unclaimed && !viewerId && profile.profileVisibility === 'private')
-        const levelIndex = state.playerRanks[row.id]?.levelIndex
-        return [
-          {
-            ...row,
-            fullName: masked ? maskPublicName(profile.fullName) : profile.fullName,
-            nickname: masked ? null : profile.nickname,
-            playingLevel:
-              alwaysPrivate || levelIndex == null ? null : (PLAYING_LEVELS[levelIndex] ?? null),
-            pictureUrl: masked && !alwaysPrivate ? null : profile.picture,
-            ...resolveMockProfileBanner(profile.bannerId, state.profileBanners),
-            masked,
-            levelHidden: alwaysPrivate,
-            unclaimed,
-          },
-        ]
-      })
+  /** Full names, nicknames and pictures for everyone (D-2026-11-25-04); `masked` only gates the tap. */
+  const entries = (
+    period: LeaderboardPeriod,
+    viewerId: string | null,
+    scope?: LeaderboardScope,
+  ): LeaderboardRow[] =>
+    leaderboardTop(standings(period, scope)).flatMap((row) => {
+      const profile = state.playerProfiles.find((p) => p.playerId === row.id)
+      if (!profile) return []
+      const unclaimed = candidates.find((p) => p.id === row.id)?.unclaimedClubCount === 1
+      const alwaysPrivate =
+        !unclaimed && profile.profileVisibility === 'always_private' && viewerId !== row.id
+      const masked =
+        alwaysPrivate || (!unclaimed && !viewerId && profile.profileVisibility === 'private')
+      const levelIndex = state.playerRanks[row.id]?.levelIndex
+      return [
+        {
+          ...row,
+          fullName: profile.fullName,
+          nickname: profile.nickname,
+          playingLevel:
+            alwaysPrivate || levelIndex == null ? null : (PLAYING_LEVELS[levelIndex] ?? null),
+          pictureUrl: profile.picture,
+          ...resolveMockProfileBanner(profile.bannerId, state.profileBanners),
+          masked,
+          levelHidden: alwaysPrivate,
+          unclaimed,
+        },
+      ]
+    })
   return { now, standings, places, entries }
 }

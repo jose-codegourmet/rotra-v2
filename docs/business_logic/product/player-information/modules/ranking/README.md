@@ -1,6 +1,6 @@
 # Shared rank and overall leaderboard
 
-**Last verified:** 2026-11-18 (Player leaderboard rules).
+**Last verified:** 2026-11-25 (four periods, club leaderboards, shared places, full names; [D-2026-11-25-04](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)); 2026-11-18 (Player leaderboard rules).
 
 **Status:** Engine decided November 11, 2026 ([D-2026-11-11-05](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-05), from the [ranking-by-wins proposal](../../../../../decisions/2026-11-11-ranking-by-wins/01-proposal.md)): rank comes from **wins, weighted by who you beat**. The constants (band edges, step sizes) and the worked examples are chosen in #247; do not pick them from this document alone.
 
@@ -16,7 +16,7 @@ Operators assign one of **nine levels** (decided October 26, 2026; the earlier I
 
 The nine are ordered; a difference between two levels is counted in whole levels (e.g. “2 levels below suggestion”). The nine levels are **bands on the hidden rating** (below): a player's shown level is read off their rating, nobody assigns it globally. The band edges are chosen in #247.
 
-City/National/World competition categories are deferred. A player has a skill label and can place on the annual, monthly and weekly leaderboards. Singles and doubles share one rank.
+City/National/World competition categories are deferred. A player has a skill label and can place on the annual, quarterly, monthly and weekly leaderboards, ROTRA-wide and per club. Singles and doubles share one rank.
 
 ## Club assessment authority: the level for the night
 
@@ -65,14 +65,26 @@ A player can share, as a link, a QR code or a post/story image ([D-2026-11-09-08
 
 ## Overall leaderboard
 
-**Top annual**, **Top monthly** and **Top weekly** each show the first 50 players across clubs. The year begins on January 1, the month on its first day and the week on Monday. All three start at 00:00 Asia/Manila. These rules were approved November 16 and clarified November 18, 2026. [Decision D-2026-11-16-05](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-05).
+**Top annual**, **Top quarterly**, **Top monthly** and **Top weekly** each show the top 50 players across clubs (the **ROTRA leaderboard**). The year begins on January 1, the quarter on January 1, April 1, July 1 or October 1 (Q1 January to March, Q2 April to June, Q3 July to September, Q4 October to December), the month on its first day and the week on Monday. All four start at 00:00 Asia/Manila. Approved November 16, clarified November 18, 2026 ([D-2026-11-16-05](../../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-05)); quarterly, club leaderboards, shared places, the podium and full names added November 25, 2026 ([D-2026-11-25-04](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)).
 
 - Count wins and losses from full participation in valid standard matches (singles or doubles) in valid finished sessions. A match with a confirmed winner counts even without a score or published standings. Exclude fun games, games from a not-ranked session (Record games off, [D-2026-11-20-02](../../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02): they stay in the player's history but never count toward the leaderboards' wins or the win rate), either side of a mid-game substitution for the affected slot, and invalid matches or sessions.
-- A player enters the period's standings with their first qualifying match, including a loss. Sort by most wins, then higher win rate, then the account nickname alphabetically (full name fallback). Equal display names use the stable ROTRA player identity as the final tie-break. Skill rating, rank state and recent 10-match progress only describe the skill rank.
-- A single-club unclaimed player is public. When more than one club saves them, they leave all lists until they register. Private players retain their places. Visitor rows mask private names and searches omit them. Always private names are masked for other viewers, with their picture and banner still visible. [Visibility decision](../../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-07).
-- Compare each public place with the same player's top-50 place in the previous calendar period. A player who was outside the top 50 or had no qualifying matches then shows **New**. Otherwise show the change in places, including no change.
+- A player enters the period's standings with their first qualifying match, including a loss. Sort by most wins, then higher win rate. Skill rating, rank state and recent 10-match progress only describe the skill rank.
+- **Shared places** (D-2026-11-25-04): players with the same wins **and** the same win rate share a place. Places run without gaps (1, 1, 2), like the Queue session standings ([D-2026-11-18-05](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-05)). Inside a shared place, rows are ordered by the account nickname alphabetically (full name when there is none), then the stable ROTRA player identity; that order never changes the place. This replaces “win rate breaks a tie, then nickname” as a place decider.
+- **Top 50 with shared places:** a list holds the first 50 players in that order, plus anyone who shares the 50th player's place. Proposed by the mockup; the owner has not confirmed it (D-2026-11-25-04, Open).
+- **Full names and pictures** (D-2026-11-25-04): every leaderboard (ROTRA, club and session) shows each player's full name, nickname and picture to everyone, signed in or not, whatever their profile visibility (Public, Private or Always private). This overrides the masking rule for leaderboards only; profiles, member lists, search outside the leaderboard and share images keep [their rules](../../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-07). The leaderboard's name search finds every listed player. A row or podium place whose profile the viewer may not open still shows the name and picture but opens nothing.
+- A single-club unclaimed player is public. When more than one club saves them, they leave all lists until they register. Private players keep their places.
+- Compare each place with the same player's top-50 place in the previous calendar period (last year, last quarter, last month, last week). A player who was outside the top 50 or had no qualifying matches then shows **New**. Otherwise show the change in places, including no change.
 - Use the original playing date when a session syncs late. Recompute the preceding period from those facts so its final standings and movement marks include the result.
-- A profile, Compare and share cards may show public top-50 places. Only the signed-in player's own position card can show their place below 50, their wins and place 50's wins. Mention a better win rate only when place 50 actually won the win-rate tie-break.
+- **Podium** (D-2026-11-25-04): the leaderboard always shows the podium of places 1, 2 and 3, also when fewer than three places exist (an empty place keeps its step) and when the list is empty (three empty steps above the empty message). Several players in one place are stacked on that step; selecting it opens a dialog listing everyone in that place (picture, full name, nickname, wins, win rate), and each row opens the profile as list rows do.
+- A profile, Compare and share cards may show public top-50 places (a profile shows one box per list the player is in, up to four). Only the signed-in player's own position card can show their place below 50, their wins and the wins of the last player in the top 50. Mention a better win rate only when that player actually has the same wins and a better win rate.
+
+### Club leaderboard
+
+Decided November 25, 2026 ([D-2026-11-25-04](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)). Each club has its own leaderboard with the same four periods, boundaries, counting rules, shared places, top 50, podium, movement marks and full names as the ROTRA leaderboard.
+
+- It counts **only standard-match wins and losses in that club's own sessions**. Anyone who played in them can appear, members or not.
+- It lives on the Player app's club page as a Leaderboard card (period tabs, podium, then the next 7 players) with **See all**, which opens the club's leaderboard page with the whole top 50.
+- A club place is not a ROTRA place: profiles, Compare and share cards name ROTRA places only.
 
 Mock and real-mode period reads share one standings function. The database reader uses finalized match facts, confirmed history links and active club saves. [Database design](../../../../../database_design/product/player-information/modules/ranking.md#period-leaderboards).
 

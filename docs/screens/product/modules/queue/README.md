@@ -11,6 +11,7 @@
 | [Financials and inventory](financials-inventory.md) | Optional cost estimate step, club inventory |
 | [Players and roster](players-roster.md) | Saved players, add/search/link, identity verification, level assignment, presence |
 | [Session console](session-console.md) | Session / Queue / Players / Leaderboard views, courts, add court, time |
+| [Leaderboards](leaderboards.md) | Club and ROTRA leaderboards page, the podium every Queue leaderboard shares, the Podium place dialog |
 | [Shared match queue](match-queue.md) | Manual, player picker, Suggest, Generate matches, ordering, protection, attention, regeneration |
 | [Match control](match-control.md) | Put on court, pick another, Getting ready (On court), Start match, Playing control, substitutions and game credit, outcome confirmation, invalidation |
 | [Offline recovery](offline-recovery.md) | Download states, sync status, device continuation, conflicts |

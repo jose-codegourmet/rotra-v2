@@ -59,6 +59,9 @@ type Story = StoryObj<typeof meta>
 
 /** Present, off court and in no waiting match: shows the wait time and "Free" */
 export const Available: Story = {}
+/** Handicap · tonight (D-2026-11-25-03): the warning icon after the name, titled "Handicap: left knee, lower back" */
+export const WithHandicap: Story = { args: { handicapSpots: ['left_knee', 'lower_back'] } }
+export const WithHandicapLight: Story = { ...WithHandicap, globals: { theme: 'light' } }
 /** On court: the status line turns accent and no wait time shows */
 /** "Playing 7m"; hovering the pill shows "Playing on Court 1" */
 export const Playing: Story = { args: playing }

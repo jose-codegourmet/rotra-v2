@@ -184,6 +184,8 @@ export function rosterEntryDto(entry: SessionPlayer, names: RosterNames | null) 
     levelLockedAt: toIsoOrNull(entry.levelLockedAt),
     confirmedAt: toIso(entry.confirmedAt),
     gamesAdjustment: entry.gamesAdjustment,
+    /** Handicap · tonight (D-2026-11-25-03): Queue Master reads only, never a public projection */
+    handicapSpots: entry.handicapSpots,
     selfCheckedInAt: toIsoOrNull(entry.selfCheckedInAt),
     leftAt: toIsoOrNull(entry.leftAt),
     revision: toDecimalString(entry.revision),

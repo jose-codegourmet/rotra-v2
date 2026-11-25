@@ -475,6 +475,11 @@ export async function finalizeSession(
           ),
         })
         await dropUnstarted(tx, sessionId, now)
+        // Handicap · tonight is session only (D-2026-11-25-03): Session done clears it.
+        await tx.sessionPlayer.updateMany({
+          where: { sessionId, NOT: { handicapSpots: { isEmpty: true } } },
+          data: { handicapSpots: [] },
+        })
         // Finishing closes every open match request (kept on the record, hidden).
         await closeSessionMatchRequests(tx, sessionId, now)
         await tx.queueSession.update({

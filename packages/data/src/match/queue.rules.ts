@@ -35,7 +35,7 @@ export function formatForSelection(
   return { format, reason: null }
 }
 const level = (p: SessionPlayer) => (p.level ? PLAYING_LEVELS.indexOf(p.level) : 4)
-function partitions(players: SessionPlayer[]) {
+function partitions(players: SessionPlayer[], levelOf: (p: SessionPlayer) => number = level) {
   return [
     [
       [0, 1],
@@ -57,7 +57,7 @@ function partitions(players: SessionPlayer[]) {
         teamA: teamA.map((p) => p.id),
         teamB: teamB.map((p) => p.id),
         diff: Math.abs(
-          teamA.reduce((n, p) => n + level(p), 0) - teamB.reduce((n, p) => n + level(p), 0),
+          teamA.reduce((n, p) => n + levelOf(p), 0) - teamB.reduce((n, p) => n + levelOf(p), 0),
         ),
       }
     })
@@ -112,6 +112,11 @@ export function splitTeams(
   players: SessionPlayer[],
   format: 'singles' | 'doubles',
   rng: () => number,
+  /**
+   * The level each player counts as (default: the assigned level). Generate matches passes
+   * tonight's level (Even game, D-2026-11-25-01); Main Queue regeneration keeps the default.
+   */
+  levelOf?: (p: SessionPlayer) => number,
 ): MatchLineup {
   if (format === 'singles')
     return {
@@ -119,7 +124,7 @@ export function splitTeams(
       teamA: players.slice(0, 1).map((p) => p.id),
       teamB: players.slice(1, 2).map((p) => p.id),
     }
-  const options = partitions(players),
+  const options = partitions(players, levelOf),
     easy =
       session.sessionMode === 'chill'
         ? rng() < 0.3

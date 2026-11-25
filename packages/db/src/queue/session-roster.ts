@@ -1,4 +1,5 @@
 import 'server-only'
+import { handicapSpotsOf, isHandicapSpot } from '@rotra/data/session-roster/handicap'
 import { levelRestrictionBlockFor } from '@rotra/data/session-roster/levelRestriction.rules'
 import {
   normalizeSocialLink,
@@ -885,6 +886,31 @@ export async function setGamesPlayed(
       })
     }
     return { changed }
+  })
+}
+
+/**
+ * Handicap · tonight (D-2026-11-25-03): the whole set of marked spots on one live entry (empty
+ * clears it). Active sessions only; Session done empties every entry. Repeat-safe: the same set
+ * writes nothing.
+ */
+export async function setHandicap(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; rosterId: string; spots: unknown[] },
+) {
+  return rosterCommand(context, sessionId, async (tx, session) => {
+    requireState(session, ['active'], 'Start the session first.')
+    if (!input.spots.every(isHandicapSpot))
+      throw new ServiceError('invalid', { spots: 'Choose spots on the figure.' })
+    const entry = await liveEntry(tx, sessionId, input.rosterId)
+    const spots = handicapSpotsOf(input.spots)
+    if (handicapSpotsOf(entry.handicapSpots).join() !== spots.join())
+      await tx.sessionPlayer.update({
+        where: { id: entry.id },
+        data: { handicapSpots: spots, revision: { increment: 1 } },
+      })
+    return { rosterId: entry.id, name: entry.nameSnapshot, spots }
   })
 }
 

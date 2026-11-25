@@ -79,6 +79,13 @@ export const OnCourt: Story = {
   args: { match: { status: 'oncourt', courtLabel: 'Court 1' } },
 }
 
+/** Handicap · tonight (D-2026-11-25-03): left knee and lower back marked */
+export const WithHandicap: Story = { args: { handicapSpots: ['left_knee', 'lower_back'] } }
+export const WithHandicapLight: Story = {
+  args: { handicapSpots: ['left_knee', 'lower_back'] },
+  globals: { theme: 'light' },
+}
+
 export const Pending: Story = { args: { isPending: true } }
 
 export const Failed: Story = {

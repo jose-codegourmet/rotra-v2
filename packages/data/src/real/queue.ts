@@ -32,6 +32,7 @@ import {
 } from '../queue-session/queueSession.types'
 import { hostRegistrationText } from '../session-host/sessionHost.rules'
 import type { SessionHostRegistration } from '../session-host/sessionHost.types'
+import { handicapSpotsOf } from '../session-roster/handicap.rules'
 import { levelLabel, queueMasterName } from '../session-roster/sessionRoster.rules'
 import type {
   DirectoryPlayer,
@@ -537,6 +538,8 @@ export type WireRosterEntry = {
   clubNickname?: string | null
   /** Set games played adjustment (#717); missing on older servers means 0 */
   gamesAdjustment?: number
+  /** Handicap · tonight (D-2026-11-25-03); Queue Master reads only, missing on older servers */
+  handicapSpots?: string[]
   /** The Player's own I'm here / I'm leaving times (D-2026-11-09-03); missing on older servers */
   selfCheckedInAt?: string | null
   leftAt?: string | null
@@ -563,6 +566,7 @@ const rosterOf = (entry: WireRosterEntry): SessionPlayer => ({
   confirmedAt: msOf(entry.confirmedAt),
   selfCheckedInAt: msOrNull(entry.selfCheckedInAt ?? null),
   leftAt: msOrNull(entry.leftAt ?? null),
+  handicapSpots: handicapSpotsOf(entry.handicapSpots),
 })
 
 export type WireRosterRead = {

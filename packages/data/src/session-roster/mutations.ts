@@ -46,6 +46,7 @@ import {
   realSetAcceptJoinRequests,
   realSetAlwaysRequireRequest,
 } from '../real/session-live'
+import { type HandicapSpot, handicapSpotsOf, isHandicapSpot } from './handicap.rules'
 import { levelRestrictionBlockFor } from './levelRestriction.rules'
 import {
   inUnfinishedMatch,
@@ -623,6 +624,42 @@ export function setGamesPlayed(input: SetGamesPlayedInput) {
           text: one
             ? `Games played set · ${nameIn(s, one)}`
             : `Games played set for ${rows.length} player${rows.length === 1 ? '' : 's'}`,
+        }
+      },
+    ),
+  )
+}
+export type SetHandicapInput = {
+  sessionId: string
+  rosterId: string
+  /** Every marked spot (the whole set, not a change); empty clears the handicap */
+  spots: HandicapSpot[]
+  operationId?: string
+}
+/**
+ * Handicap · tonight (D-2026-11-25-03): saves the marked spots on one live roster entry, from the
+ * live Edit player sheet's Save changes. Live sessions only; an ordinary Roster write offline, like
+ * presence. Session done clears it.
+ */
+export function setHandicap(input: SetHandicapInput) {
+  return dispatch('roster.handicap', input, () =>
+    queueMutation(
+      {
+        area: 'Roster',
+        sessionId: input.sessionId,
+        operationId: input.operationId,
+        fingerprint: input.operationId
+          ? JSON.stringify([input.rosterId, handicapSpotsOf(input.spots)])
+          : undefined,
+      },
+      (s) => {
+        if (sessionIn(s, input.sessionId).state !== 'active') fail('Start the session first.')
+        if (!input.spots.every(isHandicapSpot)) fail('Choose spots on the figure.')
+        const p = row(s, input.rosterId, input.sessionId)
+        p.handicapSpots = handicapSpotsOf(input.spots)
+        return {
+          data: { rosterId: p.id, spots: p.handicapSpots },
+          text: `Handicap saved · ${nameIn(s, p)}`,
         }
       },
     ),

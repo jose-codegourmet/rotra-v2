@@ -482,6 +482,7 @@
     "./admin-edit-player-form": "./src/forms/admin-edit-player-form/AdminEditPlayerForm.tsx",
     "./admin-verification-override-form": "./src/forms/admin-verification-override-form/AdminVerificationOverrideForm.tsx",
     "./admin-player-change-form": "./src/forms/admin-player-change-form/AdminPlayerChangeForm.tsx",
+    "./admin-player-gender-form": "./src/forms/admin-player-gender-form/AdminPlayerGenderForm.tsx",
     "./admin-player-actions": "./src/components/admin-player-actions/AdminPlayerActions.tsx",
     "./copy-player-value": "./src/components/copy-player-value/CopyPlayerValue.tsx",
     "./admin-player-bulk-bar": "./src/components/admin-player-bulk-bar/AdminPlayerBulkBar.tsx",

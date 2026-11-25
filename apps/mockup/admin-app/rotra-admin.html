@@ -892,7 +892,7 @@ function freshState() {
 function freshUi() {
   return {
     login: { email: '', pass: '', show: false, err: '', pending: false },
-    clubsQ: '', clubsF: 'all', playersQ: '', playersF: 'all', shown: 25, reqF: 'submitted',
+    clubsQ: '', clubsF: 'all', playersQ: '', playersF: 'all', playersG: 'all', shown: 25, reqF: 'submitted',
     cfg: null, cfgErr: '', cfgConflict: false, lic: null, sheet: null, nav: false, resetArmed: false, pendingGo: null,
   };
 }
@@ -1426,9 +1426,9 @@ function viewSales() {
 // The RTR ID carries the creation date as MMDDYY; show it the way people say it (“Jul 9, 2026”).
 const fmtAdded = (p) => { const d = p.rtr.split('-')[3] || ''; return /^\d{6}$/.test(d) ? fmtYmd(`20${d.slice(4)}-${d.slice(0, 2)}-${d.slice(2, 4)}`) : esc(d); };
 function playerMatches() {
-  const q = S.ui.playersQ.trim(), F = S.ui.playersF;
+  const q = S.ui.playersQ.trim(), F = S.ui.playersF, G = S.ui.playersG || 'all';
   const qp = plain(q), qd = q.replace(/\D/g, '');
-  return S.players.filter((p) => (F === 'all' || (F === 'registered' ? p.claimed : F === 'verified' ? isVerified(p) : F === 'unverified' ? p.claimed && !isVerified(p) : F === 'details' ? needsDetails(p) : !p.claimed))
+  return S.players.filter((p) => (G === 'all' || (G === 'none' ? !p.gender : p.gender === G)) && (F === 'all' || (F === 'registered' ? p.claimed : F === 'verified' ? isVerified(p) : F === 'unverified' ? p.claimed && !isVerified(p) : F === 'details' ? needsDetails(p) : !p.claimed))
     && (!q || plain(`${p.name} ${p.nick} ${p.rtr} ${p.email}`).includes(qp) || (qd.length >= 4 && (p.phone.replace(/\D/g, '').includes(qd) || p.phone.replace(/\D/g, '').includes(qd.replace(/^0/, '63'))))));
 }
 function viewPlayers() {
@@ -1449,12 +1449,13 @@ function viewPlayers() {
         <label class="field"><span>Added from</span><input class="input" type="date"></label>
         <label class="field"><span>Added to</span><input class="input" type="date"></label>
         <label class="field"><span>Place registered</span><select class="input"><option>All places</option><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label>
+        <label class="field"><span>Gender</span><select class="input" data-change="plGender">${[['all','All'],['male','Male'],['female','Female'],['none','Not given']].map(([v,l])=>`<option value="${v}" ${(S.ui.playersG||'all')===v?'selected':''}>${l}</option>`).join('')}</select></label>
         <label class="field"><span>Archive status</span><select class="input"><option>Active</option><option>Archived</option><option>All</option></select></label>
       </div>
       <label class="pl-dup"><span class="stack tight"><b>Duplicates only</b><span class="small muted">Duplicate matches share a normalized name, phone or email. Flag only; never merge.</span></span><input type="checkbox" role="switch" class="pl-switch" aria-label="Duplicates only"></label>
       <div class="pl-adv-foot"><button class="btn" data-act="clearPlayers">Clear filters</button><button class="btn primary" data-act="plAdv">Done</button></div></section>` : ''}
     <div class="pl-bulk"><label class="pl-all"><input type="checkbox" data-change="plSelectAll"> Select all on this page</label><button class="btn xs" type="button">Select all ${all.length} matching</button></div>
-    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card player-row" data-act="pmSheet" data-v="Quick view" data-id="${p.id}"><label class="player-selection"><input class="player-select" type="checkbox" data-change="plCount" aria-label="Select ${esc(p.name)}"></label>${avatar(p)}<div class="main"><button class="link" data-act="pmSheet" data-v="Quick view" data-id="${p.id}">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${accountChips(p)}${needsDetails(p)?chip('Details required','warn'):''}${rankOf(p).chip}</div><p class="small muted">${esc(clubLine(p) || 'Created by Admin')} · Added ${fmtAdded(p)}</p></div><button class="btn" aria-label="Actions for ${esc(p.name)}" aria-haspopup="menu" data-act="pmMenu" data-id="${p.id}">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
+    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card player-row" data-act="pmSheet" data-v="Quick view" data-id="${p.id}"><label class="player-selection"><input class="player-select" type="checkbox" data-id="${p.id}" data-change="plCount" aria-label="Select ${esc(p.name)}"></label>${avatar(p)}<div class="main"><button class="link" data-act="pmSheet" data-v="Quick view" data-id="${p.id}">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${accountChips(p)}${needsDetails(p)?chip('Details required','warn'):''}${rankOf(p).chip}</div><p class="small muted">${esc(clubLine(p) || 'Created by Admin')} · Added ${fmtAdded(p)}</p></div><button class="btn" aria-label="Actions for ${esc(p.name)}" aria-haspopup="menu" data-act="pmMenu" data-id="${p.id}">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
     ${(() => {
       const pages = Math.max(1, Math.ceil(all.length / size));
       // 1 … 4 5 6 … 12: always the first and last page, and the pages next to the current one.
@@ -1466,7 +1467,7 @@ function viewPlayers() {
         <div class="pg-ctl"><button class="btn sm" data-act="plPage" data-v="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Previous page">‹<span class="pg-w"> Prev</span></button><span class="pg-nums">${items.map(btn).join('')}</span><button class="btn sm" data-act="plPage" data-v="${page + 1}" ${page >= pages ? 'disabled' : ''} aria-label="Next page"><span class="pg-w">Next </span>›</button></div>
         <label class="pg-size small muted">Rows <select class="input" aria-label="Rows per page" data-change="plSize">${[25, 50, 100].map((n) => `<option ${n === size ? 'selected' : ''}>${n}</option>`).join('')}</select></label></nav>`;
     })()}
-    <div class="pl-dock" role="region" aria-label="Actions for the selected players"><b class="pl-dock-n tnum">0 selected</b><div class="pl-dock-acts">${['Archive','Restore','Remove','Export CSV','Copy RTR IDs'].map(x=>`<button class="btn xs ${x==='Remove'?'danger':''}" data-act="pmSheet" data-v="${x}">${x}</button>`).join('')}</div><button class="btn xs ghost" data-act="plClear">Clear</button></div>`);
+    <div class="pl-dock" role="region" aria-label="Actions for the selected players"><b class="pl-dock-n tnum">0 selected</b><div class="pl-dock-acts">${['Archive','Restore','Set gender','Remove','Export CSV','Copy RTR IDs'].map(x=>`<button class="btn xs ${x==='Remove'?'danger':''}" data-act="${x==='Set gender'?'plSetGender':'pmSheet'}" ${x==='Set gender'?'':`data-v="${x}"`}>${x}</button>`).join('')}</div><button class="btn xs ghost" data-act="plClear">Clear</button></div>`);
 }
 function showPlayerActions(trigger,id) {
   document.querySelector('.player-actions-popover')?.remove();
@@ -2360,8 +2361,30 @@ const ACT = {
   plAdv: () => { S.ui.playerAdv = !S.ui.playerAdv; render(); },
   plGrid: (el) => { S.ui.playerGrid = !!el.dataset.v; render(); },
   plPage: (el) => { S.ui.playerPage = +el.dataset.v; render(); },
+  // Set gender (owner, November 25, 2026): Admin sets Male, Female or Not given for every selected
+  // player, registered or unclaimed. The player can still change their own afterwards.
+  plSetGender: () => {
+    const ids = [...document.querySelectorAll('.player-select:checked')].map((x) => x.dataset.id);
+    if (!ids.length) return;
+    document.querySelectorAll('.scrim,.sheet').forEach((x) => x.remove());
+    const body = `<p>Set the gender for ${ids.length === 1 ? esc(playerOf(ids[0])?.name || 'this player') : `${ids.length} players`}. Players can still change their own in Edit profile.</p>
+      <fieldset class="stack"><legend class="small muted">Gender</legend>${[['male','Male'],['female','Female'],['none','Not given']].map(([v,l])=>`<label class="row"><input type="radio" name="pl-gender" value="${v}" data-change="plGenderPick"> ${l}</label>`).join('')}</fieldset>
+      <div id="pl-gender-results" role="status"></div>`;
+    document.body.insertAdjacentHTML('beforeend', sheetWrap(`Set gender`, body, `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" id="pl-gender-go" data-act="plGenderSave" data-ids="${ids.join(',')}" disabled>Set gender</button>`));
+    document.getElementById('sheet-title')?.focus();
+  },
+  plGenderSave: (el) => {
+    const picked = document.querySelector('input[name="pl-gender"]:checked')?.value;
+    if (!picked) return;
+    const value = picked === 'none' ? null : picked;
+    const ids = (el.dataset.ids || '').split(',').filter(Boolean);
+    ids.forEach((id) => { const p = playerOf(id); if (p) p.gender = value; });
+    document.querySelectorAll('.scrim,.sheet').forEach((x) => x.remove());
+    toast(`${ids.length} succeeded, 0 failed`);
+    render();
+  },
   playersF: (el) => { S.ui.playersF = el.dataset.v; S.ui.shown = 25; render(); },
-  clearPlayers: () => { S.ui.playersQ = ''; S.ui.playersF = 'all'; S.ui.shown = 25; render(); },
+  clearPlayers: () => { S.ui.playersQ = ''; S.ui.playersF = 'all'; S.ui.playersG = 'all'; S.ui.shown = 25; render(); },
   morePlayers: () => { S.ui.shown += 25; render(); },
   reqF: (el) => { S.ui.reqF = el.dataset.v; render(); },
   viewPhoto: (el) => {
@@ -2791,6 +2814,8 @@ const CHANGE = {
   },
   charFiles: (el) => { addCharFiles(el.files); el.value = ''; },
   bannerFiles: (el) => { addBannerFiles(el.files); el.value = ''; },
+  plGender: (el) => { S.ui.playersG = el.value; S.ui.playerPage = 1; S.ui.shown = 25; render(); },
+  plGenderPick: () => { const go = document.getElementById('pl-gender-go'); if (go) go.disabled = false; },
   plSize: (el) => { S.ui.playerSize = +el.value; S.ui.playerPage = 1; render(); },
   // Edit profile: the RTR ID preview follows the registration place and date.
   peRtr: (el) => { const p = playerOf(el.dataset.id), box = document.getElementById('pe-rtr'); if (p && box) box.textContent = rtrWith(p.rtr, pv('place'), pv('regDate')); },

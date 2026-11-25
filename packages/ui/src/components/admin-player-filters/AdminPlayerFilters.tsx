@@ -126,6 +126,22 @@ export function AdminPlayerFilters({
                 onChange={(place) => onChange({ place: place === 'all' ? undefined : [place] })}
               />
             </Field>
+            <Field label="Gender">
+              <Select
+                value={f.gender ?? 'all'}
+                options={[
+                  { value: 'all', label: 'All' },
+                  { value: 'male', label: 'Male' },
+                  { value: 'female', label: 'Female' },
+                  { value: 'none', label: 'Not given' },
+                ]}
+                onChange={(gender) =>
+                  onChange({
+                    gender: gender === 'all' ? undefined : (gender as 'male' | 'female' | 'none'),
+                  })
+                }
+              />
+            </Field>
             <Field label="Archive status">
               <Select
                 value={f.archived ?? 'active'}

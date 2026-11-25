@@ -23,7 +23,11 @@ import { ConflictError, MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { allocateMockRtrId, replaceRtrId } from '../player/unclaimed'
 import { realSetAdminVerificationOverride } from '../real/account-verification'
-import { realCreateAdminPlayer, realUpdateAdminPlayer } from '../real/admin-players'
+import {
+  realCreateAdminPlayer,
+  realSetAdminPlayersGender,
+  realUpdateAdminPlayer,
+} from '../real/admin-players'
 import { isRealDataMode } from '../real/mode'
 import {
   adminPlayerChangedFields,
@@ -38,7 +42,7 @@ import type {
   AdminPlayerEditInput,
   AdminPlayerEditResult,
 } from './adminPlayer.types'
-import { adminPlayerEditOf, adminPlayerOf, getAdminPlayerEdit } from './fetchers'
+import { adminPlayerEditOf, adminPlayerOf, getAdminPlayerEdit, isClubOnlyRecord } from './fetchers'
 import { duplicateGroups } from './management.rules'
 
 async function owner() {
@@ -486,6 +490,78 @@ export const removeAdminPlayers = (input: {
   reason: string
   confirmations: Record<string, string>
 }) => changeAdminPlayers({ ...input, action: 'remove' })
+/** The words the owner sees for a gender choice (Admin Players › Set gender). */
+const GENDER_WORD = { male: 'Male', female: 'Female' } as const
+
+/**
+ * Admin Players › Set gender (owner, November 25, 2026, D-2026-11-19-01): sets Male, Female or
+ * Not given (null) for every selected player, registered or unclaimed. No reason is asked. Each
+ * player is its own save and its own Record of actions entry; a player that already has the value
+ * succeeds without a write. The player can still change their own gender afterwards. Real mode
+ * stores it on the player; a club-only or shared-entry record has no gender column yet.
+ */
+export async function setAdminPlayersGender(input: {
+  ids: string[]
+  gender: 'male' | 'female' | null
+}): Promise<AdminPlayerBulkResult[]> {
+  await owner()
+  if (input.gender !== null && input.gender !== 'male' && input.gender !== 'female')
+    throw new MockError('conflict', 'Choose Male, Female or Not given.')
+  const ids = [...new Set(input.ids)]
+  if (isRealDataMode()) return realSetAdminPlayersGender({ ids, gender: input.gender })
+  const results: AdminPlayerBulkResult[] = []
+  for (const id of ids) {
+    try {
+      results.push(
+        await adminMutation(100, (draft) => {
+          checkMockSave()
+          const word = input.gender ? GENDER_WORD[input.gender] : 'Not given'
+          const player = draft.players.find((p) => p.id === id)
+          if (player) {
+            const current = record(draft, id)
+            const profile = draft.playerProfiles.find((p) => p.playerId === id)
+            if (!profile) throw new MockError('conflict', 'Player not found. Reload the list.')
+            if ((profile.gender ?? null) !== input.gender) {
+              profile.gender = input.gender
+              // An unclaimed player's club copies follow; a registered player's are the player's own.
+              if (!current.view.claimed)
+                for (const club of draft.clubPlayers.filter((c) => c.playerId === id))
+                  club.gender = input.gender
+              current.record.revision++
+              appendAdminAudit(draft, {
+                action: 'player_gender_set',
+                targetType: 'player',
+                targetId: id,
+                summary: `Set gender for ${player.fullName} (${player.rtrId}) to ${word}.`,
+              })
+            }
+            return { id, name: player.fullName, success: true }
+          }
+          const clubOnly = draft.clubPlayers.find((c) => c.id === id && isClubOnlyRecord(c))
+          if (!clubOnly) throw new MockError('conflict', 'Player not found. Reload the list.')
+          if ((clubOnly.gender ?? null) !== input.gender) {
+            clubOnly.gender = input.gender
+            appendAdminAudit(draft, {
+              action: 'player_gender_set',
+              targetType: 'player',
+              targetId: id,
+              summary: `Set gender for ${clubOnly.fullName} to ${word}.`,
+            })
+          }
+          return { id, name: clubOnly.fullName, success: true }
+        }),
+      )
+    } catch (error) {
+      results.push({
+        id,
+        name: id,
+        success: false,
+        error: error instanceof Error ? error.message : 'Could not save.',
+      })
+    }
+  }
+  return results
+}
 export async function issueRegistrationLink(id: string) {
   await owner()
   return adminMutation(300, (draft) => {

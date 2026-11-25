@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 269 · CANCELLED: 4 · MOCKUP ONLY: 4
+TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 270 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -477,4 +477,5 @@ TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 269 · CANCELLED: 4 · MOCKUP ONL
 | [2026-11-23-queue-social-link-entry-key](2026-11-23-queue-social-link-entry-key.md) | Add player: a social link saves an unclaimed player without an email (#1019) | add-player-sheet, add-player-form, edit-player-details-form | IN MOCK APP — #1019 |
 | [2026-11-23-queue-unclaimed-name-search](2026-11-23-queue-unclaimed-name-search.md) | Player Information finds unclaimed players by name and shows their name and picture | add-player-sheet, player-confirm-card | IN MOCK APP — PR #1030 |
 | [2026-11-23-queue-waitlist-strict-order](2026-11-23-queue-waitlist-strict-order.md) | The waitlist is strictly first come, first served | waitlist-panel, session-setup-form (setup-courts-section) | IN MOCK APP — #1036 |
+| [2026-11-25-admin-bulk-set-gender](2026-11-25-admin-bulk-set-gender.md) | Admin app: Set gender for the selected players, plus a Gender filter | admin-player-bulk-bar, admin-player-filters, admin-player-gender-form (new) | IN MOCK APP — PR #1101 |
 <!-- status-index:end -->

@@ -40,6 +40,8 @@ type WireCourt = {
   openedEarlyAt: string | null
   openUntil: string | null
   removedAt: string | null
+  /** Court order (#1105); missing on older servers, then the list order */
+  position?: number
 }
 type WireSummary = {
   session: WireSession
@@ -97,8 +99,10 @@ export type StandingRow = {
   losses: number
 }
 
-export const courtOf = (c: WireCourt): SessionCourt => ({
+/** `index` is the court's place in the list it came in, the order when `position` is missing. */
+export const courtOf = (c: WireCourt, index = 0): SessionCourt => ({
   id: c.id,
+  position: c.position ?? index + 1,
   sessionId: c.sessionId,
   label: c.label,
   startsAt: msOrNull(c.startsAt) ?? undefined,

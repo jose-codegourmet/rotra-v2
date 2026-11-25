@@ -7,6 +7,7 @@ import { allowedRequestFormats } from '@rotra/data/match-request/rules'
 import { recordsGames, sessionScoring } from '@rotra/data/queue-session/types'
 import { useExtendSession } from '@rotra/data/queue-session/useExtendSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { useReorderCourts } from '@rotra/data/queue-session/useReorderCourts'
 import { useUpdateCourt } from '@rotra/data/queue-session/useUpdateCourt'
 import { useSessionCostEstimate } from '@rotra/data/session-cost/useSessionCostEstimate'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
@@ -18,6 +19,7 @@ import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { CostEstimateResult } from '@rotra/ui/cost-estimate-summary'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
+import { CourtLabelForm } from '@rotra/ui/forms/court-label-form'
 import { Icon } from '@rotra/ui/icon'
 import { SessionLinkCard } from '@rotra/ui/session-link-card'
 import { SettingsCard } from '@rotra/ui/settings-card'
@@ -53,7 +55,8 @@ const errorMessage = (error: unknown) =>
 /**
  * The console's Settings tab (the prototype's liveSettings()): the Setup heading with one help line
  * and "All session settings" (opens the read-only Q-PREPARE page), the Courts box (From, Until and
- * Follows session end on useUpdateCourt, Extend on useExtendSession, Add court), a 2x2 grid of cards
+ * Follows session end on useUpdateCourt, Extend on useExtendSession, Add court, drag or arrow-key
+ * reorder on useReorderCourts, the label opening the Courts tab's Change court label dialog), a 2x2 grid of cards
  * (Game rules | Players, Costs | Notes), the session hosts, then the Session link and Who can join
  * boxes. The Courts box and its cards toast their own saves; this view only toasts failures.
  */
@@ -70,10 +73,14 @@ export function SettingsView({
   const matches = useSessionMatches(sessionId)
   const cost = useSessionCostEstimate(sessionId)
   const updateCourt = useUpdateCourt()
+  const reorderCourts = useReorderCourts()
   const extend = useExtendSession()
   const setAcceptJoinRequests = useSetAcceptJoinRequests()
   const setAlwaysRequireRequest = useSetAlwaysRequireRequest()
   const [addPlayerOpen, setAddPlayerOpen] = useState(false)
+  /** The court whose Change court label dialog is open (its label button in the Courts box) */
+  const [labelCourtId, setLabelCourtId] = useState<string | null>(null)
+  const [labelError, setLabelError] = useState<string | undefined>()
   // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
   const [origin, setOrigin] = useState('')
   useEffect(() => setOrigin(window.location.origin), [])
@@ -141,16 +148,23 @@ export function SettingsView({
     const playing = onIt.find((m) => m.state === 'active')
     const ready = onIt.find((m) => m.state === 'on_court')
     const match = playing ?? ready
+    const open = courtOpen(c, now)
+    // Free since the later of the court's open moment and the end of its last done or invalid match.
+    const freeSince =
+      !match && open
+        ? Math.max(
+            c.openedEarlyAt ?? c.startsAt ?? s.startedAt ?? s.scheduledStartAt,
+            ...onIt
+              .filter((m) => m.state === 'completed' || m.state === 'invalid')
+              .flatMap((m) => (m.endedAt != null ? [m.endedAt] : [])),
+          )
+        : undefined
     return {
       id: c.id,
       label: c.label,
-      state: playing
-        ? 'playing'
-        : ready
-          ? 'getting-ready'
-          : courtOpen(c, now)
-            ? 'free'
-            : 'not-open',
+      state: playing ? 'playing' : ready ? 'getting-ready' : open ? 'free' : 'not-open',
+      playingSince: playing?.startedAt ?? undefined,
+      freeSince,
       teamA: match?.teamA.map(player),
       teamB: match?.teamB.map(player),
       from: c.startsAt ?? s.startedAt ?? s.scheduledStartAt,
@@ -171,6 +185,27 @@ export function SettingsView({
     )
   }
   const startOf = (c: (typeof courts)[number]) => c.startsAt ?? s.startedAt ?? s.scheduledStartAt
+  /** Change court label, as on the Courts tab: only the label changes; start and end stay. */
+  const onSaveLabel = (c: (typeof courts)[number], label: string) => {
+    if (updateCourt.isPending) return
+    if (label === c.label) {
+      setLabelCourtId(null)
+      toast('Court label unchanged')
+      return
+    }
+    setLabelError(undefined)
+    updateCourt.mutate(
+      { sessionId, courtId: c.id, label, startsAt: startOf(c), openUntil: c.openUntil },
+      {
+        onSuccess: () => {
+          setLabelCourtId(null)
+          toast(`${c.label} is now ${label}`)
+        },
+        onError: (error: unknown) => setLabelError(errorMessage(error)),
+      },
+    )
+  }
+  const labelCourt = courts.find((c) => c.id === labelCourtId)
 
   return (
     <section aria-label="Settings" className="flex flex-col gap-4">
@@ -207,7 +242,30 @@ export function SettingsView({
           )
         }
         onAddCourt={onAddCourt}
+        onReorder={(courtIds) =>
+          reorderCourts.mutate(
+            { sessionId, courtIds },
+            { onError: (error) => toast.error(errorMessage(error)) },
+          )
+        }
+        onRename={(courtId) => {
+          setLabelError(undefined)
+          setLabelCourtId(courtId)
+        }}
       />
+      {labelCourt ? (
+        <CourtLabelForm
+          key={labelCourt.id}
+          open
+          onOpenChange={(next) => {
+            if (!next) setLabelCourtId(null)
+          }}
+          currentLabel={labelCourt.label}
+          onSubmit={({ label }) => onSaveLabel(labelCourt, label)}
+          isPending={updateCourt.isPending}
+          serverError={labelError}
+        />
+      ) : null}
       <div className="grid gap-4 min-[761px]:grid-cols-2">
         <SettingsCard
           title="Game rules"

@@ -71,11 +71,31 @@ export function levelCodeFor(id: number | null): PlayingLevel | null {
   return id == null ? null : (PLAYING_LEVELS[id] ?? null)
 }
 
+/**
+ * Court order (owner decision, 2026-11-25): position, then created_at and id. Every read of a
+ * session's courts uses it, so court lists and Auto Queue's fill follow the Queue Master's order.
+ */
+export const COURT_ORDER = [
+  { position: 'asc' },
+  { createdAt: 'asc' },
+  { id: 'asc' },
+] satisfies Prisma.SessionCourtOrderByWithRelationInput[]
+
+/** The session's live (not removed) courts in court order. */
 export function liveCourts(tx: Tx, sessionId: string) {
   return tx.sessionCourt.findMany({
     where: { sessionId, removedAt: null },
-    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+    orderBy: COURT_ORDER,
   })
+}
+
+/** The position a new court of the session takes: after every court, removed ones included. */
+export async function nextCourtPosition(tx: Tx, sessionId: string) {
+  const { _max } = await tx.sessionCourt.aggregate({
+    where: { sessionId },
+    _max: { position: true },
+  })
+  return (_max.position ?? 0) + 1
 }
 
 /**

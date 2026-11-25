@@ -156,7 +156,13 @@ model SessionCourt {
   id            String    @id @db.Uuid
   clubId        String    @map("club_id") @db.Uuid
   sessionId     String    @map("session_id") @db.Uuid
+  /// Not unique: two courts in a session may share a label (owner decision, 2026-11-25).
   label         String
+  /// Court order in the session, from 1 (owner decision, 2026-11-25): every court list and Auto
+  /// Queue's fill read courts by position, then created_at, id. A new court takes the session's
+  /// highest position + 1; Reorder courts rewrites the live courts 1..n. Not unique, and removed
+  /// courts keep theirs.
+  position      Int
   /// Planned start. Null = the session start.
   startsAt      DateTime? @map("starts_at") @db.Timestamptz(6)
   /// Start anyway: opened before the planned start; cleared by Undo early open while free.

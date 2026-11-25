@@ -73,6 +73,7 @@ export function createQueueFixtures(now = Date.now()) {
       id: `${tonight.id}-court-${n}`,
       sessionId: tonight.id,
       label: `Court ${n}`,
+      position: n,
       startsAt: tonight.scheduledStartAt,
       openUntil: null,
       removedAt: null,

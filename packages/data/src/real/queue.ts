@@ -22,12 +22,13 @@ import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubAccess } from '../license/license.types'
 import type { PlayingLevel } from '../player/player.types'
 import type { ParticipantStatsRead } from '../public-session/publicSession.types'
-import type {
-  DownloadState,
-  QueueSession,
-  QueueSessionInput,
-  QueueSessionSummary,
-  SessionCourt,
+import {
+  byCourtOrder,
+  type DownloadState,
+  type QueueSession,
+  type QueueSessionInput,
+  type QueueSessionSummary,
+  type SessionCourt,
 } from '../queue-session/queueSession.types'
 import { hostRegistrationText } from '../session-host/sessionHost.rules'
 import type { SessionHostRegistration } from '../session-host/sessionHost.types'
@@ -358,6 +359,8 @@ export type WireCourt = {
   id: string
   sessionId: string
   label: string
+  /** Court order from 1; missing in a copy downloaded before court order existed (read order then). */
+  position?: number
   /** Null for older courts: the session start applies. */
   startsAt?: string | null
   openedEarlyAt?: string | null
@@ -378,10 +381,12 @@ export type WireSessionSummary = {
   requestCount?: number
 }
 
-export const courtOf = (court: WireCourt): SessionCourt => ({
+/** `index` is the court's place in the list it came in, the order when `position` is missing. */
+export const courtOf = (court: WireCourt, index = 0): SessionCourt => ({
   id: court.id,
   sessionId: court.sessionId,
   label: court.label,
+  position: court.position ?? index + 1,
   startsAt: msOrNull(court.startsAt ?? null) ?? undefined,
   openedEarlyAt: msOrNull(court.openedEarlyAt ?? null),
   openUntil: msOrNull(court.openUntil),
@@ -425,7 +430,7 @@ export async function realGetQueueSession(id: string) {
   return {
     ...summaryOf(wire, download !== null),
     ...(wire.requestCount === undefined ? {} : { requestCount: wire.requestCount }),
-    courts: wire.courts.map(courtOf),
+    courts: wire.courts.map(courtOf).sort(byCourtOrder),
     downloadState: (isDownloading(id)
       ? 'downloading'
       : download

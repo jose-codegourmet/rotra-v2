@@ -24,7 +24,13 @@ const base = {
   onChangeFrom: fn(),
   onChangeUntil: fn(),
   onFollowSessionEnd: fn(),
+  onRename: fn(),
 } satisfies SettingsCourtCardProps
+
+const NOW = at(19, 40)
+/** Timers against a fixed now: "Playing · 14 min", "Free · 6 min", "Free · 1 h 5 min". */
+const playingTimer = { state: 'playing', teamA, teamB, playingSince: at(19, 26), now: NOW } as const
+const freeTimer = { state: 'free', freeSince: at(19, 34), now: NOW } as const
 
 /** Keeps the times and the checkbox in state so the story behaves like the Settings tab. */
 function Stateful(args: SettingsCourtCardProps) {
@@ -81,6 +87,20 @@ export const NextDay: Story = {
 /** From at or after Until: the field is flagged and the refusal shows under it. */
 export const InvalidFrom: Story = {
   args: { followsSessionEnd: false, from: at(21, 30), until: at(21) },
+}
+/** The chip timers: "Playing · 14 min" from the match start. */
+export const PlayingTimer: Story = { args: playingTimer }
+/** "Free · 6 min" from the court's open moment or its last match's end. */
+export const FreeTimer: Story = { args: freeTimer }
+/** An hour or more: "Free · 1 h 5 min". */
+export const FreeTimerHours: Story = { args: { ...freeTimer, freeSince: at(18, 35) } }
+/** The ⠿ handle before the label (the box attaches the drag and arrow-key handlers). */
+export const WithHandle: Story = { args: { ...playingTimer, handleProps: {} } }
+export const PlayingTimerLight: Story = { args: playingTimer, globals: { theme: 'light' } }
+export const FreeTimerLight: Story = { args: freeTimer, globals: { theme: 'light' } }
+export const WithHandleLight: Story = {
+  args: { ...playingTimer, handleProps: {} },
+  globals: { theme: 'light' },
 }
 export const PlayingLight: Story = {
   args: { state: 'playing', teamA, teamB },

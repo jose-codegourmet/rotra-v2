@@ -50,11 +50,12 @@ import type { ClaimLinkRecord } from '../player-account/playerAccount.types'
 import type { PlayerNotification } from '../player-notifications/playerNotifications.types'
 import type { ProfileBanner } from '../profile-banner/profileBanner.types'
 import type { ProfileCharacter } from '../profile-character/profileCharacter.types'
-import type {
-  DownloadState,
-  QueueSession,
-  SessionCourt,
-  SessionFinalization,
+import {
+  byCourtOrder,
+  type DownloadState,
+  type QueueSession,
+  type SessionCourt,
+  type SessionFinalization,
 } from '../queue-session/queueSession.types'
 import type { RankingPolicyVersion } from '../ranking-settings/rankingSettings.types'
 import { isRealDataMode } from '../real/mode'
@@ -139,6 +140,11 @@ export type MockState = {
    */
   sessionHosts?: SessionHostRecord[]
   sessions: QueueSession[]
+  /**
+   * Every session's courts, removed ones included. Each session's courts are kept in court order
+   * (`position`, owner decision 2026-11-25) by every write (`keepCourtOrder`), so a filter by
+   * session reads them in that order.
+   */
   courts: SessionCourt[]
   roster: SessionPlayer[]
   waitlist: SessionWaitlistEntry[]
@@ -211,6 +217,25 @@ function freeze<T>(value: T): DeepReadonly<T> {
     Object.freeze(value)
   }
   return value as DeepReadonly<T>
+}
+/**
+ * Puts each session's courts in court order in place: a session's courts keep the array slots they
+ * had and only swap among them (a stable sort by position), so other sessions are not moved.
+ */
+function keepCourtOrder(state: MockState) {
+  const slots = new Map<string, number[]>()
+  state.courts.forEach((court, index) => {
+    const indexes = slots.get(court.sessionId)
+    if (indexes) indexes.push(index)
+    else slots.set(court.sessionId, [index])
+  })
+  const courts = [...state.courts]
+  for (const indexes of slots.values()) {
+    const sorted = indexes.map((i) => courts[i] as SessionCourt).sort(byCourtOrder)
+    indexes.forEach((slot, n) => {
+      state.courts[slot] = sorted[n] as SessionCourt
+    })
+  }
 }
 function seedState(): MockState {
   const now = Date.now(),
@@ -321,6 +346,7 @@ function seedState(): MockState {
   seedAdminPlayerManagement(state)
   seedLeaderboardHistory(state)
   seedUnclaimedPlayers(state, now)
+  keepCourtOrder(state)
   return state
 }
 /**
@@ -365,12 +391,14 @@ export function createMockStore() {
         // The working state is private to one offline apply: no freeze, no listeners.
         const draft = structuredClone(working.snapshot) as MockState
         change(draft)
+        keepCourtOrder(draft)
         working.snapshot = draft
         return
       }
       if (isRealDataMode()) throw new NotConnectedError()
       const draft = structuredClone(snapshot) as MockState
       change(draft)
+      keepCourtOrder(draft)
       snapshot = freeze(structuredClone(draft))
       notify()
     },

@@ -1,6 +1,10 @@
 import type { PlayingLevel } from '../player/player.types'
 import { atWhenLabel, joinRequestsClosedNote } from '../queue-session/queueSession.rules'
-import type { QueueSessionInput, SessionCourt } from '../queue-session/queueSession.types'
+import {
+  courtMovedText,
+  type QueueSessionInput,
+  type SessionCourt,
+} from '../queue-session/queueSession.types'
 import { hostRegistrationText } from '../session-host/sessionHost.rules'
 import type { SessionHostRegistration } from '../session-host/sessionHost.types'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
@@ -126,6 +130,7 @@ type WireCourt = {
   id: string
   sessionId: string
   label: string
+  position: number
   /** Null for older courts: the session start applies. */
   startsAt: string | null
   openedEarlyAt: string | null
@@ -140,6 +145,7 @@ const courtOf = (court: WireCourt): SessionCourt => ({
   id: court.id,
   sessionId: court.sessionId,
   label: court.label,
+  position: court.position,
   startsAt: court.startsAt ? Date.parse(court.startsAt) : undefined,
   openedEarlyAt: court.openedEarlyAt ? Date.parse(court.openedEarlyAt) : null,
   openUntil: court.openUntil ? Date.parse(court.openUntil) : null,
@@ -230,6 +236,19 @@ export async function realUndoCourtEarlyOpen(input: { sessionId: string; courtId
 export async function realRemoveCourt(input: { sessionId: string; courtId: string }) {
   await realRequest(courtPath(input.sessionId, input.courtId), { method: 'DELETE' })
   return accepted(null, 'Court removed')
+}
+
+/** Reorder courts (owner decision, 2026-11-25): the full new order of the live courts. Online only. */
+export async function realReorderCourts(input: { sessionId: string; courtIds: string[] }) {
+  const { courts, moved } = await realRequest<{
+    courts: WireCourt[]
+    moved: { courtId: string; position: number } | null
+  }>(`${sessionPath(input.sessionId)}/courts/order`, {
+    method: 'PATCH',
+    body: { courtIds: input.courtIds },
+  })
+  const label = moved && courts.find((c) => c.id === moved.courtId)?.label
+  return accepted(courts.map(courtOf), label && moved ? courtMovedText(label, moved.position) : '')
 }
 
 const endToast = (session: WireSession) =>

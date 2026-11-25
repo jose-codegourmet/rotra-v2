@@ -3,12 +3,12 @@
 import { Checkbox } from '@rotra/ui/checkbox'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
-import { FreeCourtChip } from '@rotra/ui/court-card'
 import { CourtDrawing, type CourtPlayer } from '@rotra/ui/court-drawing'
 import { DateTimePicker } from '@rotra/ui/date-time-picker'
 import { startOfDay } from '@rotra/ui/date-time-picker/helpers'
 import { toast } from '@rotra/ui/toaster'
-import { DAY_MS, opensBeforeClosesError, whenText } from './SettingsCourtCard.helpers'
+import { type ComponentProps, useEffect, useState } from 'react'
+import { DAY_MS, opensBeforeClosesError, sinceText, whenText } from './SettingsCourtCard.helpers'
 
 export type SettingsCourtState = 'free' | 'getting-ready' | 'playing' | 'not-open'
 
@@ -33,6 +33,22 @@ export type SettingsCourtCardProps = {
   onChangeUntil: (until: number) => void
   /** Clears the court's own end: it follows the session end again. The card toasts "COURT follows the session end". */
   onFollowSessionEnd: () => void
+  /** While Playing: when the match started, epoch ms. The chip reads "Playing · 14 min". */
+  playingSince?: number
+  /**
+   * While Free: since when, epoch ms (the later of the court's open moment and the end of its last
+   * done or invalid match). The chip reads "Free · 6 min"; plain "Free" without it.
+   */
+  freeSince?: number
+  /** The time the timers count to; the box passes the console's. Without it the card ticks every 30 s. */
+  now?: number
+  /** The label is a button that opens the Change court label dialog; a plain label without it */
+  onRename?: () => void
+  /**
+   * Pointer and key handlers the box attaches to the ⠿ drag handle before the label. No handle
+   * without them. The card sets the button's aria-label "Move COURT".
+   */
+  handleProps?: Omit<ComponentProps<'button'>, 'aria-label' | 'children' | 'type'>
   className?: string
 }
 
@@ -42,19 +58,52 @@ const GLOW =
 // The picker's time button stops at 260 px by default; here it fills the column to the card's edge.
 const FIELD = '[&_button]:max-w-none'
 
-function StateChip({ state }: { state: SettingsCourtState }) {
-  if (state === 'playing') return <Chip tone="accent">Playing</Chip>
+const TICK_MS = 30_000
+
+/** The card's own clock when the box passes no `now`: a render every 30 s, cleared on unmount. */
+function useTick(now: number | undefined): number {
+  const [tick, setTick] = useState(() => Date.now())
+  useEffect(() => {
+    if (now != null) return
+    const timer = window.setInterval(() => setTick(Date.now()), TICK_MS)
+    return () => window.clearInterval(timer)
+  }, [now])
+  return now ?? tick
+}
+
+function StateChip({
+  state,
+  playingSince,
+  freeSince,
+  now,
+}: {
+  state: SettingsCourtState
+  playingSince?: number
+  freeSince?: number
+  now: number
+}) {
+  if (state === 'playing') {
+    const time = sinceText(playingSince, now)
+    return <Chip tone="accent">{time ? `Playing · ${time}` : 'Playing'}</Chip>
+  }
   if (state === 'getting-ready') return <Chip>Getting ready</Chip>
   if (state === 'not-open') return <Chip>Not open yet</Chip>
-  return <FreeCourtChip />
+  const time = sinceText(freeSince, now)
+  return <Chip>{time ? `Free · ${time}` : 'Free'}</Chip>
 }
+
+const HANDLE =
+  'grid size-11 flex-none cursor-grab touch-none place-items-center -my-2.5 -ml-2.5 rounded-sm border-0 bg-transparent p-0 text-xl leading-none text-fg2 hover:bg-elev hover:text-fg active:cursor-grabbing'
+const NAME =
+  'min-w-0 cursor-pointer truncate border-0 bg-transparent p-0 text-left font-bold text-fg hover:underline hover:decoration-dotted hover:underline-offset-[3px]'
 
 /**
  * One small court card in the Settings Courts box (the prototype's .ls-cc): label and status chip,
  * the court drawing (grey "FREE" when no match is on it, accent border and glow while Playing), then
  * From and Until time fields that open the time dialog and a "Follows session end" checkbox. Every
  * change saves at once. Until is always editable: a time other than the session end unticks the box,
- * the session end ticks it.
+ * the session end ticks it. The chip times Playing ("Playing · 14 min") and Free ("Free · 6 min"); the
+ * header can carry the box's ⠿ drag handle and a label button that opens Change court label.
  */
 export function SettingsCourtCard({
   label,
@@ -68,8 +117,14 @@ export function SettingsCourtCard({
   onChangeFrom,
   onChangeUntil,
   onFollowSessionEnd,
+  playingSince,
+  freeSince,
+  now: nowProp,
+  onRename,
+  handleProps,
   className,
 }: SettingsCourtCardProps) {
+  const now = useTick(nowProp)
   const hasMatch = state === 'playing' || state === 'getting-ready'
   const invalidFrom = from >= until
   const nextDay = startOfDay(until) !== startOfDay(from)
@@ -119,8 +174,33 @@ export function SettingsCourtCard({
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <b className="min-w-0 truncate">{label}</b>
-        <StateChip state={state} />
+        <div className="flex min-w-0 items-center gap-0.5">
+          {handleProps ? (
+            <button
+              type="button"
+              aria-label={`Move ${label}`}
+              title="Drag to reorder"
+              data-court-grip=""
+              {...handleProps}
+              className={cn(HANDLE, handleProps.className)}
+            >
+              ⠿
+            </button>
+          ) : null}
+          {onRename ? (
+            <button
+              type="button"
+              aria-label={`Change ${label} label`}
+              onClick={onRename}
+              className={NAME}
+            >
+              {label}
+            </button>
+          ) : (
+            <b className="min-w-0 truncate">{label}</b>
+          )}
+        </div>
+        <StateChip state={state} playingSince={playingSince} freeSince={freeSince} now={now} />
       </div>
       <CourtDrawing free={!hasMatch} freeLabel="FREE" teamA={teamA} teamB={teamB} />
       <div className="grid grid-cols-1 gap-1.5">

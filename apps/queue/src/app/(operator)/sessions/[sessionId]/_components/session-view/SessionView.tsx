@@ -609,9 +609,6 @@ export function SessionView({
             if (!next) setLabelCourtId(null)
           }}
           currentLabel={labelCourt.label}
-          otherLabels={courts
-            .filter((c) => c.id !== labelCourt.id && !c.removedAt)
-            .map((c) => c.label)}
           onSubmit={({ label }) => onSaveLabel(labelCourt, label)}
           isPending={updateCourt.isPending}
           serverError={labelError}

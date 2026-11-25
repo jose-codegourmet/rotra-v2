@@ -132,10 +132,10 @@ SELECT label
 FROM session_courts
 WHERE session_id = $1
   AND removed_at IS NULL
-ORDER BY created_at ASC, id ASC
+ORDER BY position ASC, created_at ASC, id ASC
 `
 
-// Live courts in creation order (the id breaks a tie).
+// Live courts in court order (position, then creation time and id).
 func (q *Queries) ListPublicSessionCourts(ctx context.Context, sessionID pgtype.UUID) ([]string, error) {
 	rows, err := q.db.Query(ctx, listPublicSessionCourts, sessionID)
 	if err != nil {

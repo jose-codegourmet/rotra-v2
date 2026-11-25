@@ -38,13 +38,13 @@ JOIN clubs c ON c.id = s.club_id
 LEFT JOIN session_publications sp ON sp.session_id = s.id
 WHERE s.public_slug = @slug;
 
--- Live courts in creation order (the id breaks a tie).
+-- Live courts in court order (position, then creation time and id).
 -- name: ListPublicSessionCourts :many
 SELECT label
 FROM session_courts
 WHERE session_id = @session_id
   AND removed_at IS NULL
-ORDER BY created_at ASC, id ASC;
+ORDER BY position ASC, created_at ASC, id ASC;
 
 -- The live roster in slot order: not released and not a no show. The club player is looked up inside the
 -- session's own club; a missing one (or a guest, with no profile) has no picture.

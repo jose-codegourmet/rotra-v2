@@ -9,7 +9,6 @@ const meta = {
     open: true,
     onOpenChange: fn(),
     currentLabel: 'Court 1',
-    otherLabels: ['Court 2', 'Court 3'],
     onSubmit: fn(),
   },
 } satisfies Meta<typeof CourtLabelForm>
@@ -31,7 +30,8 @@ const typeAndSave =
 /** Prefilled with the current label; the hint says where it shows. */
 export const Default: Story = {}
 export const Empty: Story = { play: typeAndSave('') }
-export const Duplicate: Story = { play: typeAndSave('court 2') }
+/** Another court's label is allowed (owner decision, 2026-11-25): saving goes through. */
+export const SameAsAnotherCourt: Story = { play: typeAndSave('Court 2') }
 export const Saving: Story = { args: { isPending: true } }
 export const ServerError: Story = { args: { serverError: 'Court no longer available.' } }
 export const Light: Story = { globals: { theme: 'light' } }

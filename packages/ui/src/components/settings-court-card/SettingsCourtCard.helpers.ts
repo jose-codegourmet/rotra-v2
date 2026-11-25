@@ -25,3 +25,20 @@ export function whenText(at: number, base: number): string {
 export function opensBeforeClosesError(label: string): string {
   return `${label} has to open before it closes.`
 }
+
+/**
+ * The prototype's courtDuration(): a court chip's timer from whole minutes. "0 min" under a minute,
+ * "14 min", "1 h", "1 h 5 min". Minutes are floored and never negative.
+ */
+export function courtDuration(minutes: number): string {
+  const whole = Number.isFinite(minutes) ? Math.max(0, Math.floor(minutes)) : 0
+  const hours = Math.floor(whole / 60)
+  const rest = whole % 60
+  return [hours ? `${hours} h` : '', rest ? `${rest} min` : ''].filter(Boolean).join(' ') || '0 min'
+}
+
+/** Whole minutes from `since` to `now` as the chip timer; null when `since` is unknown or ahead. */
+export function sinceText(since: number | undefined, now: number): string | null {
+  if (since == null || since > now) return null
+  return courtDuration((now - since) / 60_000)
+}

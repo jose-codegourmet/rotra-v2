@@ -448,6 +448,7 @@
     "./club-player/useClubPlayerYearStats": "./src/club-player/useClubPlayerYearStats.ts",
     "./fixtures/saved-player-stats": "./src/fixtures/savedPlayerStats.ts",
     "./queue-session/useUpdateCourt": "./src/queue-session/useUpdateCourt.ts",
+    "./queue-session/useReorderCourts": "./src/queue-session/useReorderCourts.ts",
     "./match/auto-queue-types": "./src/match/autoQueue.types.ts",
     "./match/auto-queue-rules": "./src/match/autoQueue.rules.ts",
     "./match/plan-ahead-rules": "./src/match/planAhead.rules.ts",

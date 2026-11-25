@@ -11,6 +11,8 @@ export const settingsCourtsBoxMeta = {
     'Extend toasts "Session ends at TIME · public page updates after sync" (TIME with its day when it is not today). Do not toast again in the container.',
     'Add court opens the existing Add court dialog (AddCourtForm); the Courts and time sheet stays elsewhere (console header, Overview, court menus).',
     'Setting an exact end time in this box is open (docs/mockup-changes/2026-11-19-queue-settings-courts-add-extend.md); not built.',
+    'Reorder (onReorder): drag a card by its ⠿ handle (plain pointer events; only the handle starts a drag, so the slider still swipes). Past 4 px the card lifts (shadow-pop) and follows the pointer; the card under the pointer gives up its place and the others slide aside (no animation with reduced motion). On phones, holding near the slider edge shows the next or previous court. Dropping calls onReorder(courtIds) once with every court id in the new order, only when it changed, and toasts "COURT moved to position N". Escape (or a cancelled pointer) puts it back. On the focused handle ArrowLeft/ArrowUp moves the court one place earlier and ArrowRight/ArrowDown one later, same callback and toast; focus stays on the handle. Add court stays last and never moves. The new order shows at once and gives way to the courts prop as soon as it changes.',
+    'Rename (onRename): the label button on each card reports the court id; the container opens Change court label.',
     'Do not move SnapCarousel to Embla; this slider is the only one (with SavedPlayerStatsCarousel).',
   ],
   prototype: {
@@ -24,6 +26,6 @@ export const settingsCourtsBoxMeta = {
     'docs/mockup-changes/2026-11-19-queue-settings-courts-add-extend.md',
     'docs/mockup-changes/2026-11-19-queue-settings-courts-slider.md',
   ],
-  variants: ['grid', 'slider'],
+  variants: ['grid', 'slider', 'reorder'],
   related: ['SettingsCourtCard', 'AddCourtTile', 'CourtCard', 'SavedPlayerStatsCarousel'],
 } satisfies ComponentMeta

@@ -147,6 +147,8 @@ export function courtDto(court: SessionCourt) {
     id: court.id,
     sessionId: court.sessionId,
     label: court.label,
+    /** Court order in the session, from 1 (owner decision, 2026-11-25). */
+    position: court.position,
     /** Planned start; null means the session start. */
     startsAt: toIsoOrNull(court.startsAt),
     openedEarlyAt: toIsoOrNull(court.openedEarlyAt),

@@ -184,6 +184,10 @@ before a step, `snapshot` pins the rows after it, `save` and `{{name}}` pass a g
 `testdata/tools/capture-writes-queue.test.mjs` (same recipe as the groups above), and `queue.seed.sql` is the seed. A race whose winner is
 not decided is tested in `race_test.go`, not pinned.
 
+The club's trusted hosts and a Queue Session's hosts (`hosts.go`, and the two GETs in `internal/signedin/queue_hosts.go`, D-2026-11-22-01) have the golden `hosts`
+(cases from `gen-writes-queue-hosts-cases.py`; the generated ids of an added host are redacted). The setup save's `hostClubPlayerIds` and the freeze of a
+finished session's hosts are not in Go yet.
+
 Preparation, courts and the roster (`session_prep.go`, `courts.go`, `roster_ops.go`) and the club's own writes (`club_writes.go`) are in the same package.
 Their goldens are `prep`, `rosterops` and `club` (cases from `gen-writes-queue-prep-cases.py`, `gen-writes-queue-ops-cases.py` and
 `gen-writes-queue-club-cases.py`). Capture `prep` with `TZ=UTC` (see its generator). `session_rules.go` holds the preparation rules no other code

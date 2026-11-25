@@ -64,6 +64,11 @@ func TestMoneyGolden(t *testing.T) { writetest.Replay(t, "testdata", "money", bu
 // arrays the TypeScript reads with no order are compared as sets (the cases name them with "unordered").
 func TestFinalizeGolden(t *testing.T) { writetest.Replay(t, "testdata", "finalize", buildWithReads) }
 
+// The club's trusted hosts (GET, POST /api/club/trusted-hosts, DELETE /api/club/trusted-hosts/{clubPlayerId}) and a Queue Session's hosts (GET, POST
+// /api/sessions/{id}/hosts, DELETE /api/sessions/{id}/hosts/{clubPlayerId}), D-2026-11-22-01. The two GETs are the signedin package's routes, so the
+// group mounts the reads too. The ids a host's registration makes come from a random operation id, and the case files hide them (Case.redact).
+func TestHostsGolden(t *testing.T) { writetest.Replay(t, "testdata", "hosts", buildWithReads) }
+
 // The Queue visitor routes: Request to join (POST join-request) and My request (GET my-request), with the receipt in an httpOnly cookie. The
 // capture sets the receipt secret to "capture-visitor-receipt-secret"; the Set-Cookie text is the one Next writes. The nosecret file is the same
 // routes with the secret unset, which the TypeScript answers with 503 where it needs the receipt.

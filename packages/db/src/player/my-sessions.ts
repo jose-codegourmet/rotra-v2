@@ -131,7 +131,8 @@ export async function readMySessions(context: PlayerContext) {
  * other players. Own games are shareable before the club publishes (D-2026-11-13-06), so the
  * people come back for an unpublished session too; only `published` and `position` (Share result)
  * wait for the standings to be shared. Only games the player played are read. A guest (no profile
- * with an RTR ID) shows a masked name and no picture, as on public pages.
+ * with an RTR ID) shows a masked name and the picture the club set for it (D-2026-11-09-12), else
+ * initials, as on the session page.
  */
 export async function readMyShareSession(context: PlayerContext, sessionId: string) {
   const empty = { published: false, position: null, games: {} }
@@ -170,6 +171,7 @@ export async function readMyShareSession(context: PlayerContext, sessionId: stri
       select: {
         id: true,
         nameSnapshot: true,
+        clubPlayer: { select: { avatarRef: true } },
         playerAtEntry: {
           select: {
             avatarRef: true,
@@ -184,7 +186,7 @@ export async function readMyShareSession(context: PlayerContext, sessionId: stri
       entries.map((e) => [
         e.id,
         !e.playerAtEntry?.idAllocation
-          ? { name: maskPublicName(e.nameSnapshot), picture: null }
+          ? { name: maskPublicName(e.nameSnapshot), picture: e.clubPlayer.avatarRef ?? null }
           : e.playerAtEntry.profileVisibility === 'always_private'
             ? { name: maskPublicName(e.nameSnapshot), picture: e.playerAtEntry.avatarRef }
             : { name: e.nameSnapshot, picture: e.playerAtEntry.avatarRef },

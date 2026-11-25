@@ -6,20 +6,23 @@ import { profileCharacterImage } from '../profile-character/fetchers'
 import { maskPublicName } from '../public-session/publicSession.rules'
 import { isRealDataMode } from '../real/mode'
 import { realGetMyShareSession } from '../real/my-sessions'
-import { getPlayerGames, getPlayerProfile, getPlayerRank } from './fetchers'
+import { getPlayerGames, getPlayerProfile, getPlayerRank, guestClubPicture } from './fetchers'
 import { countYearCountedWins, sessionWinLoss } from './player.rules'
 import type { PlayerShareGame, PlayerShareParticipant } from './player.types'
 import { isPrivatePlayer } from './visibility'
 
 const SAMPLE_SESSION_POSITIONS: Record<string, number> = { m2: 3, m6: 2, m3: 7, m4: 5, m5: 12 }
 
-/** Cards carry no identifying picture for private players or guests. */
+/**
+ * Cards mask private players and guests. A guest shows the picture the club set for it
+ * (D-2026-11-09-12), else initials; a private player carries no identifying picture.
+ */
 function shareParticipant(name: string): PlayerShareParticipant {
   const player = readMockState().playerProfiles.find(
     (p) => p.fullName === name || p.nickname === name,
   )
-  if (!player || isPrivatePlayer(player.playerId))
-    return { name: maskPublicName(name), picture: null }
+  if (!player) return { name: maskPublicName(name), picture: guestClubPicture(name) }
+  if (isPrivatePlayer(player.playerId)) return { name: maskPublicName(name), picture: null }
   return { name, picture: profileCharacterImage(player.picture) ?? player.picture }
 }
 export async function getPlayerShareData(

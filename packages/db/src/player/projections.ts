@@ -514,12 +514,14 @@ export async function confirmHistoryAttribution(
 /**
  * One person on a game court (`PlayerGamePlayer`): the entry's name snapshot, the ROTRA player's
  * picture reference (a photo URL or `character:<id>`; the client resolves it) and player ID. A
- * guest or unclaimed record (no profile with an RTR ID) has no picture and no player ID; their name
- * shows as it always has on game rows. With `maskAlwaysPrivate`, an always-private player
+ * guest or unclaimed record (no profile with an RTR ID) has no player ID and shows the picture the
+ * club set for it (D-2026-11-09-12), else initials, as on the session page; their name shows as it
+ * always has on game rows. With `maskAlwaysPrivate`, an always-private player
  * (D-2026-11-12-01) shows a masked name; their picture and player ID stay, as on the leaderboard.
  */
 type CourtEntry = {
   nameSnapshot: string
+  clubPlayer: { avatarRef: string | null }
   playerAtEntry: {
     id: string
     avatarRef: string | null
@@ -533,7 +535,8 @@ function courtPlayer(
 ): { name: string; picture: string | null; playerId: string | null } {
   if (!entry) return { name: '', picture: null, playerId: null }
   const player = entry.playerAtEntry
-  if (!player?.idAllocation) return { name: entry.nameSnapshot, picture: null, playerId: null }
+  if (!player?.idAllocation)
+    return { name: entry.nameSnapshot, picture: entry.clubPlayer.avatarRef ?? null, playerId: null }
   return {
     name:
       maskAlwaysPrivate && player.profileVisibility === 'always_private'
@@ -570,6 +573,7 @@ async function historyFromFacts(tx: Tx, facts: PlayerMatchFact[], maskAlwaysPriv
       select: {
         id: true,
         nameSnapshot: true,
+        clubPlayer: { select: { avatarRef: true } },
         playerAtEntry: {
           select: {
             id: true,

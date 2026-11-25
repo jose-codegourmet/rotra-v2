@@ -4,6 +4,7 @@ import { adminPlayersCsv } from '@rotra/data/admin-player/management-rules'
 import type { AdminPlayer, AdminPlayerBulkResult } from '@rotra/data/admin-player/types'
 import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
 import { useAdminPlayerSelection } from '@rotra/data/admin-player/useAdminPlayerSelection'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import { AdminPlayerBulkBar } from '@rotra/ui/admin-player-bulk-bar'
 import { AdminPlayerChangeForm } from '@rotra/ui/admin-player-change-form'
 import { AdminPlayerGenderForm } from '@rotra/ui/admin-player-gender-form'
@@ -36,6 +37,7 @@ export function PlayerBulkActions({ ids, onClear }: { ids: string[]; onClear: ()
       ) : players.length ? (
         <AdminPlayerBulkBar
           players={players}
+          canRemove={!isRealDataMode()}
           offline={offline}
           onClear={onClear}
           onAction={(action) => {

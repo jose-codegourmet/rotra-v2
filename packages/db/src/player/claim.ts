@@ -1,12 +1,13 @@
 import 'server-only'
 import { maskPhone } from '@rotra/schema/phone'
-import type { ClubContext } from '../auth/account-context'
+import { recordAudit } from '../admin/audit'
+import type { AdminContext, ClubContext } from '../auth/account-context'
 import { type ProviderAdmin, ProviderError } from '../auth/provider-admin'
 import { AUTH_PROVIDER } from '../auth/supabase'
 import { googleLoginLockKey } from '../auth/supabase-provider-admin'
 import { prisma } from '../client/prisma'
 import type { Prisma } from '../generated/prisma/client'
-import { requireClubEntitlement } from '../service/authorize'
+import { requireAdmin, requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
 import { allocateRtrId, linkClubRecordsByPhone } from './identity'
@@ -95,6 +96,67 @@ export async function issueClaimLink(context: ClubContext, clubPlayerId: string)
     })
     return { token, expiresAt: toIso(expiresAt) }
   })
+}
+
+/**
+ * A-PLAYERS › Copy registration link (owner, November 25, 2026): ROTRA Admin issues a player-keyed
+ * link for an unclaimed player with an RTR ID. No issuing club, so registering from it adds the
+ * player to no club (owner decision, November 8, 2026). Seven days, replaces the earlier active
+ * link, an archived player is refused. The token is returned once and never audited. A club-only
+ * record or a shared entry is the club's record: its club shares the link from Queue.
+ */
+export async function issueAdminClaimLink(context: AdminContext, playerId: string) {
+  requireAdmin(context)
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(playerId))
+    throw new ServiceError('not_found')
+  const token = newToken()
+  const tokenDigest = await digest(token)
+  const issued = await prisma.$transaction(async (tx) => {
+    const rows = await tx.$queryRaw<{ id: string }[]>`
+      SELECT "id" FROM "players" WHERE "id" = ${playerId}::uuid FOR UPDATE`
+    if (!rows.length) return null
+    const player = await tx.player.findUniqueOrThrow({
+      where: { id: playerId },
+      select: {
+        profileState: true,
+        archivedAt: true,
+        idAllocation: { select: { rtrId: true } },
+      },
+    })
+    if (!player.idAllocation) return null
+    if (player.profileState === 'claimed')
+      throw new ServiceError('conflict', { player: 'Already registered' })
+    if (player.archivedAt)
+      throw new ServiceError('conflict', { player: 'Restore this player first.' })
+    const now = new Date()
+    const expiresAt = new Date(now.getTime() + CLAIM_LINK_DAYS * 86_400_000)
+    await tx.playerClaimLink.updateMany({
+      where: { playerId, state: 'active' },
+      data: { state: 'revoked', revokedAt: now, revision: { increment: 1 } },
+    })
+    await tx.playerClaimLink.create({
+      data: { playerId, issuingClubId: null, tokenDigest, issuedAt: now, expiresAt },
+    })
+    await recordAudit(tx, context, {
+      action: 'player.registration_link_issued',
+      targetType: 'player',
+      targetId: playerId,
+      metadata: { rtrId: player.idAllocation.rtrId, expiresAt: toIso(expiresAt) },
+    })
+    return { token, expiresAt: toIso(expiresAt) }
+  })
+  if (issued) return issued
+  const clubRecord =
+    (await prisma.sharedPlayerEntry.findUnique({
+      where: { id: playerId },
+      select: { id: true },
+    })) ?? (await prisma.clubPlayer.findUnique({ where: { id: playerId }, select: { id: true } }))
+  if (clubRecord)
+    throw new ServiceError('conflict', {
+      player:
+        'This record is saved by its club. Its club can share the registration link from Queue.',
+    })
+  throw new ServiceError('not_found')
 }
 
 type LinkPlayer = NonNullable<Awaited<ReturnType<typeof findPlayerLink>>>['player']

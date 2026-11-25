@@ -64,7 +64,12 @@ export type ClubPlayerDto = {
 /** Q-SAVED-PLAYERS: every player the club has saved, with identity, RTR ID and latest club level. */
 export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerDto[]> {
   const rows = await prisma.clubPlayer.findMany({
-    where: { clubId: context.clubId, removedAt: null },
+    // A player ROTRA Admin archived is left out of the club's saved players until restored.
+    where: {
+      clubId: context.clubId,
+      removedAt: null,
+      OR: [{ playerId: null }, { player: { archivedAt: null } }],
+    },
     orderBy: { displayName: 'asc' },
     select: {
       id: true,
@@ -293,6 +298,7 @@ export async function lookupPlayer(context: ClubContext, query: string): Promise
       id: playerId ?? undefined,
       profileState: 'claimed',
       hiddenFromDirectory: false,
+      archivedAt: null,
       idAllocation: { isNot: null },
     },
     select: {

@@ -4,12 +4,15 @@ import { Button } from '@rotra/ui/button'
 export type AdminPlayerBulkBarProps = {
   players: AdminPlayer[]
   offline?: boolean
+  /** False hides Remove (Admin real mode: permanent removal is not connected to saved data yet). */
+  canRemove?: boolean
   onClear: () => void
   onAction: (action: 'archive' | 'restore' | 'gender' | 'remove' | 'export' | 'copy') => void
 }
 export function AdminPlayerBulkBar({
   players,
   offline,
+  canRemove = true,
   onClear,
   onAction,
 }: AdminPlayerBulkBarProps) {
@@ -36,15 +39,17 @@ export function AdminPlayerBulkBar({
         <Button size="xs" disabled={offline} onClick={() => onAction('gender')}>
           Set gender
         </Button>
-        <Button
-          size="xs"
-          variant="danger"
-          disabled={offline || blocked > 0}
-          title={blocked ? `${blocked} cannot be removed` : undefined}
-          onClick={() => onAction('remove')}
-        >
-          Remove {blocked ? `(${blocked} ineligible)` : ''}
-        </Button>
+        {canRemove ? (
+          <Button
+            size="xs"
+            variant="danger"
+            disabled={offline || blocked > 0}
+            title={blocked ? `${blocked} cannot be removed` : undefined}
+            onClick={() => onAction('remove')}
+          >
+            Remove {blocked ? `(${blocked} ineligible)` : ''}
+          </Button>
+        ) : null}
         <Button size="xs" onClick={() => onAction('export')}>
           Export CSV
         </Button>

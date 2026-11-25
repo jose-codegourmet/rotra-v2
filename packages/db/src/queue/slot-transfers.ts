@@ -149,6 +149,7 @@ async function recipientFor(tx: Tx, session: QueueSession, senderPlayerId: strin
           avatarRef: true,
           profileState: true,
           hiddenFromDirectory: true,
+          archivedAt: true,
         },
       },
     },
@@ -158,6 +159,7 @@ async function recipientFor(tx: Tx, session: QueueSession, senderPlayerId: strin
     !allocation ||
     !player ||
     player.profileState !== 'claimed' ||
+    player.archivedAt ||
     (player.hiddenFromDirectory && player.id !== senderPlayerId)
   )
     throw new ServiceError('not_found', { rtrId: TRANSFER_NOT_FOUND_ERROR })

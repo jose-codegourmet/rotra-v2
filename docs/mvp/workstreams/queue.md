@@ -29,7 +29,7 @@ session page; the November 6 prototype changes (epic #408).
 | Capability | Status | Evidence | Tickets |
 |---|---|---|---|
 | Club sign-in / session / sign-out | implemented | `(auth)/login/page.tsx` → `real/queue.ts:30-39` → `api/auth/{sign-in,session,sign-out}` → `db/src/auth/sign-in.ts` | #8 closed; #381, #382 open |
-| Club password change | not implemented | `data/src/club/settings.ts:97` mock only | Ticket: needed |
+| Club password change | implemented, not run against a database | `POST /api/club/password` (`db/src/auth/club-password.ts`): the current password is checked by a fresh sign-in kept off this device's session, then the new one is set | none |
 | Club details: logo, venues, license read | implemented | `real/queue.ts:89-171` → `api/{club,venues,license}` → `db/src/admin/{club-logo,clubs,licenses}.ts` | #8 closed |
 | Club name-change request, session defaults | not implemented | `data/src/club/settings.ts` `requestClubNameChange`, `updateSessionDefaults` mock only; `club/fetchers.ts:400` mock only | Ticket: needed |
 | Facebook post template (save, reset to default) | implemented | `club/settings.ts` `saveFacebookPost`/`resetFacebookPostTemplate` → `real/queue.ts:135` → `api/club` PATCH | #473 |
@@ -122,7 +122,7 @@ Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisio
 
 ## Remaining work
 
-- [ ] Club settings in real mode: password change is NOT done (mock-only; MVP scope: open question 3). Name-change request (`POST` and `DELETE /api/club/name-change`; cancel stores the request as `cancelled`) and session defaults (`PATCH /api/club`) are connected, built but not yet run against a database.
+- [ ] Club settings in real mode: password change (`POST /api/club/password`; owner asked for it November 25, 2026), name-change request (`POST` and `DELETE /api/club/name-change`; cancel stores the request as `cancelled`) and session defaults (`PATCH /api/club`) are connected, built but not yet run against a database.
 - [ ] Downloads / This device page. #477 (blocked on #246).
 - [x] Attach a signed-in player to a join request (real mode, #687: one-tap join and Cancel request through the Player app). Player sign-up (D-07): guest registration through club invitations (#490).
 - [ ] Decide whether published results and profile pictures on the public page are masked too (D-06 "not covered yet"). Owner decision.

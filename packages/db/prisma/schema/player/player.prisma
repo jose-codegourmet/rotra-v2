@@ -66,6 +66,9 @@ model Player {
   /// Validated playing-style fields (`@rotra/schema/personal-details`); final schema pending.
   personalDetails       Json?              @map("personal_details")
   detailsVersion        Int?               @map("details_version")
+  /// Admin › Archive (reason required, audited); null = active. Hides the player from club pickers and
+  /// directories; sign-in and history stay. Restore clears it.
+  archivedAt            DateTime?          @map("archived_at") @db.Timestamptz(6)
   createdAt             DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt             DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision              BigInt             @default(1)
@@ -200,8 +203,9 @@ enum PlayerClaimLinkState {
 model PlayerClaimLink {
   id            String               @id @default(uuid(7)) @db.Uuid
   playerId      String               @map("player_id") @db.Uuid
-  /// The issuing club; its club_accounts row is the issuing account. Null only for the staging link
-  /// of a registration from the Admin link, which has no club (D-2026-11-20-01).
+  /// The issuing club; its club_accounts row is the issuing account. Null for the staging link of a
+  /// registration from the Admin link (D-2026-11-20-01) and for a link ROTRA Admin issues for an
+  /// unclaimed player (owner, November 25, 2026); neither adds the player to a club.
   issuingClubId String?              @map("issuing_club_id") @db.Uuid
   /// SHA-256 of the opaque token.
   tokenDigest   Bytes                @unique @map("token_digest")

@@ -76,6 +76,9 @@ const UI_ACTION: Record<string, string> = {
   'player.profile_updated': 'player_updated',
   'player.password_set': 'player_updated',
   'player.gender_set': 'player_gender_set',
+  'player.archived': 'player_archived',
+  'player.restored': 'player_restored',
+  'player.registration_link_issued': 'player_link_issued',
   'player.verification_override_set': 'player_verification_override_set',
   'player.verification_override_cleared': 'player_verification_override_cleared',
 }
@@ -353,6 +356,21 @@ async function summarizer(events: ReadEvent[]) {
         const gender = str(metadata.gender)
         if (!name) return null
         return `Set gender for ${name} to ${gender === 'male' ? 'Male' : gender === 'female' ? 'Female' : 'Not given'}.`
+      }
+      case 'player.archived':
+      case 'player.restored': {
+        const name = str(metadata.name)
+        const rtrId = str(metadata.rtrId)
+        const reason = str(metadata.reason)
+        if (!name || !rtrId || !reason) return null
+        return `${event.action === 'player.archived' ? 'Archived' : 'Restored'} ${name} (${rtrId}). Reason: ${reason}`
+      }
+      case 'player.registration_link_issued': {
+        const rtrId = str(metadata.rtrId)
+        const expiresAt = str(metadata.expiresAt)
+        return rtrId && expiresAt
+          ? `Registration link issued by ROTRA Admin (${rtrId}); expires ${expiresAt}.`
+          : null
       }
       case 'player.password_set': {
         const reason = str(metadata.reason)

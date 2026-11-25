@@ -19,12 +19,14 @@ import { supersedeOpenContactRequests } from '../contact-change-request/fetchers
 import { adminAccount } from '../fixtures/adminAccounts'
 import { createAdminVerifiedNotification } from '../fixtures/playerNotifications'
 import { checkMockSave } from '../mock/bridge'
-import { ConflictError, MockError } from '../mock/errors'
+import { ConflictError, MockError, NotConnectedError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { allocateMockRtrId, replaceRtrId } from '../player/unclaimed'
 import { realSetAdminVerificationOverride } from '../real/account-verification'
 import {
   realCreateAdminPlayer,
+  realIssueAdminRegistrationLink,
+  realSetAdminPlayersArchived,
   realSetAdminPlayersGender,
   realUpdateAdminPlayer,
 } from '../real/admin-players'
@@ -434,6 +436,15 @@ export async function changeAdminPlayers(input: {
 }) {
   await owner()
   reason(input.reason)
+  if (isRealDataMode()) {
+    // Permanent removal is not connected to saved data yet; the Admin app hides Remove in real mode.
+    if (input.action === 'remove') throw new NotConnectedError()
+    return realSetAdminPlayersArchived({
+      ids: [...new Set(input.ids)],
+      action: input.action,
+      reason: input.reason.trim(),
+    })
+  }
   const results: AdminPlayerBulkResult[] = []
   for (const id of [...new Set(input.ids)]) {
     try {
@@ -564,6 +575,7 @@ export async function setAdminPlayersGender(input: {
 }
 export async function issueRegistrationLink(id: string) {
   await owner()
+  if (isRealDataMode()) return realIssueAdminRegistrationLink(id)
   return adminMutation(300, (draft) => {
     checkMockSave()
     const current = record(draft, id)

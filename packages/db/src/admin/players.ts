@@ -216,6 +216,7 @@ export async function readAdminPlayerDirectory(
       avatarRef: true,
       profileState: true,
       hidePhoneFromClubs: true,
+      archivedAt: true,
       revision: true,
       privateContact: { select: { phoneE164: true, email: true } },
       verificationOverride: true,
@@ -294,8 +295,7 @@ export async function readAdminPlayerDirectory(
                   kind: 'below' as const,
                   text: `${level.label} · ${recentStandardMatches} of ${rank.policyVersion.recentStandardMatchThreshold} recent matches`,
                 },
-        // Archive/removal persistence is not implemented; never infer permission to remove a row.
-        archivedAt: null,
+        archivedAt: player.archivedAt?.toISOString() ?? null,
         revision: player.revision.toString(),
         removalReason: "This part of ROTRA isn't connected to saved data yet.",
         verification: verificationOf(player, claimed),
@@ -528,6 +528,78 @@ export async function setAdminPlayersGender(
         results.push(
           entry || clubOnly
             ? { id, name: id, success: false, error: NO_STORED_GENDER }
+            : { id, name: id, success: false, error: 'Player not found. Reload the list.' },
+        )
+      } else results.push({ id, name, success: true })
+    } catch {
+      results.push({ id, name: id, success: false, error: 'Could not save.' })
+    }
+  }
+  return results
+}
+
+const CLUB_ONLY_ARCHIVE =
+  "This record is saved by its club only. Archiving it isn't connected to saved data yet."
+
+/**
+ * Admin Players › Archive / Restore (owner, November 25, 2026): reason required, one transaction and
+ * one audit event per player. Archive hides the player from club pickers and directories; sign-in
+ * and history stay. Archiving an archived player (or restoring an active one) is not a write. A
+ * club-only record or a shared entry has no archive column yet, so it reports a failure.
+ */
+export async function setAdminPlayersArchived(
+  context: AdminContext,
+  input: { ids: string[]; action: 'archive' | 'restore'; reason: string },
+): Promise<{ id: string; name: string; success: boolean; error?: string }[]> {
+  requireAdmin(context)
+  const reason = input.reason.trim()
+  if (!reason) throw new ServiceError('invalid', { reason: 'Add a reason.' })
+  const archive = input.action === 'archive'
+  const results: { id: string; name: string; success: boolean; error?: string }[] = []
+  for (const id of [...new Set(input.ids)]) {
+    if (!UUID.test(id)) {
+      results.push({ id, name: id, success: false, error: 'Player not found. Reload the list.' })
+      continue
+    }
+    try {
+      const name = await prisma.$transaction(async (tx) => {
+        const rows = await tx.$queryRaw<{ id: string }[]>`
+          SELECT "id" FROM "players" WHERE "id" = ${id}::uuid FOR UPDATE`
+        if (!rows.length) return null
+        const player = await tx.player.findUniqueOrThrow({
+          where: { id },
+          select: {
+            fullName: true,
+            archivedAt: true,
+            idAllocation: { select: { rtrId: true } },
+          },
+        })
+        if (!player.idAllocation) return null
+        if (!!player.archivedAt !== archive) {
+          await tx.player.update({
+            where: { id },
+            data: { archivedAt: archive ? new Date() : null, revision: { increment: 1 } },
+          })
+          await recordAudit(tx, context, {
+            action: archive ? 'player.archived' : 'player.restored',
+            targetType: 'player',
+            targetId: id,
+            metadata: { name: player.fullName, rtrId: player.idAllocation.rtrId, reason },
+          })
+        }
+        return player.fullName
+      })
+      if (name === null) {
+        const entry = await prisma.sharedPlayerEntry.findUnique({
+          where: { id },
+          select: { id: true },
+        })
+        const clubOnly = entry
+          ? null
+          : await prisma.clubPlayer.findUnique({ where: { id }, select: { id: true } })
+        results.push(
+          entry || clubOnly
+            ? { id, name: id, success: false, error: CLUB_ONLY_ARCHIVE }
             : { id, name: id, success: false, error: 'Player not found. Reload the list.' },
         )
       } else results.push({ id, name, success: true })

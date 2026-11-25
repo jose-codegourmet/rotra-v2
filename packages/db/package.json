@@ -68,6 +68,7 @@
     "./queue/results": "./src/queue/results.ts",
     "./admin/retention": "./src/admin/retention.ts",
     "./auth/sign-in": "./src/auth/sign-in.ts",
+    "./auth/club-password": "./src/auth/club-password.ts",
     "./auth/supabase-provider-admin": "./src/auth/supabase-provider-admin.ts",
     "./service/request": "./src/service/request.ts",
     "./admin/password-resets": "./src/admin/password-resets.ts",

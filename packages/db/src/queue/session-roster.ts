@@ -414,6 +414,7 @@ export async function clubPlayerForProfile(
     select: {
       fullName: true,
       profileState: true,
+      archivedAt: true,
       idAllocation: { select: { rtrId: true } },
     },
   })
@@ -423,7 +424,8 @@ export async function clubPlayerForProfile(
         where: { id: profileId, claimedPlayerId: null, retiredAt: null },
         select: { id: true },
       })
-  if (!(player?.idAllocation && player.profileState === 'claimed') && !entry)
+  // An archived player (Admin › Archive) is left out of club pickers until restored.
+  if (!(player?.idAllocation && player.profileState === 'claimed' && !player.archivedAt) && !entry)
     throw new ServiceError('not_found', { player: 'Player not available.' })
   const key = entry ? { sharedEntryId: entry.id } : { playerId: profileId }
   const saved = await tx.clubPlayer.findFirst({ where: { clubId: context.clubId, ...key } })

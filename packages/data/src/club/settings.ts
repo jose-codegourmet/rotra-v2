@@ -11,6 +11,7 @@ import { realGetFacebookPost, realGetPostPreview } from '../real/facebook-post'
 import { isRealDataMode } from '../real/mode'
 import {
   realCancelClubNameChange,
+  realChangeClubPassword,
   realRegenerateClubInvite,
   realRequestClubNameChange,
   realSaveFacebookPost,
@@ -150,6 +151,10 @@ export const resetFacebookPostTemplate = () =>
         return { data: null, text: 'Default template restored' }
       })
 export async function changeClubPassword(input: { current: string; next: string }) {
+  if (isRealDataMode()) {
+    requireOnline()
+    return realChangeClubPassword(input)
+  }
   const result = await queueMutation(
     { area: 'Club settings', onlineOnly: true, clubAccess: true },
     () => {

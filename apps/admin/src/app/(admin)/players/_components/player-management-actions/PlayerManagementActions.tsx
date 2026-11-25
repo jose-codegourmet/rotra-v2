@@ -5,6 +5,7 @@ import { useAdminPlayerProfile } from '@rotra/data/admin-player/useAdminPlayer'
 import { useAdminPlayerGames } from '@rotra/data/admin-player/useAdminPlayerGames'
 import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayerMutations'
 import { appOrigin } from '@rotra/data/app-origins'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import { AdminPlayerActions } from '@rotra/ui/admin-player-actions'
 import { AdminPlayerChangeForm } from '@rotra/ui/admin-player-change-form'
 import { AdminPlayerQuickView } from '@rotra/ui/admin-player-quick-view'
@@ -39,6 +40,7 @@ export function PlayerManagementActions({ player }: { player: AdminPlayer }) {
       <AdminPlayerActions
         player={player}
         offline={offline}
+        canRemove={!isRealDataMode()}
         pending={mutations.link.isPending || mutations.change.isPending}
         onAction={(action) => {
           if (action === 'edit') {

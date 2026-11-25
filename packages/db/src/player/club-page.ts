@@ -86,7 +86,7 @@ export async function readClubPage(clubId: string, viewerId: string | null): Pro
         clubId,
         removedAt: null,
         playerId: { not: null },
-        player: { profileState: 'claimed', hiddenFromDirectory: false },
+        player: { profileState: 'claimed', hiddenFromDirectory: false, archivedAt: null },
       },
       select: {
         id: true,

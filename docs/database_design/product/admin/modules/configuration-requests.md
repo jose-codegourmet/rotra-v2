@@ -90,7 +90,7 @@ Business sources: [configuration](../../../../business_logic/product/admin/modul
 
 ## F07 follow-up: player management (#335)
 
-The mock UI now supports player archive and eligibility-checked removal. Operational persistence must add archive timestamp and revision, retain audit identity/RTR ID after eligible removal, enforce all history/reference guards transactionally, and allow an Admin claim-link issuer with seven-day expiry and revocation. No schema or migration is introduced by #335. Claims across app origins require a shared server transport, not client storage.
+The mock UI now supports player archive and eligibility-checked removal. Operational persistence must add archive timestamp and revision, retain audit identity/RTR ID after eligible removal, enforce all history/reference guards transactionally, and allow an Admin claim-link issuer with seven-day expiry and revocation. No schema or migration is introduced by #335. Since November 25, 2026 (owner): `players.archived_at` (`20261125000200_player_archive`, not applied) stores archive for players with an RTR ID, and Admin issues player-keyed links with no issuing club; eligibility-checked removal stays mock-only. Claims across app origins require a shared server transport, not client storage.
 
 ## `player_password_reset_requests` (#491)
 

@@ -5,6 +5,8 @@ export type AdminPlayerActionsProps = {
   player: AdminPlayer
   offline?: boolean
   pending?: boolean
+  /** False hides Remove (Admin real mode: permanent removal is not connected to saved data yet). */
+  canRemove?: boolean
   onAction: (
     action:
       | 'quick'
@@ -22,6 +24,7 @@ export function AdminPlayerActions({
   player: p,
   offline,
   pending,
+  canRemove = true,
   onAction,
 }: AdminPlayerActionsProps) {
   const unavailable = offline
@@ -54,12 +57,16 @@ export function AdminPlayerActions({
           disabledReason: unavailable,
           onSelect: () => onAction(p.archivedAt ? 'restore' : 'archive'),
         },
-        {
-          label: 'Remove',
-          disabledReason: unavailable ?? p.removalReason ?? undefined,
-          destructive: true,
-          onSelect: () => onAction('remove'),
-        },
+        ...(canRemove
+          ? [
+              {
+                label: 'Remove',
+                disabledReason: unavailable ?? p.removalReason ?? undefined,
+                destructive: true,
+                onSelect: () => onAction('remove'),
+              },
+            ]
+          : []),
       ]}
     />
   )

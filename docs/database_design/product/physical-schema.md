@@ -445,7 +445,7 @@ every existing row keeps its club.
 | Table | Keys and uniques | Checks and triggers | Scoped FKs |
 |---|---|---|---|
 | `player_id_allocations` (changed) | unchanged | `creating_club_id` nullable: null means the RTR ID came from the Admin link, its place the founding city the player picked (`location_code_id`, as for every allocation). `player_id_allocations_guard()` now compares `creating_club_id` with `IS NOT DISTINCT FROM`, so Admin's RTR ID change also works on such a row; DELETE still refused | unchanged (`RESTRICT`) |
-| `player_claim_links` (changed) | unchanged | `issuing_club_id` nullable: null only for the staging link of an Admin-link registration; a link a club issues always has its club | unchanged (`RESTRICT`) |
+| `player_claim_links` (changed) | unchanged | `issuing_club_id` nullable: null for the staging link of an Admin-link registration and for a link ROTRA Admin issues for an unclaimed player (owner, November 25, 2026; no constraint change); a link a club issues always has its club | unchanged (`RESTRICT`) |
 
 Apply it before deploying the code that writes these nulls (the Admin-link registration, password
 and Google, in real mode). The guard function stays revoked from PUBLIC. No grant, RLS or index change.

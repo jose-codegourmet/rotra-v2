@@ -134,3 +134,25 @@ export async function realSetAdminPlayersGender(input: {
   )
   return results
 }
+
+/** Admin Players › Archive / Restore: one result per selected player; Remove is not connected. */
+export async function realSetAdminPlayersArchived(input: {
+  ids: string[]
+  action: 'archive' | 'restore'
+  reason: string
+}): Promise<AdminPlayerBulkResult[]> {
+  const { results } = await realRequest<{ results: AdminPlayerBulkResult[] }>(
+    '/api/players/archive',
+    { method: 'PATCH', body: input },
+  )
+  return results
+}
+
+/** A-PLAYERS › Copy registration link, issued as ROTRA Admin (7 days, replaces the earlier link). */
+export async function realIssueAdminRegistrationLink(
+  playerId: string,
+): Promise<{ token: string; expiresAt: string }> {
+  return realRequest(`/api/players/${encodeURIComponent(playerId)}/registration-link`, {
+    method: 'POST',
+  })
+}

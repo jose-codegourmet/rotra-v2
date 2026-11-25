@@ -186,6 +186,15 @@ export async function realCancelClubNameChange() {
   return accepted(null, 'Name-change request cancelled')
 }
 
+/** Q-CLUB › Change password: the server checks the current password before setting the new one. */
+export async function realChangeClubPassword(input: { current: string; next: string }) {
+  await realRequest('/api/club/password', {
+    method: 'POST',
+    body: { current: input.current, next: input.next },
+  })
+  return accepted(null, 'Password changed')
+}
+
 /** Q-CLUB › Session defaults: players per court and the usual entrance fee. */
 export async function realUpdateSessionDefaults(input: {
   defaultPlayersPerCourt: number

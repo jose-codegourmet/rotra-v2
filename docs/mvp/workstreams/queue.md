@@ -146,6 +146,9 @@ Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisio
 - [D-2026-11-23-08](../decisions/2026-11-23.md#d-2026-11-23-08) — expected match length per scoring mode and the Playing court card's expected finish (mockup only; Epic Q27).
 - [D-2026-11-23-09](../decisions/2026-11-23.md#d-2026-11-23-09) — Plan Ahead uses free and finishing-soon players, ranked together (mockup only; Epic Q27).
 - [D-2026-11-23-10](../decisions/2026-11-23.md#d-2026-11-23-10) — the games badge opens a compact games dialog with Matches and Planned queue (mockup only; Epic Q27).
+- [D-2026-11-25-01](../decisions/2026-11-25.md#d-2026-11-25-01) — match making factors for Generate matches: Whose turn (with the exhaustion rule), Fresh faces, Even game by tonight's results (mockup only).
+- [D-2026-11-25-02](../decisions/2026-11-25.md#d-2026-11-25-02) — the Almost done switch on a Playing court card; Plan Ahead treats those players as free soon (mockup only).
+- [D-2026-11-25-03](../decisions/2026-11-25.md#d-2026-11-25-03) — Handicap · tonight in the live Edit player sheet; a handicapped player rests after 1 game in a row (mockup only).
 
 ## Blocking open decisions
 

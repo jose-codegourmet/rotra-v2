@@ -212,7 +212,7 @@ Decided by the platform owner on October 27, 2026, while reviewing the [ROTRA Ad
 
 ## Settled by the product owner (October 31, 2026)
 
-Queue prepared capacity, individual court windows, Auto Queue generation (now called Generate matches) and draft transfer are recorded in [the owner review](../../decisions/2026-10-30-queue-flexibility/05-owner-review.md). Pairing weights, money and ranking formulas remain open where previously recorded.
+Queue prepared capacity, individual court windows, Auto Queue generation (now called Generate matches) and draft transfer are recorded in [the owner review](../../decisions/2026-10-30-queue-flexibility/05-owner-review.md). Pairing weights, money and ranking formulas remain open where previously recorded; Generate matches pairing is now set by the match making factors ([D-2026-11-25-01](../../mvp/decisions/2026-11-25.md#d-2026-11-25-01), November 25, 2026), which use tonight's results only and leave rank math open.
 
 
 ## Guest registration settled on November 8, 2026 (#490)

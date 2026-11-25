@@ -92,12 +92,19 @@ Title **Set games played** (#717, owner decisions November 11, 2026). Opened fro
 
 ## D-EDIT-LIVE-PLAYER — Edit player during a session
 
-Owner artifact comment, November 19, 2026 ([log](../mockup-changes/2026-11-19-queue-live-edit-player.md)). Opened by the pencil (**Edit player**) on a live Players card; tapping it never selects the card. Title **Edit NAME** (the one name the card shows). Header: the picture (56 px) with the level ring, as on the card; the shown name, the full name under it when they differ; chips LEVEL, Registered / Unclaimed / Guest, and tonight's state (**Playing · Court N** / **On court · Court N**, **Present**, or **Not here**). Then two sections with small headings (owner artifact comment, November 19, 2026: organize it and show the ring). **Profile** (left out when a guest has nothing to edit):
+Owner artifact comment, November 19, 2026 ([log](../mockup-changes/2026-11-19-queue-live-edit-player.md)). Opened by the pencil (**Edit player**) on a live Players card; tapping it never selects the card. Title **Edit NAME** (the one name the card shows). Header: the picture (56 px) with the level ring, as on the card; the shown name, the full name under it when they differ; chips LEVEL, Registered / Unclaimed / Guest, and tonight's state (**Playing · Court N** / **On court · Court N**, **Present**, or **Not here**). Then sections with small headings (owner artifact comment, November 19, 2026: organize it and show the ring; **Handicap · tonight** added November 25, 2026). **Profile** (left out when a guest has nothing to edit):
 - **Club nickname (optional)**, registered players only (same rule as Saved players › Club nickname; empty falls back to the account nickname or name).
 - **Profile picture**, unclaimed players only: the same picture editor as Edit details (upload, Remove, previous picture, eight characters). Picture changes apply at once.
 Section **Tonight**:
 - **Games played**: one row, label with “Now N” (and “· will be M” once changed) on the left, a − N + stepper on the right (0–99), with the copy “Auto Queue, Catch Up and fewest-games sorting use the new count right away.” Saved as an adjustment, as D-SET-GAMES.
 - **Availability**: one row, label on the left, **Present** · **Not here** on the right. When Not here is picked for a player in a match: “NAME is in a match now. Marking them not here doesn't take them off it.”
+
+Section **Handicap · tonight** (owner decision, November 25, 2026, [D-2026-11-25-03](../../mvp/decisions/2026-11-25.md#d-2026-11-25-03); [log](../../mockup-changes/2026-11-25-queue-handicap-tonight.md); mockup only):
+- A simple front-facing person figure (inline drawing in token colours, about 200 × 198 px with its tap areas, the figure itself about 180 px tall; fits at 375 px). The figure faces the viewer, so the player's left is on the viewer's right; small **Right** and **Left** labels sit at its top corners.
+- Eleven spots, each a real button (44 × 44 px tap area, `aria-pressed`, accessible name and title = the spot): **Left shoulder**, **Right shoulder**, **Left elbow**, **Right elbow**, **Left wrist**, **Right wrist**, **Lower back**, **Left knee**, **Right knee**, **Left ankle**, **Right ankle**. A spot is a small dot on the joint (a short pill for Lower back); tapping fills it with the warning colour, tapping again clears it.
+- Under the figure, one chip per marked spot in figure order (“Left knee” with a remove **×**, accessible name “Clear left knee”), or a plain **No handicap** chip when none.
+- Hint: “Tap a spot to mark it, tap again to clear. Generate matches rests NAME after 1 game in a row (Hard mode: 2). Only you see it, and it clears when the session ends.”
+- Saved with **Save changes** like the rest of the sheet. The session's Players card then shows the handicap icon next to the name.
 
 Buttons: **Cancel**, primary **Save changes**. No confirmation step. Toast **“Changes saved · NAME”**, or **“No changes”** when nothing changed. Availability follows D-2026-11-09-03 (the Queue Master's last action wins), as the card's Present switch.
 

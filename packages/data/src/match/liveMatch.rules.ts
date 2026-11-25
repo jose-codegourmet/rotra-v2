@@ -7,9 +7,6 @@ import type { Match, MatchLineup } from './match.types'
  * rules in `match.rules.ts` (court fill, `canMoveCourt`, `canStart`) are called, never changed.
  */
 
-/** Real mode has no Route Handler for these yet: the refusal the screen shows as a toast. */
-export const notInRealModeYet = (action: string) => `${action} isn't available in real mode yet.`
-
 /** Pause match: only a Playing match with no confirmed outcome. */
 export const canPauseMatch = (m: Pick<Match, 'state' | 'decision'>) =>
   m.state === 'active' && !m.decision
@@ -69,3 +66,20 @@ export const swappedPartnersText = (matchNo: number, a: string, b: string) =>
 /** “Match 18: Nina and Theo swapped places” (Swap from match; the player coming out first). */
 export const swappedPlacesText = (matchNo: number, out: string, opponent: string) =>
   `Match ${matchNo}: ${out} and ${opponent} swapped places`
+
+/**
+ * Trade courts (owner, November 25, 2026, for a match put on the wrong court): two different
+ * one-court matches on courts (Getting ready or Playing), neither decided. A 5v5 never trades.
+ */
+export function canTradeCourts(
+  m: Pick<Match, 'id' | 'state' | 'decision' | 'courtIds'>,
+  n: Pick<Match, 'id' | 'state' | 'decision' | 'courtIds'>,
+) {
+  const one = (x: typeof m) =>
+    (x.state === 'on_court' || x.state === 'active') && !x.decision && x.courtIds.length === 1
+  return m.id !== n.id && one(m) && one(n)
+}
+
+/** “Match 16 now on Court 2 · Match 18 now on Court 1” */
+export const tradedCourtsText = (matchNo: number, to: string, otherNo: number, otherTo: string) =>
+  `Match ${matchNo} now on ${to} · Match ${otherNo} now on ${otherTo}`

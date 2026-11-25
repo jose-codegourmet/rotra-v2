@@ -175,6 +175,23 @@ length, rounded up to the next 15 minutes, and must be after now (at most 24 hou
 until it is. Starting saves the new end; courts that follow the session end move with it, courts with their own
 set times do not.
 
+**Starting on an earlier day than planned (owner, November 25, 2026, [log](../../../../../mockup-changes/2026-11-25-queue-early-day-start.md)).**
+When the planned start is still ahead (a session planned for tomorrow started today), Start also moves the
+planned start to now, so the session's window is now → the new end and the end never falls before the start.
+The notice adds "Starting now moves its start to now." Courts that follow the session start open now; a court
+with its own later start keeps it, and one that would open at or after the new end blocks Start until it is
+edited. The minimum still freezes from the planned window. Before this, such a start failed with "Something
+went wrong."
+
+**Back to preparation (owner, November 25, 2026, [log](../../../../../mockup-changes/2026-11-25-queue-back-to-preparation.md)).**
+Until any game starts, the Queue Master can undo Start from the live console's ⋯ menu (**Back to
+preparation…**, confirmed in [D-BACK-TO-PREP](../../../../../screens/product/dialogs.md#d-back-to-prep--undo-start)). It is refused once any match is active,
+completed or invalid, and offline. Confirming makes the session prepared again: the start time clears, every
+level unlocks, the planned start and end and each court's planned start go back to what they were before
+Start (a late or other-day start had changed them), and matches waiting in the Main Queue or put on court
+are removed. Join requests closed at Start stay closed; the session link takes new join requests again. How
+the real database keeps the pre-Start planned times is still an open question (see the log).
+
 The actual start time (`startedAt`) is fixed once play begins: "Start time is fixed: it records when play began."
 
 ## Running

@@ -186,7 +186,13 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
           />
           <Tabs aria-label="Result slides" value={slide} onChange={setSlide} items={SLIDES}>
             <TabsContent value="standings">
-              <StandingsSlide {...frame} rows={snapshot.standings} />
+              <StandingsSlide
+                {...frame}
+                rows={snapshot.standings.map((row) => ({
+                  ...row,
+                  pictureUrl: pictureOf(row.clubPlayerId),
+                }))}
+              />
             </TabsContent>
             <TabsContent value="awards">
               <AwardsSlide

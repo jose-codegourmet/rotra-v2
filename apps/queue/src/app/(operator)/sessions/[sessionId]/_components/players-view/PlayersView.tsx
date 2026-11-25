@@ -55,8 +55,10 @@ import { EmptyState } from '@rotra/ui/empty-state'
 import { NoShowPanel } from '@rotra/ui/no-show-panel'
 import { PlayerPoolCard, type PlayerPoolCardStatus } from '@rotra/ui/player-pool-card'
 import {
+  DEFAULT_PLAYER_POOL_SORT,
   type PlayerPoolShow,
   type PlayerPoolSort,
+  type PlayerPoolSortKey,
   PlayerPoolToolbar,
 } from '@rotra/ui/player-pool-toolbar'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
@@ -79,23 +81,37 @@ type PoolRow = {
   player: SessionPlayer
   playing: boolean
   games: number
+  /** The card's Total: games played plus games queued for the night */
+  total: number
   minutes: number
   status: PlayerPoolCardStatus
 }
 
 const levelIndex = (p: SessionPlayer) => (p.level ? PLAYING_LEVELS.indexOf(p.level) : -1)
 
-/** The prototype's sorters: longest wait keeps off-court first, then present first */
-const SORTERS: Record<PlayerPoolSort, (a: PoolRow, b: PoolRow) => number> = {
-  wait: (a, b) =>
+/**
+ * By the name the card shows (owner, November 25, 2026): club nickname, then nickname, then full
+ * name, ignoring case ("andong" sits with "Ali", not after "Zed").
+ */
+const byName = (a: PoolRow, b: PoolRow) =>
+  queueMasterName(a.player).localeCompare(queueMasterName(b.player), undefined, {
+    sensitivity: 'base',
+  })
+
+/**
+ * The prototype's sorters (owner, November 25, 2026), each in its first direction times `dir`:
+ * Name A–Z, Games fewest first (the card's Total), Wait longest first (off court first, then
+ * present first, whichever way) and Level high to low.
+ */
+const SORTERS: Record<PlayerPoolSortKey, (dir: 1 | -1) => (a: PoolRow, b: PoolRow) => number> = {
+  name: (dir) => (a, b) => dir * byName(a, b),
+  games: (dir) => (a, b) => dir * (a.total - b.total) || b.minutes - a.minutes || byName(a, b),
+  wait: (dir) => (a, b) =>
     Number(a.playing) - Number(b.playing) ||
     Number(b.player.present) - Number(a.player.present) ||
-    b.minutes - a.minutes,
-  least: (a, b) => a.games - b.games || b.minutes - a.minutes,
-  most: (a, b) => b.games - a.games || a.player.nameSnapshot.localeCompare(b.player.nameSnapshot),
-  level: (a, b) =>
-    levelIndex(b.player) - levelIndex(a.player) ||
-    a.player.nameSnapshot.localeCompare(b.player.nameSnapshot),
+    dir * (b.minutes - a.minutes) ||
+    byName(a, b),
+  level: (dir) => (a, b) => dir * (levelIndex(b.player) - levelIndex(a.player)) || byName(a, b),
 }
 
 /** The roster's median shown count, prefilled by Set games for all… (#717); 0 for an empty roster */
@@ -180,7 +196,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const [editPending, setEditPending] = useState(false)
   const [pictureError, setPictureError] = useState<string | undefined>()
   const [show, setShow] = useState<PlayerPoolShow>('available')
-  const [sort, setSort] = useState<PlayerPoolSort>('wait')
+  const [sort, setSort] = useState<PlayerPoolSort>(DEFAULT_PLAYER_POOL_SORT)
   const [held, setHeld] = useState<{ filter: PlayerPoolShow; ids: string[] } | null>(null)
   /** Roster ids in pick order */
   const [picked, setPicked] = useState<string[]>([])
@@ -245,7 +261,15 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
     const active = activeMatchFor(player.id, all)
     const queueIndex = waiting.findIndex((m) => allPlayers(m).includes(player.id))
     const status: PlayerPoolCardStatus = active
-      ? { kind: 'playing', courtLabel: courtNames(active, s.courts) }
+      ? {
+          kind: 'playing',
+          courtLabel: courtNames(active, s.courts),
+          // Getting ready (on court, not started) has no minutes yet.
+          minutes:
+            active.state === 'active' && active.startedAt != null
+              ? (now - active.startedAt) / 60_000
+              : null,
+        }
       : !player.present
         ? { kind: 'away' }
         : queueIndex >= 0
@@ -255,6 +279,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
       player,
       playing: !!active,
       games: gamesPlayed(player, all),
+      total: gamesPlayed(player, all) + queuedCount(player.id, all),
       minutes: waitMinutes(player, all, s.startedAt, now),
       status,
     }
@@ -278,13 +303,26 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             ? !r.player.present || retained(r.player.id)
             : true,
     )
-    .sort(SORTERS[sort])
+    .sort(SORTERS[sort.key](sort.dir))
   if (held?.filter === show && setPresence.pending.size) {
     const rank = (id: string) => {
       const index = held.ids.indexOf(id)
       return index < 0 ? Infinity : index
     }
     shown.sort((a, b) => rank(a.player.id) - rank(b.player.id))
+  }
+
+  /**
+   * All present / All away and the selection bar's Set present / Set away (owner, November 25,
+   * 2026): the same presence batch as each card's switch, so one toast reports the change. Only
+   * players whose presence would change are sent; the grid keeps its order while the batch saves.
+   */
+  const setPresenceFor = (ids: string[], present: boolean) => {
+    const changing = ids.filter((id) => rosterList.find((p) => p.id === id)?.present !== present)
+    if (!changing.length) return
+    if (!setPresence.pending.size || held?.filter !== show)
+      setHeld({ filter: show, ids: shown.map((r) => r.player.id) })
+    for (const id of changing) setPresence.set(id, present)
   }
 
   // A pick survives only while that player is still on the roster.
@@ -445,7 +483,31 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             {counts.everyone}.
           </p>
         </div>
-        <div className="flex flex-nowrap gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button
+            size="sm"
+            disabled={counts.away === 0}
+            onClick={() =>
+              setPresenceFor(
+                rosterList.map((p) => p.id),
+                true,
+              )
+            }
+          >
+            All present
+          </Button>
+          <Button
+            size="sm"
+            disabled={counts.present === 0}
+            onClick={() =>
+              setPresenceFor(
+                rosterList.map((p) => p.id),
+                false,
+              )
+            }
+          >
+            All away
+          </Button>
           <Button
             size="sm"
             disabled={!rosterList.length}
@@ -555,6 +617,30 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           label={planLabel}
           valid={!!plan.format}
           onClear={() => setPicked([])}
+          trailingActions={
+            <>
+              <Button
+                size="sm"
+                disabled={selected.every((p) => p.present)}
+                onClick={() => {
+                  setPresenceFor(selection, true)
+                  setPicked([])
+                }}
+              >
+                Set present
+              </Button>
+              <Button
+                size="sm"
+                disabled={selected.every((p) => !p.present)}
+                onClick={() => {
+                  setPresenceFor(selection, false)
+                  setPicked([])
+                }}
+              >
+                Set away
+              </Button>
+            </>
+          }
           onMakeMatch={async () => {
             await setPresence.flush()
             if (!plan.format) return

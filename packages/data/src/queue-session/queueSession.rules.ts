@@ -187,6 +187,29 @@ export const END_WITHIN_DAY_ERROR = 'Choose an end at most 24 hours after play b
 export const START_NEEDS_NEW_END = 'Set a new end time after now to start.'
 
 /**
+ * Back to preparation (owner, November 25, 2026): why the ⋯ menu item is disabled, or null. Only
+ * before any game starts (no match Playing, done or invalid) and only online.
+ */
+export function backToPreparationBlocker(
+  matches: readonly { state: 'waiting' | 'on_court' | 'active' | 'completed' | 'invalid' }[],
+  online: boolean,
+) {
+  if (matches.some((m) => m.state === 'active' || m.state === 'completed' || m.state === 'invalid'))
+    return 'Not available once a game has started.'
+  if (!online) return 'Needs an internet connection.'
+  return null
+}
+
+/** The Back to preparation toast: "Back to preparation · levels unlocked · 2 matches removed". */
+export function backToPreparationToast(matchesRemoved: number) {
+  const removed =
+    matchesRemoved > 0
+      ? ` · ${matchesRemoved} match${matchesRemoved === 1 ? '' : 'es'} removed`
+      : ''
+  return `Back to preparation · levels unlocked${removed}`
+}
+
+/**
  * T3: starting after the planned end, or on another club day than the planned start, needs a new
  * end first (the prototype's startNeedsEnd(); the same rule as StartSessionSheet's startNeedsNewEnd).
  */

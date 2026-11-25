@@ -50,3 +50,17 @@ export function plannedEndPassed(minutes: number): string {
 export function startedAgo(minutes: number): string {
   return isLongTimeAgo(minutes) ? `Started ${LONG_TIME_AGO}` : `Started ${queueTime(minutes)} ago`
 }
+
+/**
+ * Status pill time (owner, November 25, 2026): "2m" under an hour, "1h 5m" (or "1h" on the hour)
+ * under a day, "1d+" from 24 hours. Used by the status pills on the Players cards and the Main
+ * Queue faces ("Wait 2m", "In queue 2m", "Playing 1m").
+ */
+export function shortTime(minutes: number): string {
+  const m = wholeMinutes(minutes)
+  if (m >= MINUTES_PER_DAY) return '1d+'
+  if (m < MINUTES_PER_HOUR) return `${m}m`
+  const hours = Math.floor(m / MINUTES_PER_HOUR)
+  const rest = m % MINUTES_PER_HOUR
+  return rest ? `${hours}h ${rest}m` : `${hours}h`
+}

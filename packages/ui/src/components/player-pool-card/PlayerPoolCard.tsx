@@ -1,19 +1,22 @@
 'use client'
 
 import type { PlayingLevel } from '@rotra/data/player/types'
-import { waitPhrase } from '@rotra/schema/queue-time'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { StatusPill, type StatusPillValue } from '@rotra/ui/status-pill'
 import { Switch } from '@rotra/ui/switch'
 import type { KeyboardEvent } from 'react'
 import { playerPoolCardVariants } from './PlayerPoolCard.variants'
 
 export type PlayerPoolCardStatus =
-  /** On court: `courtLabel` is "Court 1", or "Court 1 + Court 2" for a merged 5v5 */
-  | { kind: 'playing'; courtLabel: string }
+  /**
+   * On court: `courtLabel` is "Court 1", or "Court 1 + Court 2" for a merged 5v5. `minutes` since the
+   * match began; null while it is on court but not started (Getting ready).
+   */
+  | { kind: 'playing'; courtLabel: string; minutes?: number | null }
   /** Not present */
   | { kind: 'away' }
   /** Present, off court, already in a waiting match at queue position `position` */
@@ -37,7 +40,7 @@ export type PlayerPoolCardProps = {
   forTheNight: number
   selfCheckedInAt?: number | null
   leftAt?: number | null
-  /** Minutes since the player's last game ended (or since they became present). Shown for available players only */
+  /** Minutes since the player's last game ended (or since they became present): the Wait / In queue pill */
   waitMinutes?: number
   status: PlayerPoolCardStatus
   present: boolean
@@ -73,16 +76,22 @@ export type PlayerPoolCardProps = {
   className?: string
 }
 
-function statusText(status: PlayerPoolCardStatus) {
+/**
+ * The card's status pill (owner, November 25, 2026): Wait / In queue with the wait minutes, Playing
+ * with the minutes since the match began (Getting ready before it starts), or Away.
+ */
+function pillOf(status: PlayerPoolCardStatus, waitMinutes: number): StatusPillValue {
   switch (status.kind) {
     case 'playing':
-      return `On ${status.courtLabel}`
+      return status.minutes == null
+        ? { kind: 'ready', courtLabel: status.courtLabel }
+        : { kind: 'playing', minutes: status.minutes, courtLabel: status.courtLabel }
     case 'away':
-      return 'Away'
+      return { kind: 'away' }
     case 'queued':
-      return `Queued · #${status.position}`
+      return { kind: 'queued', minutes: waitMinutes }
     case 'free':
-      return 'Free'
+      return { kind: 'wait', minutes: waitMinutes }
   }
 }
 
@@ -96,7 +105,8 @@ const RING = {
 /**
  * One player in the live Players view (the prototype's .pc3): a role=button card with the picture in
  * a level-band ring, one name (club nickname, nickname, full name; two lines at most), the
- * Current | Total games strip, wait time, status and the Present switch. Tapping, Enter or Space
+ * Current | Total games strip, the status pill (StatusPill: Wait / In queue / Playing / Getting
+ * ready / Away) and the Present switch. Tapping, Enter or Space
  * toggles selection; selected cards show their pick order in a badge. No Move to waitlist: the
  * session is already running.
  */
@@ -133,7 +143,6 @@ export function PlayerPoolCard({
       : !present && leftAt != null
         ? `Left · ${new Date(leftAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
         : undefined
-  const showWait = state === 'available' && waitMinutes !== undefined
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (event.target !== event.currentTarget) return
     if (event.key === 'Enter' || event.key === ' ') {
@@ -276,12 +285,7 @@ export function PlayerPoolCard({
         </div>
       </div>
       <div className="flex flex-nowrap items-center justify-between gap-3">
-        <span
-          className={cn('text-[13px] text-fg2', state === 'playing' && 'font-semibold text-accent')}
-        >
-          {statusText(status)}
-          {showWait ? ` · ${waitPhrase(waitMinutes)}` : null}
-        </span>
+        <StatusPill status={pillOf(status, waitMinutes ?? 0)} />
         {/* The switch sits inside the card: stop its clicks and keys from reaching the card's selection. */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the Switch */}
         <span

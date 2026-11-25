@@ -124,6 +124,14 @@ export function sessionDto(session: QueueSession) {
     playersPerCourt: session.playersPerCourt,
     expectedPlayers: session.expectedPlayers,
     startedAt: toIsoOrNull(session.startedAt),
+    /** The planned window at Start; Back to preparation puts it back (owner, November 25, 2026). */
+    plannedBeforeStart:
+      session.plannedStartBeforeStartAt && session.plannedEndBeforeStartAt
+        ? {
+            startAt: toIso(session.plannedStartBeforeStartAt),
+            endAt: toIso(session.plannedEndBeforeStartAt),
+          }
+        : null,
     finalizedAt: toIsoOrNull(session.finalizedAt),
     seriesId: session.seriesId,
     publicSlug: session.publicSlug,

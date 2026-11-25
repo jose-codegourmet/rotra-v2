@@ -9,8 +9,13 @@ import { type PointerEvent as ReactPointerEvent, type RefObject, useEffect, useR
 export const COURT_DROP_ATTRIBUTE = 'data-free-court'
 /** Set on a drop target while the dragged drawing is over it (CourtCard styles it solid with a tint) */
 export const COURT_OVER_ATTRIBUTE = 'data-court-drop'
-/** Set on the body for the whole drag (CourtCard shows every free open court's dashed outline) */
+/**
+ * Set on the body for the whole drag (CourtCard shows every drop target's dashed outline; the card
+ * being dragged marks itself `data-court-source` and shows none)
+ */
 export const COURT_DRAGGING_ATTRIBUTE = 'data-court-dragging'
+/** Set on the dragged drawing's own court card while it is a drop target too (a busy court) */
+export const COURT_SOURCE_ATTRIBUTE = 'data-court-source'
 
 // The same ghost the swap drag uses (SwappablePlayer's .swap-ghost), as the mockup log asks.
 const GHOST_CLASSES = [
@@ -68,6 +73,7 @@ function lift(d: Drag) {
   }
   d.ghost = ghost
   d.on = true
+  d.source.closest(`[${COURT_DROP_ATTRIBUTE}]`)?.setAttribute(COURT_SOURCE_ATTRIBUTE, '')
   document.body.setAttribute(COURT_DRAGGING_ATTRIBUTE, '')
   document.body.classList.add(...BODY_CLASSES)
   if (d.touch && typeof navigator.vibrate === 'function') navigator.vibrate(10)
@@ -77,8 +83,10 @@ function move(d: Drag, x: number, y: number) {
   if (!d.ghost) return
   d.ghost.style.transform = `translate(${x - d.x}px, ${y - d.y}px)`
   const hit = document.elementFromPoint(x, y)
-  const target =
+  const found =
     hit instanceof Element ? hit.closest<HTMLElement>(`[${COURT_DROP_ATTRIBUTE}]`) : null
+  // A busy court carries the attribute too (trade courts); its own drawing never lands on it.
+  const target = found?.contains(d.source) ? null : found
   if (d.over && d.over !== target) d.over.removeAttribute(COURT_OVER_ATTRIBUTE)
   d.over = target
   if (target) target.setAttribute(COURT_OVER_ATTRIBUTE, '')
@@ -106,6 +114,7 @@ function end(apply: boolean) {
   document.body.removeAttribute(COURT_DRAGGING_ATTRIBUTE)
   document.body.classList.remove(...BODY_CLASSES)
   d.over?.removeAttribute(COURT_OVER_ATTRIBUTE)
+  d.source.closest(`[${COURT_DROP_ATTRIBUTE}]`)?.removeAttribute(COURT_SOURCE_ATTRIBUTE)
   swallowNextClick()
   const courtId = d.over?.getAttribute(COURT_DROP_ATTRIBUTE)
   if (apply && courtId) d.onDrop(courtId)

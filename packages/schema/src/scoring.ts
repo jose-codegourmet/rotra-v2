@@ -116,9 +116,15 @@ export function gameScoreValid(mode: ScoringMode, winnerScore: number, loserScor
 export const PICK_WINNER_ERROR = 'Pick the winner.'
 export const losingScoreRangeError = (mode: ScoringMode) =>
   `Enter the losing score as a whole number from 0 to ${losingScoreMax(mode)}.`
-/** `row`: a best-of-3 game row, whose switch is Deuce for this game, not Went to deuce. */
+/**
+ * `row`: a best-of-3 game row. Shared rule copy (the Go rule and @rotra/rule-cases match it); the
+ * result dialog no longer has these switches and says `deuceNeedsLeadError` instead.
+ */
 export const goesToDeuceError = (mode: ScoringMode, row = false) =>
   `At ${mode.target - 1}–${mode.target - 1} the game goes to deuce. Turn on ${row ? 'Deuce for this game' : 'Went to deuce'} and type both scores.`
+/** The result dialog's 31–30 message (owner, November 25, 2026: no deuce switch; raise the winner's box). */
+export const deuceNeedsLeadError = (mode: ScoringMode) =>
+  `At ${mode.target - 1}–${mode.target - 1} the game goes to deuce: the winner needs a 2-point lead, like ${mode.target + 1}–${mode.target - 1}.`
 export const deuceLeadError = (mode: ScoringMode) =>
   `A deuce game ends when one pair leads by 2, like ${mode.target + 1}–${mode.target - 1}.`
 export const scoreDisagreesError = (byScore: Team, picked: Team) =>
@@ -176,6 +182,30 @@ export function gameScoreError(
     return mode.deuce && lost === T - 1 ? `${pre}${goesToDeuceError(mode, row)}` : range()
   return null
 }
+
+/**
+ * The result dialog's check of two typed boxes (owner, November 25, 2026: both boxes always typed,
+ * no deuce switch). An error message, or null when the score is one the mode can produce. The
+ * winner is whoever has more; `game` is the 0-based best-of-3 row ("Game 2: " prefix).
+ */
+export function typedScoreError(
+  mode: ScoringMode,
+  a: number,
+  b: number,
+  options: { game?: number } = {},
+): string | null {
+  const T = mode.target,
+    pre = options.game === undefined ? '' : gamePrefix(options.game)
+  if (!isWhole(a) || !isWhole(b)) return `${pre}Scores are whole numbers.`
+  if (a === b) return `${pre}A game can't end level. One pair needs ${T}.`
+  const w = Math.max(a, b),
+    l = Math.min(a, b)
+  if (gameScoreValid(mode, w, l)) return null
+  if (!mode.deuce) return `${pre}The winner has ${T} and the other pair 0 to ${T - 1}.`
+  if (w === T && l === T - 1) return `${pre}${deuceNeedsLeadError(mode)}`
+  return `${pre}Enter a finished game: ${T} against 0 to ${T - 2}, or past ${T - 1}–${T - 1} a 2-point lead, like ${T + 1}–${T - 1}.`
+}
+export const BOTH_SCORES_ERROR = 'Enter both scores, or clear them.'
 
 /** A result as stored on a completed match (and as `completeMatch` takes it). */
 export type ResultValues = {

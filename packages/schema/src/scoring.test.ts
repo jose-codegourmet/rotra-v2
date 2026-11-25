@@ -11,6 +11,7 @@ import {
   SCORING_KEYS,
   scoringMode,
   scoringOf,
+  typedScoreError,
   validateResult,
 } from './scoring'
 
@@ -93,6 +94,26 @@ describe('gameScoreError with the dialog entry', () => {
     )
     expect(gameScoreError(mode, { winner: 'A', a: 31, b: null, deuceEntry: false })).toBe(
       'Enter the losing score as a whole number from 0 to 29.',
+    )
+  })
+})
+
+describe('typedScoreError (two boxes, no deuce switch)', () => {
+  it('takes the higher score as the winner and checks the mode', () => {
+    expect(typedScoreError(SCORING['31'], 30, 32)).toBeNull()
+    expect(typedScoreError(SCORING['31'], 31, 21)).toBeNull()
+    expect(typedScoreError(SCORING['31'], 31, 30)).toBe(
+      'At 30–30 the game goes to deuce: the winner needs a 2-point lead, like 32–30.',
+    )
+    expect(typedScoreError(SCORING['31'], 33, 30)).toBe(
+      'Enter a finished game: 31 against 0 to 29, or past 30–30 a 2-point lead, like 32–30.',
+    )
+    expect(typedScoreError(SCORING['31nd'], 31, 30)).toBeNull()
+    expect(typedScoreError(SCORING['31nd'], 32, 30)).toBe(
+      'The winner has 31 and the other pair 0 to 30.',
+    )
+    expect(typedScoreError(SCORING['21x3'], 21, 21, { game: 2 })).toBe(
+      "Game 3: A game can't end level. One pair needs 21.",
     )
   })
 })

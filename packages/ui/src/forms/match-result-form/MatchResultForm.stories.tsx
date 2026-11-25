@@ -32,69 +32,80 @@ const review: Story['play'] = async ({ canvasElement, userEvent }) => {
 }
 
 /** A best-of-3 game row: who won it, the losing box, or Deuce on with both boxes */
+/** A game row: its winner's box at 21 (or the two `typed` boxes), the other box `lose` */
 const game = (
   winner: GameRowInput['winner'],
   lose = '',
-  deuce?: { a: string; b: string },
+  typed?: { a: string; b: string },
 ): GameRowInput => ({
   winner,
-  deuce: Boolean(deuce),
-  lose: deuce ? '' : lose,
-  a: deuce?.a ?? '',
-  b: deuce?.b ?? '',
+  a: typed?.a ?? (winner === 'A' ? '21' : winner ? lose : ''),
+  b: typed?.b ?? (winner === 'B' ? '21' : winner ? lose : ''),
 })
+
 const rows = (...picked: GameRowInput[]) =>
   [0, 1, 2].map((i) => picked[i] ?? game(null)) as GameRowInput[]
 
 // ---- One game: 16/31 (the default) ----
 
-/** Opens empty: Pick the winner, then only the hint "Pick the winner first. The score is optional." */
+/** Opens with both boxes blank and typeable; no deuce switch (owner, November 25, 2026) */
 export const Empty: Story = {}
 
-/** Team A picked: Team A shows 31, one box for Team B's score, Went to deuce off */
-export const WinnerPicked: Story = { args: { defaultValues: { winner: 'A' } } }
+/** Team A picked: Team A's box holds 31 and is green (still editable) */
+export const WinnerPicked: Story = {
+  args: { defaultValues: { winner: 'A', scoreA: '31' } },
+}
 
-/** The losing score typed: 31–24, Clear score shown */
-export const LosingScore: Story = { args: { defaultValues: { winner: 'A', lose: '24' } } }
+/** 31–24, Clear score shown */
+export const LosingScore: Story = {
+  args: { defaultValues: { winner: 'A', scoreA: '31', scoreB: '24' } },
+}
 
-/** Team B won: the fixed 31 moves to Team B's side, the box asks for Team A's score */
-export const TeamBWins: Story = { args: { defaultValues: { winner: 'B', lose: '27' } } }
+/** Team B won 31–27 */
+export const TeamBWins: Story = {
+  args: { defaultValues: { winner: 'B', scoreA: '27', scoreB: '31' } },
+}
 
-/** Went to deuce on: two boxes typed by hand, 32–30 */
-export const WentToDeuce: Story = {
-  args: { defaultValues: { winner: 'A', deuce: true, scoreA: '32', scoreB: '30' } },
+/** Deuce: the green box raised to 32, 32–30 */
+export const Deuce: Story = {
+  args: { defaultValues: { winner: 'A', scoreA: '32', scoreB: '30' } },
 }
 
 /** Review result with nothing chosen: "Pick the winner." */
 export const PickWinnerError: Story = { play: review }
 
-/** A losing score above the range: "Enter the losing score as a whole number from 0 to 29." */
-export const LosingScoreRangeError: Story = {
-  args: { defaultValues: { winner: 'A', lose: '31' } },
+/** Typing the scores picks the winner: 30–32 picks Team B */
+export const ScoresPickWinner: Story = {
+  args: { defaultValues: { scoreA: '30', scoreB: '32' } },
+}
+
+/** 31–31: "A game can't end level. One pair needs 31." */
+export const LevelError: Story = {
+  args: { defaultValues: { winner: 'A', scoreA: '31', scoreB: '31' } },
   play: review,
 }
 
-/** 30 in the single box: "At 30–30 the game goes to deuce. Turn on Went to deuce and type both scores." */
+/** 31–30: "At 30–30 the game goes to deuce: the winner needs a 2-point lead, like 32–30." */
 export const GoesToDeuceError: Story = {
-  args: { defaultValues: { winner: 'A', lose: '30' } },
+  args: { defaultValues: { winner: 'A', scoreA: '31', scoreB: '30' } },
   play: review,
 }
 
-/** 31–30 with Went to deuce on: "A deuce game ends when one pair leads by 2, like 32–30." */
+/** 33–30: "Enter a finished game: 31 against 0 to 29, or past 30–30 a 2-point lead, like 32–30." */
 export const DeuceLeadError: Story = {
-  args: { defaultValues: { winner: 'A', deuce: true, scoreA: '31', scoreB: '30' } },
+  args: { defaultValues: { winner: 'A', scoreA: '33', scoreB: '30' } },
   play: review,
 }
 
-/** 30–32 with Team A picked: "The score says Team B won, but Team A is picked. Fix one of them." */
-export const ScoreDisagreesError: Story = {
-  args: { defaultValues: { winner: 'A', deuce: true, scoreA: '30', scoreB: '32' } },
+/** Only the loser's box: "Enter both scores, or clear them." */
+export const BothScoresError: Story = {
+  args: { defaultValues: { winner: 'A', scoreB: '24' } },
   play: review,
 }
 
-/** Clear score empties the box and brings the hint back */
+/** Clear score empties the boxes and brings the hint back */
 export const ClearScore: Story = {
-  args: { defaultValues: { winner: 'A', lose: '24' } },
+  args: { defaultValues: { winner: 'A', scoreA: '31', scoreB: '24' } },
   play: async ({ canvasElement, userEvent }) => {
     const body = within(canvasElement.ownerDocument.body)
     await userEvent.click(await body.findByRole('button', { name: 'Clear score' }))
@@ -103,42 +114,38 @@ export const ClearScore: Story = {
 
 // ---- One game: 16/31, no deuce ----
 
-/** No Went to deuce switch; the box takes 0 to 30 */
+/** 31–30 is a finished game without deuce */
 export const NoDeuce: Story = {
-  args: { scoring: '31nd', defaultValues: { winner: 'A', lose: '30' } },
+  args: { scoring: '31nd', defaultValues: { winner: 'A', scoreA: '31', scoreB: '30' } },
 }
 
-/** "Enter the losing score as a whole number from 0 to 30." */
+/** 32–30: "The winner has 31 and the other pair 0 to 30." */
 export const NoDeuceRangeError: Story = {
-  args: { scoring: '31nd', defaultValues: { winner: 'A', lose: '31' } },
+  args: { scoring: '31nd', defaultValues: { winner: 'A', scoreA: '32', scoreB: '30' } },
   play: review,
 }
 
 // ---- One game: 11/21 ----
 
-/** "Game to 21. Enter the losing score, or leave it empty." */
-export const To21: Story = { args: { scoring: '21', defaultValues: { winner: 'B', lose: '17' } } }
+/** "Game to 21. … Past 20–20, change the green box too, like 22–20." */
+export const To21: Story = {
+  args: { scoring: '21', defaultValues: { winner: 'B', scoreA: '17', scoreB: '21' } },
+}
 
-/** Went to deuce in 11/21: "Deuce at 20–20: the first to lead by 2 wins. Type both scores." */
+/** Deuce in 11/21: 22–24 */
 export const To21Deuce: Story = {
-  args: { scoring: '21', defaultValues: { winner: 'B', deuce: true, scoreA: '22', scoreB: '24' } },
+  args: { scoring: '21', defaultValues: { winner: 'B', scoreA: '22', scoreB: '24' } },
 }
 
-/** "At 20–20 the game goes to deuce. Turn on Went to deuce and type both scores." */
+/** "At 20–20 the game goes to deuce: the winner needs a 2-point lead, like 22–20." */
 export const To21GoesToDeuceError: Story = {
-  args: { scoring: '21', defaultValues: { winner: 'B', lose: '20' } },
-  play: review,
-}
-
-/** "A deuce game ends when one pair leads by 2, like 22–20." */
-export const To21DeuceLeadError: Story = {
-  args: { scoring: '21', defaultValues: { winner: 'B', deuce: true, scoreA: '20', scoreB: '23' } },
+  args: { scoring: '21', defaultValues: { winner: 'B', scoreA: '20', scoreB: '21' } },
   play: review,
 }
 
 // ---- Best of 3: 11/21 × 3 ----
 
-/** Pick the winner, OR, Enter each game with Game 1 and Game 2, each with a Deuce toggle */
+/** Pick the winner, OR, Enter each game with Game 1 and Game 2, each a Team A / Team B pick and two boxes */
 export const BestOf3Empty: Story = { args: { scoring: '21x3' } }
 
 /** Winner only: Team B picked, no game entered (still confirms) */
@@ -194,7 +201,7 @@ export const BestOf3MissingScoreError: Story = {
   play: review,
 }
 
-/** "Game 2: At 20–20 the game goes to deuce. Turn on Deuce for this game and type both scores." */
+/** "Game 2: At 20–20 the game goes to deuce: the winner needs a 2-point lead, like 22–20." */
 export const BestOf3GoesToDeuceError: Story = {
   args: {
     scoring: '21x3',
@@ -203,13 +210,13 @@ export const BestOf3GoesToDeuceError: Story = {
   play: review,
 }
 
-/** "Game 1: A deuce game ends when one pair leads by 2, like 22–20." */
+/** "Game 1: Enter a finished game: 21 against 0 to 19, or past 20–20 a 2-point lead, like 22–20." */
 export const BestOf3DeuceLeadError: Story = {
   args: {
     scoring: '21x3',
     defaultValues: {
       winner: 'A',
-      games: rows(game('A', '', { a: '21', b: '20' }), game('A', '15')),
+      games: rows(game('A', '', { a: '24', b: '20' }), game('A', '15')),
     },
   },
   play: review,
@@ -229,7 +236,7 @@ export const BestOf3ClearScores: Story = {
 
 // ---- Best of 3: 21 × 3 (no deuce) ----
 
-/** No Deuce toggle on the rows; 2–1 with a 21–20 game */
+/** 21 × 3 has no deuce; 2–1 with a 21–20 game */
 export const BestOf3NoDeuce: Story = {
   args: {
     scoring: '21x3nd',
@@ -240,11 +247,14 @@ export const BestOf3NoDeuce: Story = {
   },
 }
 
-/** "Game 2: Enter the losing score as a whole number from 0 to 20." */
+/** "Game 2: The winner has 21 and the other pair 0 to 20." */
 export const BestOf3NoDeuceRangeError: Story = {
   args: {
     scoring: '21x3nd',
-    defaultValues: { winner: 'A', games: rows(game('A', '18'), game('A', '22')) },
+    defaultValues: {
+      winner: 'A',
+      games: rows(game('A', '18'), game('A', '', { a: '23', b: '21' })),
+    },
   },
   play: review,
 }
@@ -256,17 +266,17 @@ export const Pending: Story = { args: { defaultValues: { winner: 'B' }, isPendin
 /** The result could not be taken further; what was typed stays */
 export const ServerError: Story = {
   args: {
-    defaultValues: { winner: 'A', lose: '24' },
+    defaultValues: { winner: 'A', scoreA: '31', scoreB: '24' },
     serverError: 'This match already has a confirmed outcome or is not active.',
   },
 }
 
 export const Phone: Story = {
-  args: { defaultValues: { winner: 'A', lose: '24' } },
+  args: { defaultValues: { winner: 'A', scoreA: '31', scoreB: '24' } },
   globals: { viewport: { value: 'phone' } },
 }
 export const Desktop: Story = {
-  args: { defaultValues: { winner: 'A', lose: '24' } },
+  args: { defaultValues: { winner: 'A', scoreA: '31', scoreB: '24' } },
   globals: { viewport: { value: 'desktop' } },
 }
 export const PhoneBestOf3: Story = {
@@ -274,10 +284,10 @@ export const PhoneBestOf3: Story = {
   globals: { viewport: { value: 'phone' } },
 }
 export const Light: Story = {
-  args: { defaultValues: { winner: 'A', lose: '24' } },
+  args: { defaultValues: { winner: 'A', scoreA: '31', scoreB: '24' } },
   globals: { theme: 'light' },
 }
-export const LightDeuce: Story = { args: WentToDeuce.args, globals: { theme: 'light' } }
+export const LightDeuce: Story = { args: Deuce.args, globals: { theme: 'light' } }
 export const LightBestOf3: Story = { args: BestOf3TwoOne.args, globals: { theme: 'light' } }
 export const LightError: Story = {
   args: BestOf3GoesToDeuceError.args,

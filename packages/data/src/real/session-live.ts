@@ -1,5 +1,9 @@
 import type { PlayingLevel } from '../player/player.types'
-import { atWhenLabel, joinRequestsClosedNote } from '../queue-session/queueSession.rules'
+import {
+  atWhenLabel,
+  backToPreparationToast,
+  joinRequestsClosedNote,
+} from '../queue-session/queueSession.rules'
 import {
   courtMovedText,
   type QueueSessionInput,
@@ -53,6 +57,19 @@ export async function realStartSession(input: { sessionId: string; newEndAt?: nu
   return accepted(
     await realGetQueueSession(sessionId),
     `Session started · levels locked${ends}${closed}`,
+  )
+}
+
+/** Back to preparation (D-BACK-TO-PREP): undoes Start while no game has started. */
+export async function realBackToPreparation(sessionId: string) {
+  const { revision } = await readSession(sessionId)
+  const session = await realRequest<WireSession & { matchesRemoved?: number }>(
+    `${sessionPath(sessionId)}/back-to-preparation`,
+    { method: 'POST', body: { expectedRevision: revision }, fields: { session: 'session' } },
+  )
+  return accepted(
+    await realGetQueueSession(sessionId),
+    backToPreparationToast(session.matchesRemoved ?? 0),
   )
 }
 

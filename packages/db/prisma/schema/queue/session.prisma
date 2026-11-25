@@ -72,6 +72,11 @@ model QueueSession {
   expectedPlayers      Int?              @map("expected_players")
   queueRevision        BigInt            @default(1) @map("queue_revision")
   startedAt            DateTime?         @map("started_at") @db.Timestamptz(6)
+  /// The planned window as it was at Start, before a late or other-day start moved it. Set together
+  /// at Start, cleared by Back to preparation, which puts them back. Null for sessions started before
+  /// 2026-11-25 (then going back keeps the current planned times).
+  plannedStartBeforeStartAt DateTime?    @map("planned_start_before_start_at") @db.Timestamptz(6)
+  plannedEndBeforeStartAt   DateTime?    @map("planned_end_before_start_at") @db.Timestamptz(6)
   finalizedAt          DateTime?         @map("finalized_at") @db.Timestamptz(6)
   /// Shared by sessions created together as a repeating series; each stays independent.
   seriesId             String?           @map("series_id") @db.Uuid

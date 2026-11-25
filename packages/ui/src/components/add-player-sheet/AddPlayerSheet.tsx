@@ -14,13 +14,37 @@ import type {
 } from '@rotra/ui/forms/new-player-form/schema'
 import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
+import { LevelPill } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
 import { PlayerConfirmCard } from '@rotra/ui/player-confirm-card'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
+import { Select } from '@rotra/ui/select'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { TextInput } from '@rotra/ui/text-input'
 import { type ReactNode, useEffect, useId, useRef, useState } from 'react'
+
+/** The Saved players filter (owner, November 25, 2026): All, or one account state. */
+type SavedFilter = 'all' | 'registered' | 'unclaimed' | 'guest'
+const SAVED_FILTERS: { value: SavedFilter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'registered', label: 'Registered' },
+  { value: 'unclaimed', label: 'Unclaimed' },
+  { value: 'guest', label: 'Guest' },
+]
+/** The Saved players skill dropdown (owner, November 25, 2026): level bands, or no level yet. */
+type SkillFilter = 'all' | 'beginner' | 'intermediate' | 'advanced' | 'none'
+const SKILL_FILTERS: { value: SkillFilter; label: string }[] = [
+  { value: 'all', label: 'All levels' },
+  { value: 'beginner', label: 'Beginner' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'advanced', label: 'Advanced' },
+  { value: 'none', label: 'No level' },
+]
+const skillOf = (level: PlayingLevel | null): SkillFilter =>
+  (level?.split('_')[0] as SkillFilter | undefined) ?? 'none'
+/** The saved players search applies this long after the last keystroke (owner, November 25, 2026). */
+export const SAVED_SEARCH_DEBOUNCE_MS = 500
 
 /** A saved player or a Player Information result the Queue Master can add. Never carries a phone or an email. */
 export type AddPlayerCandidate = {
@@ -151,17 +175,37 @@ const matches = (candidate: AddPlayerCandidate, query: string) =>
     v?.toLowerCase().includes(query),
   )
 
+/** A saved player row while the search waits: picture, two lines and the chip, as skeletons. */
+function CandidateRowSkeleton() {
+  return (
+    <div
+      aria-hidden
+      className="flex w-full items-center gap-2.5 rounded-md border border-border-strong bg-bg px-3 py-2.5 touch:min-h-12"
+    >
+      <Skeleton className="size-9 flex-none rounded-full" />
+      <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <Skeleton className="w-3/5" />
+        <Skeleton className="w-2/5" />
+      </span>
+      <Skeleton className="h-[22px] w-[72px] flex-none rounded-full" />
+    </div>
+  )
+}
+
 /** The prototypes' .opt row: picture, name, a muted second line and the identity chip. */
 function CandidateRow({
   candidate,
   subtitle,
   onPick,
   disabled,
+  showLevel,
 }: {
   candidate: AddPlayerCandidate
   subtitle: ReactNode
   onPick: () => void
   disabled?: boolean
+  /** Saved players: the club's level for the player beside the subtitle ("No level yet" without one) */
+  showLevel?: boolean
 }) {
   return (
     <button
@@ -176,7 +220,20 @@ function CandidateRow({
       <Avatar name={candidate.name || 'Not registered'} src={candidate.photoUrl} />
       <span className="flex min-w-0 flex-1 flex-col">
         <b className="[overflow-wrap:anywhere]">{candidate.name || 'Not registered yet'}</b>
-        <span className="text-[13px] text-fg2">{subtitle}</span>
+        {showLevel ? (
+          <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-fg2">
+            <span>{subtitle}</span>
+            <LevelPill
+              level={candidate.suggestion}
+              className={cn(
+                'bg-transparent px-0 py-0',
+                candidate.suggestion ? 'text-fg' : 'font-medium text-fg2',
+              )}
+            />
+          </span>
+        ) : (
+          <span className="text-[13px] text-fg2">{subtitle}</span>
+        )}
       </span>
       <IdentityChip identity={candidate.identity} detailsRequired={candidate.detailsRequired} />
     </button>
@@ -219,6 +276,10 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const [tab, setTab] = useState<AddPlayerTab>(initialTab)
   const [query, setQuery] = useState('')
+  const [savedFilter, setSavedFilter] = useState<SavedFilter>('all')
+  const [skillFilter, setSkillFilter] = useState<SkillFilter>('all')
+  // The search the saved players list applies: the typed query, SAVED_SEARCH_DEBOUNCE_MS later.
+  const [savedQuery, setSavedQuery] = useState('')
   const [pick, setPick] = useState<{
     candidate: AddPlayerCandidate
     source: AddPlayerSource
@@ -232,6 +293,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
 
   const clearTab = () => {
     setQuery('')
+    setSavedQuery('')
     setPick(null)
     setLevel(null)
     setLevelError('')
@@ -248,6 +310,8 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     setPrevOpen(open)
     if (open) {
       setTab(initialTab)
+      setSavedFilter('all')
+      setSkillFilter('all')
       clearTab()
     }
   }
@@ -272,6 +336,13 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     })
     return () => cancelAnimationFrame(id)
   }, [open, tab, round, pick, offline])
+
+  // Saved players search: apply the typed query once typing pauses (skeleton rows meanwhile).
+  useEffect(() => {
+    if (query === savedQuery) return
+    const timer = setTimeout(() => setSavedQuery(query), SAVED_SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(timer)
+  }, [query, savedQuery])
 
   const changeTab = (next: AddPlayerTab) => {
     setTab(next)
@@ -329,7 +400,22 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
   const q = query.trim().toLowerCase()
   const inSession = new Set(session?.inSessionIds)
   const alreadyCount = savedPlayers.filter((p) => inSession.has(p.id)).length
-  const savedList = savedPlayers.filter((p) => !inSession.has(p.id) && matches(p, q))
+  // Saved players: the debounced search, then the account and skill filters. Each option's count
+  // applies the other filter, so it is what that option would list; a lookup-pending player shows
+  // under All only.
+  const sq = savedQuery.trim().toLowerCase()
+  const searching = query !== savedQuery
+  const savedMatches = savedPlayers.filter((p) => !inSession.has(p.id) && matches(p, sq))
+  const byAccount = (filter: SavedFilter) => (p: AddPlayerCandidate) =>
+    filter === 'all' || p.identity === filter
+  const bySkill = (filter: SkillFilter) => (p: AddPlayerCandidate) =>
+    filter === 'all' || skillOf(p.suggestion) === filter
+  const savedCount = (filter: SavedFilter) =>
+    savedMatches.filter((p) => byAccount(filter)(p) && bySkill(skillFilter)(p)).length
+  const skillCount = (filter: SkillFilter) =>
+    savedMatches.filter((p) => byAccount(savedFilter)(p) && bySkill(filter)(p)).length
+  const savedList = savedMatches.filter((p) => byAccount(savedFilter)(p) && bySkill(skillFilter)(p))
+  const filtered = savedFilter !== 'all' || skillFilter !== 'all'
   const primaryLabel = addPlayerSubmitLabel(full, false, props.context)
 
   const closeLabel = addedCount > 0 ? 'Done' : 'Cancel'
@@ -445,14 +531,47 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                   autoComplete="off"
                 />
               </Field>
+              <div className="flex flex-wrap items-center gap-2">
+                <SegmentedControl
+                  aria-label="Show saved players"
+                  options={SAVED_FILTERS.map((f) => ({
+                    value: f.value,
+                    label: `${f.label} · ${savedCount(f.value)}`,
+                  }))}
+                  value={savedFilter}
+                  onChange={(next) => setSavedFilter(next as SavedFilter)}
+                />
+                <Select
+                  aria-label="Skill"
+                  className="w-auto"
+                  options={SKILL_FILTERS.map((f) => ({
+                    value: f.value,
+                    label: `${f.value === 'all' ? 'Skill: ' : ''}${f.label} · ${skillCount(f.value)}`,
+                  }))}
+                  value={skillFilter}
+                  onChange={(next) => setSkillFilter(next as SkillFilter)}
+                />
+              </div>
               {alreadyCount > 0 ? (
                 <p className="m-0 text-[13px] text-fg2">
                   {alreadyCount} saved player{alreadyCount === 1 ? ' is' : 's are'} already in this
                   session and not listed.
                 </p>
               ) : null}
-              <div className="flex max-h-80 flex-col gap-1.5 overflow-y-auto">
-                {savedList.length ? (
+              <div
+                aria-busy={searching || undefined}
+                className="flex max-h-80 flex-col gap-1.5 overflow-y-auto"
+              >
+                {searching ? (
+                  <>
+                    <span role="status" className="sr-only">
+                      Searching saved players…
+                    </span>
+                    {[0, 1, 2, 3].map((i) => (
+                      <CandidateRowSkeleton key={i} />
+                    ))}
+                  </>
+                ) : savedList.length ? (
                   savedList.map((candidate) => (
                     <CandidateRow
                       key={candidate.id}
@@ -463,11 +582,30 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                       }
                       onPick={() => pickCandidate(candidate, 'saved')}
                       disabled={isPending}
+                      showLevel
                     />
                   ))
+                ) : filtered && savedMatches.length ? (
+                  <EmptyState
+                    action={
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setSavedFilter('all')
+                          setSkillFilter('all')
+                        }}
+                      >
+                        Show all
+                      </Button>
+                    }
+                  >
+                    {sq
+                      ? 'No saved player matches these filters.'
+                      : 'No saved players to add with these filters.'}
+                  </EmptyState>
                 ) : (
                   <EmptyState>
-                    {alreadyCount > 0 && !q
+                    {alreadyCount > 0 && !sq
                       ? 'Every saved player is already in this session. Add someone new or search Player Information.'
                       : 'No saved player matches. Try Player Information or add a new player.'}
                   </EmptyState>

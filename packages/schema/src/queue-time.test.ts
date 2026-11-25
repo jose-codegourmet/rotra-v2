@@ -4,6 +4,7 @@ import {
   LONG_TIME_AGO,
   plannedEndPassed,
   queueTime,
+  shortTime,
   startedAgo,
   waitPhrase,
 } from './queue-time'
@@ -52,5 +53,17 @@ describe('phrases built on queueTime', () => {
   it('substitution hint', () => {
     expect(startedAgo(5)).toBe('Started 5 min ago')
     expect(startedAgo(1500)).toBe('Started long time ago')
+  })
+
+  it('status pill time: "2m", "1h 5m", "1h", "1d+"', () => {
+    expect(shortTime(0)).toBe('0m')
+    expect(shortTime(2.9)).toBe('2m')
+    expect(shortTime(59)).toBe('59m')
+    expect(shortTime(60)).toBe('1h')
+    expect(shortTime(65)).toBe('1h 5m')
+    expect(shortTime(1439)).toBe('23h 59m')
+    expect(shortTime(1440)).toBe('1d+')
+    expect(shortTime(-5)).toBe('0m')
+    expect(shortTime(Number.NaN)).toBe('0m')
   })
 })

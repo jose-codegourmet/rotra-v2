@@ -21,6 +21,8 @@ export function useSessionRoster(sessionId: string) {
   const query = useQuery({
     queryKey: sessionRosterKeys.list(sessionId),
     queryFn: () => getSessionRoster(sessionId),
+    // No session yet (New session): nothing to read, and an empty id would request /api/sessions/roster.
+    enabled: sessionId !== '',
   })
   if (!query.data) return { ...query, data: undefined }
   const overlaid = overlayRoster(sessionId, query.data, roster.pendingOps(), roster.resolved)

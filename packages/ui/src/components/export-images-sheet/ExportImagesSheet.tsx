@@ -5,6 +5,7 @@ import { Checkbox } from '@rotra/ui/checkbox'
 import { ExportFramePreview } from '@rotra/ui/export-images-sheet/export-frame-preview'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Sheet } from '@rotra/ui/sheet'
+import type { ReactNode } from 'react'
 
 export type ExportImagesFormat = 'story' | 'feed'
 
@@ -15,10 +16,13 @@ export type ExportImagesSelection = {
   includeOffDay: boolean
 }
 
-export type ExportImagesFrame = {
-  /** "Standings", "Standings 2", "Awards", "Off Day" */
-  title: string
-  rows: string[]
+/** One image the download makes, drawn as its preview */
+export type ExportImagesPreview = {
+  key: string
+  /** "Standings", "Standings · 2 of 3", "Awards", "Off Day" */
+  label: string
+  /** The result slide this image downloads as (StandingsSlide, AwardsSlide or OffDaySlide) */
+  image: ReactNode
 }
 
 export type ExportImagesSheetProps = {
@@ -27,11 +31,10 @@ export type ExportImagesSheetProps = {
   format: ExportImagesFormat
   selection: ExportImagesSelection
   /**
-   * One entry per image, computed by the container from the result snapshot, the selection and the
-   * format (14 standings rows per Story image, 10 per Feed image)
+   * One entry per image, built by the container from the result snapshot, the selection and the
+   * format (14 standings rows per Story image, 9 per Feed image; a position is never split)
    */
-  frames: ExportImagesFrame[]
-  clubName: string
+  previews: ExportImagesPreview[]
   onFormatChange: (format: ExportImagesFormat) => void
   onSelectionChange: (selection: ExportImagesSelection) => void
   onDownload: () => void
@@ -49,7 +52,7 @@ const FORMAT_OPTIONS = [
 /**
  * Q-EXPORT: the Download images sheet. Story or Feed post format, the Standings / Awards / Include
  * Off Day choices (Off Day with the warn border and off by default), "N images…" with a preview of
- * every image in a row that scrolls inside its own box, and the primary "Download N images".
+ * every image (the image itself, scaled down) in a row that scrolls inside its own box, and the primary "Download N images".
  * Downloading never publishes and never re-finalizes the session.
  */
 export function ExportImagesSheet({
@@ -57,15 +60,14 @@ export function ExportImagesSheet({
   onOpenChange,
   format,
   selection,
-  frames,
-  clubName,
+  previews,
   onFormatChange,
   onSelectionChange,
   onDownload,
   downloadEnabled,
   disabledReason,
 }: ExportImagesSheetProps) {
-  const count = frames.length
+  const count = previews.length
   const images = `${count} image${count === 1 ? '' : 's'}`
   const setSelection = (patch: Partial<ExportImagesSelection>) =>
     onSelectionChange({ ...selection, ...patch })
@@ -113,14 +115,10 @@ export function ExportImagesSheet({
         {images}. Long standings continue onto extra images so every name stays readable.
       </p>
       <section aria-label="Image previews" className="flex max-w-full gap-2.5 overflow-x-auto pb-1">
-        {frames.map((frame, index) => (
-          <ExportFramePreview
-            key={`${index}-${frame.title}`}
-            format={format}
-            clubName={clubName}
-            title={frame.title}
-            rows={frame.rows}
-          />
+        {previews.map((preview) => (
+          <ExportFramePreview key={preview.key} format={format} label={preview.label}>
+            {preview.image}
+          </ExportFramePreview>
         ))}
       </section>
       {!downloadEnabled && disabledReason ? (

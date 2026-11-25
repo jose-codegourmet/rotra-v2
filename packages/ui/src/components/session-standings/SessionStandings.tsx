@@ -9,6 +9,7 @@ import {
   formatStandingsGames,
   type StandingsGames,
   StandingsPlayerCell,
+  tiedNames,
 } from '@rotra/ui/standings-faces'
 import { type ReactNode, useRef } from 'react'
 
@@ -203,9 +204,11 @@ export function SessionStandings({
                         pictureUrl: player.pictureUrl,
                         onOpen: player.onOpen,
                       }))}
-                      names={row.players
-                        .map((player) => (player.isViewer ? `${player.name} (you)` : player.name))
-                        .join(', ')}
+                      names={tiedNames(
+                        row.players.map((player) =>
+                          player.isViewer ? `${player.name} (you)` : player.name,
+                        ),
+                      )}
                     />
                   </td>
                   <td className={cn(cell, 'text-right tabular-nums')}>{row.wins}</td>

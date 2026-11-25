@@ -262,25 +262,44 @@ describe('substitution game credit in results', () => {
 
 describe('export frames', () => {
   const names = (n: number) => Array.from({ length: n }, (_, i) => `Player ${i + 1}`)
-  it('splits 30 rows into three Story frames of 14, 14 and 2', () => {
-    const frames = paginateStandings(names(30), 'story')
+  /** One row per player, each at its own position */
+  const solo = (n: number) => names(n).map((name, i) => ({ name, position: i + 1 }))
+  it('splits 30 solo positions into Story images of 14, 14 and 2', () => {
+    const frames = paginateStandings(solo(30), 'story')
     expect(frames.map((f) => [f.title, f.rows.length])).toEqual([
-      ['Standings 1', 14],
-      ['Standings 2', 14],
-      ['Standings 3', 2],
+      ['Standings · 1 of 3', 14],
+      ['Standings · 2 of 3', 14],
+      ['Standings · 3 of 3', 2],
     ])
   })
-  it('splits 30 rows into three Feed frames of 10', () => {
-    const frames = paginateStandings(names(30), 'feed')
-    expect(frames.map((f) => [f.title, f.rows.length])).toEqual([
-      ['Standings 1', 10],
-      ['Standings 2', 10],
-      ['Standings 3', 10],
+  it('splits 30 solo positions into Feed images of 9, 9, 9 and 3', () => {
+    const frames = paginateStandings(solo(30), 'feed')
+    expect(frames.map((f) => f.rows.length)).toEqual([9, 9, 9, 3])
+    expect(frames.map((f) => [f.page, f.pages])).toEqual([
+      [1, 4],
+      [2, 4],
+      [3, 4],
+      [4, 4],
     ])
   })
-  it('titles a single frame plainly and keeps one frame for empty standings', () => {
-    expect(paginateStandings(names(14), 'story').map((f) => f.title)).toEqual(['Standings'])
-    expect(paginateStandings([], 'feed')).toEqual([{ title: 'Standings', rows: [] }])
+  it('counts a shared position as one row per three names and never splits it', () => {
+    // 8 solo positions, then a 6-way tie (2 rows), then 1 solo: Feed fits 9 rows.
+    const rows = [
+      ...solo(8),
+      ...names(6).map((name) => ({ name: `Tied ${name}`, position: 9 })),
+      { name: 'Last', position: 10 },
+    ]
+    const frames = paginateStandings(rows, 'feed')
+    expect(frames.map((f) => f.rows.map((r) => r.position))).toEqual([
+      [1, 2, 3, 4, 5, 6, 7, 8],
+      [9, 9, 9, 9, 9, 9, 10],
+    ])
+  })
+  it('titles a single image plainly and keeps one image for empty standings', () => {
+    expect(paginateStandings(solo(14), 'story').map((f) => f.title)).toEqual(['Standings'])
+    expect(paginateStandings([], 'feed')).toEqual([
+      { title: 'Standings', rows: [], page: 1, pages: 1 },
+    ])
   })
   it('adds Awards and only includes Off Day when chosen', () => {
     const standings: StandingRow[] = names(3).map((name) => ({
@@ -317,21 +336,14 @@ describe('export frames', () => {
         'story',
       ),
     ).toEqual([
-      { title: 'Standings', rows: ['Player 1', 'Player 2', 'Player 3'] },
-      { title: 'Awards', rows: ['MVP · Player 1'] },
+      { kind: 'standings', title: 'Standings', rows: standings, page: 1, pages: 1 },
+      { kind: 'awards', title: 'Awards' },
     ])
     expect(
       buildExportFrames(snapshot, { slides: ['awards'], includeOffDay: true }, 'feed').map(
         (f) => f.title,
       ),
     ).toEqual(['Awards', 'Off Day'])
-    expect(
-      buildExportFrames(
-        { ...snapshot, awards: { ...snapshot.awards, mvp: null } },
-        { slides: ['awards'], includeOffDay: false },
-        'feed',
-      ),
-    ).toEqual([{ title: 'Awards', rows: ['MVP · none'] }])
   })
 })
 

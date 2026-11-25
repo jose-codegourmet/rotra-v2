@@ -1,18 +1,15 @@
 import {
+  BOTH_SCORES_ERROR,
   EVERY_GAME_SCORE_ERROR,
   type GameScore,
-  gamePrefix,
-  gameScoreError,
   gamesDisagreeError,
   gamesWon,
-  goesToDeuceError,
-  losingScoreMax,
-  losingScoreRangeError,
   PICK_WINNER_ERROR,
   type ScoringKey,
   type ScoringMode,
   scoringMode,
   type Team,
+  typedScoreError,
   UNDECIDED_GAMES_ERROR,
   validateResult,
 } from '@rotra/schema/scoring'
@@ -22,25 +19,20 @@ export type { Team }
 
 const team = z.enum(['A', 'B']).nullable()
 
-/** One best-of-3 game row as typed: who won it, its Deuce toggle, the losing box, the two deuce boxes */
+/**
+ * One best-of-3 game row as typed: who won it and its two boxes (owner, November 25, 2026: no
+ * Deuce toggle; the winner's box starts at the target and can be raised).
+ */
 const gameInput = z.object({
   winner: team,
-  deuce: z.boolean(),
-  /** The losing-score box ("" is no score); the winner's side is the fixed target */
-  lose: z.string(),
-  /** The two boxes while Deuce is on */
   a: z.string(),
   b: z.string(),
 })
 
 const resultInput = z.object({
-  /** Pick the winner; best of 3: follows the games once one pair has won 2 */
+  /** Pick the winner; follows the typed scores, and in best of 3 the games once one pair won 2 */
   winner: team,
-  /** One game, deuce modes: Went to deuce (two boxes instead of the losing box) */
-  deuce: z.boolean(),
-  /** One game: the losing-score box; "" is no score */
-  lose: z.string(),
-  /** One game with Went to deuce on: Team A's and Team B's typed scores */
+  /** One game: Team A's and Team B's boxes ("" is empty) */
   scoreA: z.string(),
   scoreB: z.string(),
   /** Best of 3: Game 1, Game 2, Game 3 (Game 3 counts only when games 1 and 2 were split) */
@@ -48,6 +40,7 @@ const resultInput = z.object({
 })
 
 export type GameRowInput = z.input<typeof gameInput>
+type Boxes = { a: string; b: string }
 
 const isBlank = (value: string) => value.trim() === ''
 const wholeNumber = (value: string): number | null => {
@@ -55,9 +48,39 @@ const wholeNumber = (value: string): number | null => {
   return /^\d+$/.test(trimmed) ? Number(trimmed) : null
 }
 
-/** Whether a game (or the one-game area) has anything typed in its score boxes */
-export const scoreTyped = (o: { deuce: boolean; lose: string; a: string; b: string }) =>
-  o.deuce ? !isBlank(o.a) || !isBlank(o.b) : !isBlank(o.lose)
+/** A score counts only when both boxes are filled; the winner's box alone is a winner-only result */
+export const scoreTyped = (o: Boxes) => !isBlank(o.a) && !isBlank(o.b)
+/** Anything in either box (Clear score shows) */
+export const anyBoxTyped = (o: Boxes) => !isBlank(o.a) || !isBlank(o.b)
+
+/**
+ * Who the boxes say won: the higher of two whole scores, or one box alone at the target or more.
+ * Typing the scores picks the winner (owner, November 25, 2026).
+ */
+export function scoreWinner(mode: ScoringMode, o: Boxes): Team | null {
+  const a = wholeNumber(o.a),
+    b = wholeNumber(o.b)
+  if (a !== null && b !== null) return a === b ? null : a > b ? 'A' : 'B'
+  if (a !== null && isBlank(o.b) && a >= mode.target) return 'A'
+  if (b !== null && isBlank(o.a) && b >= mode.target) return 'B'
+  return null
+}
+
+/**
+ * Picking a team (or a game's winner) fills its box with the target; picking the other team after a
+ * mistake trades the two scores. Returns the boxes to set.
+ */
+export function boxesForPick(mode: ScoringMode, o: Boxes, t: Team): Boxes {
+  const T = mode.target
+  const mine = t === 'A' ? o.a : o.b,
+    other = t === 'A' ? o.b : o.a
+  const m = wholeNumber(mine),
+    n = wholeNumber(other)
+  let next: [string, string] = [mine, other]
+  if (n !== null && n >= T && (m === null || m < n)) next = [other, mine]
+  else if (m === null || (n !== null && m <= n)) next = [String(T), other]
+  return t === 'A' ? { a: next[0], b: next[1] } : { a: next[1], b: next[0] }
+}
 
 /** Best of 3: the rows that show (Game 3 only after a split), the games each pair won, the winner */
 export function gamesState(games: readonly Pick<GameRowInput, 'winner'>[]) {
@@ -72,46 +95,33 @@ export function gamesState(games: readonly Pick<GameRowInput, 'winner'>[]) {
   return { visible, wins, played: visible.filter((i) => games[i]?.winner), decided }
 }
 
-type Typed = { winner: Team; deuce: boolean; lose: string; a: string; b: string }
 type Outcome = { error: string } | { score: GameScore | null }
 
-/**
- * One game as typed: no score, the score, or the message that refuses it. The losing box is checked
- * for its range first (0 to target − 2 with deuce, target − 1 without; target − 1 with deuce says to
- * turn the switch on), then the shared `gameScoreError` checks the game.
- */
-function gameOutcome(mode: ScoringMode, o: Typed, game?: number): Outcome {
-  const deuceEntry = mode.deuce && o.deuce
-  if (!scoreTyped({ ...o, deuce: deuceEntry })) return { score: null }
-  const T = mode.target,
-    pre = game === undefined ? '' : gamePrefix(game)
-  let a: number | null, b: number | null
-  if (deuceEntry) {
-    a = wholeNumber(o.a)
+/** One game as typed: no score (empty, or only the winner's box), the score, or why it is refused. */
+function gameOutcome(
+  mode: ScoringMode,
+  o: Boxes & { winner: Team | null },
+  game?: number,
+): Outcome {
+  const fa = !isBlank(o.a),
+    fb = !isBlank(o.b)
+  if (!fa && !fb) return { score: null }
+  const pre = game === undefined ? '' : `Game ${game + 1}: `
+  if (!fa || !fb)
+    return (fa ? 'A' : 'B') === o.winner ? { score: null } : { error: `${pre}${BOTH_SCORES_ERROR}` }
+  const a = wholeNumber(o.a),
     b = wholeNumber(o.b)
-  } else {
-    const lost = wholeNumber(o.lose)
-    if (lost === null || lost > losingScoreMax(mode))
-      return {
-        error:
-          mode.deuce && lost === T - 1
-            ? `${pre}${goesToDeuceError(mode, game !== undefined)}`
-            : `${pre}${losingScoreRangeError(mode)}`,
-      }
-    a = o.winner === 'A' ? T : lost
-    b = o.winner === 'A' ? lost : T
-  }
-  const error = gameScoreError(mode, { winner: o.winner, a, b, deuceEntry }, { game })
+  const error = typedScoreError(mode, a ?? Number.NaN, b ?? Number.NaN, { game })
   return error ? { error } : { score: { a: a as number, b: b as number } }
 }
 
 /**
- * Q-MATCH-DONE for the session's scoring mode (Q22). One game: Pick the winner is required, the
- * score is optional (the losing box, or both boxes with Went to deuce). Best of 3: the winner alone,
+ * Q-MATCH-DONE for the session's scoring mode (Q22). One game: a winner is required (picked, or
+ * from the typed scores), the score is optional (both boxes, or only the winner's). Best of 3: the winner alone,
  * or Enter each game (who won each game; scores optional, but every game played or none). Scores the
  * mode cannot produce are refused with the mockup log's copy; the final values pass the shared
  * `validateResult` that `completeMatch` runs. The pick problem sits on `winner`, a one-game score on
- * `lose`, a row's score on `games.N.lose` and a whole-games problem on `games.root`; the form shows
+ * `scoreA`, a row's score on `games.N.a` and a whole-games problem on `games.root`; the form shows
  * one line.
  */
 export function matchResultSchemaFor(scoring: ScoringKey = '31') {
@@ -121,24 +131,18 @@ export function matchResultSchemaFor(scoring: ScoringKey = '31') {
       ctx.addIssue({ code: 'custom', message, path })
       return z.NEVER
     }
-    const { winner } = values
     if (mode.games === 1) {
+      const winner = scoreWinner(mode, { a: values.scoreA, b: values.scoreB }) ?? values.winner
       if (!winner) return fail(PICK_WINNER_ERROR, ['winner'])
-      const out = gameOutcome(mode, {
-        winner,
-        deuce: values.deuce,
-        lose: values.lose,
-        a: values.scoreA,
-        b: values.scoreB,
-      })
-      if ('error' in out) return fail(out.error, ['lose'])
+      const out = gameOutcome(mode, { winner, a: values.scoreA, b: values.scoreB })
+      if ('error' in out) return fail(out.error, ['scoreA'])
       const check = validateResult({
         scoring,
         winner,
         scoreA: out.score?.a ?? null,
         scoreB: out.score?.b ?? null,
       })
-      if (check.error) return fail(check.error, ['lose'])
+      if (check.error) return fail(check.error, ['scoreA'])
       return {
         winningTeam: winner,
         teamAScore: out.score?.a ?? null,
@@ -147,7 +151,11 @@ export function matchResultSchemaFor(scoring: ScoringKey = '31') {
       }
     }
 
-    const rows = values.games
+    const winner = values.winner
+    const rows = values.games.map((row) => ({
+      ...row,
+      winner: scoreWinner(mode, row) ?? row.winner,
+    }))
     const st = gamesState(rows)
     const used = st.visible.some((i) => rows[i] && (rows[i].winner || scoreTyped(rows[i])))
     if (!used) {
@@ -165,8 +173,8 @@ export function matchResultSchemaFor(scoring: ScoringKey = '31') {
     const games: GameScore[] = []
     for (const i of st.played) {
       const row = rows[i] as GameRowInput
-      const out = gameOutcome(mode, { ...row, winner: row.winner as Team }, i)
-      if ('error' in out) return fail(out.error, ['games', i, 'lose'])
+      const out = gameOutcome(mode, row, i)
+      if ('error' in out) return fail(out.error, ['games', i, 'a'])
       if (out.score) games.push(out.score)
     }
     const check = validateResult({ scoring, winner: st.decided, games })

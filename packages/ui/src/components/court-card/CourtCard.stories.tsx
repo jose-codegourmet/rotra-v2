@@ -112,6 +112,9 @@ function nextFor(court: SessionCourt, list: Match[]) {
         formatLabel: FORMAT_LABELS[match.format],
         teamA: match.teamA.map((id) => playerOf(id).shortName),
         teamB: match.teamB.map((id) => playerOf(id).shortName),
+        // Owner, November 25, 2026: each pair's pictures before its names
+        facesA: match.teamA.map(playerOf),
+        facesB: match.teamB.map(playerOf),
       }
     : null
   return {

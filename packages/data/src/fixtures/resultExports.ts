@@ -1,21 +1,24 @@
-import { paginateStandings } from '../session-result/sessionResult.rules'
-import type { ExportFormat } from '../session-result/sessionResult.types'
 import { clubs } from './clubs'
 import { clubPlayers, leaderboardPlayers } from './players'
 import { sessionHistoryFixtures } from './sessionHistory'
 
-/** One image of a Download images export: its slide title and the lines it lists. */
-export type ResultExportFrameFixture = {
-  title: string
-  rows: string[]
+/** One standings row of the export sample (the fields StandingsSlide draws). */
+export type ResultExportStandingRow = {
+  id: string
+  position: number
+  name: string
+  wins: number
+  losses: number
+  games: number
 }
 
 /**
  * Story-only data for the Download images sheet (Q-EXPORT) and Publish results (Q-PUBLISH): the
  * demo club, a 30-name standings list (the first 20 saved club players plus ten other leaderboard
  * players; Kenji, Kenjie and Atty Steph stay off this sample so the 14/14/2 frame split holds),
- * the awards lines and three Off Day names. Frames are paginated by the Q08 session-result rule
- * (14 rows per Story image, 10 per Feed).
+ * the awards lines and three Off Day names. `standingsRows30` gives those 30 names positions with
+ * a 2-way, a 3-way and a 6-way tie, so the export rule (14 rows per Story image, 9 per Feed; a
+ * position is never split) has shared positions to page.
  */
 const club = clubs[0]
 if (!club) throw new Error('Missing club fixture.')
@@ -39,8 +42,29 @@ const awardsRows = [
   `Most Improved · ${clubPlayers[3]?.fullName}`,
 ]
 
-const paginate = (rows: string[], format: ExportFormat): ResultExportFrameFixture[] =>
-  paginateStandings(rows, format)
+/** Positions for the 30 names: ties of 2 (position 2), 3 (position 5) and 6 (position 9). */
+const TIES: Record<number, number> = { 2: 2, 5: 3, 9: 6 }
+const standingsRows30: ResultExportStandingRow[] = (() => {
+  const rows: ResultExportStandingRow[] = []
+  let position = 0
+  while (rows.length < standingsNames30.length) {
+    position++
+    const size = Math.min(TIES[position] ?? 1, standingsNames30.length - rows.length)
+    for (let k = 0; k < size; k++) {
+      const name = standingsNames30[rows.length] as string
+      const wins = Math.max(0, 8 - position)
+      rows.push({
+        id: `row-${rows.length + 1}`,
+        position,
+        name,
+        wins,
+        losses: position,
+        games: wins + position,
+      })
+    }
+  }
+  return rows
+})()
 
 export const resultExportFixtures = {
   clubName: club.name,
@@ -51,17 +75,7 @@ export const resultExportFixtures = {
   standingsNames30,
   awardsRows,
   offDayNames,
-  /** 30 names as Story images: three standings frames of 14, 14 and 2, then Awards */
-  storyFrames30: [...paginate(standingsNames30, 'story'), { title: 'Awards', rows: awardsRows }],
-  /** 30 names as Feed images: three standings frames of 10, then Awards */
-  feedFrames30: [...paginate(standingsNames30, 'feed'), { title: 'Awards', rows: awardsRows }],
-  awardsOnlyFrames: [{ title: 'Awards', rows: awardsRows }],
-  /** Standings (14 names, one Story frame), Awards and the explicitly included Off Day frame */
-  withOffDayFrames: [
-    ...paginate(standingsNames30.slice(0, 14), 'story'),
-    { title: 'Awards', rows: awardsRows },
-    { title: 'Off Day', rows: offDayNames },
-  ],
+  standingsRows30,
 } satisfies {
   clubName: string
   session: typeof thursday.session
@@ -70,8 +84,5 @@ export const resultExportFixtures = {
   standingsNames30: string[]
   awardsRows: string[]
   offDayNames: string[]
-  storyFrames30: ResultExportFrameFixture[]
-  feedFrames30: ResultExportFrameFixture[]
-  awardsOnlyFrames: ResultExportFrameFixture[]
-  withOffDayFrames: ResultExportFrameFixture[]
+  standingsRows30: ResultExportStandingRow[]
 }

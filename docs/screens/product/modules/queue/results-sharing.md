@@ -22,7 +22,7 @@ Results are read-only. No manual MVP selection or Off Day editing.
 
 ## Q-STANDINGS-SLIDE — Slide 1
 
-Table: #, Player, W, L, G — players with at least one counted game, ordered by most wins, then fewest losses. Players with the same wins and losses share a position (1, 1, 2 since November 19, 2026; was 1, 1, 3); the slide keeps one row per player with the shared number ([D-2026-11-18-05](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-05); mockup only). Guests included; fun games count; partial and invalid games don't. Empty: “No counted games were recorded in this session.”
+Table: #, Player, W, L, G — players with at least one counted game, ordered by most wins, then fewest losses. Players with the same wins and losses share a position (1, 1, 2 since November 19, 2026; was 1, 1, 3); the slide and the downloaded images show one row per position: the players' faces stacked (at most four; more show three and a “+N” chip), then their names, “A & B” for two and “A, B, C” for three or more (owner, November 25, 2026, [log](../../../../mockup-changes/2026-11-25-queue-standings-image-shared-rows.md); this replaces the November 18 “one row per player” for images; [D-2026-11-18-05](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-05); mockup only). Guests included; fun games count; partial and invalid games don't. Empty: “No counted games were recorded in this session.”
 
 ## Q-AWARDS-SLIDE — Slide 2
 
@@ -59,8 +59,8 @@ Sheet **Download images**:
 
 - Format: **Story · tall** (default) or **Feed post · 4:5**.
 - Checkboxes: Standings, Awards (both on), **Include Off Day** (off, warning border).
-- “N images. Long standings continue onto extra images so every name stays readable.” Standings split at **14 rows per Story image, 10 per Feed image** (“Standings 1”, “Standings 2”, …).
-- Preview frames: club name, slide title, rows, footer “powered by rotra”.
+- “N images. Long standings continue onto extra images so every name stays readable.” Standings split at **14 rows per Story image, 9 per Feed image**, one row per position; a position with more than three names counts one row per three names, and a position never splits across images. Titles read “Standings · 1 of 3” when there is more than one.
+- Preview frames are the images themselves, scaled down (owner, November 25, 2026: the old text-list previews looked unpolished; [log](../../../../mockup-changes/2026-11-25-queue-standings-image-shared-rows.md)).
 - Primary **Download N images**.
 
 Images are files for the operator to share through Instagram/Facebook. No automatic posting or social login. Retrying a download never re-finalizes the session. (Downloading is turned off in the prototype.)

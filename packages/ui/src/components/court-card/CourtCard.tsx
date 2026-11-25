@@ -5,6 +5,7 @@ import { cn } from '@rotra/ui/cn'
 import { CourtDrawing, type CourtPlayer } from '@rotra/ui/court-drawing'
 import { Icon } from '@rotra/ui/icon'
 import { OverflowMenu, type OverflowMenuItem } from '@rotra/ui/overflow-menu'
+import { PairFaces, type PairFacesPlayer } from '@rotra/ui/pair-faces'
 import type { ReactNode } from 'react'
 import { courtCardVariants, freeCourtDropClass } from './CourtCard.variants'
 
@@ -55,6 +56,11 @@ type CourtCardMatchBase = CourtCardBase & {
    * court that carries `dropCourtId` reports that court's id; anywhere else does nothing.
    */
   onDragMove?: (courtId: string) => void
+  /**
+   * Owner, November 25, 2026: a busy one-court court a dragged drawing can land on; the two matches
+   * trade courts. Its own drawing never targets it. Leave out for a merged 5v5 court.
+   */
+  dropCourtId?: string
   /** ⋯ menu: Remove, disabled here with "Only a free court can be removed" */
   onRemove?: () => void
 }
@@ -115,6 +121,12 @@ export type CourtCardNextMatch = {
   /** Short names per team */
   teamA: string[]
   teamB: string[]
+  /**
+   * Owner, November 25, 2026: each pair's pictures before its names ("(faces) Danna & Darryn vs
+   * (faces) Derr & Dexter"). Without them the line is the names only.
+   */
+  facesA?: PairFacesPlayer[]
+  facesB?: PairFacesPlayer[]
 }
 
 export type CourtCardFreeProps = CourtCardBase & {
@@ -418,6 +430,7 @@ function PlayingCourtCard({
   substitutions = 0,
   onOpenMatch,
   onDragMove,
+  dropCourtId,
   onPause,
   onMoveToFree,
   noFreeCourt = false,
@@ -432,7 +445,12 @@ function PlayingCourtCard({
   return (
     <article
       aria-label={label}
-      className={cn(courtCardVariants({ variant: 'in-game', merged }), className)}
+      data-free-court={merged ? undefined : dropCourtId}
+      className={cn(
+        courtCardVariants({ variant: 'in-game', merged }),
+        !merged && dropCourtId && freeCourtDropClass({}),
+        className,
+      )}
     >
       <MatchCourtHead
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
@@ -512,6 +530,7 @@ function GettingReadyCourtCard({
   onStartMatch,
   onOpenMatch,
   onDragMove,
+  dropCourtId,
   onSwap,
   swapWith,
   openedEarly = false,
@@ -524,7 +543,12 @@ function GettingReadyCourtCard({
   return (
     <article
       aria-label={label}
-      className={cn(courtCardVariants({ variant: 'on-court', merged }), className)}
+      data-free-court={merged ? undefined : dropCourtId}
+      className={cn(
+        courtCardVariants({ variant: 'on-court', merged }),
+        !merged && dropCourtId && freeCourtDropClass({}),
+        className,
+      )}
     >
       <MatchCourtHead
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
@@ -652,7 +676,17 @@ function FreeCourtCard({
             <span className="text-fg2">Next eligible:</span> #{next.position} · {next.formatLabel}
           </p>
           <p className="text-[13px]">
-            {listNames(next.teamA)} <span className="text-fg2">vs</span> {listNames(next.teamB)}
+            {next.facesA && next.facesB ? (
+              <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+                <PairFaces players={next.facesA} />
+                <span className="text-fg2">vs</span>
+                <PairFaces players={next.facesB} />
+              </span>
+            ) : (
+              <>
+                {listNames(next.teamA)} <span className="text-fg2">vs</span> {listNames(next.teamB)}
+              </>
+            )}
           </p>
           {onPlace || onPickAnother ? (
             <div className="mt-auto flex flex-wrap items-center gap-2">

@@ -13,6 +13,7 @@ import { realDownloadSession } from '../real/device'
 import { isRealDataMode } from '../real/mode'
 import { realCreateQueueSession } from '../real/queue'
 import {
+  realBackToPreparation,
   realCancelSession,
   realDeleteSession,
   realStartSession,
@@ -27,6 +28,8 @@ import { closePendingSlotTransfers } from '../slot-transfer/closeSlotTransfers'
 import { saveToastText } from '../sync/fetchers'
 import {
   atWhenLabel,
+  backToPreparationBlocker,
+  backToPreparationToast,
   cancelBlocker,
   cancelReasonError,
   cancelReasonOf,
@@ -375,6 +378,8 @@ export function startSession(input: string | { sessionId: string; newEndAt?: num
     if (reason) throw new MockError('permission', reason)
     // The minimum freezes from the planned window, before a late start moves the end.
     recomputeMinimum(state, sessionId)
+    // Back to preparation puts the planned window back (owner, November 25, 2026).
+    s.plannedBeforeStart = { startAt: s.scheduledStartAt, endAt: s.scheduledEndAt }
     const courts = state.courts.filter((c) => c.sessionId === sessionId)
     for (const court of courts) {
       if (court.startsAt === undefined || court.startsAt === s.scheduledStartAt)
@@ -384,6 +389,8 @@ export function startSession(input: string | { sessionId: string; newEndAt?: num
       const conflict = sessionEndCourtConflict(courts, newEndAt, now, now)
       if (conflict) throw new MockError('permission', conflict)
       s.scheduledEndAt = newEndAt
+      // Started on an earlier day than planned (owner, November 25, 2026): the start moves to now.
+      if (s.scheduledStartAt > now) s.scheduledStartAt = now
     }
     s.state = 'active'
     s.startedAt = now
@@ -404,6 +411,52 @@ export function startSession(input: string | { sessionId: string; newEndAt?: num
       data: s,
       text: `Session started · levels locked${late ? ` · ends ${atWhenLabel(s.scheduledEndAt, now)}` : ''}${joinRequestsClosedNote(closed)}`,
     }
+  })
+}
+/**
+ * Back to preparation (owner, November 25, 2026): undoes Start while no game has started. Waiting
+ * and On court matches are removed, open match requests close, the start time clears, the planned
+ * window goes back to what it was at Start, courts that followed the start follow it again, early
+ * opens clear and every level unlocks. Join requests closed at Start stay closed.
+ */
+export function backToPreparation(sessionId: string) {
+  if (isRealDataMode()) return realBackToPreparation(sessionId)
+  return queueMutation({ area: 'Session', onlineOnly: true }, (state) => {
+    const s = sessionIn(state, sessionId)
+    if (s.state !== 'active')
+      throw new MockError('permission', 'Only a live session can go back to preparation.')
+    const matches = state.matches.filter((m) => m.sessionId === sessionId)
+    const reason = backToPreparationBlocker(matches, true)
+    if (reason) throw new MockError('conflict', reason)
+    const now = Date.now()
+    const startedAt = s.startedAt
+    state.matches = state.matches.filter((m) => m.sessionId !== sessionId)
+    for (const m of state.matchRequests)
+      if (m.sessionId === sessionId && m.status === 'open') {
+        m.status = 'closed'
+        m.decidedAt = now
+      }
+    for (const d of state.dropOutNotices)
+      if (d.sessionId === sessionId && d.status === 'open') {
+        d.status = 'closed'
+        d.closedAt = now
+      }
+    if (s.plannedBeforeStart) {
+      s.scheduledStartAt = s.plannedBeforeStart.startAt
+      s.scheduledEndAt = s.plannedBeforeStart.endAt
+    }
+    s.plannedBeforeStart = null
+    s.state = 'prepared'
+    s.startedAt = null
+    for (const court of state.courts)
+      if (court.sessionId === sessionId) {
+        // Start set the courts that followed the session start to the start time.
+        if (startedAt != null && court.startsAt === startedAt) court.startsAt = undefined
+        court.openedEarlyAt = null
+      }
+    for (const p of state.roster) if (p.sessionId === sessionId) p.levelLockedAt = null
+    recomputeMinimum(state, sessionId)
+    return { data: s, text: backToPreparationToast(matches.length) }
   })
 }
 /** Deletes a prepared session that nobody holds a slot in; confirmed players block it. */

@@ -11,6 +11,7 @@ import {
   type StandingsFaceBand,
   type StandingsGames,
   StandingsPlayerCell,
+  tiedNames,
 } from '@rotra/ui/standings-faces'
 import { createColumnHelper } from '@tanstack/react-table'
 import { type ReactNode, useMemo } from 'react'
@@ -139,7 +140,7 @@ export function LiveLeaderboard({
                 onOpen: () => onOpenProfile(p.playerId),
               }))}
               profileLabel={record ? profileLabelOf : undefined}
-              names={<b>{players.map((p) => p.name).join(', ')}</b>}
+              names={<b>{tiedNames(players.map((p) => p.name))}</b>}
               detail={
                 record ? undefined : (
                   <span className="block text-[13px] text-fg2">{levels.join(', ')}</span>

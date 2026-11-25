@@ -4,6 +4,7 @@ import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { useMediaQuery } from '@rotra/ui/hooks/use-media-query'
+import { levelLabel } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
 import { Pager } from '@rotra/ui/pager'
 import { playerTileVariants } from '@rotra/ui/player-tile/variants'
@@ -125,7 +126,25 @@ const statusLabel = (p: SwapPickerPlayer) =>
         ? 'Away'
         : `rest ${p.restMinutes}m`
 
-/** The prototype's .ptile.sm: picture, first name, "games/minimum · status" */
+/** The picture's level ring (owner, November 25, 2026), as on the Main Queue faces */
+const ringOf = (level: PlayingLevel | null) =>
+  level?.startsWith('beginner')
+    ? 'outline-lv-beg'
+    : level?.startsWith('intermediate')
+      ? 'outline-lv-int'
+      : level?.startsWith('advanced')
+        ? 'outline-lv-adv'
+        : 'outline-lv-none'
+
+/** A free player's rest in the wait tones: warning from 10 minutes, error from 16 (StatusPill's) */
+const restTone = (minutes: number) =>
+  minutes >= 16 ? 'font-bold text-error' : minutes >= 10 ? 'font-bold text-warn' : undefined
+
+/**
+ * The prototype's .ptile.sm: picture with the level ring and the games badge (owner, November 25,
+ * 2026), first name, then the status alone (the badge shows the games, so no "games/minimum"); a
+ * free player's rest takes the wait tones.
+ */
 function Tile({
   player,
   minimumGames,
@@ -151,19 +170,34 @@ function Tile({
       aria-pressed={pressed}
       disabled={disabled}
       onClick={onClick}
-      aria-label={`${player.name}, ${player.games} of ${minimumGames} games, ${status}`}
+      aria-label={`${player.name}, ${levelLabel(player.level)}, ${player.games} of ${minimumGames} games, ${status}`}
       className={cn(
         playerTileVariants({ state: player.status === 'away' ? 'away' : busy ? 'busy' : 'note' }),
         'gap-0.5 px-1 pt-2.5 pb-2',
         className,
       )}
     >
-      <span data-slot="picture" className="mb-1 flex">
-        <Avatar name={player.name} src={player.photoUrl} size={44} />
+      <span data-slot="picture" className="relative mb-1.5 flex">
+        <Avatar
+          name={player.name}
+          src={player.photoUrl}
+          size={44}
+          className={cn('outline-3 outline-offset-2', ringOf(player.level))}
+        />
+        <span
+          aria-hidden="true"
+          className="absolute -top-1.5 -right-2.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-on-photo/90 px-1 text-[11px] leading-none font-extrabold text-photo-label tabular-nums"
+        >
+          {player.games}
+        </span>
       </span>
       <span className="max-w-full truncate text-[13px] font-bold">{player.shortName}</span>
       <span className="text-[11px] whitespace-nowrap text-fg2">
-        {player.games}/{minimumGames} · {status}
+        <span
+          className={!note && player.status === 'free' ? restTone(player.restMinutes) : undefined}
+        >
+          {status}
+        </span>
       </span>
     </button>
   )

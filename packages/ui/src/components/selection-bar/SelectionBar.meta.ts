@@ -5,6 +5,7 @@ export const selectionBarMeta = {
   description:
     'The bar that turns picked players into a match: stacked faces, "N selected · FORMAT" or the reason the pick cannot become a match, Clear, and the primary Make match.',
   usage: [
+    'trailingActions sit between Clear and the primary: the Players view passes Set present and Set away (owner, November 25, 2026). actions sit before Clear.',
     'Render it under the PlayerPoolCard grid only while at least one player is picked (Q-POOL).',
     'The parent decides the label and validity from the pick count and the session formats (2 singles, 3 1v2, 4 doubles, 6 3v3, 8 4v4, 10 5v5; singles or doubles may be off). Fun formats add ", counts toward session games only".',
     'Make match stays disabled until the pick is valid and is hidden when onMakeMatch is not given.',

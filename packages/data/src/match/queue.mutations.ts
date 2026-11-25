@@ -1,12 +1,14 @@
 import { withClubNickname } from '../club-player/clubNickname.rules'
 import { withGender } from '../club-player/gender.rules'
+import { getConnectivity } from '../connectivity/connectivity'
 import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
 import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
+import { realClearQueue } from '../real/match'
 import { isRealDataMode } from '../real/mode'
-import { notInRealModeYet, swappedPartnersText } from './liveMatch.rules'
+import { swappedPartnersText } from './liveMatch.rules'
 import {
   allPlayers,
   completeLineup,
@@ -276,8 +278,11 @@ export function removeWaitingMatch(input: { sessionId: string; matchId: string }
 }
 /** Remove every waiting match in one write, leaving court and finished matches untouched. */
 export function clearQueue(sessionId: string) {
-  if (isRealDataMode())
-    throw new MockError('permission', 'Clear queue is not available in real mode.')
+  if (isRealDataMode()) {
+    if (getConnectivity() === 'offline')
+      throw new MockError('offline', 'Clear queue needs an internet connection.')
+    return realClearQueue(sessionId)
+  }
   const snapshot = readMockState()
   requireSessionWrite(snapshot, sessionId)
   requireLive(snapshot, sessionId)
@@ -299,7 +304,7 @@ export const canClearQueue = (matches: Match[]) =>
  * Two players on different teams trade places. Waiting and Getting ready: “switched sides”, and
  * the match becomes manual and protected from regeneration. Playing (owner, November 19, 2026):
  * “swapped partners”; no substitution is recorded, so the result follows the pairs as they are at
- * Match done. On a court (Getting ready or Playing) it is mock only for now.
+ * Match done. On a court (Getting ready or Playing) real mode needs to be online.
  */
 export function swapPlayers(input: { sessionId: string; matchId: string; a: string; b: string }) {
   return dispatch('queue.swapPlayers', input, () =>
@@ -307,9 +312,10 @@ export function swapPlayers(input: { sessionId: string; matchId: string; a: stri
       const m = s.matches.find((x) => x.id === input.matchId && x.sessionId === input.sessionId)
       if (!m || m.decision || !['waiting', 'on_court', 'active'].includes(m.state))
         throw new MockError('permission', 'Only a waiting match can be changed.')
-      // Offline in real mode this runs over the downloaded copy: only a waiting swap can be queued.
+      // Offline in real mode this runs over the downloaded copy: only a waiting swap can be queued;
+      // a swap on a court goes to the server online (switch-sides, November 25, 2026).
       if (m.state !== 'waiting' && isRealDataMode())
-        throw new MockError('permission', notInRealModeYet('Swapping players on a court'))
+        throw new MockError('offline', 'Swapping players on a court needs an internet connection.')
       const a = m.teamA.includes(input.a) ? input.a : input.b,
         b = m.teamB.includes(input.b) ? input.b : input.a
       if (a === b || !m.teamA.includes(a) || !m.teamB.includes(b))

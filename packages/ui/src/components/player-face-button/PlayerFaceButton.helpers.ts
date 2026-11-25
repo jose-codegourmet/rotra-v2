@@ -1,11 +1,33 @@
 import { queueTime } from '@rotra/schema/queue-time'
+import type { StatusPillValue } from '@rotra/ui/status-pill'
 
-/** Wait under a queue-card name: minutes since last game, or why a timer is replaced. */
+/**
+ * Status under a Main Queue name: minutes since last game (In queue), or why that player is busy or
+ * absent. `courtLabel` names the court in the pill's hover; Playing's `minutes` is since that match
+ * began.
+ */
 export type PlayerWait =
   | { kind: 'minutes'; minutes: number }
-  | { kind: 'on-court' }
-  | { kind: 'playing' }
+  | { kind: 'on-court'; courtLabel?: string }
+  | { kind: 'playing'; courtLabel?: string; minutes?: number }
   | { kind: 'not-here' }
+
+/**
+ * The pill under a Main Queue face (owner, November 25, 2026): a present player in the queued match
+ * reads "In queue Nm"; busy elsewhere "Playing Nm" or "Getting ready"; absent "Away".
+ */
+export function waitPill(wait: PlayerWait): StatusPillValue {
+  switch (wait.kind) {
+    case 'minutes':
+      return { kind: 'queued', minutes: wait.minutes }
+    case 'on-court':
+      return { kind: 'ready', courtLabel: wait.courtLabel ?? 'court' }
+    case 'playing':
+      return { kind: 'playing', minutes: wait.minutes ?? 0, courtLabel: wait.courtLabel ?? 'court' }
+    case 'not-here':
+      return { kind: 'away' }
+  }
+}
 
 /** Visible wait line under a queue-card name: "M min", or why the player is busy or absent. */
 export function waitCopy(wait: PlayerWait): string {

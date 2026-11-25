@@ -255,6 +255,26 @@ textarea.input { min-height: 80px; resize: vertical; }
 .el-line > div:first-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .el-step { display: flex; align-items: center; gap: 8px; }
 .el-step b { font-size: 22px; min-width: 32px; text-align: center; }
+/* Handicap · tonight (D-2026-11-25-03): a front-facing figure; each spot is a 44 px button. Marked spots use the warning token. */
+.hc-fig { position: relative; width: 220px; height: 226px; margin-inline: auto; flex: none; }
+.hc-art { position: absolute; left: 50%; top: 0; width: 107px; height: 220px; transform: translateX(-50%); pointer-events: none; }
+.hc-art img, .hc-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hc-side { position: absolute; top: 0; font-size: 10px; line-height: 1; color: var(--fg2); pointer-events: none; }
+.hc-zone { position: absolute; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 10px; background: transparent; cursor: pointer; }
+.hc-dot { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--fg2); transform: translate(-50%, -50%); pointer-events: none; }
+.hc-dot.wide { width: 26px; border-radius: 999px; }
+.hc-zone:hover .hc-dot { border-color: var(--warn); }
+.hc-zone[aria-pressed="true"] .hc-dot { background: var(--warn); border-color: var(--warn); box-shadow: 0 0 8px 2px color-mix(in srgb, var(--warn) 55%, transparent); }
+.hc-zone[aria-pressed="true"] .hc-dot::after { content: ''; position: absolute; inset: -2px; border-radius: inherit; border: 2px solid var(--warn); animation: hc-pulse 1.6s ease-out infinite; }
+@keyframes hc-pulse { from { transform: scale(1); opacity: 0.9; } to { transform: scale(2.4); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .hc-zone[aria-pressed="true"] .hc-dot::after { animation: none; transform: scale(1.7); opacity: 0.45; } }
+.ex-chip.hc-chip { height: 32px; gap: 2px; padding: 0 2px 0 12px; font-size: 13px; color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); background: var(--warn-subtle); }
+.hc-chip b { font-weight: 600; }
+.hc-chip .icon-btn { position: relative; width: 28px; height: 28px; min-width: 28px; min-height: 28px; padding: 0; border-radius: 999px; color: inherit; }
+.hc-chip .icon-btn::after { content: ""; position: absolute; inset: -8px; }
+.hc-chip .icon-btn svg { width: 14px; height: 14px; }
+.hc-ico { display: inline-flex; flex: none; color: var(--warn); }
+.hc-ico svg { width: 14px; height: 14px; }
 /* Settings tab, live (owner artifact comment, November 19, 2026: readable layout, some areas as cards). */
 .ls-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .ls-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
@@ -2489,9 +2509,14 @@ const courtMatches = (s) => s.matches.filter((m) => m.status === 'oncourt' || m.
 const busyOf = (s, pid, except) => courtMatches(s).find((m) => m !== except && all(m).includes(pid));
 // Expected finish (owner, November 23, 2026). ROTRA has no live score, so this is an estimate from time only: the session's
 // scoring mode (typical / long minutes) and the minutes played. left = expected minutes left; tag = the lowercase wording for drafts.
+// Almost done (D-2026-11-25-02): the Queue Master's switch on a Playing court card, after asking the players. While it is on, the
+// court reads "Almost done" in place of the time estimate and Plan Ahead treats those players as free soon, 0 minutes left.
+// It only counts while the match is Playing; Match done, Pause match and Mark invalid clear it.
+const almostDoneOf = (m) => m.status === 'active' && !!m.almostDone;
 function finishOf(s, m) {
   const sc = SCORING[scoringOf(s)];
   if (m.status !== 'active' || !m.startedAt) return { phase: 'notStarted', left: sc.typical, text: 'Not started yet', tag: 'not started yet' };
+  if (almostDoneOf(m)) return { phase: 'almost', left: 0, text: 'Almost done', tag: 'almost done' };
   const p = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
   const left = Math.max(0, sc.typical - p);
   if (p < sc.typical - 3) { const n = Math.max(1, left); return { phase: 'mid', left, text: `Ends in about ${n} min`, tag: `ends in about ${n} min` }; }
@@ -2500,8 +2525,9 @@ function finishOf(s, m) {
   return { phase: 'long', left: 0, text: 'Running long', tag: 'running long' };
 }
 // Plan Ahead (owner, November 23, 2026): a busy player counts only when their court is Finishing soon, Could end any time
-// or Running long. Courts still mid-game (Ends in about N min) or Getting ready are left out.
-const endingSoon = (s, m) => ['soon', 'any', 'long'].includes(finishOf(s, m).phase);
+// or Running long, or the Queue Master switched it to Almost done (D-2026-11-25-02). Courts still mid-game (Ends in about N min)
+// or Getting ready are left out.
+const endingSoon = (s, m) => ['almost', 'soon', 'any', 'long'].includes(finishOf(s, m).phase);
 const aheadOk = (s, pid) => { const b = busyOf(s, pid); return !b || endingSoon(s, b); };
 const busyText = (s, m) => m.status === 'oncourt' ? `on ${courtsOf(s, m)}` : `playing on ${courtsOf(s, m)}`;
 const courtFill = (s) => (s.courtFill === 'auto' ? 'auto' : 'manual');
@@ -5218,9 +5244,11 @@ function courtsPane(s) {
       }
       const mins = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
       const subs = (m.subs || []).length;
+      // D-2026-11-25-02: the Almost done switch, Playing only, under the players. Optional; the Queue Master flips it after asking the players.
       return `<div class="court busy ${merged ? 'merged' : ''}">${head(chip(merged ? 'Merged · Playing' : 'Playing', 'ok'))}
+        <label class="between" style="flex-wrap:nowrap"><span class="small"><b>Almost done</b></span>${sw(almostDoneOf(m), 'toggleAlmostDone', `data-id="${m.id}"`, `Almost done, ${courtsOf(s, m)}`)}</label>
         <p class="small muted">${matchLabel(m)} · Match ${m.seq} · ${elapsedTime(mins)}${subs ? ` · ${subs} substitution${subs > 1 ? 's' : ''}` : ''}</p>
-        ${(() => { const f = finishOf(s, m); return f.phase === 'soon' ? `<p class="small" style="color:var(--accent)">${esc(f.text)}</p>` : f.phase === 'long' ? `<p class="small" style="color:var(--warn)">${esc(f.text)}</p>` : `<p class="small muted">${esc(f.text)}</p>`; })()}
+        ${(() => { const f = finishOf(s, m); return f.phase === 'soon' || f.phase === 'almost' ? `<p class="small" style="color:var(--accent)">${esc(f.text)}</p>` : f.phase === 'long' ? `<p class="small" style="color:var(--warn)">${esc(f.text)}</p>` : `<p class="small muted">${esc(f.text)}</p>`; })()}
         <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="openMatch" data-id="${m.id}">Open match</button><button class="btn sm" data-act="pauseMatch" data-id="${m.id}" title="Back to Getting ready, for a match started by mistake">${I.q_pause} Pause match</button></div></div>`;
     }
     const notStarted = !courtOpen(s, c);
@@ -5414,6 +5442,114 @@ function bagTeams(s, t) {
   });
   return { teamA, teamB, ...(kept.length ? { reason: `Bagging pair: ${kept.join(', ')} are partners` } : {}) };
 }
+// ---------- Handicap · tonight (D-2026-11-25-03) ----------
+// Queue Master only, this session only: spots marked on a front-facing figure in the live Edit player sheet. A player with any
+// handicap rests after 1 game in a row instead of 2 (Hard mode: 2 instead of 3). Nothing else changes. Cleared when the session
+// ends; never on the public page, the Player app, results or exports. The figure faces you, so the player's left is on your right.
+// The figure is Higgsfield art (art/handicap-figure.png, 490 × 1008) breathing in Rive (art/handicap-figure.riv, built from
+// rive/handicap-figure/ with apps/landingpage/rive/rig.py), drawn 220 px tall in the middle of a 220 × 226 px area.
+// at: the joint on the art, in image px (measured on the PNG). box: the 44 × 44 px tap area (left, top) in the 220 × 226 area;
+// the boxes never overlap and each holds its spot.
+const HC_K = 220 / 1008, HC_OX = (220 - 490 * HC_K) / 2;
+const HC_SPOTS = [
+  { k: 'lshoulder', label: 'Left shoulder', box: [110, 4], at: [325, 205] },
+  { k: 'rshoulder', label: 'Right shoulder', box: [66, 4], at: [165, 205] },
+  { k: 'lelbow', label: 'Left elbow', box: [136, 50], at: [390, 357] },
+  { k: 'relbow', label: 'Right elbow', box: [40, 50], at: [100, 357] },
+  { k: 'lwrist', label: 'Left wrist', box: [146, 94], at: [433, 493] },
+  { k: 'rwrist', label: 'Right wrist', box: [30, 94], at: [57, 493] },
+  { k: 'back', label: 'Lower back', box: [88, 72], at: [245, 430] },
+  { k: 'lknee', label: 'Left knee', box: [110, 138], at: [342, 690] },
+  { k: 'rknee', label: 'Right knee', box: [66, 138], at: [145, 690] },
+  { k: 'lankle', label: 'Left ankle', box: [114, 182], at: [362, 885] },
+  { k: 'rankle', label: 'Right ankle', box: [62, 182], at: [125, 885] },
+];
+const hcOf = (r) => (r && Array.isArray(r.handicap) ? r.handicap.filter((k) => HC_SPOTS.some((x) => x.k === k)) : []);
+const hcLabel = (k) => (HC_SPOTS.find((x) => x.k === k) || {}).label || '';
+const hcText = (keys) => `Handicap: ${HC_SPOTS.filter((x) => keys.includes(x.k)).map((x) => x.label.toLowerCase()).join(', ')}`;
+function hcFigure(keys, who) {
+  return `<div class="hc-fig" role="group" aria-label="Where ${esc(who)} has a handicap"><div class="hc-art" data-hc-art></div><span class="hc-side" style="left:0" aria-hidden="true">Right</span><span class="hc-side" style="right:0" aria-hidden="true">Left</span>${HC_SPOTS.map((x) => { const on = keys.includes(x.k);
+    const dx = HC_OX + x.at[0] * HC_K - x.box[0], dy = x.at[1] * HC_K - x.box[1];
+    return `<button type="button" class="hc-zone" style="left:${x.box[0]}px;top:${x.box[1]}px" data-act="hcToggle" data-k="${x.k}" aria-pressed="${on}" aria-label="${x.label}" title="${x.label}"><span class="hc-dot${x.k === 'back' ? ' wide' : ''}" style="left:${dx.toFixed(1)}px;top:${dy.toFixed(1)}px"></span></button>`; }).join('')}</div>`;
+}
+// The art is one node kept across renders (the sheet re-renders on every tap), so the idle loop never restarts or reloads.
+// The still shows until Rive has drawn, and stays when Rive can't load or the viewer prefers reduced motion.
+// The routed prototype serves the art from /queue-app/art/; the standalone file from art/ next to it.
+const HC_ART = { el: null, img: null, r: null, tried: false };
+const hcArtSrc = (ext) => `${location.protocol === 'file:' || /\.html$/.test(location.pathname) ? '' : '/queue-app/'}art/handicap-figure.${ext}`;
+function setupHcArt() {
+  const slot = document.querySelector('[data-hc-art]');
+  if (!slot) { if (HC_ART.r) HC_ART.r.pause(); return; }
+  if (!HC_ART.el) {
+    HC_ART.el = document.createElement('div'); HC_ART.el.style.cssText = 'position:absolute;inset:0';
+    HC_ART.img = new Image(); HC_ART.img.src = hcArtSrc('png'); HC_ART.img.alt = ''; HC_ART.img.draggable = false;
+    HC_ART.el.appendChild(HC_ART.img);
+  }
+  slot.appendChild(HC_ART.el);
+  if (HC_ART.r) { HC_ART.r.play(); return; }
+  if (HC_ART.tried || reduceMotion()) return;
+  HC_ART.tried = true;
+  const start = () => {
+    if (!window.rive) return;
+    const cv = document.createElement('canvas'), dpr = Math.min(window.devicePixelRatio || 1, 3);
+    cv.width = Math.round(107 * dpr); cv.height = Math.round(220 * dpr); cv.style.visibility = 'hidden';
+    HC_ART.el.appendChild(cv);
+    const r = new rive.Rive({ src: hcArtSrc('riv'), canvas: cv, autoplay: true, stateMachine: 'Main',
+      layout: new rive.Layout({ fit: rive.Fit.Contain, alignment: rive.Alignment.Center }),
+      onLoadError: () => { HC_ART.r = null; try { r.cleanup(); } catch (e) { /* already gone */ } cv.remove(); HC_ART.img.style.visibility = ''; } });
+    HC_ART.r = r;
+    const first = () => { r.off(rive.EventType.Advance, first); cv.style.visibility = ''; HC_ART.img.style.visibility = 'hidden'; if (!document.querySelector('[data-hc-art]')) r.pause(); };
+    r.on(rive.EventType.Advance, first);
+  };
+  if (window.rive) start();
+  else { const sc = document.createElement('script'); sc.src = 'https://unpkg.com/@rive-app/canvas@2.50.0/rive.js'; sc.onload = start; document.head.appendChild(sc); }
+}
+
+// ---------- Match making factors (D-2026-11-25-01) ----------
+// Three checks in this order, a ladder, not a points score: 1. Whose turn (fair turns win over close games), 2. Fresh faces,
+// 3. Even game. Used by every Generate matches tab, Catch Up included.
+const mmStart = (m) => m.startedAt || m.placedAt || 0;
+// A player's games tonight in start order: completed, On court and Playing (invalid matches don't count).
+const nightGames = (s, pid) => s.matches.filter((m) => ['done', 'oncourt', 'active'].includes(m.status) && all(m).includes(pid)).sort((a, b) => mmStart(a) - mmStart(b));
+// Games in a row: the player's latest games with no started match in between that they sat out. A match that started after
+// one of their games ended and before the next began, without them, resets the streak. On court and Playing games count.
+function streakOf(s, pid) {
+  const games = nightGames(s, pid); let n = 0, to = Infinity;
+  for (let i = games.length - 1; i >= 0; i--) {
+    const g = games[i], from = g.status === 'done' ? g.endedAt || mmStart(g) : Infinity;
+    if (s.matches.some((m) => m.startedAt && m.startedAt > from && m.startedAt < to && !all(m).includes(pid))) break;
+    n += 1; to = mmStart(g);
+  }
+  return n;
+}
+// Exhaustion: 2 games in a row, 3 in Hard mode; a player with a handicap tonight (D-2026-11-25-03) one fewer (1, Hard 2).
+const restAfter = (s, pid) => (s.mode === 'hard' ? 3 : 2) - (hcOf(R(s, pid)).length ? 1 : 0);
+// Even game: level adjusted by tonight's results only, level + 0.25 × (wins − losses), capped at ±1 level. No long-term win rate.
+function tonightLevel(s, pid) {
+  const r = R(s, pid); let w = 0, l = 0;
+  s.matches.forEach((m) => { if (m.status !== 'done' || !m.winner || !counted(m, pid)) return; const sd = sideOf(m, pid); if (sd === m.winner) w += 1; else if (sd) l += 1; });
+  return (r && r.level != null ? r.level : 4) + Math.max(-1, Math.min(1, 0.25 * (w - l)));
+}
+const cmpKeys = (a, b) => { for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] - b[i]; return 0; };
+// Fresh faces inside Whose turn: players more due than the last one Whose turn would pick must play; among the players tied with
+// that last one, take the first group (in Whose turn order) with nobody from each other's last 2 games. If none exists, keep the
+// Whose turn group (a strong avoid, broken only when no match is possible otherwise). `must` are bagging partners, placed first.
+function freshPick(sorted, size, must, key, clash) {
+  const rest = sorted.filter((p) => !must.includes(p)), need = size - must.length;
+  const strict = must.concat(rest.slice(0, need));
+  const ok = (g) => !g.some((x, i) => g.slice(i + 1).some((y) => clash(x, y)));
+  if (need <= 0 || ok(strict)) return { group: strict, avoided: null };
+  const cut = key(rest[need - 1]);
+  const base = must.concat(rest.filter((p) => cmpKeys(key(p), cut) < 0)), tied = rest.filter((p) => cmpKeys(key(p), cut) === 0), k = size - base.length;
+  let found = null;
+  const walk = (from, chosen) => {
+    if (found) return;
+    if (chosen.length === k) { found = base.concat(chosen); return; }
+    for (let i = from; i <= tied.length - (k - chosen.length) && !found; i++) { const next = chosen.concat(tied[i]); if (ok(base.concat(next))) walk(i + 1, next); }
+  };
+  if (ok(base)) walk(0, []);
+  return found ? { group: found, avoided: strict } : { group: strict, avoided: null };
+}
 function generateDrafts(s, tab, count, target, fixed) {
   // D-2026-11-13-07: players already in a waiting match in the Main Queue are never available to Generate matches.
   // Owner artifact comment, November 19, 2026: players on the exemption list are left out of generated matches.
@@ -5425,27 +5561,51 @@ function generateDrafts(s, tab, count, target, fixed) {
   if (tab === 'catchup' && (!Number.isInteger(+target) || +target < 1 || target === '')) return { error: 'Enter a whole number of games, 1 or more.' };
   const load = Object.fromEntries(players.map((p) => [p, gamesOf(s,p) + queuedCount(s,p)]));
   fixed.forEach((m) => all(m).forEach((p) => { if (p in load) load[p]++; }));
+  // Whose turn: games in a row so far (kept drafts count, in order; a player left out of a draft sat it out) and matches rested.
+  const streak = Object.fromEntries(players.map((p) => [p, streakOf(s, p)]));
+  const sitOut = Object.fromEntries(players.map((p) => [p, restInfo(s, p).waits]));
+  const rest = Object.fromEntries(players.map((p) => [p, restInfo(s, p).mins]));
+  const night = Object.fromEntries(players.map((p) => [p, nightGames(s, p)]));
+  const planDraft = (m) => players.forEach((p) => { if (all(m).includes(p)) { streak[p] += 1; sitOut[p] = 0; } else { streak[p] = 0; sitOut[p] += 1; } });
+  fixed.forEach(planDraft);
+  const tired = (p) => streak[p] >= restAfter(s, p);
   const out = []; let stop = '';
+  // Fresh faces: anyone the player partnered or faced in either of their last 2 games (completed, On court, Playing, or an earlier draft in this batch).
+  const lastTwo = (p) => night[p].concat(fixed, out).filter((m) => all(m).includes(p)).slice(-2);
+  const metIn = (p, q) => lastTwo(p).find((m) => all(m).includes(q));
+  const bagPair = (p, q) => baggingPairs(s).some((pr) => bagApplies(s, pr) && ((pr.a === p && pr.b === q) || (pr.a === q && pr.b === p)));
+  const clash = (p, q) => !!metIn(p, q) && !bagPair(p, q);
+  const partnersIn = (m, p, q) => (m.teamA.includes(p) && m.teamA.includes(q)) || (m.teamB.includes(p) && m.teamB.includes(q));
+  const clashes = (g) => g.flatMap((x, i) => g.slice(i + 1).filter((y) => clash(x, y)).map((y) => [x, y]));
   for (let i=0; i<count; i++) {
     if (tab === 'catchup' && players.every((p) => load[p] >= +target)) { stop = players.length ? `Everyone available reaches ${target} game${+target === 1 ? '' : 's'} with these matches.` : `Made 0 of ${count}: not enough free players for another match.`; break; }
     const fmt = formats.length === 2 ? (players.length >= 4 && i % 3 !== 2 ? 'doubles' : 'singles') : formats[0];
     const size = fmt === 'doubles' ? 4 : 2;
     if (players.length < size) { stop = `Made ${out.length} of ${count}: not enough ${tab === 'ahead' ? 'free or finishing-soon' : 'free'} players for another match.`; break; }
     // Plan Ahead (owner, November 23, 2026): free players and players on a finishing-soon court rank together by load;
-    // ties go to the soonest free (expected minutes left; free, Could end any time and Running long = 0).
+    // ties go to the soonest free (expected minutes left; free, Almost done, Could end any time and Running long = 0).
     const aheadLeft = (p) => { const b = busyOf(s, p); return b ? finishOf(s, b).left : 0; };
-    const sorted = players.slice().sort((x,y) => {
-      const wait = restInfo(s,y).mins - restInfo(s,x).mins;
-      const priority = tab === 'catchup' ? ((load[x] < +target ? 0 : 1) - (load[y] < +target ? 0 : 1)) || load[x]-load[y] : tab === 'wait' ? (load[x]-gamesOf(s,x))-(load[y]-gamesOf(s,y)) || wait : tab === 'ahead' ? load[x]-load[y] || aheadLeft(x)-aheadLeft(y) : load[x]-load[y];
-      return priority || wait || players.indexOf(x)-players.indexOf(y);
-    });
-    const pick = sorted.slice(0,size);
-    if (tab === 'catchup' && !pick.some((p) => load[p] < +target)) { stop = `Made ${out.length} of ${count}: no other match helps anyone reach ${target} game${+target === 1 ? '' : 's'}.`; break; }
-    // Bagging (owner answer Q12, November 11, 2026: the pair beats fairness): an applicable pair with both players free leads the next doubles draft.
+    // 1. Whose turn. Rested players first: an exhausted player is used only when the match can't be made otherwise. Then each tab's
+    // own order (load = games played + planned), with longest rest breaking ties.
+    const turnKey = (p) => [tired(p) ? 1 : 0, ...(tab === 'catchup' ? [load[p] < +target ? 0 : 1, load[p]] : tab === 'wait' ? [load[p] - gamesOf(s, p), -sitOut[p]] : [load[p]])];
+    const sorted = players.slice().sort((x, y) => cmpKeys(turnKey(x), turnKey(y)) || (tab === 'ahead' ? aheadLeft(x) - aheadLeft(y) : 0) || rest[y] - rest[x] || players.indexOf(x) - players.indexOf(y));
+    // Bagging (owner answer Q12, November 11, 2026: the pair beats fairness): an applicable pair with both players free leads the next
+    // doubles draft. Bagging partners also win over Fresh faces for that pair.
     const seedPair = fmt === 'doubles' ? baggingPairs(s).find((pr) => bagApplies(s, pr) && sorted.includes(pr.a) && sorted.includes(pr.b) && !out.some((m) => m.teamA.concat(m.teamB).includes(pr.a))) : null;
-    const seeded = seedPair ? [seedPair.a, seedPair.b, ...sorted.filter((p) => p !== seedPair.a && p !== seedPair.b).slice(0, size - 2)] : pick;
-    const pk = fmt === 'doubles' && baggingPairs(s).length ? bagFill(s, seeded, sorted) : pick;
-    out.push({ format: fmt, ...(fmt === 'doubles' && baggingPairs(s).length ? bagTeams(s, splitTeams(s, pk, fmt)) : splitTeams(s,pk,fmt)) }); pk.forEach((p) => load[p]++);
+    // 2. Fresh faces, within Whose turn.
+    const { group, avoided } = freshPick(sorted, size, seedPair ? [seedPair.a, seedPair.b] : [], turnKey, clash);
+    if (tab === 'catchup' && !group.some((p) => load[p] < +target)) { stop = `Made ${out.length} of ${count}: no other match helps anyone reach ${target} game${+target === 1 ? '' : 's'}.`; break; }
+    const pk = fmt === 'doubles' && baggingPairs(s).length ? bagFill(s, group, sorted) : group;
+    // 3. Even game: teams split by tonight's level (Chill and Fair easy games stay as before).
+    const teams = splitTeams(s, pk, fmt, (p) => tonightLevel(s, p));
+    const m = { format: fmt, ...(fmt === 'doubles' && baggingPairs(s).length ? bagTeams(s, teams) : teams) };
+    // The reason line says what drove the draft: the bagging pair or Whose turn, then Fresh faces.
+    const left = clashes(pk), dodged = avoided ? clashes(avoided) : [];
+    const rested = Math.min(...pk.map((p) => sitOut[p]));
+    const turn = pk.some(tired) ? 'Not enough rested players' : rested > 0 ? `Rested ${rested} match${rested === 1 ? '' : 'es'}` : tab === 'catchup' ? `Below ${target} game${+target === 1 ? '' : 's'}` : tab === 'wait' ? 'Longest wait' : 'Fewest games';
+    const fresh = left.length ? "Couldn't avoid a repeat" : dodged.length ? (dodged.some(([x, y]) => partnersIn(metIn(x, y), x, y)) ? 'Avoided repeat partners' : 'Avoided repeat opponents') : '';
+    m.reason = [m.reason || turn, fresh].filter(Boolean).join(' · ');
+    out.push(m); pk.forEach((p) => load[p]++); planDraft(m);
   }
   stop ||= `Made ${out.length} of ${count} match${count === 1 ? '' : 'es'}.`;
   if (tab === 'catchup') {
@@ -5555,7 +5715,7 @@ function playersPane(s) {
       const st = x.a ? (x.a.status === 'oncourt' ? `On court · getting ready · ${courtsOf(s, x.a)}` : `Playing · ${courtsOf(s, x.a)}`) : !x.r.present ? 'Away' : x.qpos ? `Queued · #${x.qpos}` : 'Free';
       return `<article class="pc3 lv-${rvBand(x.r)} ${x.a && x.a.status === 'active' ? 'playing' : ''} ${x.r.present ? '' : 'away'}" role="button" tabindex="0" data-act="selPlayer" data-pid="${x.r.pid}" aria-pressed="${i >= 0}" aria-label="${esc(x.p.name)}, ${esc(lvLabel(x.r.level))}, ${x.g} games">
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
-        <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile" title="${esc(lvLabel(x.r.level))}">${avatar(x.p)}</button><div style="min-width:0;flex:1"><div class="pc3-name" title="${esc(x.p.name)}">${esc(clubNickOf(x.p) || x.p.nick || x.p.name)}</div></div><button class="btn xs ghost icon-btn" data-act="openEditLive" data-pid="${x.r.pid}" aria-label="Edit ${esc(x.p.name)}" title="Edit player">${I.edit}</button></div>
+        <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile" title="${esc(lvLabel(x.r.level))}">${avatar(x.p)}</button><div class="row" style="min-width:0;flex:1;gap:4px;flex-wrap:nowrap"><div class="pc3-name" style="min-width:0" title="${esc(x.p.name)}">${esc(clubNickOf(x.p) || x.p.nick || x.p.name)}</div>${hcOf(x.r).length ? `<span class="hc-ico" role="img" title="${esc(hcText(hcOf(x.r)))}" aria-label="${esc(hcText(hcOf(x.r)))}">${I.alert}</span>` : ''}</div><button class="btn xs ghost icon-btn" data-act="openEditLive" data-pid="${x.r.pid}" aria-label="Edit ${esc(x.p.name)}" title="Edit player">${I.edit}</button></div>
         <div class="pc3-games"><button type="button" class="pg-played" data-act="openSetGames" data-pid="${x.r.pid}" title="Set games played" aria-label="${x.g} games played. Set games played for ${esc(x.p.name)}"><b class="tnum">${x.g}</b><span>Current</span></button><i aria-hidden="true"></i><div class="pg-total" title="Played plus queued for the night" aria-label="${x.g + queuedCount(s, x.r.pid)} for the night, played plus queued"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>Total</span></div></div>
         <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : queueTime(x.mins) === LONG_AGO ? ` · ${LONG_AGO}` : ` · ${queueTime(x.mins)} wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
         <div class="row">${!x.r.present && !x.g && !x.a ? `<button class="btn xs ghost" style="color:var(--error)" data-act="openNoShow" data-pid="${x.r.pid}" aria-label="Mark ${esc(x.p.name)} as No show (cancelled)">No show (cancelled)</button>` : ''}</div>
@@ -6394,6 +6554,7 @@ const SHEETS = {
   // picture (unclaimed), games played and availability. "Set games for all…" keeps D-SET-GAMES.
   editLive(sh) {
     const s = cur(), r = R(s, sh.pid), p = P(sh.pid);
+    if (!Array.isArray(sh.hc)) sh.hc = hcOf(r);
     if (!r || !p) return sheetShell('Edit player', '<p>This player is no longer on the roster.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
     const busy = busyOf(s, p.id), now = gamesOf(s, p.id), shown = clubNickOf(p) || p.nick || p.name;
     const who = { registered: 'Registered', unclaimed: 'Unclaimed', guest: 'Guest' }[p.identity] || '';
@@ -6411,7 +6572,11 @@ const SHEETS = {
         <span class="hint" style="margin-top:-6px">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</span>
         <div class="el-line"><b id="el-av-l">Availability</b>
           <div class="seg" role="group" aria-labelledby="el-av-l">${[[true, 'Present'], [false, 'Not here']].map(([v, l]) => `<button type="button" aria-pressed="${sh.present === v}" data-act="elPresent" data-v="${v}">${l}</button>`).join('')}</div></div>
-        ${!sh.present && busy ? `<span class="hint" style="margin-top:-6px">${esc(short(p.id))} is in a match now. Marking them not here doesn't take them off it.</span>` : ''}</section>`,
+        ${!sh.present && busy ? `<span class="hint" style="margin-top:-6px">${esc(short(p.id))} is in a match now. Marking them not here doesn't take them off it.</span>` : ''}</section>
+      <section class="el-sec" aria-labelledby="el-hc-h"><h3 id="el-hc-h">Handicap · tonight</h3>
+        ${hcFigure(sh.hc, short(p.id))}
+        <div class="row" style="gap:8px" aria-live="polite">${sh.hc.length ? HC_SPOTS.filter((x) => sh.hc.includes(x.k)).map((x) => `<span class="ex-chip hc-chip"><b>${x.label}</b><button type="button" class="btn xs ghost icon-btn" data-act="hcToggle" data-k="${x.k}" aria-label="Clear ${x.label.toLowerCase()}" title="Remove">${I.x}</button></span>`).join('') : chip('No handicap')}</div>
+        <span class="hint" style="margin-top:-6px">Tap a spot to mark it, tap again to clear. Generate matches rests ${esc(short(p.id))} after 1 game in a row (Hard mode: 2). Only you see it, and it clears when the session ends.</span></section>`,
       `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="saveEditLive">Save changes</button>`);
   },
   // Exemption list picker: search, filter by level, tap players to toggle, then Save list.
@@ -7406,9 +7571,10 @@ const SHEETS = {
 };
 
 // ---------- Matchmaking (prototype heuristics) ----------
-function splitTeams(s, pick, fmt) {
+// `lvOf` (optional): Generate matches passes tonight's level (Even game, D-2026-11-25-01); Main Queue regeneration keeps the assigned level.
+function splitTeams(s, pick, fmt, lvOf) {
   if (fmt === 'singles') return { teamA: [pick[0]], teamB: [pick[1]] };
-  const lv = (p) => (R(s, p).level != null ? R(s, p).level : 4);
+  const lv = lvOf || ((p) => (R(s, p).level != null ? R(s, p).level : 4));
   const opts = [[[0, 1], [2, 3]], [[0, 2], [1, 3]], [[0, 3], [1, 2]]]
     .map(([a, b]) => { const A = a.map((i) => pick[i]), B = b.map((i) => pick[i]); return { A, B, diff: Math.abs(A.reduce((t, p) => t + lv(p), 0) - B.reduce((t, p) => t + lv(p), 0)) }; })
     .sort((x, y) => x.diff - y.diff);
@@ -8232,8 +8398,10 @@ const ACT = {
   allAbsent: () => { cur().roster.forEach((r) => { r.present = false; r.selfCheckedIn = false; }); commit('Everyone marked absent'); render(); },
   openEditLive: (d) => {
     const s = cur(), r = s && R(s, d.pid), p = P(d.pid); if (!r || !p || s.status !== 'active') return;
-    openSheet({ type: 'editLive', pid: p.id, nick: p.clubNick || '', games: Math.min(99, Math.max(0, gamesOf(s, p.id))), present: !!r.present });
+    openSheet({ type: 'editLive', pid: p.id, nick: p.clubNick || '', games: Math.min(99, Math.max(0, gamesOf(s, p.id))), present: !!r.present, hc: hcOf(r) });
   },
+  // D-2026-11-25-03: mark or clear a handicap spot in the sheet; saved with Save changes.
+  hcToggle: (d) => { const sh = S.ui.sheet; if (sh?.type !== 'editLive' || !HC_SPOTS.some((x) => x.k === d.k)) return; sh.hc = sh.hc || []; sh.hc = sh.hc.includes(d.k) ? sh.hc.filter((k) => k !== d.k) : [...sh.hc, d.k]; render(); },
   elGames: (d) => { const sh = S.ui.sheet; if (sh?.type !== 'editLive') return; sh.games = Math.min(99, Math.max(0, sh.games + (+d.d || 0))); render(); },
   elPresent: (d) => { const sh = S.ui.sheet; if (sh?.type !== 'editLive') return; sh.present = d.v === 'true'; render(); },
   saveEditLive: () => {
@@ -8242,6 +8410,8 @@ const ACT = {
     let changed = false;
     if (p.identity === 'registered') { const v = (sh.nick || '').trim(); if (v !== (p.clubNick || '')) { p.clubNick = v; changed = true; } }
     if (sh.games !== gamesOf(s, p.id)) { r.gamesAdj = sh.games - countedGamesOf(s, p.id); changed = true; }
+    const hc = HC_SPOTS.map((x) => x.k).filter((k) => (sh.hc || []).includes(k));
+    if (hc.join() !== hcOf(r).join()) { if (hc.length) r.handicap = hc; else delete r.handicap; changed = true; }
     if (sh.present !== !!r.present) {
       // D-2026-11-09-03: the QM's last action wins, as on the card's Present switch.
       r.present = sh.present; if (r.present) { r.presentAt = Date.now(); r.selfLeft = false; } else r.selfCheckedIn = false;
@@ -8538,10 +8708,17 @@ const ACT = {
   exClear: () => { const sh = S.ui.sheet; if (sh?.type !== 'exemptPick') return; sh.sel = []; render(); },
   exSave: () => { const s = cur(), sh = S.ui.sheet; if (sh?.type !== 'exemptPick') return; s.exempt = sh.sel.filter((p) => R(s, p)); S.ui.sheet = null; commit(s.exempt.length ? `Exemption list saved · ${s.exempt.length} player${s.exempt.length === 1 ? '' : 's'}` : 'Exemption list cleared'); render(); },
   exemptRemove: (d) => { const s = cur(); s.exempt = exemptOf(s).filter((p) => p !== d.pid); commit(`${nm(d.pid)} taken off the exemption list`); render(); },
+  // D-2026-11-25-02: Almost done on a Playing court card. Playing only; it resets at Match done and whenever the match leaves Playing.
+  toggleAlmostDone: (d) => {
+    const s = cur(), m = s && s.matches.find((x) => x.id === d.id);
+    if (!m || m.status !== 'active') { toast('Something changed. Review the match again.'); render(); return; }
+    m.almostDone = !m.almostDone;
+    commit(m.almostDone ? `Match ${m.seq} almost done · ${courtsOf(s, m)}` : `Match ${m.seq} · Almost done off`); render();
+  },
   pauseMatch: (d) => {
     const s = cur(), m = s.matches.find((x) => x.id === d.id);
     if (!m || m.status !== 'active') { toast('Something changed. Review the match again.'); render(); return; }
-    m.status = 'oncourt'; delete m.startedAt; m.placedAt = m.placedAt || Date.now();
+    m.status = 'oncourt'; delete m.startedAt; delete m.almostDone; m.placedAt = m.placedAt || Date.now();
     S.ui.sheet = null; commit(`Match ${m.seq} paused · back to Getting ready on ${courtsOf(s, m)}`); render();
   },
   // Send back to queue: to the top of the queue; the court frees. In Auto Queue the court refills with another match.
@@ -8630,7 +8807,7 @@ const ACT = {
   confirmResult: () => {
     const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id), r = sh.res;
     if (m.status !== 'active') { closeSheet(); return; }
-    m.status = 'done'; m.winner = r.winner; m.endedAt = Date.now();
+    m.status = 'done'; m.winner = r.winner; m.endedAt = Date.now(); delete m.almostDone;
     if (r.scoreA != null) { m.scoreA = r.scoreA; m.scoreB = r.scoreB; if (r.games) m.games = r.games; }
     // The first freed court is offered to the picker (Q-NEXT-MATCH); Auto Queue fills every other court as before.
     const first = m.courts[0];
@@ -8664,7 +8841,7 @@ const ACT = {
   openInvalid: (d) => openSheet({ type: 'invalid', id: d.id }),
   confirmInvalid: () => {
     const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id);
-    m.status = 'invalid'; m.endedAt = Date.now();
+    m.status = 'invalid'; m.endedAt = Date.now(); delete m.almostDone;
     S.ui.sheet = null; commit(`Match ${m.seq} marked invalid · ${courtsOf(s, m)} free${autoNote(s, autoFill(s))}`); render();
   },
   openEditor: (d) => {
@@ -8815,6 +8992,8 @@ const ACT = {
     const s = cur();
     // On court matches were never started: they're dropped like waiting matches.
     onCourt(s).forEach((m) => { m.status = 'waiting'; m.courts = []; delete m.placedAt; });
+    // D-2026-11-25-03: Handicap · tonight is session only; it clears when the session ends.
+    s.roster.forEach((r) => { delete r.handicap; });
     (s.requests || []).forEach((r) => { if (r.status === 'pending') r.status = 'closed'; });
     (s.matchRequests || []).forEach((r) => { if (r.status === 'open') r.status = 'closed'; });
     (s.dropOuts || []).forEach((r) => { if (r.status === 'open') r.status = 'closed'; });
@@ -9392,6 +9571,7 @@ function render() {
   const html = topBar() + (hasShell() ? `<div class="shell ${navMin ? 'rail-min' : ''} ${S.ui.navOpen ? 'nav-open' : ''}">${navRail()}<div class="nav-scrim" data-act="toggleNav" aria-hidden="true"></div><div class="shell-main">${page}</div>${mobileDock()}</div>` : page) + (S.screen === 'setup' ? setupCourtDialog : '') + (sh ? SHEETS[sh.type](sh) : '');
   document.getElementById('app').innerHTML = html;
   setupSavedPlayerStats();
+  setupHcArt();
   setupQueueSlide();
   setupCourtSlider();
   document.body.style.overflow = sh ? 'hidden' : '';

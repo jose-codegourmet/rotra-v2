@@ -30,6 +30,10 @@ await mkdir(publicOutput, { recursive: true })
 for (const file of ['index.html', 'index.css', 'router.js']) {
   await cp(new URL(file, root), new URL(file, publicOutput))
 }
+// Queue art (the handicap figure still and its Rive file) is served as static files next to the routes.
+await cp(new URL('queue-app/art/', root), new URL('queue-app/art/', publicOutput), {
+  recursive: true,
+})
 for (const product of ['player', 'queue', 'admin']) {
   const file = `${product}-app/rotra-${product}.html`
   const html = await readFile(new URL(file, root), 'utf8')

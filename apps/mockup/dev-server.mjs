@@ -44,6 +44,16 @@ createServer(async (request, response) => {
       send(200, type, await readFile(new URL(file, root)))
       return
     }
+    // Queue art (the handicap figure): the still and its Rive file.
+    const art = path.match(/^\/queue-app\/art\/[\w-]+\.(png|riv)$/)
+    if (art) {
+      send(
+        200,
+        art[1] === 'png' ? 'image/png' : 'application/octet-stream',
+        await readFile(new URL(path.slice(1), root)),
+      )
+      return
+    }
     if (product) {
       const file = new URL(`${product}-app/rotra-${product}.html`, root)
       const html = await readFile(file, 'utf8')

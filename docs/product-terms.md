@@ -1,6 +1,6 @@
 # Product terms — ROTRA v1
 
-**Last verified:** 2026-11-22 (Trusted host, Host; Refund and Reject and refund, #1014; Waiver and Slot history, #1013; Transfer link, #1012); 2026-11-18 (leaderboard terms; scoring mode, deuce and best of 3) · **Owner:** product owner · **Single source of vocabulary.** If a word here
+**Last verified:** 2026-11-25 (Almost done, Match making factors, Handicap · tonight); 2026-11-22 (Trusted host, Host; Refund and Reject and refund, #1014; Waiver and Slot history, #1013; Transfer link, #1012); 2026-11-18 (leaderboard terms; scoring mode, deuce and best of 3) · **Owner:** product owner · **Single source of vocabulary.** If a word here
 disagrees with a business, screen, or database doc, this file is wrong and must be fixed in the same PR.
 
 **Read this when** a task uses a domain word, or names a type, component, route, query key, enum value,
@@ -172,6 +172,9 @@ Rules: [Queueing](business_logic/product/queue/modules/queueing/README.md)
 | Swap with the queue | Puts the next ready waiting match on an On court match's court and moves the On court match into that match's queue place |
 | Available Players / Plan Ahead / Longest Wait / Fewest Games | Generate matches strategies |
 | Expected finish | An estimate of when a Playing match ends, from time only: the session's scoring mode (its typical and long match minutes) and the minutes played. ROTRA has no live score, so it never knows the real score or a deuce. Shown on the Playing court card and used by Plan Ahead (mockup, November 23, 2026). Code: `finishOf` |
+| Almost done | The Queue Master's optional switch on a **Playing** court card, flipped after asking the players. While on, the court reads “Almost done” in place of the expected finish and Plan Ahead treats those players as free soon (0 minutes left). It resets at Match done and whenever the match leaves Playing ([D-2026-11-25-02](mvp/decisions/2026-11-25.md#d-2026-11-25-02); mockup only). Code: `almostDone` |
+| Match making factors | The three checks Generate matches uses, in priority order (a ladder, not a points score): **Whose turn** (fewest games, longest rest, and the exhaustion rule: 2 games in a row, Hard mode 3, then sit out at least one), **Fresh faces** (no one from the player's last 2 games as partner or opponent, unless no match is possible otherwise) and **Even game** (teams split by level adjusted by tonight's results only) ([D-2026-11-25-01](mvp/decisions/2026-11-25.md#d-2026-11-25-01); mockup only) |
+| Handicap · tonight | Spots the Queue Master marks on a figure in the live Edit player sheet (shoulders, elbows, wrists, lower back, knees, ankles). Any handicap makes the player exhausted after 1 game in a row instead of 2 (Hard 2 instead of 3). Session only and Queue Master only: cleared when the session ends, never public ([D-2026-11-25-03](mvp/decisions/2026-11-25.md#d-2026-11-25-03); mockup only). Code: `handicap` |
 | Catch Up | Generate matches strategy with an explicitly chosen game target, separate from the session minimum. “Games each player should reach” prioritizes eligible players below that number; completed games, Main Queue waiting assignments and earlier drafts in this batch count toward reaching it in the plan. Planned games are not completed results |
 | Draft | A suggested future lineup held outside the Main Queue; neither queued nor played |
 | Regenerate | Rebuilds unprotected waiting matches; keeps protected manual ones |

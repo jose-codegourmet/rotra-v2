@@ -17,6 +17,7 @@
 | `generation_id` | Optional UUID grouping a generation/rebuild command, not a new product feature |
 | `attention_reasons` | Derived projection/cache of validated lineup problems |
 | `placed_at` | Nullable timestamptz (settled November 6, 2026). Set when the match goes `on_court` (by hand or by Auto Queue); cleared if it is sent back to the queue. Required while `on_court`, null while waiting; matches started before the On court step have none |
+| `almost_done_at` | **Proposed, November 25, 2026** ([D-2026-11-25-02](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-02); mockup only, no migration). Nullable timestamptz: when the Queue Master switched the Playing match to **Almost done**; null when off. Only meaningful while `state = active`; the Match done, Pause match (back to `on_court`) and Mark invalid commands clear it in the same transition, so a non-active match never carries it. Plan Ahead reads it as 0 minutes left. A timestamp rather than a boolean so the console can order or audit it; a boolean would also do. Never part of results or facts |
 | `started_at`, `ended_at`, `revision` | Transition metadata. `started_at` is set **only at Start match**, never at placement; the minutes-played timer reads it |
 
 Do not add a mandatory court FK to a waiting match. An `on_court` match **has** its court assignment (two for 5v5) before it starts; see occupancy below. Index `(session_id, state, queue_position, id)` for non-removed rows to scan the shared queue. Reorder/regenerate under a locked session queue revision; use a deterministic tie key during draft ordering and establish unique canonical waiting positions at commit.
@@ -26,6 +27,8 @@ A participant already playing makes a waiting match temporarily ineligible, not 
 Queue position is advisory: any ready waiting match may be placed regardless of position, so the place command validates eligibility, not "is first in queue". **Send back to queue** gives the match the first `queue_position` (top of the queue). Regenerate gives each rebuilt match the `queue_position` of a match it replaces, so rebuilt work stays where the old work was.
 
 Standard formats that are off for the session (`allow_singles`/`allow_doubles` false) are rejected for new or edited matches by command validation. Fun formats are always accepted for manual matches and never produced by generation.
+
+**Match making factors** ([D-2026-11-25-01](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-01), November 25, 2026; mockup only) need no new match columns: games in a row, matches sat out, the last 2 games' partners and opponents, and tonight's wins and losses are all derived from `matches` (`state`, `started_at`, `placed_at`, `ended_at`), `match_participations` and `match_decisions` at generation time, plus the proposed `session_players.handicap_spots`. Drafts stay outside these tables until transferred.
 
 At Session done, waiting matches and `on_court` matches that never started are excluded from results (on_court ones settled November 6, 2026). Whether they are kept (state waiting, frozen) or marked removed is part of the open closure policy; either way they produce no facts.
 

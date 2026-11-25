@@ -25,7 +25,7 @@ Vercel project builds. `main` is merged into `go-stack` at least weekly; `go-sta
 | 13 | [ ] | [staging-verification_20261117](./tracks/staging-verification_20261117/) — Staging verification: live checks and load test (B-52) | chore | high | every move track (5–12) | 5 / 10 |
 | 14 | [ ] | [ship-and-retire_20261113](./tracks/ship-and-retire_20261113/) — Ship the Go stack and retire Supabase | chore | medium | staging-verification | 3 / 7 |
 | 15 | [ ] | [env-setup_20261121](./tracks/env-setup_20261121/) — Environment variables: what is missing and how to set it (run before 13) | chore | high | go-writes-queue | 3 / 9 |
-| 16 | [ ] | [regression-go_20261125](./tracks/regression-go_20261125/) — Regression suite on the Go API and plain Postgres, no Supabase (run before 13) | chore | high | go-writes-queue, go-sign-in-catch-up | 5 / 22 |
+| 16 | [~] | [regression-go_20261125](./tracks/regression-go_20261125/) — Regression suite on the Go API and plain Postgres, no Supabase (run before 13) | chore | high | go-writes-queue, go-sign-in-catch-up | 5 / 22 |
 
 ## Backlog
 

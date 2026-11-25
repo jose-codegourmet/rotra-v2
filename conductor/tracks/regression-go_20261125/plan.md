@@ -39,9 +39,9 @@ Order of work: get one test through the whole new stack first (Phase 2, no clock
 
 ## Phase 5: CI and docs
 
-- [ ] **5.1** Regression workflow: set up Go (with its build cache) and a Postgres service, drop the Supabase CLI, upload the Go log with the report; record one run and its duration here
+- [x] **5.1** Regression workflow: set up Go (with its build cache) and a Postgres service, drop the Supabase CLI, upload the Go log with the report; record one run and its duration here (run [45532973558](https://github.com/jose-codegourmet/rotra-v2/actions/runs/45532973558), 2026-11-25, `suite=all`, `seeds=5`: success, 47 passed and 5 skipped (BL-22) in 5.0 min of tests, 6 min 39 s for the job. The first run, [45531969580](https://github.com/jose-codegourmet/rotra-v2/actions/runs/45531969580), is the one whose UI failures were triaged)
 - [x] **5.2** Update `docs/regression.md`, the `apps/e2e` lines in `AGENTS.md`, the `Makefile` comments and `e2e-down`; add the decision entry that replaces the local-Supabase part of D-2026-11-12-05
-- [ ] **5.3** `make check` on the last commit
+- [x] **5.3** `make check` on the last commit (`check: OK`, run on the final code commit with the Next.js agent markers cleared; the commits after it change only `conductor/` and docs)
 
 ## Baseline (last TypeScript run)
 

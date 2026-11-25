@@ -116,6 +116,13 @@ Not drafted, because a ticket already exists: offline download/outbox (#477, #24
   (`readPlayerSessionAccess`) returns `courtsNow` for a live session, and the queue faces follow the
   signed-in name rule and open the profile card. The page's Refresh reloads that read too. Written
   and type-checked; not run against a database.
+- **Update, November 25, 2026:** `getSignedInSession` and `getSessionPageAccount` get no route, on
+  purpose. The Queue app holds no Player session in real mode, so the signed-in view is the Player
+  app's own reads (`…/access`, `…/my-night`, `…/match-history`, the match request options) laid over
+  the visitor page. Both hooks stay disabled in real mode and the fetchers refuse with
+  NotConnectedError. Still different from the mock: the roster is uncapped only for a Player with a
+  slot in the session, the waitlist stays masked, and the real public read sends no
+  `amountDuePerPlayer` to anyone.
 
 ### 404 · F07.63 · Chore: Signed-in Player writes in real mode
 **Product:** queue, player · **Depends on:** 398, 401, 403

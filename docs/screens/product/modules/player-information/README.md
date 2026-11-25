@@ -9,6 +9,7 @@
 | [Identity and privacy](identity-privacy.md) | RTR ID/QR, profile visibility (Public · Private · Always private), Hide from Player Information, hidden phone, approved contact-change request, sign-in methods, account verification (P-VERIFICATION) |
 | [Notifications](notifications.md) | Bell and notifications page (P-NOTIFICATIONS), ROTRA announcements |
 | [Ranking and history](ranking-history.md) | Overall leaderboard, rank explanation, eligibility/reassessment, match history |
+| [Public match page](match-page.md) | One game's public page (P-MATCH-PAGE, `/matches/[matchId]`, November 25, 2026): the court with skill-group rings and **Before this game** |
 | [Public club page](club-page.md) | A club's public page and its full Members page (epic P07, #737) |
 | [Legal pages](legal.md) | Privacy Policy (P-PRIVACY) and Terms of Service (P-TERMS), public static pages ([D-2026-11-17-01](../../../../mvp/decisions/2026-11-17.md#d-2026-11-17-01)) |
 

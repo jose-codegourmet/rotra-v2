@@ -4,6 +4,7 @@ export const recentGamesCardMeta = {
   description:
     'Recent games on the profile: the three latest games (any kind, newest first), each the standard game row with “session · date · club” under it; All games (N) opens the Games page.',
   usage: [
+    '`onOpenGame` (game id) makes every court open its match page.',
     'Display official records without result editing controls.',
     'Sits under Recent sessions (ProfileSessionsCard). Empty: “No games recorded yet.”',
     'me draws the profile owner first on every court; onOpenPlayer opens a face’s profile card; onShareGame only on your own profile.',
@@ -13,6 +14,7 @@ export const recentGamesCardMeta = {
     screen: 'Profile › Recent games (recentGamesCard, .rg-item, .rg-src)',
   },
   docs: [
+    'docs/mockup-changes/2026-11-25-player-match-page.md',
     'docs/mockup-changes/2026-11-13-player-recent-sessions-games.md',
     'docs/screens/product/modules/player-information/ranking-history.md',
   ],

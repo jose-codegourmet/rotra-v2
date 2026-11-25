@@ -40,6 +40,8 @@ export type MatchHistoryProps = {
   onShareGames?: (sessionId: string) => void
   /** Your own games: the share icon on each court */
   onShareGame?: (sessionId: string, gameId: string) => void
+  /** Opens a game's match page: the whole court box (2026-11-25 match page log) */
+  onOpenGame?: (gameId: string) => void
 }
 export function MatchHistory({
   sessions,
@@ -56,6 +58,7 @@ export function MatchHistory({
   onShareResult,
   onShareGames,
   onShareGame,
+  onOpenGame,
 }: MatchHistoryProps) {
   const listRef = useRef<HTMLDivElement>(null)
   // Uncontrolled when no onPageChange is given (stories, other callers).
@@ -160,6 +163,7 @@ export function MatchHistory({
                       onShareGame={
                         onShareGame ? (gameId) => onShareGame(session.id, gameId) : undefined
                       }
+                      onOpenGame={onOpenGame}
                       actions={shareRow(session)}
                     />
                   ))

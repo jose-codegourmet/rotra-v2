@@ -12,6 +12,8 @@ export type SessionGamesProps = {
   onOpenPlayer?: (player: GameRowPlayer) => void
   /** Your own games: the share icon on each court (Share game) */
   onShareGame?: (gameId: string) => void
+  /** Opens a game's match page: the whole court box (2026-11-25 match page log) */
+  onOpenGame?: (gameId: string) => void
   /** Between the session head and the games: the Share performance / result / games row */
   actions?: ReactNode
 }
@@ -20,6 +22,7 @@ export function SessionGames({
   me,
   onOpenPlayer,
   onShareGame,
+  onOpenGame,
   actions,
 }: SessionGamesProps) {
   return (
@@ -58,6 +61,7 @@ export function SessionGames({
             me={me}
             onOpenPlayer={onOpenPlayer}
             onShare={onShareGame ? () => onShareGame(game.id) : undefined}
+            onOpen={onOpenGame ? () => onOpenGame(game.id) : undefined}
           />
         ))}
       </div>

@@ -20,6 +20,20 @@ export type MatchCourtPlayer = {
    * corner (the Queue console's face badge). Nothing when missing.
    */
   badge?: number
+  /**
+   * Match page (2026-11-25 match page log): the player's skill group that night, drawn as the
+   * picture's border when the court has `skillRings`; null or missing is the none ring (no level
+   * yet, a guest, or a level hidden from this viewer).
+   */
+  skillGroup?: 'beginner' | 'intermediate' | 'advanced' | null
+}
+
+/** The public session tiles' skill-group colours, as the ring under the winner ring. */
+const SKILL_RINGS = {
+  beginner: '[--ring:var(--lv-beg)]',
+  intermediate: '[--ring:var(--lv-int)]',
+  advanced: '[--ring:var(--lv-adv)]',
+  none: '[--ring:var(--lv-none)]',
 }
 
 export type MatchCourtProps = {
@@ -73,6 +87,17 @@ export type MatchCourtProps = {
    * no winner ring. Takes precedence over `score`.
    */
   versus?: boolean
+  /**
+   * Player variant (2026-11-25 match page log): the whole court box opens the game's match page. A
+   * full-size button sits under the faces (named “Open the match page: <ariaLabel>”); the faces and
+   * the `action` stay their own buttons, the score box and corner pill let taps through.
+   */
+  onOpen?: () => void
+  /**
+   * Match page court: each face's picture border is its `skillGroup` (3 px); the winning side adds a
+   * 2 px dark gap and a 3 px accent outer ring; hover and focus swap the accent for a light ring.
+   */
+  skillRings?: boolean
   className?: string
 }
 
@@ -138,6 +163,8 @@ export function MatchCourt({
   now = false,
   highlightedPlayerKey,
   versus = false,
+  onOpen,
+  skillRings = false,
   className,
 }: MatchCourtProps) {
   const face = (player: MatchCourtPlayer, won: boolean) => {
@@ -152,10 +179,21 @@ export function MatchCourt({
             size={44}
             className={cn(
               'size-[46px] text-sm max-[480px]:size-9 max-[480px]:text-xs',
-              won ? 'ring-3 ring-accent' : 'ring-2 ring-court-line',
+              skillRings
+                ? [
+                    SKILL_RINGS[player.skillGroup ?? 'none'],
+                    won
+                      ? 'shadow-[0_0_0_3px_var(--ring),0_0_0_5px_var(--court-level-label),0_0_0_8px_var(--accent)]'
+                      : 'shadow-[0_0_0_3px_var(--ring)]',
+                    player.onOpen &&
+                      'group-hover/face:shadow-[0_0_0_3px_var(--ring),0_0_0_5px_var(--court-level-label),0_0_0_8px_color-mix(in_srgb,var(--on-photo)_60%,transparent)] group-focus-visible/face:shadow-[0_0_0_3px_var(--ring),0_0_0_5px_var(--court-level-label),0_0_0_8px_color-mix(in_srgb,var(--on-photo)_60%,transparent)]',
+                  ]
+                : [
+                    won ? 'ring-3 ring-accent' : 'ring-2 ring-court-line',
+                    player.onOpen &&
+                      'group-hover/face:ring-3 group-hover/face:ring-accent group-focus-visible/face:ring-3 group-focus-visible/face:ring-accent',
+                  ],
               highlighted && 'outline-3 outline-offset-2 outline-warn',
-              player.onOpen &&
-                'group-hover/face:ring-3 group-hover/face:ring-accent group-focus-visible/face:ring-3 group-focus-visible/face:ring-accent',
             )}
           />
           {player.badge ? (
@@ -191,7 +229,7 @@ export function MatchCourt({
         type="button"
         aria-label={`${player.name}${games}${highlighted ? ' (highlighted)' : ''}. View profile`}
         onClick={player.onOpen}
-        className={cn(base, 'cursor-pointer focus-visible:outline-none')}
+        className={cn(base, 'pointer-events-auto cursor-pointer focus-visible:outline-none')}
       >
         {body}
       </button>
@@ -201,13 +239,18 @@ export function MatchCourt({
       </span>
     )
   }
-  const side = 'relative z-1 flex min-w-0 items-center justify-evenly gap-1.5 px-1 py-3'
+  const side = cn(
+    'relative z-1 flex min-w-0 items-center justify-evenly gap-1.5',
+    skillRings ? 'px-1.5 py-4' : 'px-1 py-3',
+    onOpen && 'pointer-events-none',
+  )
   const names = (players: MatchCourtPlayer[]) => players.map((p) => p.name).join(' and ')
   const leftWon = winner === 'left'
   const ring = !invalid && !notCounted && !versus
   const playerVariant = cornerLabel !== undefined
   const games = invalid || versus || !score ? [] : (gameScores ?? [])
   const hasGames = games.length > 0
+  const courtLabel = ariaLabel ?? `Match ${number}: ${names(left)} versus ${names(right)}`
   return (
     <article
       data-now={now || undefined}
@@ -215,7 +258,7 @@ export function MatchCourt({
     >
       <fieldset
         data-court
-        aria-label={ariaLabel ?? `Match ${number}: ${names(left)} versus ${names(right)}`}
+        aria-label={courtLabel}
         className={cn(
           'relative m-0 grid min-h-[132px] min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center overflow-hidden rounded-lg border-0 p-0 transition-shadow motion-reduce:transition-none',
           hasGames
@@ -228,6 +271,14 @@ export function MatchCourt({
         )}
       >
         <MatchCourtArt />
+        {onOpen ? (
+          <button
+            type="button"
+            onClick={onOpen}
+            aria-label={`Open the match page: ${courtLabel}`}
+            className="absolute inset-0 z-0 cursor-pointer rounded-lg border-0 bg-transparent p-0 hover:shadow-[inset_0_0_0_2px_color-mix(in_srgb,var(--on-photo)_55%,transparent)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+          />
+        ) : null}
         <div className="pointer-events-none absolute top-2 right-2 left-2 z-2 flex flex-col items-start gap-1">
           {playerVariant ? (
             <span className="rounded-full bg-court-level-label px-2 text-[10px] font-extrabold tracking-[0.5px] whitespace-nowrap text-on-photo/85 uppercase">
@@ -251,7 +302,12 @@ export function MatchCourt({
         </div>
         {action}
         <div className={side}>{left.map((p) => face(p, ring && leftWon))}</div>
-        <div className="relative z-1 mx-1 flex min-w-24 flex-col items-center justify-center gap-1.5 rounded-xl bg-court-level-label px-3.5 py-2.5 text-center text-on-photo max-[480px]:mx-0.5 max-[480px]:min-w-0 max-[480px]:px-2 max-[480px]:py-2">
+        <div
+          className={cn(
+            'relative z-1 mx-1 flex min-w-24 flex-col items-center justify-center gap-1.5 rounded-xl bg-court-level-label px-3.5 py-2.5 text-center text-on-photo max-[480px]:mx-0.5 max-[480px]:min-w-0 max-[480px]:px-2 max-[480px]:py-2',
+            onOpen && 'pointer-events-none',
+          )}
+        >
           {versus ? (
             <span className="text-[13px] font-extrabold tracking-[1px] text-on-photo/80">VS</span>
           ) : invalid ? null : score ? (

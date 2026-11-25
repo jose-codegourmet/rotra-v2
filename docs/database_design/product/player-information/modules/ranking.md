@@ -37,6 +37,8 @@ Eligibility of assessments for no-shows/invalid sessions remains open. Do not in
 
 Read `player_match_facts` only from valid finalized sessions. Filter to full-participation standard matches. Preserve session-assigned levels and partner/opponent lineup context. Current global rank must not retroactively overwrite these snapshots.
 
+**Match page id** (proposal, November 25, 2026, [mockup log](../../../../mockup-changes/2026-11-25-player-match-page.md)): the public match page `/matches/[matchId]` is keyed by the match's own id, the `match_id` every participant's `player_match_facts` row already shares (unique `(match_id, session_player_id)`). A game in a player's history must carry that shared id, never a per-player row id, so every player in the match links to the same page. The page reads all facts with that `match_id` for the court, and the same session's earlier facts per participant for **Before this game**. No new table.
+
 Fun matches and outgoing/incoming mid-game substitutes do not supply long-term performance. Optional scores remain optional evidence. Winner-only games remain valid; the formula cannot silently treat absent scores as zero points.
 
 ## `player_rank_current`

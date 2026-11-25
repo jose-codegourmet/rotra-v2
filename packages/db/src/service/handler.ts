@@ -140,6 +140,8 @@ export const VISITOR_COMMANDS = [
   'player.google-sign-in',
   /** P-INVITE: the invite card and, signed in, where the viewer stands */
   'player.invite-landing',
+  /** P-MATCH-PAGE: public, but faces are masked per viewer, so private and no-store */
+  'player.match-page',
 ] as const
 
 export type VisitorCommandId = (typeof VISITOR_COMMANDS)[number]

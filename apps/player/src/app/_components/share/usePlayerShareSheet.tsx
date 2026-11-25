@@ -17,6 +17,7 @@ import { SHARE_FORMATS, type ShareFormat } from '@rotra/ui/share-card/helpers'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
+import { matchHref } from '../match-link/useOpenMatch'
 import { pictureSrc } from '../profile-picture/pictureSrc'
 
 type Selection = {
@@ -40,19 +41,26 @@ export function usePlayerShareSheet(playerId: string | null) {
     value && 'link' in value && typeof window !== 'undefined'
       ? new URL(value.link ?? '', window.location.origin).href
       : ''
+  // Share game links to the game's match page (2026-11-25 match page log); other shares keep theirs.
+  const gameLink =
+    selection?.kind === 'game' && selection.gameId && typeof window !== 'undefined'
+      ? new URL(matchHref(selection.gameId), window.location.origin).href
+      : ''
   const profileLink =
     profileShare && typeof window !== 'undefined'
       ? new URL(profileShare.link, window.location.origin).href
       : ''
-  const copyLink = async (url: string, profileLink = false) => {
+  const copyLink = async (url: string, kind: 'profile' | 'game' | null = null) => {
     try {
       await navigator.clipboard.writeText(url)
       toast('Link copied')
     } catch {
       toast.error(
-        profileLink
+        kind === 'profile'
           ? `Couldn't copy. Your profile link is ${url}`
-          : "Couldn't copy the link. Copy it from the address bar.",
+          : kind === 'game'
+            ? `Couldn't copy. The game link is ${url}`
+            : "Couldn't copy the link. Copy it from the address bar.",
       )
     }
   }
@@ -102,7 +110,7 @@ export function usePlayerShareSheet(playerId: string | null) {
           <ProfileShareCard
             {...common}
             link={profileLink}
-            onCopy={() => void copyLink(profileLink, true)}
+            onCopy={() => void copyLink(profileLink, 'profile')}
             name={profileShare.profile.fullName}
             nickname={profileShare.profile.nickname}
             picture={pictureSrc(
@@ -172,7 +180,13 @@ export function usePlayerShareSheet(playerId: string | null) {
           if (selection?.kind === 'game') {
             const game = value.session.games.find((g) => g.id === selection.gameId)
             return game ? (
-              <GameShareCard {...common} {...session} game={game} />
+              <GameShareCard
+                {...common}
+                {...session}
+                link={gameLink}
+                onCopy={() => void copyLink(gameLink, 'game')}
+                game={game}
+              />
             ) : (
               <Notice>No share card is available.</Notice>
             )

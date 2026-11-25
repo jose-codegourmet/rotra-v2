@@ -24,6 +24,8 @@ export type SessionMatchesSheetProps = {
   onOpenPlayer?: (player: GameRowPlayer) => void
   /** Your own games: the share icon on each counted court */
   onShareGame?: (sessionId: string, gameId: string) => void
+  /** Opens a game's match page: the whole court box (2026-11-25 match page log) */
+  onOpenGame?: (gameId: string) => void
   /** Your own profile: Share performance in the footer */
   onSharePerformance?: (sessionId: string) => void
 }
@@ -44,6 +46,7 @@ export function SessionMatchesSheet({
   me,
   onOpenPlayer,
   onShareGame,
+  onOpenGame,
   onSharePerformance,
 }: SessionMatchesSheetProps) {
   const record = session ? sessionRecord(session) : null
@@ -103,6 +106,7 @@ export function SessionMatchesSheet({
                     ? () => onShareGame(session.id, game.id)
                     : undefined
                 }
+                onOpen={onOpenGame ? () => onOpenGame(game.id) : undefined}
               />
             ))}
           </div>

@@ -91,3 +91,32 @@ export const BestOfThreePhone: Story = {
 }
 /** Winner picked, no score entered: no game pill. */
 export const BestOfThreeNoScore: Story = { args: { score: null, gameScores: [] } }
+
+/** Match page (2026-11-25): every face ringed in its skill group; the winners add a dark gap and the accent ring. */
+export const SkillRings: Story = {
+  args: {
+    cornerLabel: 'Doubles',
+    skillRings: true,
+    left: [
+      { ...face('Jose Buctuanon', 'You'), badge: 2, skillGroup: 'intermediate' },
+      { ...face('Dalton Reyes'), badge: 2, skillGroup: 'beginner' },
+    ],
+    right: [
+      { ...face('Gab Santos'), badge: 2, skillGroup: 'advanced' },
+      { ...face('J*** R***'), badge: 1, skillGroup: null },
+    ],
+    ariaLabel: 'Doubles: You and Dalton Reyes versus Gab Santos and J*** R***',
+  },
+  globals: { theme: 'dark' },
+}
+export const SkillRingsLight: Story = { ...SkillRings, globals: { theme: 'light' } }
+export const SkillRingsPhone: Story = {
+  ...SkillRings,
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}
+/** Court tap: the whole court box opens the match page; the faces keep their own buttons. */
+export const OpensMatchPage: Story = {
+  args: { ...PlayerVariant.args, onOpen: () => {} },
+  globals: { theme: 'dark' },
+}
+export const OpensMatchPageLight: Story = { ...OpensMatchPage, globals: { theme: 'light' } }

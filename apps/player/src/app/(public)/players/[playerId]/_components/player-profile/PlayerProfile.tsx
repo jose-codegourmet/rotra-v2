@@ -46,6 +46,7 @@ import { useState } from 'react'
 import { ClubCard } from '@/app/_components/club-card/ClubCard'
 import { copyPlayerId } from '@/app/_components/copy-player-id/copyPlayerId'
 import { GamePlayerProfile } from '@/app/_components/game-player-profile/GamePlayerProfile'
+import { useOpenMatch } from '@/app/_components/match-link/useOpenMatch'
 import { useBannerSheet } from '@/app/_components/profile-banner/useBannerSheet'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useProfilePictureSheet } from '@/app/_components/profile-picture/useProfilePictureSheet'
@@ -105,6 +106,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   // Share profile shows on every readable profile (2026-11-13-profile-card-open-share, pass 3);
   // rank, result, performance and game shares stay on your own.
   const sharing = usePlayerShareSheet(playerId)
+  const openMatch = useOpenMatch(player?.fullName ?? 'Profile')
   const pictureEditor = useProfilePictureSheet(isOwn ? player : null)
   const bannerEditor = useBannerSheet(isOwn ? player : null)
   const photo = usePhotoViewer()
@@ -383,6 +385,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               me={gamesMe}
               onOpenPlayer={setOpenPlayer}
               onShareGame={isOwn ? sharing.openGame : undefined}
+              onOpenGame={openMatch}
             />
             <SessionMatchesSheet
               session={openSession}
@@ -393,6 +396,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               me={gamesMe}
               onOpenPlayer={setOpenPlayer}
               onShareGame={isOwn ? sharing.openGame : undefined}
+              onOpenGame={openMatch}
               onSharePerformance={isOwn ? sharing.openPerformance : undefined}
             />
             <GamePlayerProfile

@@ -1,0 +1,19 @@
+{
+  "id": "regression-go_20261125",
+  "title": "Regression suite on the Go API and plain Postgres",
+  "type": "chore",
+  "priority": "high",
+  "order": 16,
+  "status": "pending",
+  "created": "2026-11-25",
+  "updated": "2026-11-25",
+  "depends_on": "go-writes-queue, go-sign-in-catch-up",
+  "phases": {
+    "total": 5,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 22,
+    "completed": 0
+  }
+}

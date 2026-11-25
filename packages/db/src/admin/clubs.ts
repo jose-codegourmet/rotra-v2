@@ -488,6 +488,22 @@ export async function requestClubNameChange(
   }
 }
 
+/**
+ * Q-CLUB · Cancel the club's own pending name request: pending becomes cancelled, which frees the
+ * one-pending slot. Repeat-safe: with nothing pending it changes nothing.
+ */
+export async function cancelClubNameChange(context: ClubContext) {
+  await requireClubEntitlement(context)
+  return prisma.$transaction(async (tx) => {
+    await lockClub(tx, context.clubId)
+    const { count } = await tx.clubNameChangeRequest.updateMany({
+      where: { clubId: context.clubId, state: 'pending' },
+      data: { state: 'cancelled', revision: { increment: 1 } },
+    })
+    return { cancelled: count > 0 }
+  })
+}
+
 function nameChangeDto(request: {
   id: string
   clubId: string

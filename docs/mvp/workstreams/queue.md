@@ -122,7 +122,7 @@ Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisio
 
 ## Remaining work
 
-- [ ] Club settings in real mode: name-change request, session defaults, password change. Ticket: needed (MVP scope: open question 3).
+- [ ] Club settings in real mode: password change is NOT done (mock-only; MVP scope: open question 3). Name-change request (`POST` and `DELETE /api/club/name-change`; cancel stores the request as `cancelled`) and session defaults (`PATCH /api/club`) are connected, built but not yet run against a database.
 - [ ] Downloads / This device page. #477 (blocked on #246).
 - [x] Attach a signed-in player to a join request (real mode, #687: one-tap join and Cancel request through the Player app). Player sign-up (D-07): guest registration through club invitations (#490).
 - [ ] Decide whether published results and profile pictures on the public page are masked too (D-06 "not covered yet"). Owner decision.

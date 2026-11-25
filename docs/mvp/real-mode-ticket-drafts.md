@@ -120,9 +120,16 @@ Not drafted, because a ticket already exists: offline download/outbox (#477, #24
   purpose. The Queue app holds no Player session in real mode, so the signed-in view is the Player
   app's own reads (`…/access`, `…/my-night`, `…/match-history`, the match request options) laid over
   the visitor page. Both hooks stay disabled in real mode and the fetchers refuse with
-  NotConnectedError. Still different from the mock: the roster is uncapped only for a Player with a
-  slot in the session, the waitlist stays masked, and the real public read sends no
-  `amountDuePerPlayer` to anyone.
+  NotConnectedError. Three differences from the mock were listed here as open questions (the roster
+  uncapped only for a Player with a slot, the waitlist masked, no `amountDuePerPlayer` in the real
+  public read), plus the missing match name in View match.
+- **Decided (owner, November 25, 2026: follow mock;
+  [D-2026-11-25-05](decisions/2026-11-25.md#d-2026-11-25-05)):** all four now follow the mock in
+  real mode. `readPlayerSessionAccess` sends the whole roster to any signed-in Player, the waitlist
+  by the signed-in name rule, and each waiting match's `label` (shared `matchLabel` rule, gender
+  from `players.gender`; unknown reads Genderless). `readPublicSession` sends `amountDuePerPlayer`
+  from the same `estimateFor` / `amountDuePerHead` the Queue Master's Payments use. Written; not
+  type-checked or run against a database yet.
 
 ### 404 · F07.63 · Chore: Signed-in Player writes in real mode
 **Product:** queue, player · **Depends on:** 398, 401, 403

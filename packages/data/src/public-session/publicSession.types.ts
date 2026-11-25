@@ -275,7 +275,7 @@ export type PublicQueuedMatch = {
   teamB: PublicMatchPlayer[]
   /**
    * The match's name for the View match dialog's title ("Mixed Doubles", D-2026-11-19-07). Missing
-   * reads as the format's own label ("Doubles"): real mode stores no gender yet.
+   * reads as the format's own label ("Doubles").
    */
   label?: string
 }
@@ -480,8 +480,15 @@ export type PlayerSessionAccess = {
   levelBlock?: PlayerLevelBlock | null
   /** The Player's latest request for this session (any status), or null */
   joinRequest: MyJoinRequest | null
+  /** Real mode: always true, a signed-in Player gets the whole roster (D-2026-11-25-05) */
   fullRoster: boolean
   participants: PublicSessionParticipant[]
+  /**
+   * Real mode: the waitlist by the same signed-in name rule as `participants`, in the public
+   * page's order (D-2026-11-25-05). Missing in mock mode and on a server from before it was sent;
+   * the page then keeps the public page's masked waitlist.
+   */
+  waitlist?: PublicSessionParticipant[]
   /** Real mode: the Hosts section by the same signed-in name rule as `participants` (#1006) */
   hosts?: PublicSessionParticipant[]
   /**

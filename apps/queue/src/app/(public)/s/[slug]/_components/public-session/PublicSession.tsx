@@ -597,6 +597,7 @@ export function PublicSession({
     !signedRead &&
     (signedInPage.isError || signedInPage.fetchStatus === 'paused')
   const sessionOpen = p.status === 'prepared' || p.status === 'active'
+  // Any signed-in Player sees the whole roster (D-2026-11-25-05): the access read sends it all.
   const uncapped = !!signedRead || access?.fullRoster === true
   // #731: any signed-in Player can open a participant's profile card (mock: the signed-in read;
   // real: the Player app's access read, which says who each participant is).
@@ -612,7 +613,8 @@ export function PublicSession({
         : null,
   })
   const participants = (access && !signedRead ? access.participants : p.participants).map(tile)
-  const waitlist = p.waitlist.map(tile)
+  // The waitlist follows the same signed-in name rule (D-2026-11-25-05); visitors stay masked.
+  const waitlist = (access && !signedRead ? (access.waitlist ?? p.waitlist) : p.waitlist).map(tile)
   // Hosts (#1006): the same name rule as Players. Real mode's signed-in names come from the Player
   // app's access read, like `participants`; zero hosts hides the section.
   const hosts = (access && !signedRead ? (access.hosts ?? p.hosts) : p.hosts)?.map((h, i) => ({

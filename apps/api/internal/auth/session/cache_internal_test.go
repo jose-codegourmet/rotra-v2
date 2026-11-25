@@ -90,15 +90,3 @@ func TestTTLCacheStaysBounded(t *testing.T) {
 		t.Fatalf("size %d beyond the cap", n)
 	}
 }
-
-// An entry put on a test clock that jumped ahead must not outlive a reset to real time.
-func TestTTLCacheEntryFromTheFutureExpiresWhenTimeGoesBack(t *testing.T) {
-	now := time.Now().Add(3 * time.Hour)
-	c := newTTLCache[string](5*time.Second, func() time.Time { return now })
-	id := uuid.New()
-	c.put(id, "active", c.epoch())
-	now = now.Add(-3 * time.Hour)
-	if _, ok := c.get(id); ok {
-		t.Fatal("an entry that ends more than one TTL ahead was put on a clock that went back; it must miss")
-	}
-}

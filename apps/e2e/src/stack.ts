@@ -96,8 +96,7 @@ export function appServerEnv(app: AppName): Record<string, string> {
 }
 
 /**
- * The env for the Go API. Only what it needs; nothing else of the runner's env reaches it. The
- * sign-in limits are widened because a night runs from one address in seconds of real time.
+ * The env for the Go API: only what it needs, all fixed local test values.
  */
 export function goApiEnv(): Record<string, string> {
   const env = {

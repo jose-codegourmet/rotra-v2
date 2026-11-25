@@ -131,7 +131,8 @@ test(`REG-08 all disruptions, high end, with match requests (Not full)${REG08_DE
     {
       id: 'REG-08',
       bug: 'A player present all night ends under the floor, spread 3 (#1098)',
-      match: /FAIL PASS RULE: \d+ player\(s\) below floor/,
+      // Pinned to this run (seed 3505436714): one player, P14, 7 games against 8. Any other pass-rule failure stays red.
+      match: /FAIL PASS RULE: 1 player\(s\) below floor[^\n]*P14 present=180m target=8 actual=7/,
       when: REG08_DEFECT,
     },
     () =>

@@ -20,7 +20,7 @@ gets their fair share of games when real-life disruptions happen. Decisions:
   and `resetClock` move all four together. The Go clock exists only in the binary built with
   `go build -tags e2e` (done by `prepare`), only with `ROTRA_E2E_CLOCK=1`, only when `DATABASE_URL` is the
   local throwaway database, and its control endpoint is on `127.0.0.1:9193`. Every clock never runs
-  earlier than real time. The Go in-memory limiter and caches treat a window that starts in the future as
+  earlier than real time. The Go HTTP rate limiter and snapshot cache treat a window that starts in the future as
   over, so a reset does not leave a key blocked.
 - The simulation client does what the real apps do: on 401 `expired` (the access pass lives 15 minutes
   on the test clock) it refreshes once and retries.

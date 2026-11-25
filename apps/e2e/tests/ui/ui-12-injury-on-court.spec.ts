@@ -58,7 +58,7 @@ test('UI-12 injury On court: Start match waits for a replacement', async ({ brow
   await expect(card.getByText(reason as string, { exact: true })).toBeVisible()
 
   // Open match › Replace player › the hurt player (first in the lineup) out, the only free player
-  // in. 
+  // in.
   await card.getByRole('button', { name: 'Open match', exact: true }).click()
   const sheet = qm.getByRole('dialog', { name: /^Match \d+ · Court 1 · Getting ready$/ })
   await expect(sheet.getByRole('button', { name: 'Start match', exact: true })).toBeDisabled()

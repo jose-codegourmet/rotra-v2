@@ -1,6 +1,6 @@
 # Product terms — ROTRA v1
 
-**Last verified:** 2026-11-25 (Almost done, Match making factors, Handicap · tonight); 2026-11-22 (Trusted host, Host; Refund and Reject and refund, #1014; Waiver and Slot history, #1013; Transfer link, #1012); 2026-11-18 (leaderboard terms; scoring mode, deuce and best of 3) · **Owner:** product owner · **Single source of vocabulary.** If a word here
+**Last verified:** 2026-11-25 (Almost done, Match making factors, Handicap · tonight; Top quarterly, Club leaderboard, Podium; D-2026-11-25-04); 2026-11-22 (Trusted host, Host; Refund and Reject and refund, #1014; Waiver and Slot history, #1013; Transfer link, #1012); 2026-11-18 (leaderboard terms; scoring mode, deuce and best of 3) · **Owner:** product owner · **Single source of vocabulary.** If a word here
 disagrees with a business, screen, or database doc, this file is wrong and must be fixed in the same PR.
 
 **Read this when** a task uses a domain word, or names a type, component, route, query key, enum value,
@@ -149,7 +149,9 @@ Rules: [Ranking](business_logic/product/player-information/modules/ranking/READM
 | Club assessment | The latest of the nine levels one club assigned to a player |
 | Session playing level | The level the club set for this session; locks at Start session (late entries lock when added) |
 | Shared rank | Cross-club skill rank, based on wins weighted by opponent strength |
-| Top annual, Top monthly, Top weekly | ROTRA’s three cross-club leaderboards. Each shows the top 50 by wins in standard matches for the calendar period. Top annual replaces the overall list |
+| Top annual, Top quarterly, Top monthly, Top weekly | The four leaderboard periods, on ROTRA’s cross-club leaderboard and on each club leaderboard. Each shows the top 50 by wins in standard matches for the calendar period (quarters: January to March, April to June, July to September, October to December). Top annual replaces the overall list. Players with the same wins and win rate share a place (D-2026-11-25-04) |
+| Club leaderboard | A club's own leaderboard on its club page: the same four periods, counting only standard-match wins in that club's sessions; anyone who played in them can appear (D-2026-11-25-04) |
+| Podium | The top three places above a leaderboard's list; always shown, empty steps included; players sharing a place are stacked on its step (D-2026-11-25-04) |
 | Needs reassessment | Skill rank remains visible after three months without play and needs a fresh assessment |
 
 ---

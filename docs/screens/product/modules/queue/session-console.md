@@ -1,6 +1,6 @@
 # Active session console
 
-**Last verified:** 2026-11-18 for the Scoring chip ([D-2026-11-18-04](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); [log](../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only). 2026-11-11 for the console header, Courts and time and the Players tab ([D-2026-11-11-11](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
+**Last verified:** 2026-11-25 for the Leaderboard tab's podium ([D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04); [log](../../../../mockup-changes/2026-11-25-queue-leaderboard-podium.md); mockup only). 2026-11-18 for the Scoring chip ([D-2026-11-18-04](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-04); [log](../../../../mockup-changes/2026-11-18-queue-scoring-modes.md); mockup only). 2026-11-11 for the console header, Courts and time and the Players tab ([D-2026-11-11-11](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)); 2026-11-06 for the rest.
 
 **Surfaces:** `Q-CONSOLE`, `Q-COURTS`, `Q-POOL`, `Q-LEADERBOARD`, `Q-SESSION-ADJUST`, `Q-ADD-COURT`.
 
@@ -97,6 +97,8 @@ One success toast per batch: “N player(s) marked present, M away” (omit a ze
 Not reachable when Record games is off: the session has no Leaderboard tab and no standings ([D-2026-11-18-06](../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06)).
 
 Copy: “Tonight's standings from completed games: most wins, then fewest losses. Players with the same wins and losses share a position. It updates each time you confirm a result. Partial and invalid games don't count.”
+
+**Podium (owner, November 25, 2026; [D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04); [log](../../../../mockup-changes/2026-11-25-queue-leaderboard-podium.md); mockup only).** One leaderboard, for this session only (no period tabs). Between the copy and the table, the [podium](leaderboards.md#podium) that every Queue leaderboard shares: “Top three”, “This session · N players”, then places 1 to 3 from the same standings as the table, each step showing “W W · L L” (with “each” on a shared place). It always shows: with fewer than three places the missing steps are empty, and with no completed game all three are empty above the empty message. A one-player place opens that player's profile; a shared place (same wins and losses) stacks the pictures and opens the [Podium place](leaderboards.md#q-podium-place--podium-place-dialog) dialog. The table below is unchanged and still lists every position, 1 to 3 included.
 
 Table: rank (top three highlighted), player picture, name and level, W, L, Games “g/min” (the adjusted games played count after a Set games played override, #717; W and L stay as recorded), Win %. Empty: “No completed games yet. Standings appear after the first confirmed result.”
 

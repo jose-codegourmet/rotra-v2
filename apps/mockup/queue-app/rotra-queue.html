@@ -31,7 +31,7 @@
 </style>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&family=Silkscreen:wght@400;700&display=swap">
 <style>
 /* Layout: courtside operator app. One top bar, one content column on phones; courts beside the shared queue on wide screens.
    Tokens follow apps/client globals.css (dark default, light toggleable). */
@@ -1391,6 +1391,126 @@ textarea.tpl { font-family: var(--mono); font-size: 13px; line-height: 1.55; min
 .lb-table tr.me td { background: var(--accent-subtle); font-weight: 700; }
 .lb-who { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
 .lb-face .avatar { width: 28px; height: 28px; font-size: 11px; }
+/* Owner, November 25, 2026 (D-2026-11-25-04): every leaderboard shows the ROTRA Player podium. A dark stage lit from below in
+   the brand green with an 8 px grid, pixel-notched steps (2nd–1st–3rd left to right) and pixel fire behind #1. Copied from
+   rotra-player.html (.podium). Queue additions: a shared place stacks its pictures on one step and opens a dialog; a place with
+   no one yet keeps its empty step. */
+:root { --pixel: "Silkscreen", var(--mono); }
+.podium { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; gap: 18px; padding: 18px 18px 0; border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  background:
+    radial-gradient(120% 70% at 50% 100%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 8px),
+    var(--surface); }
+.pod-head { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: baseline; gap: 8px 16px; flex-wrap: wrap; }
+.pod-head h2 { font-family: var(--pixel); font-weight: 700; font-size: 18px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); }
+.pod-stage { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 10px; padding-top: 40px; }
+.pod { --glow: 30%; display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; font: inherit; }
+.pod.p1 { --glow: 100%; order: 2; }
+.pod.p2 { --glow: 55%; order: 1; }
+.pod.p3 { --glow: 38%; order: 3; }
+.pod[aria-disabled="true"], .pod.empty { cursor: default; }
+.pod-who { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; min-width: 0; max-width: 100%; padding-inline: 4px; }
+.pod-who .avatar { position: relative; z-index: 1; width: 64px; height: 64px; font-size: 20px; margin-bottom: 8px; border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px color-mix(in srgb, var(--accent) var(--glow), var(--border-strong)); }
+.pod.p1 .pod-who .avatar { width: 86px; height: 86px; font-size: 26px; border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 6px var(--accent), 0 0 32px 6px color-mix(in srgb, var(--accent) 50%, transparent); }
+/* A shared place: up to three pictures overlap on the step (two and "+N" past three). */
+.pod-stack { position: relative; z-index: 1; display: inline-flex; align-items: center; padding-left: 14px; margin-bottom: 8px; }
+.pod-who .pod-stack .avatar, .pod.p1 .pod-who .pod-stack .avatar { width: 48px; height: 48px; font-size: 15px; margin: 0 0 0 -14px; }
+.pod.p1 .pod-who .pod-stack .avatar { width: 60px; height: 60px; font-size: 18px; }
+.pod-stack .pod-more { background: var(--elev); color: var(--fg); font-weight: 800; }
+/* A place with no one yet: an empty dashed circle on the step. */
+.pod-who .avatar.pod-none { background: transparent; box-shadow: none; border: 2px dashed color-mix(in srgb, var(--accent) var(--glow), var(--border-strong)); }
+.pod-name { position: relative; z-index: 1; font-weight: 700; font-size: 15px; line-height: 1.25; overflow-wrap: anywhere; }
+.pod.p1 .pod-name { font-size: 18px; }
+.pod.empty .pod-name { color: var(--fg2); }
+.pod-lv { position: relative; z-index: 1; font-size: 12px; font-weight: 600; color: var(--fg2); }
+.pod.p1 .pod-lv { color: var(--accent); }
+/* Steps: the notched polygon gives each block stepped pixel corners. */
+.pod-step { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 12px; font-family: var(--pixel); line-height: 1;
+  clip-path: polygon(0 8px, 4px 8px, 4px 4px, 8px 4px, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 4px, calc(100% - 4px) 4px, calc(100% - 4px) 8px, 100% 8px, 100% 100%, 0 100%);
+  color: color-mix(in srgb, var(--accent) var(--glow), var(--fg2));
+  background:
+    repeating-linear-gradient(0deg, transparent 0 7px, color-mix(in srgb, var(--accent) 12%, transparent) 7px 8px),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) calc(var(--glow) * 0.42), var(--elev)), color-mix(in srgb, var(--accent) calc(var(--glow) * 0.12), var(--surface))); }
+.pod-step b { font-size: 34px; font-weight: 700; }
+.pod-step small { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+.pod.p1 .pod-step { height: 136px; color: var(--on-accent); background:
+    repeating-linear-gradient(0deg, transparent 0 7px, color-mix(in srgb, var(--on-accent) 10%, transparent) 7px 8px),
+    linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--surface))); }
+.pod.p1 .pod-step b { font-size: 46px; }
+.pod.p2 .pod-step { height: 100px; }
+.pod.p3 .pod-step { height: 76px; }
+button.pod:hover .pod-name, button.pod:focus-visible .pod-name { text-decoration: underline; text-underline-offset: 3px; }
+button.pod:hover .pod-step { filter: brightness(1.12); }
+button.pod:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
+.pp-fire.pod-fire { position: absolute; z-index: 0; left: 50%; bottom: calc(100% - 96px); transform: translateX(-50%); width: 180px; height: 150px; max-width: none; max-height: none; margin: 0; image-rendering: pixelated; pointer-events: none; }
+/* Embers: a few pixels drifting up from the floor. */
+.embers { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.embers i { position: absolute; bottom: -6px; width: 4px; height: 4px; background: var(--accent); opacity: 0; animation: ember 5s linear infinite; }
+@keyframes ember { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: .9; } 100% { transform: translateY(-260px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .embers { display: none; } }
+@media (max-width: 560px) {
+  .podium { padding: 14px 10px 0; }
+  .pod-stage { gap: 6px; padding-top: 32px; }
+  .pod-who .avatar { width: 52px; height: 52px; }
+  .pod.p1 .pod-who .avatar { width: 68px; height: 68px; }
+  .pod-who .pod-stack .avatar, .pod.p1 .pod-who .pod-stack .avatar { width: 36px; height: 36px; font-size: 12px; margin-left: -12px; }
+  .pod.p1 .pod-who .pod-stack .avatar { width: 44px; height: 44px; }
+  .pod-stack { padding-left: 12px; }
+  .pod-name { font-size: 13px; }
+  .pod.p1 .pod-name { font-size: 14px; }
+  .pod.p1 .pod-step { height: 108px; }
+  .pod.p1 .pod-step b { font-size: 36px; }
+  .pod.p2 .pod-step { height: 80px; }
+  .pod.p3 .pod-step { height: 62px; }
+  .pod-step b { font-size: 26px; }
+  .pod-step small { font-size: 10px; }
+  .pp-fire.pod-fire { width: 140px; height: 118px; bottom: calc(100% - 78px); }
+}
+/* The shared-place dialog: one row per player in that place. */
+.pod-list { display: flex; flex-direction: column; }
+.pod-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; min-height: 56px; padding: 8px; border: 0; border-radius: var(--r-sm); background: transparent; color: inherit; font: inherit; text-align: left; }
+.pod-row + .pod-row { box-shadow: 0 -1px 0 var(--border); }
+button.pod-row { cursor: pointer; }
+button.pod-row:hover { background: var(--elev); }
+.pod-row .avatar { width: 40px; height: 40px; }
+.pod-row b { overflow-wrap: anywhere; }
+.pod-row .pr-rec { display: flex; gap: 12px; font-size: 13px; color: var(--fg2); font-variant-numeric: tabular-nums; text-align: right; }
+.pod-row .pr-rec b { color: var(--fg); }
+@media (max-width: 420px) { .pod-row { grid-template-columns: 40px minmax(0, 1fr); } .pod-row .pr-rec { grid-column: 2; text-align: left; } }
+/* Q-LEADERBOARDS: the top 50 under the podium, like the ROTRA Player leaderboard (.lb-row there; tb- here, since .lb-* is taken). */
+.tb-list { display: flex; flex-direction: column; }
+.tb-head, .tb-row { display: grid; grid-template-columns: 56px 30px 36px minmax(0, 1fr) minmax(0, auto); gap: 12px; align-items: center; padding: 8px 12px; }
+.tb-head { font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--fg2); border-bottom: 1px solid var(--border); padding-block: 6px; }
+.tb-head span:first-child, .tb-head span:last-child { text-align: right; }
+.tb-row { width: 100%; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; border-radius: var(--r-sm); min-height: 56px; }
+.tb-row + .tb-row { box-shadow: 0 -1px 0 var(--border); }
+button.tb-row { cursor: pointer; }
+button.tb-row:hover { background: var(--elev); }
+.tb-pos { font-family: var(--mono); font-weight: 600; font-size: 15px; color: var(--fg2); text-align: right; font-variant-numeric: tabular-nums; }
+.tb-name { min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; row-gap: 2px; }
+.tb-name b { font-weight: 700; overflow-wrap: anywhere; }
+.tb-wins { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; text-align: right; }
+.tb-wins b { font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; }
+.tb-wins span { font-size: 12px; color: var(--fg2); }
+.tb-move { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 2px; min-width: 30px; height: 24px; font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--fg2); }
+.tb-move svg { width: 10px; height: 10px; flex: none; }
+.tb-move.up { color: var(--accent); } .tb-move.down { color: var(--error); }
+.tb-move.new { font-family: inherit; font-size: 10px; letter-spacing: .4px; text-transform: uppercase; color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent); background: var(--warn-subtle); border-radius: 999px; padding: 0 6px; height: 20px; }
+.tb-move[data-tip]::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-30%); z-index: 5; width: max-content; max-width: 240px; padding: 6px 10px; border-radius: var(--r-sm); background: var(--fg); color: var(--bg); font: 600 12px/1.35 var(--font); letter-spacing: 0; text-transform: none; white-space: normal; opacity: 0; pointer-events: none; transition: opacity .12s; }
+.tb-row:hover .tb-move[data-tip]::after, .tb-row:focus-visible .tb-move[data-tip]::after, .tb-move[data-tip]:hover::after { opacity: 1; }
+.tb-tabs { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+@media (max-width: 560px) {
+  .tb-head { display: none; }
+  .tb-row { grid-template-columns: 34px 30px 36px minmax(0, 1fr); column-gap: 8px; row-gap: 0; padding-inline: 8px; }
+  .tb-wins { grid-column: 4; flex-direction: row; align-items: baseline; gap: 6px; text-align: left; }
+  .tb-wins b { font-size: 13px; white-space: nowrap; }
+  .tb-row .avatar, .tb-pos, .tb-move { grid-row: span 2; }
+  .tb-move[data-tip]::after { transform: translateX(-12%); }
+}
 .pub-hm { display: flex; flex-direction: column; gap: 8px; }
 .gm { display: flex; flex-direction: column; gap: 6px; }
 .gm + .gm { margin-top: 4px; }
@@ -2851,6 +2971,8 @@ const I = {
   n_gear: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
   n_card: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>',
   n_device: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>',
+  // Owner, November 25, 2026 (D-2026-11-25-04): the Leaderboards nav item.
+  n_trophy: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>',
   // Preparation header actions (owner request, November 10, 2026).
   edit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/></svg>',
   link: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>',
@@ -3237,12 +3359,12 @@ function mobileDock() {
 }
 function navRail() {
   const live = S.sessions.find((x) => x.status === 'active');
-  const here = S.screen === 'home' ? 'dash' : S.screen === 'players' ? 'players' : S.screen === 'venues' ? 'venues' : S.screen === 'inventory' ? 'inventory'
+  const here = S.screen === 'home' ? 'dash' : S.screen === 'players' ? 'players' : S.screen === 'leaderboards' ? 'leaderboards' : S.screen === 'venues' ? 'venues' : S.screen === 'inventory' ? 'inventory'
     : S.screen === 'club' ? (S.ui.clubTab === 'license' || S.ui.clubTab === 'payments' ? 'license' : S.ui.clubTab === 'device' ? 'device' : 'club') : S.screen === 'console' ? 'live' : '';
   const count = { players: saved().length, venues: (S.venues || []).length, inventory: S.inventory.length };
   const items = [
     live && ['live', 'Live session', I.n_live, 'go', 'console', live.id],
-    ['dash', 'Dashboard', I.n_home, 'go', 'home'], ['players', 'Saved players', I.n_users, 'go', 'players'], ['venues', 'Venues', I.n_pin, 'go', 'venues'],
+    ['dash', 'Dashboard', I.n_home, 'go', 'home'], ['players', 'Saved players', I.n_users, 'go', 'players'], ['leaderboards', 'Leaderboards', I.n_trophy, 'go', 'leaderboards'], ['venues', 'Venues', I.n_pin, 'go', 'venues'],
     ['inventory', 'Inventory', I.n_box, 'openInventory', ''], ['club', 'Club settings', I.n_gear, 'goClub', 'club'], ['license', 'License', I.n_card, 'goClub', 'club'], ['device', 'This device', I.n_device, 'goClub', 'club'],
   ].filter(Boolean);
   return `<nav class="rail" id="app-nav" aria-label="Club navigation">
@@ -3441,6 +3563,118 @@ function postValues(s) {
 // A saved template without {{ join_link }} still ends with the join line (#730, proposed).
 const fillPost = (tpl, s) => { const v = postValues(s); const out = tpl.replace(/\{\{\s*(\w+)\s*\}\}/g, (m, k) => (k in v ? v[k] : m)); return /\{\{\s*join_link\s*\}\}/.test(tpl) ? out : `${out.replace(/\s+$/, '')}\n\n${v.join_link}`; };
 const postSample = () => cur() && !['invalid', 'finalized', 'cancelled'].includes(cur().status) ? cur() : S.sessions.filter((x) => x.status === 'prepared' || x.status === 'active').sort((a, b) => a.start - b.start)[0] || S.sessions[0];
+
+// ---------- Q-LEADERBOARDS (D-2026-11-25-04) ----------
+// Owner, November 25, 2026: a Leaderboards page in the left nav with two boards, Club (standard-match wins in this club's sessions)
+// and ROTRA (across every club), each with Top annual, Top quarterly, Top monthly and Top weekly, like the ROTRA Player leaderboard:
+// the period dates, "compared with last …", the podium, then the top 50 with movement marks. Periods are calendar periods in Manila
+// time (a quarter is a calendar quarter; a week runs Monday to Sunday). Same wins and the same win rate share a place, numbered
+// without gaps (1, 1, 2). The prototype makes the numbers up from each player's ID (like the Player mockup's periodList), and pins a
+// few shared places so the stacked podium and its dialog always show somewhere. Other clubs' players are made up too; only this
+// club's players open a profile.
+const QLB_PERIODS = [['year', 'Top annual'], ['quarter', 'Top quarterly'], ['month', 'Top monthly'], ['week', 'Top weekly']];
+const QLB_WORDS = { year: ['this year', 'last year'], quarter: ['this quarter', 'last quarter'], month: ['this month', 'last month'], week: ['this week', 'last week'] };
+const QLB_TOP = 50;
+const QLB_TOPWINS = { club: { year: 64, quarter: 22, month: 9, week: 4 }, rotra: { year: 140, quarter: 44, month: 16, week: 6 } };
+// [row index, players] pinned to share one place, per board and period (prototype only).
+const QLB_TIES = { 'club|month': [[1, 2]], 'club|week': [[0, 2], [3, 3]], 'rotra|quarter': [[2, 2]], 'rotra|week': [[0, 4]] };
+const QLB_CLUBS = ['Mandaue Shuttlers', 'Lapu-Lapu Smash', 'Talisay Drop Shot', 'Manila Net Kings', 'Davao Rally Club', 'Iloilo Feathers'];
+const QLB_FIRST = ['Aldo', 'Bianca', 'Cris', 'Dette', 'Eli', 'Faye', 'Gino', 'Hana', 'Ivan', 'Jessa', 'Kurt', 'Lara', 'Mon', 'Nica'];
+const QLB_LAST = ['Abad', 'Bello', 'Cortez', 'Diaz', 'Estrada', 'Flores', 'Gomez', 'Herrera', 'Ibarra', 'Jimenez', 'Luna', 'Mendoza', 'Pascual', 'Quino', 'Reyes'];
+let qlbOthersList = null;
+const qlbOthers = () => qlbOthersList || (qlbOthersList = Array.from({ length: 70 }, (_, i) => ({ p: { id: `xo${i}`, name: `${QLB_FIRST[i % 14]} ${QLB_LAST[(i * 7 + 3) % 15]}`, identity: 'registered', pic: { kind: 'char', seed: i % 6 } }, club: QLB_CLUBS[i % QLB_CLUBS.length], mine: false })));
+// Another club's player has no profile here, so their picture is a plain picture (no full-photo tap).
+const qlbFace = (x) => (x.mine ? avatar(x.p) : avatar(x.p).replace(/ data-photo="[^"]*"/, ''));
+// Today in Manila, as a local date (the prototype formats it on this device).
+const manilaToday = () => { const v = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(new Date()).map((x) => [x.type, x.value])); return new Date(+v.year, +v.month - 1, +v.day); };
+function qlbWhen(k) {
+  const d = manilaToday(), y = d.getFullYear(), f = (x) => x.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+  if (k === 'year') return String(y);
+  if (k === 'quarter') { const q = Math.floor(d.getMonth() / 3); return `Q${q + 1} ${y} · ${f(new Date(y, q * 3, 1))} to ${f(new Date(y, q * 3 + 3, 0))}`; }
+  if (k === 'month') return d.toLocaleDateString('en', { month: 'long', year: 'numeric' });
+  const m = new Date(d); m.setDate(d.getDate() - ((d.getDay() + 6) % 7)); const e = new Date(m); e.setDate(m.getDate() + 6);
+  return `${f(m)} to ${f(e)}`;
+}
+const qlbCache = {};
+// The board's rows, best first: { p, club, mine, w, l, place, prev }. prev is the place in the previous period; null = New.
+function qlbRows(b, k) {
+  const mine = saved().map((p) => ({ p, club: S.club.name, mine: true }));
+  const pool = b === 'rotra' ? [...mine.filter((x) => onRotra(x.p)), ...qlbOthers()] : mine;
+  const key = `${b}|${k}|${pool.map((x) => x.p.id).join(',')}`;
+  if (qlbCache[key]) return qlbCache[key];
+  const top = QLB_TOPWINS[b][k];
+  const rate = (x) => x.w / (x.w + x.l);
+  const order = (a, c) => c.w - a.w || rate(c) - rate(a) || a.p.name.localeCompare(c.p.name);
+  const rows = pool.map((x) => {
+    const h = hashStr(`qlb-${b}-${k}-${x.p.id}`), r = (h % 1000) / 1000, r2 = ((h >>> 10) % 1000) / 1000;
+    const skill = x.p.sugg != null ? Math.min(1, x.p.sugg / 25) : 0.15 + 0.45 * (((h >>> 20) % 100) / 100);
+    const w = Math.round(top * (0.15 + 0.85 * skill) * (0.25 + 0.75 * r));
+    return { ...x, w, l: Math.round(w * (0.25 + 0.6 * r2)) + ((h >>> 6) % 2), h };
+  }).filter((x) => x.w > 0).sort(order);
+  (QLB_TIES[`${b}|${k}`] || []).forEach(([at, n]) => { for (let j = 1; j < n && rows[at + j]; j++) { rows[at + j].w = rows[at].w; rows[at + j].l = rows[at].l; } });
+  rows.sort(order);
+  rows.forEach((x, i) => {
+    const prev = rows[i - 1];
+    x.place = !prev ? 1 : prev.w === x.w && prev.l === x.l ? prev.place : prev.place + 1;
+    const roll = (x.h >>> 4) % 100, step = 1 + ((x.h >>> 16) % (x.place < 10 ? 3 : 9));
+    x.prev = roll < 12 ? null : roll < 34 ? x.place : roll < 68 ? x.place + step : Math.max(1, x.place - step);
+  });
+  // The top 50, plus anyone sharing the 50th player's place (same rule as the Player app).
+  qlbCache[key] = rows.filter((x, i) => i < QLB_TOP || (rows[QLB_TOP - 1] && x.place === rows[QLB_TOP - 1].place));
+  return qlbCache[key];
+}
+const QLB_ARROW = { up: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1 9.5 8.5H.5z" fill="currentColor"/></svg>', down: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 9 .5 1.5h9z" fill="currentColor"/></svg>' };
+// [class, mark, words], as the Player leaderboard: the words are the tooltip and are read out with the row.
+function qlbMove(x, k) {
+  const last = QLB_WORDS[k][1], name = QLB_PERIODS.find(([p]) => p === k)[1].replace('Top ', '');
+  if (x.prev === null) return ['new', 'New', `New on the ${name} list. Not on it ${last}.`];
+  const d = x.prev - x.place;
+  if (!d) return ['same', '–', `Same place as ${last}: #${x.place}.`];
+  return d > 0 ? ['up', `${QLB_ARROW.up}${d}`, `Up ${d} ${d === 1 ? 'place' : 'places'}. Was #${x.prev} ${last}.`] : ['down', `${QLB_ARROW.down}${-d}`, `Down ${-d} ${d === -1 ? 'place' : 'places'}. Was #${x.prev} ${last}.`];
+}
+function qlbRow(x, b, k) {
+  const [cls, mark, words] = qlbMove(x, k), club = b === 'rotra' ? x.club : '', wins = `${x.w} ${x.w === 1 ? 'win' : 'wins'}`;
+  const inner = `<span class="tb-pos">${x.place}</span><span class="tb-move ${cls}" data-tip="${esc(words)}" title="${esc(words)}">${mark}</span>${qlbFace(x)}
+    <span class="tb-name"><b>${esc(x.p.name)}</b>${club ? `<span class="small muted">${esc(club)}</span>` : ''}</span><span class="tb-wins"><b>${wins}</b><span>${winPct(x.w, x.l)}% win rate</span></span>`;
+  return x.mine ? `<button type="button" class="tb-row" data-act="openProfile" data-id="${esc(x.p.id)}" data-back="1" aria-label="Number ${x.place}, ${esc(x.p.name)}${club ? `, ${esc(club)}` : ''}, ${wins}, ${winPct(x.w, x.l)}% win rate. ${esc(words)}">${inner}</button>`
+    : `<div class="tb-row">${inner}</div>`;
+}
+function viewLeaderboards() {
+  if (S.licenseExpired) return viewAccess();
+  const b = S.ui.qlbB === 'rotra' ? 'rotra' : 'club', k = QLB_PERIODS.some(([x]) => x === S.ui.qlbP) ? S.ui.qlbP : 'year';
+  const [now, last] = QLB_WORDS[k], label = QLB_PERIODS.find(([x]) => x === k)[1], rows = qlbRows(b, k);
+  const places = [1, 2, 3].map((pos) => ({ pos, rows: rows.filter((x) => x.place === pos) })).filter((pl) => pl.rows.length);
+  // The podium holds places 1–3, so the list carries on from place 4.
+  const list = rows.filter((x) => x.place > 3);
+  const pod = podiumHtml({
+    id: 'pod-board', sub: `${label} · ${esc(qlbWhen(k))} · top ${QLB_TOP}`, places,
+    stat: (x) => `${x.w} ${x.w === 1 ? 'win' : 'wins'}`,
+    statWords: (x) => `${x.w} ${x.w === 1 ? 'win' : 'wins'}, ${winPct(x.w, x.l)}% win rate`,
+    face: (x) => qlbFace(x),
+    open: (x) => (x.mine ? podProfileAttrs(x.p, false) : ''),
+    openPlace: (pl) => `data-act="openPodiumPlace" data-src="board" data-b="${b}" data-k="${k}" data-pos="${pl.pos}"`,
+  });
+  return `<main class="wrap">
+    <div><h1>Leaderboards</h1><p class="small muted">${b === 'club' ? `The top ${QLB_TOP} in ${esc(S.club.name)}'s sessions` : `The top ${QLB_TOP} across every club on ROTRA`}. Most wins in standard matches ${now} comes first. Singles and doubles count together.</p></div>
+    <div class="tabs" role="tablist" aria-label="Leaderboards">${[['club', 'Club'], ['rotra', 'ROTRA']].map(([x, l]) => `<button role="tab" id="qlb-${x}" aria-selected="${b === x}" aria-controls="qlb-panel" data-act="qlbBoard" data-v="${x}">${l}</button>`).join('')}</div>
+    <div class="stack" id="qlb-panel" role="tabpanel" aria-labelledby="qlb-${b}" style="gap:20px">
+      <div class="tb-tabs"><div class="seg" role="group" aria-label="Leaderboard period">${QLB_PERIODS.map(([x, l]) => `<button type="button" aria-pressed="${k === x}" data-act="qlbPeriod" data-v="${x}">${l}</button>`).join('')}</div><span class="small muted">${esc(qlbWhen(k))} · compared with ${last}</span></div>
+      ${pod}
+      <section class="card stack">${!rows.length ? `<div class="empty">No one has won a standard match ${now} yet. The list fills as ${b === 'club' ? 'your sessions finish' : 'clubs finish sessions'}.</div>`
+        : list.length ? `<div class="tb-list"><div class="tb-head" aria-hidden="true"><span>#</span><span></span><span></span><span>Player</span><span>Wins</span></div>${list.map((x) => qlbRow(x, b, k)).join('')}</div>`
+        : '<p class="small muted">Everyone on this list is on the podium.</p>'}</section>
+      <section class="card stack tight"><h2>Who appears here</h2>
+        <ul class="small muted" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+          <li><b style="color:var(--fg)">Club</b> counts wins in your club's sessions only. <b style="color:var(--fg)">ROTRA</b> counts them across every club.</li>
+          <li>Top annual, Top quarterly, Top monthly and Top weekly each list the ${QLB_TOP} players with the most wins in standard matches in that year, calendar quarter, month or week (Monday to Sunday), in Manila time. Each list starts again when a new period begins.</li>
+          <li>Players with the same wins and the same win rate share a place. Tap a shared place on the podium to see who is in it.</li>
+          <li>Fun games, partial games after a substitution, games from not-ranked sessions, and invalid games or sessions don't count.</li>
+          <li>The mark beside a place shows the move since the period before: up, down, or <b style="color:var(--fg)">New</b> when the player wasn't on that list then.</li>
+          ${b === 'rotra' ? '<li>Players from other clubs show their club. Only your club\'s players open a profile here.</li>' : ''}
+        </ul></section>
+    </div>
+  </main>`;
+}
 
 // ---------- Venues ----------
 function viewVenues() {
@@ -3892,6 +4126,7 @@ function histResultsPane(s, { invalid, played }) {
   if (invalid) return notice('bad', `<b>This session has no official result.</b> ${esc(s.invalidReason || '')} It doesn't count toward player records or rankings, and there are no standings or result slides. Its partial records aren't shown as match history.`);
   const st = standings(s);
   return `${recordedOf(s) ? '' : notice('', NOT_RANKED)}<div class="between"><h2>Standings</h2><div class="row">${st.length ? `<button class="btn sm" data-act="shareBoard" data-sid="${esc(s.id)}">${I.share} Share leaderboard</button>` : ''}<button class="btn sm" data-act="go" data-to="results">Result slides</button><button class="btn sm" data-act="openExport">Download images</button></div></div>
+    ${sessionPodium(s, 'record')}
     ${st.length ? `<div class="card lb-wrap"><table class="lb"><thead><tr><th class="n">#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">Games</th></tr></thead><tbody>
       ${standGroups(st).map((g) => { const ps = g.rows.map((r) => P(r.pid)); return `<tr class="${g.pos <= 3 ? 'top' : ''}"><td class="n tnum"><span class="rank r${g.pos}">${g.pos}</span></td><td><div class="lb-p${ps.length > 1 ? ' tied' : ''}"><span class="lb-stack">${ps.map(faceBtn).join('')}</span><b>${tiedNames(ps.map((p) => p.name))}</b></div></td><td class="n tnum"><b>${g.w}</b></td><td class="n tnum">${g.l}</td><td class="n tnum">${groupGames(g)}</td></tr>`; }).join('')}
     </tbody></table></div>` : '<div class="card empty">No counted games were recorded in this session.</div>'}`;
@@ -5751,6 +5986,7 @@ function playersPane(s) {
 function boardPane(s) {
   const st = standings(s);
   return `${recordedOf(s) ? '' : notice('', NOT_RANKED)}<div><h2>Leaderboard</h2><p class="small muted">Tonight's standings from completed games: most wins, then fewest losses. Players with the same wins and losses share a position. It updates each time you confirm a result. Partial and invalid games don't count, unless you gave a substitute the game.</p></div>
+    ${sessionPodium(s, 'console')}
     ${st.length ? `<div class="card lb-wrap"><table class="lb"><thead><tr><th class="n">#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">Games</th><th class="n">Win %</th></tr></thead><tbody>
       ${standGroups(st).map((g) => { const ps = g.rows.map((r) => P(r.pid)), lvs = [...new Set(g.rows.map((r) => { const lv = R(s, r.pid); return lvLabel(lv ? lv.level : null); }))]; return `<tr class="${g.pos <= 3 ? 'top' : ''}"><td class="n tnum"><span class="rank r${g.pos}">${g.pos}</span></td>
         <td><div class="lb-p${ps.length > 1 ? ' tied' : ''}"><span class="lb-stack">${ps.map((p) => { const r = R(s, p.id); return faceBtn(p).replace('class="face-btn"', `class="face-btn lv-ring lv-${r ? rvBand(r) : 'none'}"`); }).join('')}</span><div style="min-width:0"><b>${tiedNames(ps.map((p) => p.name))}</b><div class="small muted">${esc(lvs.join(', '))}</div></div></div></td>
@@ -5812,6 +6048,69 @@ const standGroups = (st) => st.reduce((out, r) => { const g = out[out.length - 1
 // Counted games can differ inside a shared position (a games adjustment adds no result): then the cell shows the range.
 const groupGames = (g) => { const a = g.rows.map((r) => r.g), lo = Math.min(...a), hi = Math.max(...a); return lo === hi ? `${lo}` : `${lo}–${hi}`; };
 const tiedNames = (names) => names.map((n) => esc(n)).join(', ');
+// ---------- Podium (D-2026-11-25-04) ----------
+// Owner, November 25, 2026: "a leaderboard in the queue page should look like this too" (the ROTRA Player podium), "I want the
+// leaderboards to always show the PODIUM", "multiple people can be in the podium per place as long as it is stacked" and "if
+// multiple people are in a place of the podium. clickin it should open a dialog on who's in that place". One podium function for
+// every leaderboard in the app, so the session views and the Leaderboards page match. 1st in the middle on the tallest step with
+// pixel fire behind it, 2nd left, 3rd right; the DOM stays in 1–2–3 order for screen readers and CSS order places the steps.
+// A place with one player opens that player's profile; a shared place stacks the pictures and opens the Podium place dialog;
+// a place with no one yet keeps its empty step. Names and pictures are never masked on a leaderboard.
+// o: { id, sub, places: [{ pos, rows: [{ p, w, l }] }], stat(row), statWords(row), face(row), open(row) → attrs | '', openPlace(place) → attrs }
+const POD_PLACE = ['First', 'Second', 'Third'], POD_SHORT = ['1st', '2nd', '3rd'];
+function podiumHtml(o) {
+  const embers = Array.from({ length: 14 }, (_, k) => `<i style="left:${4 + ((k * 37) % 92)}%;animation-delay:${((k * 0.73) % 5).toFixed(2)}s;animation-duration:${4 + (k % 4)}s"></i>`).join('');
+  const step = (k) => {
+    const pl = o.places.find((x) => x.pos === k + 1), rows = pl ? pl.rows : [];
+    const block = `<span class="pod-step" aria-hidden="true"><b>${k + 1}</b><small>${POD_SHORT[k]}</small></span>`;
+    if (!rows.length) return `<div class="pod p${k + 1} empty" role="group" aria-label="${POD_PLACE[k]} place, no one yet"><span class="pod-who"><span class="avatar pod-none" aria-hidden="true"></span><b class="pod-name" aria-hidden="true">—</b><span class="pod-lv" aria-hidden="true">&nbsp;</span></span>${block}</div>`;
+    const fire = k === 0 ? `${(setTimeout(ppFireStart), '')}<canvas class="pp-fire pod-fire" width="48" height="40" data-heat="34" aria-hidden="true"></canvas>` : '';
+    const one = rows.length === 1, names = rows.map((r) => r.p.name);
+    // Past three, two pictures and a "+N" bubble keep the stack inside its step on a 375 px phone.
+    const shown = rows.length > 3 ? rows.slice(0, 2) : rows;
+    const faces = one ? o.face(rows[0]) : `<span class="pod-stack">${shown.map((r) => o.face(r)).join('')}${rows.length > 3 ? `<span class="avatar pod-more" aria-hidden="true">+${rows.length - 2}</span>` : ''}</span>`;
+    const tap = one ? o.open(rows[0]) : o.openPlace(pl);
+    const label = one ? `${POD_PLACE[k]} place, ${names[0]}, ${o.statWords(rows[0])}` : `${POD_PLACE[k]} place, shared by ${rows.length} players: ${names.join(', ')}. ${o.statWords(rows[0])} each. Show who`;
+    const inner = `<span class="pod-who">${fire}${faces}${(one ? names : names.slice(0, 2)).map((n) => `<b class="pod-name">${esc(n)}</b>`).join('')}${!one && names.length > 2 ? `<span class="small muted">+${names.length - 2} more</span>` : ''}<span class="pod-lv">${esc(o.stat(rows[0]))}${one ? '' : ' each'}</span></span>${block}`;
+    return tap ? `<button type="button" class="pod p${k + 1}${one ? '' : ' shared'}" ${tap} aria-label="${esc(label)}">${inner}</button>`
+      : `<div class="pod p${k + 1}" role="group" aria-disabled="true" aria-label="${esc(label)}">${inner}</div>`;
+  };
+  return `<section class="podium" aria-labelledby="${o.id}"><span class="embers" aria-hidden="true">${embers}</span>
+    <div class="pod-head"><h2 id="${o.id}">Top three</h2><span class="small muted">${o.sub}</span></div>
+    <div class="pod-stage">${[0, 1, 2].map(step).join('')}</div></section>`;
+}
+// Who a podium face opens: the club's profile sheet for the Queue Master; on the public page, the profile card for a signed-in
+// player (visitors get no tap, as everywhere on that page).
+const podProfileAttrs = (p, pub) => (pub ? (pubSignedIn() ? `data-act="pubProfile" data-id="${esc(p.id)}"` : '') : `data-act="openProfile" data-id="${esc(p.id)}" data-back="1"`);
+const winPct = (w, l) => (w + l ? Math.round((w / (w + l)) * 100) : 0);
+// The session's podium, from the same standings as the table under it (most wins, then fewest losses; same wins and losses share a
+// position). view: 'console' (Leaderboard tab), 'record' (session record › Standings) or 'pub' (public page › Leaderboard).
+function sessionPodium(s, view) {
+  const st = standings(s);
+  return podiumHtml({
+    id: `pod-${view}`, sub: `This session · ${st.length} ${st.length === 1 ? 'player' : 'players'}`,
+    places: standGroups(st).filter((g) => g.pos <= 3).map((g) => ({ pos: g.pos, rows: g.rows.map((r) => ({ p: P(r.pid), w: r.w, l: r.l, g: r.g })) })),
+    stat: (r) => `${r.w} W · ${r.l} L`,
+    statWords: (r) => `${r.w} ${r.w === 1 ? 'win' : 'wins'}, ${r.l} ${r.l === 1 ? 'loss' : 'losses'}`,
+    face: (r) => avatar(r.p),
+    open: (r) => podProfileAttrs(r.p, view === 'pub'),
+    openPlace: (pl) => `data-act="openPodiumPlace" data-src="session" data-sid="${esc(s.id)}" data-view="${view}" data-pos="${pl.pos}"`,
+  });
+}
+// The Podium place dialog's rows: { title, sub, rows: [{ p, w, l, g, club, tap, face }] }.
+function podPlace(sh) {
+  const pos = +sh.pos, place = `${POD_SHORT[pos - 1] || `#${pos}`} place`;
+  if (sh.src === 'session') {
+    const s = S.sessions.find((x) => x.id === sh.sid), g = s && standGroups(standings(s)).find((x) => x.pos === pos);
+    if (!g) return { title: place, sub: '', rows: [] };
+    return { title: `${place} · ${g.rows.length} players`, sub: `Same wins and losses: ${g.w} W and ${g.l} L each.`,
+      rows: g.rows.map((r) => { const p = P(r.pid); return { p, w: r.w, l: r.l, g: r.g, club: '', tap: podProfileAttrs(p, sh.view === 'pub'), face: avatar(p) }; }) };
+  }
+  const rows = qlbRows(sh.b, sh.k).filter((x) => x.place === pos);
+  if (!rows.length) return { title: place, sub: '', rows: [] };
+  return { title: `${place} · ${rows.length} players`, sub: `Same wins and win rate: ${rows[0].w} ${rows[0].w === 1 ? 'win' : 'wins'} and ${winPct(rows[0].w, rows[0].l)}% each ${QLB_WORDS[sh.k][0]}.`,
+    rows: rows.map((x) => ({ p: x.p, w: x.w, l: x.l, g: x.w + x.l, club: sh.b === 'rotra' ? x.club : '', tap: x.mine ? podProfileAttrs(x.p, false) : '', face: qlbFace(x) })) };
+}
 function awards(s) {
   const done = s.matches.filter((m) => m.status === 'done');
   const lv = (p) => (R(s, p) && R(s, p).level != null ? R(s, p).level : 4);
@@ -5962,9 +6261,11 @@ function pubLeaderboard(s, pub) {
       : `<div class="lb-me"><span class="lb-me-av">${avatar(P(me))}</span><div class="lb-pos"><span class="label">Your night</span></div>${rec(mine)}</div>`)
     : '<div class="lb-me"><span class="muted">You didn\'t play a counted game in this session.</span></div>';
   if (!shared) return `<section class="stack" aria-label="Leaderboard">${meCard}<p class="small muted">${pubSignedIn() ? 'The full leaderboard shows once the club shares the results.' : 'Results for this session have not been shared.'}</p></section>`;
-  const row = (g) => { const mineRow = g.rows.some((r) => r.pid === me); return `<tr${mineRow ? ' class="me" id="lb-me-row" aria-current="true"' : ''}><td class="pos tnum">${g.pos}</td><td><span class="lb-who${g.rows.length > 1 ? ' tied' : ''}"><span class="lb-stack">${g.rows.map((r) => pubFace(P(r.pid), 'lb-face', pubNameText(P(r.pid)), pubAvatarOf(P(r.pid)))).join('')}</span><span>${g.rows.map((r) => esc(r.pid === me ? `${pubNameText(P(r.pid))} (you)` : pubNameText(P(r.pid)))).join(', ')}</span></span></td><td class="n">${g.w}</td><td class="n">${g.l}</td><td class="n">${groupGames(g)}</td></tr>`; };
+  // Owner, November 25, 2026 (D-2026-11-25-04): leaderboards always show the full name and picture, so this table no longer masks.
+  const row = (g) => { const mineRow = g.rows.some((r) => r.pid === me); return `<tr${mineRow ? ' class="me" id="lb-me-row" aria-current="true"' : ''}><td class="pos tnum">${g.pos}</td><td><span class="lb-who${g.rows.length > 1 ? ' tied' : ''}"><span class="lb-stack">${g.rows.map((r) => pubFace(P(r.pid), 'lb-face', P(r.pid).name, avatar(P(r.pid)))).join('')}</span><span>${g.rows.map((r) => esc(r.pid === me ? `${P(r.pid).name} (you)` : P(r.pid).name)).join(', ')}</span></span></td><td class="n">${g.w}</td><td class="n">${g.l}</td><td class="n">${groupGames(g)}</td></tr>`; };
   return `<section class="stack" aria-label="Leaderboard">${meCard}
     <div class="between"><span class="small muted">${st.length} players</span><button class="btn sm" data-act="shareBoard" data-sid="${esc(s.id)}">${I.share} Share leaderboard</button></div>
+    ${sessionPodium(s, 'pub')}
     <div class="card lb-card"><table class="st-table lb-table"><thead><tr><th>#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">G</th></tr></thead><tbody>${standGroups(st).map(row).join('')}</tbody></table></div>
     <p class="small muted">Wins first, then fewer losses. Players with the same wins and losses share a position. Counted games only.</p></section>`;
 }
@@ -6372,6 +6673,15 @@ const ppStatsBlock = (games, wins) => { const yr = new Date().getFullYear(), hea
 const statsSec = (st) => ppStatsBlock(st ? st.games : 0, st ? st.wins : 0);
 const pubStats = (p) => { if (!p.prior || p.base == null) return null; const games = p.prior * 5 + (hashStr(p.id) % 6); const wins = Math.round(games * p.base); return { games, wins, rate: Math.round((wins / games) * 100) }; };
 const SHEETS = {
+  // D-2026-11-25-04: a shared podium place lists who is in it. A row opens that player's profile like a face does elsewhere
+  // (none for a visitor on the public page, or for another club's player on the ROTRA board).
+  podiumPlace(sh) {
+    const pl = podPlace(sh);
+    const row = (x) => { const tag = x.tap ? 'button' : 'div';
+      return `<${tag} ${x.tap ? `type="button" ${x.tap}` : ''} class="pod-row" aria-label="${esc(`${x.p.name}${x.club ? `, ${x.club}` : ''}: ${x.w} won, ${x.l} lost, ${x.g} games, ${winPct(x.w, x.l)}% win rate${x.tap ? '. View profile' : ''}`)}">${x.face}<span style="min-width:0"><b>${esc(x.p.name)}</b>${x.club ? `<br><span class="small muted">${esc(x.club)}</span>` : ''}</span><span class="pr-rec" aria-hidden="true"><span><b>${x.w}</b> W</span><span><b>${x.l}</b> L</span><span><b>${x.g}</b> games</span><span><b>${winPct(x.w, x.l)}%</b> win rate</span></span></${tag}>`; };
+    return sheetShell(esc(pl.title), `${pl.sub ? `<p class="small muted">${esc(pl.sub)}</p>` : ''}${pl.rows.length ? `<div class="pod-list">${pl.rows.map(row).join('')}</div>` : '<div class="empty">No one is in this place now.</div>'}`,
+      '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+  },
   signOut() {
     const live = S.sessions.find((x) => x.status === 'active');
     const notes = [
@@ -6764,7 +7074,7 @@ const SHEETS = {
       <p class="small muted" style="margin:0">${p.identity === 'registered' ? 'Levels are set per session while preparing a roster, not here.' : 'Change their level for this club in Edit details. Each session can still set its own.'}</p>
         </div>
       </div>`,
-      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ sessionGames: 'games', suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${p.identity === 'registered' && !sh.back ? `<button class="btn" data-act="openClubNick" data-id="${p.id}">Club nickname</button>` : ''}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`, false, 'pp-sheet');
+      `${sh.back ? `<button class="btn" data-act="profileBack">Back to ${{ podiumPlace: 'place', sessionGames: 'games', suggest: 'suggestion', payments: 'payments', dispatch: 'match', match: 'match', onCourt: 'match', invalid: 'match' }[sh.back.type] || 'previous'}</button>` : '<button class="btn" data-act="closeSheet">Close</button>'}${sh.back ? '' : `<button class="btn danger" data-act="deletePlayer" data-id="${p.id}">Delete player</button>`}${p.identity === 'registered' && !sh.back ? `<button class="btn" data-act="openClubNick" data-id="${p.id}">Club nickname</button>` : ''}${canInvite(p) ? `<button class="btn" data-act="openEditPlayer" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="openInvite" data-id="${p.id}">Invite</button>` : ''}`, false, 'pp-sheet');
   },
   // #739 (proposed): add a bagging pair. A player can be in one pair; picking one who is already paired offers to replace that pair.
   bagAdd(sh) {
@@ -7698,6 +8008,10 @@ function go(to, id) {
 }
 const ACT = {
   go: (d) => go(d.to, d.id),
+  // D-2026-11-25-04: the podium's shared-place dialog, and the Leaderboards page's board and period tabs.
+  openPodiumPlace: (d) => openSheet({ type: 'podiumPlace', src: d.src, sid: d.sid, view: d.view, b: d.b, k: d.k, pos: +d.pos }),
+  qlbBoard: (d) => { S.ui.qlbB = d.v === 'rotra' ? 'rotra' : 'club'; render(); },
+  qlbPeriod: (d) => { S.ui.qlbP = QLB_PERIODS.some(([k]) => k === d.v) ? d.v : 'year'; render(); },
   lvMenuToggle: (d) => { S.ui.lvOpen = S.ui.lvOpen === d.pid ? null : d.pid; render(); },
   lvMenuPick: (d) => { flushPresence(); const s = cur(); const r = R(s, d.pid); r.level = +d.v; S.ui.lvOpen = null; commit(`${short(d.pid)}: ${lvLabel(r.level)}`); render(); document.getElementById(`lv-${d.pid}`)?.focus(); },
   openPublicTab: (d) => { const s = S.sessions.find((x) => x.id === d.id); if (!s) return; if (/^\/queue(\/|$)/.test(location.pathname)) { window.open(publicPageUrl(s), '_blank', 'noopener'); return; } S.currentId = s.id; go('public'); toast('In the app, this opens the public page in a new tab'); },
@@ -9566,7 +9880,7 @@ window.addEventListener('resize', () => {
 
 // ---------- Prototype routes (same paths as apps/queue, under /queue) ----------
 let prototypeRouter;
-const queuePaths = { home: '', login: '/login', venues: '/venues', inventory: '/inventory', players: '/saved-players' };
+const queuePaths = { home: '', login: '/login', venues: '/venues', inventory: '/inventory', players: '/saved-players', leaderboards: '/leaderboards' };
 const settingsSlugs = { identity: 'club-identity', invite: 'invite', defaults: 'session-defaults', hosts: 'trusted-hosts', post: 'facebook-post', license: 'license', payments: 'license', device: 'this-device', account: 'account' };
 const sessionSuffixes = { prepare: '/preparation', console: '', history: '/record', finalizing: '/finishing', results: '/results' };
 function prototypePath() {
@@ -9579,6 +9893,7 @@ function prototypePath() {
   if (S.screen === 'console') tab = ['queue', 'generate', 'roster', 'board', 'history', 'settings'].includes(S.ui.pane) ? S.ui.pane : null;
   if (S.screen === 'history') tab = S.ui.histTab && S.ui.histTab !== 'results' ? S.ui.histTab : null;
   if (S.screen === 'results') tab = S.ui.slide ? String(S.ui.slide) : null;
+  if (S.screen === 'leaderboards') tab = S.ui.qlbB === 'rotra' ? 'rotra' : null;
   if (S.screen === 'public') { path = S.ui.guest ? `/s/${encodeURIComponent(S.currentId)}` : `/sessions/${encodeURIComponent(S.currentId)}/public-page`; tab = S.ui.pubTab === 'participants' ? 'participants' : null; }
   // #1012: a transfer link's token stays on the session page's address.
   const q = new URLSearchParams(); if (tab) q.set('tab', tab); if (S.screen === 'public' && S.ui.guest && S.ui.trLink) q.set('transfer', S.ui.trLink);
@@ -9624,6 +9939,7 @@ function applyPrototypeRoute(url) {
   S.ui.histTab = HIST_TABS.some(([key]) => key === tab) ? tab : 'results';
   S.ui.slide = ['1', '2'].includes(tab) ? Number(tab) : 0;
   S.ui.pubTab = tab === 'participants' ? tab : 'details';
+  if (screen === 'leaderboards') S.ui.qlbB = tab === 'rotra' ? 'rotra' : 'club';
   return true;
 }
 
@@ -9662,7 +9978,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let selStart = null;
   try { selStart = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { selStart = null; }
-  const views = { login: viewLogin, home: viewHome, venues: viewVenues, club: viewClub, inventory: viewInventory, history: viewHistory, players: viewPlayers, setup: viewSetup, prepare: viewPrepare, console: viewConsole, finalizing: viewFinalizing, results: viewResults, public: viewPublic };
+  const views = { login: viewLogin, home: viewHome, venues: viewVenues, club: viewClub, inventory: viewInventory, history: viewHistory, players: viewPlayers, leaderboards: viewLeaderboards, setup: viewSetup, prepare: viewPrepare, console: viewConsole, finalizing: viewFinalizing, results: viewResults, public: viewPublic };
   const sh = S.ui.sheet;
   const page = (views[S.screen] || viewHome)();
   const html = topBar() + (hasShell() ? `<div class="shell ${navMin ? 'rail-min' : ''} ${S.ui.navOpen ? 'nav-open' : ''}">${navRail()}<div class="nav-scrim" data-act="toggleNav" aria-hidden="true"></div><div class="shell-main">${page}</div>${mobileDock()}</div>` : page) + (S.screen === 'setup' ? setupCourtDialog : '') + (sh ? SHEETS[sh.type](sh) : '');

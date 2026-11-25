@@ -1,6 +1,6 @@
 # Leaderboards, rank explanation, and game history
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-25 for P-LEADERBOARD and P-ELIGIBILITY (four periods, shared places, podium, full names; [D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Surfaces:** `P-LEADERBOARD`, `P-RANK-DETAIL`, `P-ELIGIBILITY`, `P-MATCH-HISTORY`.
 
@@ -8,54 +8,89 @@
 
 ## P-LEADERBOARD — ROTRA leaderboards
 
-Public without sign-in. **Top annual** is the default. The **Top annual · Top monthly · Top weekly**
-switch sits below the page title with the period and comparison, e.g. “2026 · compared with last
-year”, “November 2026 · compared with last month” or “Nov 16 to Nov 22 · compared with last week”.
-Labels use the calendar in Asia/Manila. [Decision](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-05) ·
-[Prototype change](../../../../mockup-changes/2026-11-16-player-leaderboard-periods.md).
+Public without sign-in. **Top annual** is the default. The **Top annual · Top quarterly · Top monthly
+· Top weekly** switch sits below the page title with the period and comparison, e.g. “2026 · compared
+with last year”, “Oct to Dec 2026 · compared with last quarter”, “November 2026 · compared with last
+month” or “Nov 16 to Nov 22 · compared with last week”. Labels use the calendar in Asia/Manila.
+[Decision](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-05) ·
+[four periods, shared places, podium, full names](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04) ·
+[Prototype change](../../../../mockup-changes/2026-11-16-player-leaderboard-periods.md) ·
+[November 25 change](../../../../mockup-changes/2026-11-25-player-leaderboard-podium.md).
 
 The selected period drives the podium, **Your position** card, search and list. Each row shows the
-place, movement mark, picture, name and “N wins”. On a phone, wins sit under the name. The heading
-reads # · Player · Wins. The podium replaces rows 1–3 when there are at least three players and no
-name search. When all 50 places are filled, the footer starts at “Showing 1–25 of the top 50” with
-**Show 25 more**. A shorter list gives its actual number of places. Name search covers all publicly
-readable names and nicknames in the selected top 50 and retains each hit's place. No hits reads `No one
-in the top 50 matches “name”.` Entering a full RTR ID can open a profile outside the top 50.
+place, movement mark, picture, full name, nickname and “N wins”. On a phone, wins sit under the name.
+The heading reads # · Player · Wins.
 
-Movement compares places with the previous calendar period. The mark is an up arrow with the number
-of places, a down arrow with the number, a dash for no move or **New** for a player with no place in
-the prior top 50. Pointing at the mark or focusing the row shows the earlier place where available.
-The same words are included in the row's accessible name.
+**Shared places.** Players with the same wins and the same win rate share a place, and the next place
+follows on without a gap (1, 1, 2). Rows inside a shared place are ordered by nickname (full name when
+none), then ID. A shared row's accessible name says “shared”.
 
-A signed-in player in the selected top 50 sees “Your position this month”, their place and wins,
-the movement sentence, and **Show my row**. A player with qualifying matches below place 50 sees
-“You're not in the top 50 this year” with their wins and place 50's wins. The card mentions a better
-win rate only if it decided the tie. A player with no qualifying matches sees “You haven't played a
-standard match this week yet” (with the selected period) and **Open my profile**. A profile link can
-select the period and focus and flash the player's row using `/?period=month&player=<id>`, loading
-the second page when needed.
+**Podium (always shown).** The **Top three** podium (2nd, 1st, 3rd steps) is always shown once the
+list has loaded: with fewer than three places, a place no one holds keeps its step with an empty
+dashed circle and **No one yet**; with an empty list, all three steps are empty above the empty
+message. It also stays during a name search. A place one player holds shows their picture, full name,
+nickname and “N wins” and opens the profile dialog. A place several players share stacks their
+pictures on the step (two or three overlapping, or two and a **+N** circle), lists the first two full
+names with “+N more” and “N wins each”, and opens the **shared place dialog**. The podium holds every
+player in places 1 to 3, so the list starts at place 4. When all of the top 50 are on the podium the
+list reads “Everyone on this list so far is on the podium.”
 
-A row or podium place opens the profile dialog. For visitors, a **Private** player's name is masked
-(“Jose Adrian” → “J*** A***”), their picture shows the mask's initials, the place is unavailable as
-a button and the name cannot be found by search. A private RTR ID shows the same “Profile not found”
-as an unknown ID. **Always private** players keep their public picture and banner, with a masked
-name and only the private dialog available to other viewers. Their own row is shown in full.
-[Private visibility](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-07) ·
+**Shared place dialog.** Title “1st place · 4 players”; a line “ROTRA · Top weekly · Nov 23 to Nov
+29. The same wins and the same win rate, so they share this place.”; one row per player in the
+place, in the list's order: picture, full name, nickname, **You** or **Not registered yet** chip,
+“N wins” and “N% win rate”. A row opens the profile dialog; a row of a profile the viewer may not open
+does nothing. **Close**.
+
+**List.** When all 50 rows are filled, the footer starts at “Showing 1–25 of the top 50” with **Show
+25 more** (it opens at least the podium and one row after it). The top 50 is the first 50 players
+plus anyone sharing the 50th player's place, so a list can hold a few more than 50. A shorter list
+gives its actual number. Name search covers every name and nickname in the selected top 50 and
+retains each hit's place. No hits reads `No one in the top 50 matches “name”.` Entering a full RTR ID
+can open a profile outside the top 50.
+
+Movement compares places with the previous calendar period (last year, last quarter, last month,
+last week). The mark is an up arrow with the number of places, a down arrow with the number, a dash
+for no move or **New** for a player with no place in the prior top 50. Pointing at the mark or
+focusing the row shows the earlier place where available. The same words are included in the row's
+accessible name.
+
+A signed-in player in the selected top 50 sees “Your position this month”, their place and wins
+(“· shared place” when shared), the movement sentence, and **Show my row**. A player with qualifying
+matches below the top 50 sees “You're not in the top 50 this year” with their wins and “The last
+player in the top 50 has N”, adding “and a better win rate” only when the wins are equal. A player
+with no qualifying matches sees “You're not on the leaderboard yet” and **Open my profile**. A profile
+link can select the period and focus and flash the player's row using
+`/?period=month&player=<id>`, loading the second page when needed.
+
+**Names and pictures** ([D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)):
+every row, podium place and shared place dialog shows the full name, nickname and picture to everyone,
+signed in or not, whatever the player's profile visibility, and the name search finds them. A row
+or podium place opens the profile dialog, except for a profile the viewer may not open (a **Private**
+player for a visitor, an **Always private** player for anyone else): that row or place still shows the
+name and picture but is not a button. A private RTR ID shows the same “Profile not found” as an
+unknown ID. The profile itself keeps its masking. [Private visibility](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-07) ·
 [Always private](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11).
 
 An unclaimed player saved by one club is public and has a **Not registered yet** chip on their
 leaderboard row. Their row opens the profile dialog. A person saved by more than one club joins the
 list after registering. [Unclaimed players](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04).
 
-**Who appears here** explains standard matches, the calendar resets, tie-breaking by win rate,
-excluded matches and sessions, movement marks and unclaimed players. **How ranks work** opens the
-separate skill rank explanation.
+**Who appears here** explains the four lists and standard matches, shared places (“Players with the
+same wins and the same win rate share a place, and the next place follows on (1, 1, 2). Tap a podium
+step that several players share to see them all.”), the calendar resets and the quarters, excluded
+matches and sessions, movement marks, “Every leaderboard shows each player's full name and picture,
+whatever their profile is set to.” and unclaimed players. **How ranks work** opens the separate skill
+rank explanation.
 
-States include loading, an empty period (“No one on the leaderboard has played a standard match
-this week yet.”), fetch failure with **Try again**, refresh in progress and a cached copy while
-offline. Pull down from the top or return to the tab to refresh the selected list, active search and
-signed-in place at most once every 10 seconds. The refresh pill reports the live state.
+States include loading, an empty period (podium with three empty steps, then “No one has won a
+standard match this week yet. The list fills as clubs finish sessions.”), fetch failure with **Try
+again**, refresh in progress and a cached copy while offline. Pull down from the top or return to the
+tab to refresh the selected list, active search and signed-in place at most once every 10 seconds.
+The refresh pill reports the live state.
 [Pull-to-refresh change](../../../../mockup-changes/2026-11-12-player-pull-to-refresh.md).
+
+A club has its own leaderboard with the same parts, on the club page and its leaderboard page: see
+[P-CLUB-PAGE › Leaderboard and P-CLUB-LEADERBOARD](club-page.md#leaderboard-card).
 
 ## P-RANK-DETAIL — Explain the shared rank
 
@@ -79,7 +114,7 @@ three months. After three months without play the old label remains visible with
 reassessment** and the profile explains the fresh club assessment. See [profile states](profile.md#profile-states).
 
 **Leaderboards** appears above the shared rank only when the player places in at least one of the
-three top 50 lists. Each box shows the list name, place and period wins. Opening it selects that
+four ROTRA top 50 lists (annual, quarterly, monthly, weekly; up to four boxes, [D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)). Club places are not shown. Each box shows the list name, place and period wins. Opening it selects that
 period and scrolls to and highlights the player's row. Places follow the calendar leaderboard rules
 independently of the skill rank or its progress.
 

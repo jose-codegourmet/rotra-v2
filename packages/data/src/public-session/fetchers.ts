@@ -15,7 +15,7 @@ import type { Match } from '../match/match.types'
 import { matchLabel } from '../match/matchCategory.rules'
 import { allowedRequestFormats } from '../match-request/matchRequest.rules'
 import { requireOnline } from '../mock/bridge'
-import { MockError } from '../mock/errors'
+import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore } from '../mock/store'
 import { yearGameStats } from '../player/player.rules'
@@ -581,8 +581,13 @@ function sessionPageAccountOf(state: MockState, playerId: string): SessionPageAc
   }
 }
 
-/** The signed-in Player for the session page's account bar (#693). Mock only. */
+/**
+ * The signed-in Player for the session page's account bar (#693). Mock only: real mode reads the
+ * same fields from the Player app's access read (`usePlayerSessionAccess`), so this is never
+ * called there and says so instead of reading the mock store.
+ */
 export async function getSessionPageAccount(playerId: string): Promise<SessionPageAccount> {
+  if (isRealDataMode()) throw new NotConnectedError()
   await delay()
   const { state } = serverState()
   requireSignedInPlayer(state, playerId)
@@ -597,14 +602,18 @@ function requireSignedInPlayer(state: MockState, playerId: string) {
 /**
  * The signed-in version of the shared snapshot (D-2026-11-09-09): registered players' full name,
  * nickname and RTR ID, guests masked, no cap, the viewer's rows flagged `isViewer`, plus Courts
- * now and the Queue. Built from the last synced state like the visitor version. Mock only: real
- * mode has no route yet (NotConnectedError); the Player-hosted read stays `usePlayerSessionAccess`.
+ * now and the Queue. Built from the last synced state like the visitor version. Mock only, on
+ * purpose: the Queue app holds no Player session in real mode, so the signed-in view there is the
+ * Player app's own credentialed reads (`usePlayerSessionAccess` for names, the roster, Hosts,
+ * Courts now and the Queue; `useMyNight`; `usePublicMatchHistory`) laid over the visitor page.
+ * Real mode refuses with NotConnectedError instead of reading the mock store.
  * Works offline (owner, 2026-11-10): it shows the last-loaded data, like the operator's reads.
  */
 export async function getSignedInSession(
   slug: string,
   playerId: string,
 ): Promise<SignedInPublicSession> {
+  if (isRealDataMode()) throw new NotConnectedError()
   await delay()
   const { state, ...sync } = serverState()
   requireSignedInPlayer(state, playerId)

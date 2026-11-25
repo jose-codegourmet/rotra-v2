@@ -30,7 +30,7 @@ var playingLevels = []string{
 	"advanced_low", "advanced_mid", "advanced_high",
 }
 
-// StandingRow is one ordered standings row of the snapshot. Players on the same wins and losses share a position (1, 1, 3).
+// StandingRow is one ordered standings row of the snapshot. Players on the same wins and losses share a position and the next one follows without a gap (1, 1, 2).
 type StandingRow struct {
 	Position        int    `json:"position"`
 	SessionPlayerID string `json:"sessionPlayerId"`

@@ -5237,7 +5237,7 @@
               "wins": 0,
               "games": 1,
               "losses": 1,
-              "position": 4,
+              "position": 3,
               "clubPlayerId": "c6000000-0000-4000-8000-000000000009",
               "sessionPlayerId": "a7000000-0000-4000-8000-000000000006"
             }
@@ -6637,7 +6637,7 @@
               "wins": 0,
               "games": 1,
               "losses": 1,
-              "position": 3,
+              "position": 2,
               "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
               "sessionPlayerId": "a7000000-0000-4000-8000-000000000023"
             }
@@ -16040,7 +16040,7 @@
               "wins": 1,
               "games": 3,
               "losses": 2,
-              "position": 3,
+              "position": 2,
               "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
               "sessionPlayerId": "a7000000-0000-4000-8000-000000000022"
             },
@@ -16049,7 +16049,7 @@
               "wins": 0,
               "games": 1,
               "losses": 0,
-              "position": 4,
+              "position": 3,
               "clubPlayerId": "c6000000-0000-4000-8000-000000000009",
               "sessionPlayerId": "a7000000-0000-4000-8000-000000000006"
             },
@@ -16058,7 +16058,7 @@
               "wins": 0,
               "games": 1,
               "losses": 1,
-              "position": 5,
+              "position": 4,
               "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
               "sessionPlayerId": "a7000000-0000-4000-8000-000000000004"
             },
@@ -16067,7 +16067,7 @@
               "wins": 0,
               "games": 4,
               "losses": 3,
-              "position": 6,
+              "position": 5,
               "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
               "sessionPlayerId": "a7000000-0000-4000-8000-000000000023"
             }

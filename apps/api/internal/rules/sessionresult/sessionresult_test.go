@@ -83,18 +83,18 @@ func close6(a, b float64) bool { return math.Abs(a-b) < 5e-7 }
 func TestSessionStandings(t *testing.T) {
 	roster := defaultRoster()
 	g := func(a, b string) model.Match { return game([]string{a}, []string{b}) }
-	t.Run("shares a position between players on the same wins and losses (1, 2, 2, 4)", func(t *testing.T) {
+	t.Run("shares a position between players on the same wins and losses (1, 2, 2, 3)", func(t *testing.T) {
 		rows := sessionresult.SessionStandings(roster, []model.Match{g("Zoe", "Amy"), g("Amy", "Ben"), g("Dan", "Zoe")})
-		positions(t, rows, [][2]any{{1, "Dan"}, {2, "Amy"}, {2, "Zoe"}, {4, "Ben"}})
+		positions(t, rows, [][2]any{{1, "Dan"}, {2, "Amy"}, {2, "Zoe"}, {3, "Ben"}})
 		if r := rows[2]; r.ClubPlayerID != "club-Zoe" || r.Wins != 1 || r.Losses != 1 || r.Games != 2 {
 			t.Errorf("row = %+v", r)
 		}
 	})
-	t.Run("shares one position three ways and numbers the next after all three (1, 2, 2, 2, 5)", func(t *testing.T) {
+	t.Run("shares one position three ways and numbers the next player right after (1, 2, 2, 2, 3)", func(t *testing.T) {
 		rows := sessionresult.SessionStandings(roster, []model.Match{g("Zoe", "Amy"), g("Amy", "Ben"), g("Ben", "Zoe"), g("Dan", "Eve")})
-		positions(t, rows, [][2]any{{1, "Dan"}, {2, "Amy"}, {2, "Ben"}, {2, "Zoe"}, {5, "Eve"}})
+		positions(t, rows, [][2]any{{1, "Dan"}, {2, "Amy"}, {2, "Ben"}, {2, "Zoe"}, {3, "Eve"}})
 	})
-	t.Run("puts two players on 4-2 at position 1 and the next player at 3", func(t *testing.T) {
+	t.Run("puts two players on 4-2 at position 1 and the next player at 2", func(t *testing.T) {
 		var ms []model.Match
 		wins := func(winner string, losers ...string) {
 			for _, l := range losers {
@@ -105,7 +105,7 @@ func TestSessionStandings(t *testing.T) {
 		wins("Amy", "Zoe", "Dan", "Eve", "Eve")
 		wins("Zoe", "Ben")
 		wins("Dan", "Ben")
-		positions(t, sessionresult.SessionStandings(roster, ms), [][2]any{{1, "Amy"}, {1, "Ben"}, {3, "Dan"}, {3, "Zoe"}, {5, "Eve"}})
+		positions(t, sessionresult.SessionStandings(roster, ms), [][2]any{{1, "Amy"}, {1, "Ben"}, {2, "Dan"}, {2, "Zoe"}, {3, "Eve"}})
 	})
 	t.Run("leaves out players without a counted game, partials and invalid matches", func(t *testing.T) {
 		partial := game([]string{"Zoe", "Amy"}, []string{"Ben", "Dan"})

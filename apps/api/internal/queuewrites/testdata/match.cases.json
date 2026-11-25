@@ -2815,8 +2815,9 @@
      "who": "c7000000-0000-4000-8000-000000000001",
      "body": {
       "operationId": "b4000000-0000-4000-8000-000000000081",
-      "teamAScore": 21,
-      "teamBScore": 15
+      "winningTeam": "A",
+      "teamAScore": 31,
+      "teamBScore": 10
      }
     }
    ]
@@ -2832,8 +2833,8 @@
      "body": {
       "operationId": "b4000000-0000-4000-8000-000000000082",
       "winningTeam": "B",
-      "teamAScore": 11,
-      "teamBScore": 21
+      "teamAScore": 10,
+      "teamBScore": 31
      }
     }
    ]
@@ -3014,8 +3015,8 @@
      "body": {
       "operationId": "b4000000-0000-4000-8000-000000000021",
       "winningTeam": "A",
-      "teamAScore": 21,
-      "teamBScore": 15
+      "teamAScore": 31,
+      "teamBScore": 10
      }
     },
     {
@@ -3025,8 +3026,8 @@
      "body": {
       "operationId": "b4000000-0000-4000-8000-000000000022",
       "winningTeam": "A",
-      "teamAScore": 21,
-      "teamBScore": 15
+      "teamAScore": 31,
+      "teamBScore": 10
      }
     }
    ]
@@ -3066,8 +3067,8 @@
      "body": {
       "operationId": "b4000000-0000-4000-8000-000000000092",
       "winningTeam": "B",
-      "teamAScore": 11,
-      "teamBScore": 21
+      "teamAScore": 10,
+      "teamBScore": 31
      }
     }
    ]
@@ -3082,8 +3083,9 @@
      "who": "c7000000-0000-4000-8000-000000000001",
      "body": {
       "operationId": "b4000000-0000-4000-8000-000000000093",
-      "teamAScore": 21,
-      "teamBScore": 15
+      "winningTeam": "A",
+      "teamAScore": 31,
+      "teamBScore": 10
      }
     }
    ]
@@ -3206,8 +3208,8 @@
      "body": {
       "operationId": "b4000000-0000-4000-8000-000000000101",
       "winningTeam": "A",
-      "teamAScore": 21,
-      "teamBScore": 15
+      "teamAScore": 31,
+      "teamBScore": 10
      }
     }
    ]
@@ -3221,7 +3223,8 @@
      "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/result",
      "who": "c7000000-0000-4000-8000-000000000001",
      "body": {
-      "operationId": "b4000000-0000-4000-8000-000000000102"
+      "operationId": "b4000000-0000-4000-8000-000000000102",
+      "winningTeam": "A"
      }
     }
    ]
@@ -3236,6 +3239,7 @@
      "who": "c7000000-0000-4000-8000-000000000001",
      "body": {
       "operationId": "b4000000-0000-4000-8000-000000000103",
+      "winningTeam": "A",
       "teamAScore": 3,
       "teamBScore": 3
      }
@@ -3251,7 +3255,8 @@
      "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/result",
      "who": "c7000000-0000-4000-8000-000000000001",
      "body": {
-      "operationId": "b4000000-0000-4000-8000-000000000025"
+      "operationId": "b4000000-0000-4000-8000-000000000025",
+      "winningTeam": "A"
      }
     },
     {
@@ -3274,7 +3279,8 @@
      "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/result",
      "who": "c7000000-0000-4000-8000-000000000001",
      "body": {
-      "operationId": "b4000000-0000-4000-8000-000000000104"
+      "operationId": "b4000000-0000-4000-8000-000000000104",
+      "winningTeam": "A"
      }
     }
    ]

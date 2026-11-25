@@ -89,6 +89,11 @@ test('publish', async () => {
   await captureWrites({ db: capture.db, testdata, name: 'publish', apiDir })
 })
 
+// The club's trusted hosts and a Queue Session's hosts (D-2026-11-22-01): the routes under /api/club/trusted-hosts and /api/sessions/{id}/hosts.
+test('hosts', async () => {
+  await captureWrites({ db: capture.db, testdata, name: 'hosts', apiDir })
+})
+
 test('details', async () => {
   await captureWrites({ db: capture.db, testdata, name: 'details', apiDir })
 })

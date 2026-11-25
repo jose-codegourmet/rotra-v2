@@ -469,3 +469,71 @@ export async function updateAdminPlayerProfile(
   if (!player) throw new ServiceError('not_found')
   return player
 }
+
+const NO_STORED_GENDER =
+  "This record is saved by its club only. Its gender isn't connected to saved data yet."
+
+/**
+ * Admin Players › Set gender (owner, November 25, 2026, D-2026-11-19-01): sets or clears (null) the
+ * gender of every selected allocated player, registered or not, one transaction and one audit event
+ * per player. The same value again is not a write. A club-only record or a shared entry has no
+ * gender column yet, so that player reports a failure instead of an invented save. The player's
+ * revision moves so an open Edit profile reloads before it saves over the change.
+ */
+export async function setAdminPlayersGender(
+  context: AdminContext,
+  input: { ids: string[]; gender: 'male' | 'female' | null },
+): Promise<{ id: string; name: string; success: boolean; error?: string }[]> {
+  requireAdmin(context)
+  if (input.gender !== null && input.gender !== 'male' && input.gender !== 'female')
+    throw new ServiceError('invalid', { gender: 'Choose Male, Female or Not given.' })
+  const results: { id: string; name: string; success: boolean; error?: string }[] = []
+  for (const id of [...new Set(input.ids)]) {
+    if (!UUID.test(id)) {
+      results.push({ id, name: id, success: false, error: 'Player not found. Reload the list.' })
+      continue
+    }
+    try {
+      const name = await prisma.$transaction(async (tx) => {
+        const rows = await tx.$queryRaw<{ id: string }[]>`
+          SELECT "id" FROM "players" WHERE "id" = ${id}::uuid FOR UPDATE`
+        if (!rows.length) return null
+        const player = await tx.player.findUniqueOrThrow({
+          where: { id },
+          select: { fullName: true, gender: true, idAllocation: { select: { playerId: true } } },
+        })
+        if (!player.idAllocation) return null
+        if (player.gender !== input.gender) {
+          await tx.player.update({
+            where: { id },
+            data: { gender: input.gender, revision: { increment: 1 } },
+          })
+          await recordAudit(tx, context, {
+            action: 'player.gender_set',
+            targetType: 'player',
+            targetId: id,
+            metadata: { name: player.fullName, before: player.gender, gender: input.gender },
+          })
+        }
+        return player.fullName
+      })
+      if (name === null) {
+        const entry = await prisma.sharedPlayerEntry.findUnique({
+          where: { id },
+          select: { id: true },
+        })
+        const clubOnly = entry
+          ? null
+          : await prisma.clubPlayer.findUnique({ where: { id }, select: { id: true } })
+        results.push(
+          entry || clubOnly
+            ? { id, name: id, success: false, error: NO_STORED_GENDER }
+            : { id, name: id, success: false, error: 'Player not found. Reload the list.' },
+        )
+      } else results.push({ id, name, success: true })
+    } catch {
+      results.push({ id, name: id, success: false, error: 'Could not save.' })
+    }
+  }
+  return results
+}

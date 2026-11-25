@@ -3,6 +3,7 @@ export function directoryFilters(search: URLSearchParams): AdminPlayerListParams
   const [addedFrom, addedTo] = (search.get('added') ?? '').split('..')
   const account = search.get('account'),
     level = search.get('level'),
+    gender = search.get('gender'),
     archived = search.get('archived')
   const size = Number(search.get('size') ?? search.get('shown') ?? 25)
   return {
@@ -19,6 +20,7 @@ export function directoryFilters(search: URLSearchParams): AdminPlayerListParams
       level === 'beginner' || level === 'intermediate' || level === 'advanced' || level === 'none'
         ? level
         : undefined,
+    gender: gender === 'male' || gender === 'female' || gender === 'none' ? gender : undefined,
     duplicates: search.get('dup') === '1',
     addedFrom: /^\d{4}-\d{2}-\d{2}$/.test(addedFrom ?? '') ? addedFrom : undefined,
     addedTo: /^\d{4}-\d{2}-\d{2}$/.test(addedTo ?? '') ? addedTo : undefined,
@@ -38,6 +40,7 @@ export function writeDirectoryFilters(
     q: f.q,
     account: f.account === 'all' ? undefined : f.account,
     level: f.level,
+    gender: f.gender,
     dup: f.duplicates ? '1' : undefined,
     added: f.addedFrom || f.addedTo ? `${f.addedFrom ?? ''}..${f.addedTo ?? ''}` : undefined,
     place: f.place?.join(','),

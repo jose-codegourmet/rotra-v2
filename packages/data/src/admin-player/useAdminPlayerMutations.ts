@@ -6,6 +6,7 @@ import {
   changeAdminPlayers,
   createAdminPlayer,
   issueRegistrationLink,
+  setAdminPlayersGender,
   updateAdminPlayer,
 } from './mutations'
 
@@ -56,6 +57,7 @@ export function useAdminPlayerMutations() {
     create: useMutation({ mutationFn: createAdminPlayer, onSuccess }),
     update: useEditAdminPlayer(onSuccess),
     change: useMutation({ mutationFn: changeAdminPlayers, onSuccess }),
+    setGender: useMutation({ mutationFn: setAdminPlayersGender, onSuccess }),
     link: useMutation({ mutationFn: issueRegistrationLink, onSuccess }),
   }
 }

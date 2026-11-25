@@ -68,6 +68,7 @@ export function selectAdminPlayers(all: AdminPlayer[], params: AdminPlayerListPa
         matchesAdminPlayerSearch(p, params.q) &&
         (!params.level ||
           (params.level === 'none' ? p.levelBand === null : p.levelBand === params.level)) &&
+        (!params.gender || (params.gender === 'none' ? !p.gender : p.gender === params.gender)) &&
         (!params.duplicates || duplicateIds.has(p.id)) &&
         (!params.addedFrom || p.addedOn >= params.addedFrom) &&
         (!params.addedTo || p.addedOn <= params.addedTo) &&

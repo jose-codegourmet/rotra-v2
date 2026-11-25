@@ -75,6 +75,7 @@ const UI_ACTION: Record<string, string> = {
   'player.created': 'player_created',
   'player.profile_updated': 'player_updated',
   'player.password_set': 'player_updated',
+  'player.gender_set': 'player_gender_set',
   'player.verification_override_set': 'player_verification_override_set',
   'player.verification_override_cleared': 'player_verification_override_cleared',
 }
@@ -346,6 +347,12 @@ async function summarizer(events: ReadEvent[]) {
       case 'player.created': {
         const name = str(metadata.name)
         return name ? `Created ${name} by ROTRA Admin.` : null
+      }
+      case 'player.gender_set': {
+        const name = str(metadata.name)
+        const gender = str(metadata.gender)
+        if (!name) return null
+        return `Set gender for ${name} to ${gender === 'male' ? 'Male' : gender === 'female' ? 'Female' : 'Not given'}.`
       }
       case 'player.password_set': {
         const reason = str(metadata.reason)

@@ -30,8 +30,8 @@ export type AdminPlayer = {
   /** The public nickname, else the first nickname a club saved for the player */
   nickname: string | null
   /**
-   * The player's own public gender (D-2026-11-19-01); read-only for Admin. Null or missing = "Not
-   * added yet" (every existing account, unclaimed records and shared entries).
+   * The player's public gender (D-2026-11-19-01). The player sets it; Admin can also set it for any
+   * player in bulk (November 25, 2026). Null or missing = "Not added yet".
    */
   gender?: 'male' | 'female' | null
   /**
@@ -106,6 +106,8 @@ export type AdminPlayerListParams = {
   /** Rows to return; the screen asks for 25 more each time */
   limit?: number
   level?: 'beginner' | 'intermediate' | 'advanced' | 'none'
+  /** Gender filter; `none` = not given. Omitted = all. */
+  gender?: 'male' | 'female' | 'none'
   duplicates?: boolean
   addedFrom?: string
   addedTo?: string

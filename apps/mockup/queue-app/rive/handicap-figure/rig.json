@@ -1,0 +1,32 @@
+{
+ "image": "../../art/handicap-figure.png",
+ "name": "HandicapFigure",
+ "width": 490,
+ "height": 1008,
+ "cell": 10,
+ "duration": 180,
+ "bones": [
+  {"name": "Hips", "from": [245, 470], "to": [245, 330], "parent": null},
+  {"name": "Chest", "to": [245, 175], "parent": "Hips"},
+  {"name": "Head", "to": [245, 20], "parent": "Chest"},
+  {"name": "ArmR", "from": [167, 195], "to": [100, 357], "parent": null},
+  {"name": "ForeR", "to": [57, 493], "parent": "ArmR"},
+  {"name": "HandR", "to": [45, 570], "parent": "ForeR"},
+  {"name": "ArmL", "from": [323, 195], "to": [390, 357], "parent": null},
+  {"name": "ForeL", "to": [433, 493], "parent": "ArmL"},
+  {"name": "HandL", "to": [453, 570], "parent": "ForeL"}
+ ],
+ "anchors": [
+  {"name": "FootR", "points": [[70, 985], [140, 985]]},
+  {"name": "FootL", "points": [[350, 985], [420, 985]]}
+ ],
+ "keys": {
+  "Hips": {"y": [[0, 0], [90, -4], [180, 0]]},
+  "Chest": {"rotation": [[0, 0], [90, 0], [180, 0]]},
+  "Head": {"rotation": [[0, 0], [100, 0.012], [180, 0]]},
+  "ArmR": {"y": [[0, 0], [90, -9], [180, 0]], "rotation": [[0, 0], [95, -0.015], [180, 0]]},
+  "ArmL": {"y": [[0, 0], [90, -9], [180, 0]], "rotation": [[0, 0], [95, 0.015], [180, 0]]},
+  "ForeR": {"rotation": [[0, 0], [100, 0.02], [180, 0]]},
+  "ForeL": {"rotation": [[0, 0], [100, -0.02], [180, 0]]}
+ }
+}

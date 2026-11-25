@@ -44,6 +44,7 @@ import { readPublishedResults } from './results'
 import { endedState, shownHostRows } from './session-host-snapshots'
 import { levelRestrictionBlockIn, placeClubMember, stepDownIn } from './session-roster'
 import {
+  COURT_ORDER,
   capacityOf,
   derivedId,
   LIVE_ENTRY,
@@ -990,10 +991,7 @@ export async function readPublicMatchHistory(
         orderBy: [{ confirmedAt: 'asc' }, { id: 'asc' }],
       }),
       // Removed courts too: a match played on a court removed later keeps its label.
-      tx.sessionCourt.findMany({
-        where: { sessionId: session.id },
-        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-      }),
+      tx.sessionCourt.findMany({ where: { sessionId: session.id }, orderBy: COURT_ORDER }),
     ])
     const record = sessionRecordHistory({
       fallbackStart: (session.startedAt ?? session.scheduledStartAt).getTime(),
@@ -1002,6 +1000,7 @@ export async function readPublicMatchHistory(
           id: c.id,
           sessionId: c.sessionId,
           label: c.label,
+          position: c.position,
           startsAt: c.startsAt?.getTime(),
           openedEarlyAt: c.openedEarlyAt?.getTime() ?? null,
           openUntil: c.openUntil?.getTime() ?? null,

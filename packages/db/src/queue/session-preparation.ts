@@ -8,7 +8,7 @@ import {
   startNeedsNewEnd,
   startNewEndError,
 } from '@rotra/data/queue-session/queueSession.rules'
-import type { QueueSession as SessionView } from '@rotra/data/queue-session/types'
+import { movedCourt, type QueueSession as SessionView } from '@rotra/data/queue-session/types'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { QueueSession, SessionCourt, SessionMode } from '../generated/prisma/client'
@@ -26,6 +26,7 @@ import {
   liveRoster,
   lockSession,
   mapDatabaseError,
+  nextCourtPosition,
   orderedWaitlist,
   promoteWaiter,
   recomputeMinimum,
@@ -68,7 +69,8 @@ export type QueueSessionInput = {
   levelRestriction?: unknown
   /**
    * `id` keeps an existing court on edit; courts left out are removed. `startsAt` is the planned
-   * start (null or the session start = follows the session start).
+   * start (null or the session start = follows the session start). The list order is the court
+   * order: the courts saved take positions 1..n in it. Labels may repeat (owner decision, 2026-11-25).
    */
   courts: { id?: string; label: string; startsAt?: string | null; openUntil?: string | null }[]
   repeat?: 'none' | 'weekly' | 'biweekly' | 'monthly'
@@ -307,6 +309,7 @@ export async function createQueueSession(
               clubId: context.clubId,
               sessionId: id,
               label: court.label.trim(),
+              position: n + 1,
               startsAt: startsAt === null ? null : new Date(date.start + (startsAt - start)),
               openUntil: court.openUntil
                 ? new Date(date.start + (ms(court.openUntil) - start))
@@ -414,6 +417,8 @@ export async function updateQueueSession(
         const startsAt = plannedStart(court.startsAt, start)
         const data = {
           label: court.label.trim(),
+          // The form's list order is the court order; removed courts keep their old position.
+          position: n + 1,
           startsAt: startsAt === null ? null : new Date(startsAt),
           openUntil: court.openUntil ? new Date(court.openUntil) : null,
         }
@@ -640,6 +645,8 @@ export async function addCourt(
           clubId: context.clubId,
           sessionId,
           label,
+          // A new court goes last in court order.
+          position: await nextCourtPosition(tx, sessionId),
           startsAt: startsAt === null ? null : new Date(startsAt),
           openUntil: openUntil === null ? null : new Date(openUntil),
         },
@@ -817,6 +824,63 @@ export async function removeCourt(context: ClubContext, sessionId: string, court
     session = await touchSession(tx, session)
     await recomputeMinimum(tx, session)
     return null
+  })
+}
+
+/**
+ * Reorder courts (owner decision, 2026-11-25), dragged in Settings: `courtIds` is the full new order
+ * of the session's live courts, each exactly once; they take positions 1..n. Removed courts keep
+ * theirs. Allowed while prepared or active, as the other court changes are; a list that no longer
+ * matches the live courts is a conflict. Returns the live courts in their new order and the court
+ * the toast names (`movedCourt`).
+ */
+export async function reorderSessionCourts(
+  context: ClubContext,
+  sessionId: string,
+  courtIds: string[],
+) {
+  return prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, context, sessionId)
+    await requireSessionAccess(context, session, tx)
+    requireState(
+      session,
+      ['prepared', 'active'],
+      'Courts can change only before or during the session.',
+    )
+    const courts = await liveCourts(tx, sessionId)
+    const byId = new Map(courts.map((c) => [c.id, c]))
+    if (
+      courtIds.length !== courts.length ||
+      new Set(courtIds).size !== courtIds.length ||
+      courtIds.some((id) => !byId.has(id))
+    )
+      throw new ServiceError('conflict', COURTS_CHANGED)
+    const ordered: SessionCourt[] = []
+    let changed = false
+    for (const [n, id] of courtIds.entries()) {
+      const court = byId.get(id) as SessionCourt
+      if (court.position === n + 1) {
+        ordered.push(court)
+        continue
+      }
+      changed = true
+      ordered.push(
+        await tx.sessionCourt.update({
+          where: { id },
+          data: { position: n + 1, revision: { increment: 1 } },
+        }),
+      )
+    }
+    // The same order again (a retry) writes nothing.
+    if (changed) await touchSession(tx, session)
+    return {
+      courts: ordered.map(courtDto),
+      /** The court the toast names, or null when the order did not change. */
+      moved: movedCourt(
+        courts.map((c) => c.id),
+        courtIds,
+      ),
+    }
   })
 }
 

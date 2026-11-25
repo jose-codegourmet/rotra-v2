@@ -100,7 +100,13 @@ export const prototypeDefaultRequestFormats = (
 export type SessionCourt = {
   id: string
   sessionId: string
+  /** May repeat within a session (owner decision, 2026-11-25). */
   label: string
+  /**
+   * Court order in the session, from 1 (owner decision, 2026-11-25), set by Reorder courts in
+   * Settings. Every court list and Auto Queue's fill follow it; see `byCourtOrder`.
+   */
+  position: number
   /** Older fixtures without a start are already open. New bookings always set it. */
   startsAt?: number
   /** When the Queue Master opened the court before its planned start (Start anyway); missing or null when not. `startsAt` keeps the booking. */
@@ -108,6 +114,35 @@ export type SessionCourt = {
   openUntil: number | null
   removedAt: number | null
 }
+/**
+ * Court order (owner decision, 2026-11-25): position, then the given order (a stable sort keeps
+ * the order the courts were read in on a tie). Sort a session's courts with it wherever they are read.
+ */
+export const byCourtOrder = (
+  a: Pick<SessionCourt, 'position'>,
+  b: Pick<SessionCourt, 'position'>,
+) => a.position - b.position
+/**
+ * Which court a reorder moved, for the toast "COURT moved to position N" (2026-11-25 mockup log):
+ * the court whose move alone turns `beforeIds` into `afterIds`; when two could (two neighbours
+ * swapped), the one now earlier. A reorder that is not one move names the first court whose place
+ * changed. Null when the order is the same.
+ */
+export function movedCourt(
+  beforeIds: readonly string[],
+  afterIds: readonly string[],
+): { courtId: string; position: number } | null {
+  const same = (a: readonly string[], b: readonly string[]) =>
+    a.length === b.length && a.every((id, i) => b[i] === id)
+  if (same(beforeIds, afterIds)) return null
+  const without = (ids: readonly string[], id: string) => ids.filter((x) => x !== id)
+  const id =
+    afterIds.find((id) => same(without(beforeIds, id), without(afterIds, id))) ??
+    afterIds.find((id, i) => beforeIds[i] !== id)
+  return id ? { courtId: id, position: afterIds.indexOf(id) + 1 } : null
+}
+export const courtMovedText = (label: string, position: number) =>
+  `${label} moved to position ${position}`
 export type DownloadState = 'none' | 'downloading' | 'ready'
 export type QueueSessionSummary = QueueSession & {
   courtsInUse: number

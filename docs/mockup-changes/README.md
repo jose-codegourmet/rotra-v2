@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 3 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 271 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 3 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 272 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -482,4 +482,5 @@ NEW: 3 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 271 · CANCELLED: 4 · 
 | [2026-11-25-queue-almost-done-switch](2026-11-25-queue-almost-done-switch.md) | Queue app: an Almost done switch on the Playing court card | court-card, switch, match-card | NEW |
 | [2026-11-25-queue-handicap-tonight](2026-11-25-queue-handicap-tonight.md) | Queue app: Handicap · tonight in the live Edit player sheet | edit-live-player-sheet, player-pool-card, chip | NEW |
 | [2026-11-25-queue-match-making-factors](2026-11-25-queue-match-making-factors.md) | Queue app: Generate matches picks drafts by Whose turn, Fresh faces and Even game | auto-queue-workspace, match-card | NEW |
+| [2026-11-25-queue-settings-courts-arrange](2026-11-25-queue-settings-courts-arrange.md) | Queue app: the Settings tab's courts reorder by drag, rename from the label, and show how long they've been playing or free | settings-courts-box, settings-court-card, add-court-tile, court-label-form, chip | IN MOCK APP — #1105 |
 <!-- status-index:end -->

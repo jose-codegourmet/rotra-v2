@@ -235,6 +235,7 @@ const wireCourtOf = (c: MockState['courts'][number]): WireCourt => ({
   id: c.id,
   sessionId: c.sessionId,
   label: c.label,
+  position: c.position,
   startsAt: isoOrNull(c.startsAt),
   openedEarlyAt: isoOrNull(c.openedEarlyAt),
   openUntil: isoOrNull(c.openUntil),

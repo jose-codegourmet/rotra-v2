@@ -35,12 +35,12 @@ const court = (
 })
 
 const states: Partial<SettingsCourtsBoxCourt>[] = [
-  { state: 'playing', teamA, teamB },
+  { state: 'playing', teamA, teamB, playingSince: at(19, 26) },
   { state: 'getting-ready', teamA, teamB },
-  { state: 'free', followsSessionEnd: false, until: at(22, 15) },
+  { state: 'free', followsSessionEnd: false, until: at(22, 15), freeSince: at(19, 34) },
   { state: 'not-open', from: at(20, 30) },
-  { state: 'free' },
-  { state: 'playing', teamA, teamB },
+  { state: 'free', freeSince: at(18, 35) },
+  { state: 'playing', teamA, teamB, playingSince: at(19, 38) },
 ]
 const courts = (count: number) => Array.from({ length: count }, (_, i) => court(i + 1, states[i]))
 
@@ -56,6 +56,10 @@ function Stateful(args: SettingsCourtsBoxProps) {
       onChangeFrom={(id, from) => patch(id, { from })}
       onChangeUntil={(id, until) => patch(id, { until, followsSessionEnd: false })}
       onFollowSessionEnd={(id) => patch(id, { followsSessionEnd: true })}
+      onReorder={(ids) => {
+        args.onReorder?.(ids)
+        setList((all) => ids.flatMap((id) => all.filter((c) => c.id === id)))
+      }}
       onAddCourt={() => {
         args.onAddCourt()
         setList((all) => [...all, court(all.length + 1)])
@@ -76,6 +80,8 @@ const meta = {
     onFollowSessionEnd: fn(),
     onExtend: fn(),
     onAddCourt: fn(),
+    onReorder: fn(),
+    onRename: fn(),
   },
   render: (args) => <Stateful {...args} />,
 } satisfies Meta<typeof SettingsCourtsBox>
@@ -97,6 +103,16 @@ export const PhoneSlider: Story = {
   globals: { viewport: { value: 'phone' } },
 }
 export const Desktop: Story = { args: { courts: courts(4) }, globals: desktop }
+/** Drag a card by its ⠿ handle, or focus the handle and use the arrow keys; Escape cancels a drag. */
+export const Reorder: Story = { args: { courts: courts(6) }, globals: desktop }
+/** No onReorder and no onRename: no handles, plain labels. */
+export const ReadOnlyOrder: Story = {
+  args: { courts: courts(4), onReorder: undefined, onRename: undefined },
+}
+export const ReorderLight: Story = {
+  args: { courts: courts(6) },
+  globals: { theme: 'light', ...desktop },
+}
 export const TwoCourtsLight: Story = { args: { courts: courts(2) }, globals: { theme: 'light' } }
 export const FourCourtsLight: Story = { args: { courts: courts(4) }, globals: { theme: 'light' } }
 export const SixCourtsLight: Story = {

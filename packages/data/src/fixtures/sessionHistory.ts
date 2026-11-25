@@ -172,6 +172,7 @@ export function simulateHistory(spec: SessionHistorySpec, now = Date.now()): Ses
     id: `${spec.id}-court-${i + 1}`,
     sessionId: spec.id,
     label: `Court ${i + 1}`,
+    position: i + 1,
     openUntil: null,
     removedAt: null,
   }))

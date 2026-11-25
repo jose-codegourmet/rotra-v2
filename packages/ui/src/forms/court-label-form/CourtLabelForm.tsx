@@ -7,7 +7,7 @@ import { Field } from '@rotra/ui/field'
 import { Notice } from '@rotra/ui/notice'
 import { Sheet } from '@rotra/ui/sheet'
 import { TextInput } from '@rotra/ui/text-input'
-import { type RefObject, useId, useMemo } from 'react'
+import { type RefObject, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { courtLabelDefaultValues } from './CourtLabelForm.defaultValues'
 import {
@@ -21,8 +21,6 @@ export type CourtLabelFormProps = {
   onOpenChange: (open: boolean) => void
   /** The court's label now: the title ("Change Court 1 label?") and the field's prefill */
   currentLabel: string
-  /** The session's other courts' labels: a new label must differ from each (any case) */
-  otherLabels: string[]
   /** Receives the trimmed new label; the container saves it and toasts "OLD is now NEW" */
   onSubmit: (values: CourtLabelFormValues) => void
   /** Saving: nothing can be pressed and the sheet stays open */
@@ -31,6 +29,8 @@ export type CourtLabelFormProps = {
   serverError?: string
   returnFocusRef?: RefObject<HTMLElement | null>
 }
+
+const courtLabelSchema = makeCourtLabelSchema()
 
 /**
  * Change court label (the prototype's SHEETS.courtLabel): a small dialog "Change COURT label?" with
@@ -41,16 +41,14 @@ export function CourtLabelForm({
   open,
   onOpenChange,
   currentLabel,
-  otherLabels,
   onSubmit,
   isPending = false,
   serverError,
   returnFocusRef,
 }: CourtLabelFormProps) {
   const formId = useId()
-  const schema = useMemo(() => makeCourtLabelSchema(otherLabels), [otherLabels])
   const form = useForm<CourtLabelFormInput, unknown, CourtLabelFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(courtLabelSchema),
     defaultValues: courtLabelDefaultValues(currentLabel),
   })
   const error = form.formState.errors.label?.message

@@ -146,8 +146,13 @@ court(12, 40, "C1", "2026-11-01 00:00:01+00"); court(15, 41, "Birdie Court", "20
 for sn, n in ((19, 50), (20, 51), (21, 52), (22, 53)):
     court(sn, n, "Court 1", "2026-11-01 00:00:01+00")
 court(7, 42, "Removed Page Court", "2026-11-01 00:00:01+00")
-w("INSERT INTO session_courts (id, club_id, session_id, label, removed_at, created_at, updated_at) VALUES")
-w(",\n".join(f"  ({q(COURT(n))}, {q(CLUB(S[sn]['club']))}, {q(SESS(sn))}, {q(l)}, {('TIMESTAMPTZ ' + q(r)) if r else 'NULL'}, TIMESTAMPTZ {q(c)}, {FIXED})" for sn, n, l, c, r in courts) + ";\n")
+# Court order (position) as the 20261125000100 backfill numbers it: per session by created_at, then id.
+position, seen = {}, {}
+for sn, n, l, c, r in sorted(courts, key=lambda x: (x[0], x[3], COURT(x[1]))):
+    seen[sn] = seen.get(sn, 0) + 1
+    position[n] = seen[sn]
+w("INSERT INTO session_courts (id, club_id, session_id, label, position, removed_at, created_at, updated_at) VALUES")
+w(",\n".join(f"  ({q(COURT(n))}, {q(CLUB(S[sn]['club']))}, {q(SESS(sn))}, {q(l)}, {position[n]}, {('TIMESTAMPTZ ' + q(r)) if r else 'NULL'}, TIMESTAMPTZ {q(c)}, {FIXED})" for sn, n, l, c, r in courts) + ";\n")
 
 # ---- roster ----
 sps = []  # (id, session, cp, player_at_entry, name, level, confirmed, released(reason), noshow)

@@ -181,10 +181,11 @@ export function createQueueSession(input: QueueSessionInput) {
       const cost = normalizeSessionCost(input.costEstimate)
       if (cost) state.costEstimates[id] = { ...cost, sessionId: id, currency: 'PHP' }
       state.courts.push(
-        ...input.courts.map((c) => ({
+        ...input.courts.map((c, i) => ({
           id: crypto.randomUUID(),
           sessionId: id,
           label: c.label.trim(),
+          position: i + 1,
           startsAt: date.start + ((c.startsAt ?? input.scheduledStartAt) - input.scheduledStartAt),
           openUntil:
             c.openUntil == null ? null : date.start + (c.openUntil - input.scheduledStartAt),
@@ -262,10 +263,12 @@ export function updateQueueSession({
       })
       state.courts = state.courts.filter((c) => c.sessionId !== sessionId)
       state.courts.push(
-        ...values.courts.map((c) => ({
+        ...values.courts.map((c, i) => ({
           id: crypto.randomUUID(),
           sessionId,
           label: c.label.trim(),
+          // The form's list order is the court order.
+          position: i + 1,
           startsAt: c.startsAt ?? date.start,
           openUntil: c.openUntil ?? null,
           removedAt: null,

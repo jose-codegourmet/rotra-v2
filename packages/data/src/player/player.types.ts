@@ -65,6 +65,10 @@ export type Player = {
 
 /** Official public history; fixtures contain only valid finalized sessions. */
 export type PlayerGame = {
+  /**
+   * The match: the same for every player in it, so `/matches/${id}` is its match page. Real mode
+   * sends the Queue match id; in mock mode each fixture game is its own match.
+   */
   id: string
   format: import('../match/match.types').MatchFormat
   partners: string[]

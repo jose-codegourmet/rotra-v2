@@ -16,6 +16,7 @@
   --font: "Satoshi", "Manrope", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
   --r: 10px; --r-sm: 6px;
   --court: #14603f; --court-line: rgba(255, 255, 255, 0.85); --court-free: #232328; --court-free-line: rgba(255, 255, 255, 0.16);
+  --lv-beg: #3d9bff; --lv-int: #ffd23f; --lv-adv: #ff5a5f; --lv-none: var(--border-strong); /* skill-group rings, as the Queue prototype and packages/config/theme.css */
   --shadow: none; --knob: var(--fg); --field: var(--bg);
   color-scheme: dark;
 }
@@ -27,6 +28,7 @@
   --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09); --ann-bg: #fff3b0; --ann-border: #e6b800; --ann-tag: #7a5c00;
   --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
   --court: #2e8b57; --court-line: #ffffff; --court-free: #e8ebe5; --court-free-line: rgba(18, 21, 19, 0.14);
+  --lv-beg: #1d6fd1; --lv-int: #d19a00; --lv-adv: #d6293a; --lv-none: var(--border-strong);
   --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
   color-scheme: light;
 } }
@@ -38,6 +40,7 @@
   --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09); --ann-bg: #fff3b0; --ann-border: #e6b800; --ann-tag: #7a5c00;
   --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
   --court: #2e8b57; --court-line: #ffffff; --court-free: #e8ebe5; --court-free-line: rgba(18, 21, 19, 0.14);
+  --lv-beg: #1d6fd1; --lv-int: #d19a00; --lv-adv: #d6293a; --lv-none: var(--border-strong);
   --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
   color-scheme: light;
 }
@@ -806,6 +809,29 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .gm-noscore { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .8); white-space: nowrap; }
 .gm-note { color: var(--warn); }
 @media (max-width: 480px) { .gm-court { min-height: 100px; } .gm-pl .avatar { width: 36px; height: 36px; font-size: 12px; } .gm-pl { max-width: 56px; } .gm-g { min-width: 16px; height: 16px; font-size: 10px; right: -6px; } .gm-res { min-width: 0; padding: 8px 8px; margin: 0 2px; } .gm-score { font-size: 17px; } .gm-noscore { font-size: 11px; } }
+/* Match page (mockup change 2026-11-25-player-match-page): the whole court box opens the game's match page. A full-size button sits
+   under the faces; the faces and the share button stay their own buttons above it, and the score box and format pill let taps through. */
+.gm-open { position: absolute; inset: 0; z-index: 0; padding: 0; border: 0; border-radius: 8px; background: none; cursor: pointer; }
+.gm-open:hover { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .55); }
+.gm-open:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.gm-court.opens .gm-side, .gm-court.opens .gm-res, .gm-court.opens .gm-fmt { pointer-events: none; }
+.gm-court.opens .gm-pl, .gm-court.opens .gm-share { pointer-events: auto; }
+/* Skill-group rings on the match page court: the picture's own border is the skill group (the public session tiles' colors);
+   the winning side keeps an outer accent ring, set off from the skill ring by a dark gap so both read. */
+.gm.rings .gm-pl { --ring: var(--lv-none); }
+.gm.rings .gm-pl.lv-beginner { --ring: var(--lv-beg); } .gm.rings .gm-pl.lv-intermediate { --ring: var(--lv-int); } .gm.rings .gm-pl.lv-advanced { --ring: var(--lv-adv); }
+.gm.rings .gm-pl .avatar { box-shadow: 0 0 0 3px var(--ring); }
+.gm.rings .gm-pl.won .avatar { box-shadow: 0 0 0 3px var(--ring), 0 0 0 5px rgba(0, 0, 0, .72), 0 0 0 8px var(--accent); }
+.gm.rings .gm-pl:hover .avatar, .gm.rings .gm-pl:focus-visible .avatar { box-shadow: 0 0 0 3px var(--ring), 0 0 0 5px rgba(0, 0, 0, .72), 0 0 0 8px rgba(255, 255, 255, .6); }
+.gm.rings .gm-side { padding: 16px 6px; }
+.mt-src { margin: 0; }
+.mt-src .sh-linkish { font-weight: 600; }
+.mt-who { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 0; border: 0; background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.mt-who .avatar { width: 36px; height: 36px; font-size: 12px; flex: none; }
+.mt-who b { font-size: 15px; }
+.mt-who:hover b, .mt-who:focus-visible b { text-decoration: underline; }
+.mt-blk + .mt-blk { border-top: 1px solid var(--border); padding-top: 14px; }
+.mt-blk .gm:first-of-type { border-top: 0; }
 .rg-item + .rg-item { border-top: 1px solid var(--border); }
 .rg-item .game { padding-bottom: 2px; }
 .rg-src { margin: -4px 0 10px; }
@@ -1304,6 +1330,11 @@ const MIGS_SESSIONS = [
     G('Doubles', ['Kat Lim'], ['Bea Castillo', 'Rafa Aquino'], 'L', '20–22'),
   ] },
 ];
+// Match page (mockup change 2026-11-25-player-match-page): every game carries the match id its match page opens at
+// (/matches/<matchId>), the same for every player in that match. In this prototype each player's history is its own fixture,
+// so the id is derived from the session and the game's place in it: "<sessionId>-<n>", like m1-2.
+const withMatchIds = (s) => { s.games.forEach((g, i) => { g.mid = `${s.id}-${i + 1}`; }); return s; };
+MIGS_SESSIONS.forEach(withMatchIds);
 
 // Generated history for every other profile: enough counted games for the leaderboard figure they carry.
 function genSessions(seed, counted) {
@@ -1323,7 +1354,7 @@ function genSessions(seed, counted) {
       games.push(G(single ? 'Singles' : 'Doubles', single ? [] : [pick(`p${n}${g}`)], single ? [pick(`o${n}${g}`)] : [pick(`o${n}${g}`), pick(`q${n}${g}`)], won ? 'W' : 'L', (hh >>> 9) % 3 === 0 ? null : (won ? `${a}–${b}` : `${b}–${a}`)));
     }
     if (n === 0) games.push(G('4v4 fun', [pick('f1'), pick('f2'), pick('f3')], [pick('f4'), pick('f5'), pick('f6'), pick('f7')], 'L', '18–21', 'fun'));
-    out.push({ id: `${seed}-s${n}`, title: titles[(h0 >>> n) % titles.length], club, ago, pageGone: ago > 60, games });
+    out.push(withMatchIds({ id: `${seed}-s${n}`, title: titles[(h0 >>> n) % titles.length], club, ago, pageGone: ago > 60, games }));
     left -= take; n += 1; ago += 2 + ((h0 >>> (n + 2)) % 6);
   }
   return out;
@@ -1624,22 +1655,39 @@ const people = (names) => listNames(names.map(esc));
 // solid court green, white lines, a dashed net — with faces ringed in white and names on dark pills.
 const gmCourtSVG = () => `<svg class="gm-svg" viewBox="0 0 134 61" preserveAspectRatio="none" aria-hidden="true"><rect width="134" height="61" fill="var(--court)"/><g fill="none" stroke="var(--court-line)" stroke-width="1.5" vector-effect="non-scaling-stroke"><rect x="0.75" y="0.75" width="132.5" height="59.5" vector-effect="non-scaling-stroke"/><path d="M0 4.6H134M0 56.4H134M7.6 0V61M126.4 0V61M47.2 0V61M86.8 0V61M0 30.5H47.2M86.8 30.5H134" vector-effect="non-scaling-stroke"/></g><path d="M67 0V61" stroke="var(--court-line)" stroke-width="3" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/></svg>`;
 const idByName = (n) => { const a = Object.keys(S.accounts).find((k) => S.accounts[k].name === n); if (a) return a; const i = BASE.findIndex((e) => e.name === n); return i >= 0 ? `b${i}` : null; };
-function gameRow(g, who, ctx = null, at = null) {
-  const won = g.res === 'W', partial = g.kind === 'partial';
+// Match page (mockup change 2026-11-25-player-match-page). `o.open` (default on): the court box opens the game's match page; the faces
+// and the share button keep their own actions. `o.rings`: each face gets its skill-group ring (the match page court). `o.mask`: names
+// follow the profile privacy rules for this viewer (the match page is public). `at.ownerName`: the profile whose session this is, when
+// the row is drawn from another player's side (their own count is then their appearances, not the game's place).
+const skillGroupOf = (p) => (!p || p.level == null || hiddenFromViewer(p) ? 'none' : ['beginner', 'intermediate', 'advanced'][LEVELS[p.level].tier]);
+const faceMasked = (q) => (q.real ? hiddenFromViewer(q.p) : !S.me);
+function gameRow(g, who, ctx = null, at = null, o = {}) {
+  const won = g.res === 'W', partial = g.kind === 'partial', opens = o.open !== false && !!g.mid;
   // Owner, November 14, 2026: each face carries how many games that person had played in that session up to and
   // including this one (the Queue console's face badge). The profile owner's count is the game's place in the session;
   // the others count their appearances in the session's games so far.
-  const played = (n) => at ? at.s.games.slice(0, at.gi + 1).filter((x) => x.partner.includes(n) || x.opp.includes(n)).length : null;
+  const played = (n) => at ? (at.ownerName && n === at.ownerName ? at.gi + 1 : at.s.games.slice(0, at.gi + 1).filter((x) => x.partner.includes(n) || x.opp.includes(n)).length) : null;
   const badge = (n, label) => n ? `<i class="gm-g tnum" role="img" aria-label="${esc(label)}: game ${n} of that session">${n}</i>` : '';
   // Artifact comment, same day ("since there are avatars they should open a dialog"): every face opens the profile card.
-  const face = (q, label, lit, n) => { const id = q.real ? q.id : '', a = id ? `data-id="${esc(id)}"` : `data-name="${esc(q.name)}"`; return `<button type="button" class="gm-pl${lit ? ' won' : ''}" data-act="openProfileCard" ${a} aria-label="${esc(q.name)}${n ? `, game ${n} of that session` : ''}. View profile"><span class="gm-av">${avatar(q.real ? q.p : q)}${badge(n, q.name)}</span><b>${esc(label)}</b></button>`; };
+  const face = (q, label, lit, n) => {
+    const hid = o.mask && faceMasked(q), name = hid ? maskName(q.name) : q.name, shown = hid ? maskName(label) : label;
+    const id = q.real ? q.id : '', a = id ? `data-id="${esc(id)}"` : `data-name="${esc(name)}"`;
+    const lv = o.rings ? ` lv-${skillGroupOf(q.real ? q.p : null)}` : '';
+    return `<button type="button" class="gm-pl${lit ? ' won' : ''}${lv}" data-act="openProfileCard" ${a} aria-label="${esc(name)}${n ? `, game ${n} of that session` : ''}. View profile"><span class="gm-av">${avatar(q.real ? (hid ? maskedView(q.p) : q.p) : { ...q, name })}${badge(n, name)}</span><b>${esc(shown)}</b></button>`;
+  };
   const other = (n) => { const id = idByName(n); return id ? { real: true, id, name: n, p: profileOf(id) } : { id: `x-${n}`, name: n, photo: hashStr(n) % 4 !== 0 }; };
-  const meLabel = who ? (who.id === S.me ? 'You' : firstName(who)) : 'Player';
-  const mine = [who ? face({ real: true, id: who.id, name: who.name, p: who }, meLabel, won && !partial, at ? at.gi + 1 : null) : '', ...g.partner.map((n) => face(other(n), n.split(' ')[0], won && !partial, played(n)))].join('');
-  const theirs = g.opp.map((n) => face(other(n), n.split(' ')[0], !won && !partial, played(n))).join('');
+  const whoQ = who ? (who.guest ? { id: who.id, name: who.name, photo: who.photo } : { real: true, id: who.id, name: who.name, p: who }) : null;
+  const meLabel = who ? (who.id === S.me ? 'You' : who.guest ? who.name.split(' ')[0] : firstName(who)) : 'Player';
+  const whoN = at ? (at.ownerName && who && who.name !== at.ownerName ? played(who.name) : at.gi + 1) : null;
+  // On the match page (at.ownerName set) the viewer reads "You" and the session's profile its usual first name wherever they sit.
+  const lbl = (q, n) => (at && at.ownerName && q.real ? (q.id === S.me ? 'You' : n === at.ownerName ? firstName(q.p) : n.split(' ')[0]) : n.split(' ')[0]);
+  const mine = [whoQ ? face(whoQ, meLabel, won && !partial, whoN) : '', ...g.partner.map((n) => { const q = other(n); return face(q, lbl(q, n), won && !partial, played(n)); })].join('');
+  const theirs = g.opp.map((n) => { const q = other(n); return face(q, lbl(q, n), !won && !partial, played(n)); }).join('');
   const res = partial ? '<span class="chip">Not counted</span>' : `<span class="chip ${won ? 'ok' : 'bad'}">${won ? 'Won' : 'Lost'}</span>`;
   const score = g.score ? `<span class="gm-score tnum" aria-label="Score ${g.score}">${g.score}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
-  return `<div class="gm${partial ? ' partial' : ''}"><div class="gm-court ${won ? 'w-left' : 'w-right'}" role="group" aria-label="${esc(g.fmt)}: ${esc(meLabel)}${g.partner.length ? ` and ${esc(g.partner.join(' and '))}` : ''} versus ${esc(g.opp.join(' and '))}">${gmCourtSVG()}<div class="gm-side">${mine}</div><span class="gm-fmt">${esc(g.fmt)}</span>${ctx && !partial ? `<button type="button" class="gm-share" data-act="openShare" data-kind="game" data-sid="${esc(ctx.sid)}" data-gi="${ctx.gi}" aria-label="Share this game" title="Share this game">${I.share}</button>` : ''}<div class="gm-res">${score}${res}</div><div class="gm-side">${theirs}</div></div>${g.note ? `<div class="gm-note small">${esc(g.note)}${g.kind === 'unranked' ? '' : ' · not counted'}</div>` : ''}</div>`;
+  const nm = (n) => (o.mask && faceMasked(other(n)) ? maskName(n) : n), meName = o.mask && whoQ && faceMasked(whoQ) ? maskName(meLabel) : meLabel;
+  const label = `${esc(g.fmt)}: ${esc(meName)}${g.partner.length ? ` and ${esc(g.partner.map(nm).join(' and '))}` : ''} versus ${esc(g.opp.map(nm).join(' and '))}`;
+  return `<div class="gm${partial ? ' partial' : ''}${o.rings ? ' rings' : ''}"><div class="gm-court ${won ? 'w-left' : 'w-right'}${opens ? ' opens' : ''}" role="group" aria-label="${label}">${gmCourtSVG()}${opens ? `<button type="button" class="gm-open" data-act="openMatch" data-mid="${esc(g.mid)}" aria-label="Open the match page: ${label}"></button>` : ''}<div class="gm-side">${mine}</div><span class="gm-fmt">${esc(g.fmt)}</span>${ctx && !partial ? `<button type="button" class="gm-share" data-act="openShare" data-kind="game" data-sid="${esc(ctx.sid)}" data-gi="${ctx.gi}" aria-label="Share this game" title="Share this game">${I.share}</button>` : ''}<div class="gm-res">${score}${res}</div><div class="gm-side">${theirs}</div></div>${g.note ? `<div class="gm-note small">${esc(g.note)}${g.kind === 'unranked' ? '' : ' · not counted'}</div>` : ''}</div>`;
 }
 // Owner, November 13, 2026: "in profile it should show latest sessions joined · when they click on the session then they will see their matches from there".
 // Replaces the Latest matches card: the four latest sessions this player played in, newest first; a row opens that session's matches in a dialog.
@@ -1661,6 +1709,62 @@ function recentGamesCard(p) {
   return `<section class="card stack"><div class="between"><h2>Recent games</h2>${games.length ? `<button class="btn xs" data-act="openHistory" data-id="${esc(p.id)}">All games (${total})</button>` : ''}</div>
         ${games.length ? `<div class="rg-list">${games.slice(0, 3).map(({ g, s }) => `<div class="rg-item">${gameRow(g, p, p.id === S.me ? { sid: s.id, gi: s.games.indexOf(g) } : null, { s, gi: s.games.indexOf(g) })}<p class="small muted rg-src">${esc(s.title)} · ${fmtDay(s.ago)} · ${esc(s.club)}</p></div>`).join('')}</div>` : '<div class="empty">No games recorded yet.</div>'}
       </section>`;
+}
+// ---------- P-MATCH: the public match page, /matches/<matchId> (mockup change 2026-11-25-player-match-page) ----------
+// Owner, November 25, 2026: one public page per match, the same for every player in it; anyone can open it, signed out too.
+// The match id is "<sessionId>-<n>" (see withMatchIds): the session names the history it comes from, n the game's place in it.
+function matchOf(mid) {
+  const m = /^(.+)-(\d+)$/.exec(mid || '');
+  if (!m) return null;
+  const sid = m[1], ownerId = /^m\d+$/.test(sid) ? 'u1' : (/^(.+)-s\d+$/.exec(sid) || [])[1];
+  const owner = ownerId && (Object.hasOwn(S.accounts, ownerId) || /^b\d+$/.test(ownerId)) ? profileOf(ownerId) : null;
+  const s = owner && owner.sessions.find((x) => x.id === sid), g = s && s.games.find((x) => x.mid === mid);
+  return g ? { owner, s, g, gi: s.games.indexOf(g) } : null;
+}
+// A game redrawn from another player's side: that player on the left with their partners; the result and score turn round
+// when they were on the other team.
+function gameFrom(g, ownerName, n) {
+  if (n === ownerName) return g;
+  if (g.partner.includes(n)) return { ...g, partner: [ownerName, ...g.partner.filter((x) => x !== n)] };
+  return { ...g, partner: g.opp.filter((x) => x !== n), opp: [ownerName, ...g.partner], res: g.res === 'W' ? 'L' : 'W', score: g.score ? g.score.split('–').reverse().join('–') : g.score };
+}
+const matchWho = (n, owner) => { if (n === owner.name) return owner; const id = idByName(n); return id ? profileOf(id) : { guest: true, id: `x-${n}`, name: n, photo: hashStr(n) % 4 !== 0 }; };
+const funNote = (g) => (g.kind === 'fun' && !g.note ? { ...g, note: 'Fun game' } : g);
+const matchLink = (mid) => `${/^https?:/.test(location.origin) ? location.origin : 'https://rotra.example'}/player/matches/${mid}`;
+// Where the match page's back button goes: the page the court was tapped on, else the leaderboard.
+const matchFromLabel = () => {
+  const p = S.viewId && ['profile', 'rank'].includes(S.screen) ? profileOf(S.viewId) : null;
+  if (S.screen === 'history') return 'Games';
+  if (S.screen === 'sessions') return 'Sessions';
+  if (p) return hiddenFromViewer(p) ? maskName(p.name) : p.name;
+  return S.screen === 'board' ? 'Leaderboard' : 'Back';
+};
+function viewMatch() {
+  const x = matchOf(S.viewId), from = S.ui.matchFrom, back = backBtn('matchBack', from ? from.label : 'Leaderboard');
+  if (!x) return `<main class="wrap slim"><div class="page-head">${back}<h1>Game not found</h1></div>
+    ${notice('', `No game has the ID <span class="mono">${esc(S.viewId || '')}</span>. Check the link and try again.`)}</main>`;
+  const { owner, s, g, gi } = x, meName = S.me ? (S.me === owner.id ? owner.name : S.accounts[S.me]?.name) : null;
+  // A signed-in player who played in it sees their side on the left as "You"; everyone else sees Team A (the first team) on the left.
+  const lead = meName && (meName === owner.name || g.partner.includes(meName) || g.opp.includes(meName)) ? meName : owner.name;
+  const drawn = gameFrom(g, owner.name, lead), at = (i) => ({ s, gi: i, ownerName: owner.name });
+  const shareCtx = (n, i) => (owner.id === S.me && n === owner.name ? { sid: s.id, gi: i } : null);
+  const court = gameRow(funNote(drawn), matchWho(lead, owner), shareCtx(lead, gi), at(gi), { open: false, rings: true, mask: true });
+  const title = s.pageGone ? esc(s.title) : `<button type="button" class="sh-linkish" data-act="sessionPage" data-title="${esc(s.title)}">${esc(s.title)}</button>`;
+  // Before this game: one block per player, the left side then the right, with that player's earlier games of the session in play order.
+  const blocks = [lead, ...drawn.partner, ...drawn.opp].map((n) => {
+    const who = matchWho(n, owner), q = who.guest ? { real: false, name: n } : { real: true, p: who };
+    const hid = faceMasked(q), shown = who.id === S.me ? 'You' : hid ? maskName(n.split(' ')[0]) : (who.guest ? n.split(' ')[0] : firstName(who));
+    const earlier = s.games.slice(0, gi).map((y, i) => ({ y, i })).filter(({ y }) => n === owner.name || y.partner.includes(n) || y.opp.includes(n));
+    const a = who.guest ? `data-name="${esc(hid ? maskName(n) : n)}"` : `data-id="${esc(who.id)}"`;
+    const pic = avatar(who.guest ? { ...who, name: hid ? maskName(n) : n } : hid ? maskedView(who) : who);
+    return `<div class="mt-blk"><div class="between"><button type="button" class="mt-who" data-act="openProfileCard" ${a} aria-label="${esc(hid ? maskName(n) : n)}. View profile">${pic}<b>${esc(shown)}</b></button><span class="small muted">${earlier.length ? `${earlier.length} earlier ${earlier.length === 1 ? 'game' : 'games'}` : 'No earlier games'}</span></div>
+      ${earlier.map(({ y, i }) => gameRow(funNote(gameFrom(y, owner.name, n)), who, shareCtx(n, i), at(i), { mask: true })).join('')}</div>`;
+  }).join('');
+  return `<main class="wrap mid">
+    <div class="page-head">${back}<h1>Game</h1></div>
+    <section class="card stack">${court}<p class="small muted mt-src">${title} · ${fmtDay(s.ago)} · ${esc(s.club)}</p></section>
+    <section class="card stack"><h2>Before this game</h2>${blocks}</section>
+  </main>`;
 }
 function viewSessions() {
   const p = profileOf(S.viewId);
@@ -3482,7 +3586,8 @@ function shareModel(sh) {
   }
   if (sh.kind === 'game') {
     const g = s.games[+sh.gi]; if (!g) return null;
-    return { kind: 'games', one: true, title: 'Share game', top, link, blocks: [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` }, { t: 'lines', lines: [{ res: g.res, score: g.score, mine: [p, ...g.partner.map(sharePerson)], theirs: g.opp.map(sharePerson), mineLabel: [p.name, ...g.partner.map(shareName)].map((n) => n.split(' ')[0]).join(' + '), theirsLabel: g.opp.map((n) => shareName(n).split(' ')[0]).join(' + ') }] }, { t: 'stat', text: `${g.fmt} · ${g.res === 'W' ? 'Won' : 'Lost'}${g.score ? ` ${g.score}` : ''}` }] };
+    // Mockup change 2026-11-25-player-match-page: the Link field holds the game's match page.
+    return { kind: 'games', one: true, title: 'Share game', top, link: matchLink(g.mid), blocks: [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` }, { t: 'lines', lines: [{ res: g.res, score: g.score, mine: [p, ...g.partner.map(sharePerson)], theirs: g.opp.map(sharePerson), mineLabel: [p.name, ...g.partner.map(shareName)].map((n) => n.split(' ')[0]).join(' + '), theirsLabel: g.opp.map((n) => shareName(n).split(' ')[0]).join(' + ') }] }, { t: 'stat', text: `${g.fmt} · ${g.res === 'W' ? 'Won' : 'Lost'}${g.score ? ` ${g.score}` : ''}` }] };
   }
   const gs = s.games.filter((g) => g.kind !== 'partial'), w = gs.filter((g) => g.res === 'W').length, l = gs.length - w;
   const head = [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` }];
@@ -3916,6 +4021,9 @@ const ACT = {
   goBoard: () => go('board'),
   goLogin: () => go('login'),
   openProfile: (el) => go('profile', el.dataset.id),
+  // Mockup change 2026-11-25-player-match-page: tapping a game court opens its match page.
+  openMatch: (el) => { if (S.screen !== 'match') S.ui.matchFrom = { to: S.screen, id: S.viewId, label: matchFromLabel() }; go('match', el.dataset.mid); },
+  matchBack: () => { const f = S.ui.matchFrom; S.ui.matchFrom = null; if (f) go(f.to, f.id); else go('board'); },
   // Artifact comment, November 13, 2026: leaderboard rows and the podium open this card first; its Open full profile goes to the profile page.
   openClubCard: (el) => { S.ui.sheet = { type: 'clubCard', id: el.dataset.id }; render(); },
   openSessionGames: (el) => { S.ui.sheet = { type: 'sessionGames', id: el.dataset.id, sid: el.dataset.sid }; render(); },
@@ -3972,8 +4080,9 @@ const ACT = {
   shareView: (el) => { if (S.ui.sheet?.type === 'share') { S.ui.sheet.shv = el.dataset.v; render(); } },
   shareViewClose: () => { if (S.ui.sheet) { S.ui.sheet.shv = null; render(); } },
   copyShareLink: () => {
-    const link = profileLink(S.ui.sheet?.pid || S.me);
-    try { navigator.clipboard.writeText(link).then(() => toast('Link copied'), () => toast(`Couldn't copy. Your profile link is ${link}`)); } catch (e) { toast(`Couldn't copy. Your profile link is ${link}`); }
+    const m = S.ui.sheet ? shareModel(S.ui.sheet) : null, game = S.ui.sheet?.kind === 'game';
+    const link = m ? m.link : profileLink(S.ui.sheet?.pid || S.me), what = game ? 'The game link' : 'Your profile link';
+    try { navigator.clipboard.writeText(link).then(() => toast('Link copied'), () => toast(`Couldn't copy. ${what} is ${link}`)); } catch (e) { toast(`Couldn't copy. ${what} is ${link}`); }
   },
   shareNative: () => toast('Share sheet opened'),
   savePhotos: () => toast('Share menu opened. Tap Save Image to add it to Photos.'),
@@ -4541,6 +4650,7 @@ function prototypePath() {
   let path = playerPaths[S.screen];
   if (['profile', 'history', 'rank', 'sessions'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : S.screen === 'sessions' ? '/sessions' : ''}` : '/rank';
   if (S.screen === 'club') path = `/clubs/${encodeURIComponent(S.viewId)}`;
+  if (S.screen === 'match') path = `/matches/${encodeURIComponent(S.viewId || '')}`;
   if (S.screen === 'clubMembers') path = `/clubs/${encodeURIComponent(S.viewId)}/members`;
   if (S.screen === 'notfound') path = `/find/${encodeURIComponent(S.ui.findId || S.viewId || 'unknown')}`;
   if (['claim', 'claimDone', 'reset'].includes(S.screen)) path = `/${S.screen === 'reset' ? 'reset-password' : 'claim'}/${encodeURIComponent(prototypeToken)}${S.screen === 'claimDone' ? '?complete=1' : ''}`;
@@ -4562,6 +4672,8 @@ function applyPrototypeRoute(url) {
   const profile = path.match(/^\/players\/([^/]+)(?:\/(rank|games|sessions))?$/);
   const token = path.match(/^\/(claim|reset-password)\/([^/]+)$/);
   const find = path.match(/^\/find\/([^/]+)$/);
+  const matchPage = path.match(/^\/matches\/([^/]+)$/);
+  if (matchPage) { screen = 'match'; id = decodeURIComponent(matchPage[1]); } // an unknown id shows the page's not-found state
   const clubMembersPage = path.match(/^\/clubs\/([^/]+)\/members$/);
   if (clubMembersPage) { id = decodeURIComponent(clubMembersPage[1]); if (!CLUB_DIR[id]) return false; screen = 'clubMembers'; S.ui.cm = { q: '', band: 'all' }; }
   const clubPage = path.match(/^\/clubs\/([^/]+)$/);
@@ -4606,7 +4718,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { onboard: viewOnboard, obDetails: viewObDetails, register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, home: viewHome, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
+  const views = { onboard: viewOnboard, obDetails: viewObDetails, register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, home: viewHome, profile: viewProfile, match: viewMatch, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
   if (needsGoogle() && S.gDeadline === 'passed' && !['gRequired', 'board', 'privacy', 'terms'].includes(S.screen)) S.screen = 'gRequired';
   if (S.screen === 'gRequired' && !needsGoogle()) S.screen = 'profile';
   const sh = S.ui.sheet;

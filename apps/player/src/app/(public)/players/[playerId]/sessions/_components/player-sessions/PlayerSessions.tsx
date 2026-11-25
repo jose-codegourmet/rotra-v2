@@ -14,6 +14,7 @@ import { SessionMatchesSheet } from '@rotra/ui/session-matches-sheet'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { GamePlayerProfile } from '@/app/_components/game-player-profile/GamePlayerProfile'
+import { useOpenMatch } from '@/app/_components/match-link/useOpenMatch'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { usePlayerShareSheet } from '@/app/_components/share/usePlayerShareSheet'
 import { useAppSelector } from '@/store/hooks'
@@ -35,6 +36,7 @@ export function PlayerSessions({ playerId }: { playerId: string }) {
   const viewerId = session.data?.account.id ?? account?.id ?? null
   const own = viewerId === playerId
   const sharing = usePlayerShareSheet(own ? playerId : null)
+  const openMatch = useOpenMatch('Sessions')
   const [openSessionId, setOpenSessionId] = useState<string | null>(null)
   const [openPlayer, setOpenPlayer] = useState<GameRowPlayer | null>(null)
   const back = (
@@ -126,6 +128,7 @@ export function PlayerSessions({ playerId }: { playerId: string }) {
         me={me}
         onOpenPlayer={setOpenPlayer}
         onShareGame={own ? sharing.openGame : undefined}
+        onOpenGame={openMatch}
         onSharePerformance={own ? sharing.openPerformance : undefined}
       />
       <GamePlayerProfile

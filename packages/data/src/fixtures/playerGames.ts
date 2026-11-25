@@ -37,7 +37,9 @@ export const JOSE_SESSIONS: PlayerSessionRecord[] = [
     sessionPageUrl: null,
     games: [
       game('doubles', ['Aaron'], ['Gab', 'Mikee Abellana'], 'won', '21–18'),
-      game('doubles', ['Dalton'], ['Karl', 'Jasper'], 'lost', null),
+      // The match page sample (`recorded-game-1`): Jose and Gab each have an earlier game that
+      // night, and the four play at different levels (Gab advanced, the rest intermediate).
+      game('doubles', ['Dalton'], ['Gab', 'Jasper'], 'lost', null),
       game('singles', [], ['Albion'], 'won', '21–15'),
       game('fun_3v3', ['Raymark', 'Vince'], ['Emji', 'Derrick', 'Andrew'], 'won', '21–12', 'fun'),
     ],

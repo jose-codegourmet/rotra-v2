@@ -70,6 +70,7 @@ flowchart TD
 | [Public and own player profile](modules/player-information/profile.md) | `P-PUBLIC-PROFILE`, `P-OWN-PROFILE`, `P-EDIT-PROFILE` |
 | [Public club page and club members](modules/player-information/club-page.md) | `P-CLUB-PAGE`, `P-CLUB-MEMBERS` |
 | [Global leaderboard, rank explanation, and game history](modules/player-information/ranking-history.md) | `P-LEADERBOARD`, `P-RANK-DETAIL`, `P-ELIGIBILITY`, `P-MATCH-HISTORY` |
+| [Public match page](modules/player-information/match-page.md) | `P-MATCH-PAGE` |
 | [Legal pages](modules/player-information/legal.md) | `P-PRIVACY`, `P-TERMS` |
 
 ### Admin
@@ -113,6 +114,10 @@ While the `player_google_sign_in` flag is on (#919), the same routes show the in
 ### Player club routes (epic P07)
 
 Proposed November 11, 2026 ([D-2026-11-11-11](../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)): `/clubs/[clubId]` (`P-CLUB-PAGE`) and `/clubs/[clubId]/members` (`P-CLUB-MEMBERS`) in Player Information. Both are public (no sign-in), served per request, never indexed and never static; signed-out visitors see masked member names. Linked from the clubs card on every readable profile ([D-2026-11-12-04](../../mvp/decisions/2026-11-12.md#d-2026-11-12-04)). The Members page's back link returns to the club page. Member taps open the profile dialog and don't navigate. Unknown club ids are not found. The prototype serves them under `/player/clubs/c1`.
+
+### Player match route
+
+Owner decision, November 25, 2026 ([log](../../mockup-changes/2026-11-25-player-match-page.md)): `/matches/[matchId]` (`P-MATCH-PAGE`) in Player Information, one public page per match, the same for every player in it. Public (no sign-in); names follow the profile privacy rules. Opened by tapping any game court and from the **Link** field of **Share game**. Its back link returns to the page the court was tapped on, else the leaderboard. Unknown match ids show the page's not-found state. The prototype serves it under `/player/matches/m1-2`.
 
 ### Player legal routes
 

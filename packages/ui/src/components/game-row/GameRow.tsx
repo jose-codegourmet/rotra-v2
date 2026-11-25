@@ -11,13 +11,29 @@ export type GameRowProps = {
    * The profile the games belong to, drawn first on the left. `label` is “You” on your own profile,
    * else the first name. Missing draws “Player”.
    */
-  me?: { name: string; label: string; picture?: string | null; playerId: string }
+  me?: { name: string; label: string; picture?: string | null; playerId: string | null }
   /** Opens the tapped face's profile card; without it the faces are not buttons */
   onOpenPlayer?: (player: GameRowPlayer) => void
   /** Your own games only: the round share icon in the top-right corner (“Share this game”) */
   onShare?: () => void
   /** Muted line under the court (Recent games: “session · date · club”) */
   dateLine?: string
+  /**
+   * Opens this game's match page (2026-11-25 match page log): the whole court box is a button
+   * under the faces; faces and the share icon keep their own actions. Without it the court opens
+   * nothing (the match page's own court).
+   */
+  onOpen?: () => void
+  /**
+   * Match page court only: each face's skill-group ring (off by default). Returns the face's skill
+   * group that night, or null for the none ring.
+   */
+  skillRings?: (player: GameRowPlayer) => MatchCourtPlayer['skillGroup']
+  /**
+   * Match page: the signed-in player, whose face reads “You” wherever they sit (another player's
+   * earlier games drawn from that player's side).
+   */
+  viewerPlayerId?: string | null
 }
 
 const FORMATS = {
@@ -43,7 +59,16 @@ export const NOT_RANKED_NOTE =
  * person had played in the session, this one included; 2026-11-14 log). A game of a not ranked
  * session keeps its Won / Lost and carries the not ranked note, without “· not counted”.
  */
-export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowProps) {
+export function GameRow({
+  game,
+  me,
+  onOpenPlayer,
+  onShare,
+  dateLine,
+  onOpen,
+  skillRings,
+  viewerPlayerId,
+}: GameRowProps) {
   const partial = game.counting === 'partial'
   const notRanked = game.counting === 'not_ranked'
   const won = game.result === 'won'
@@ -54,6 +79,8 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
   const opponents: GameRowPlayer[] =
     game.opponentPlayers ?? game.opponents.map((name) => ({ name, picture: null }))
   const meLabel = me?.label ?? 'Player'
+  const labelOf = (p: GameRowPlayer) =>
+    viewerPlayerId && p.playerId === viewerPlayerId ? 'You' : firstName(p.name)
 
   const face = (player: GameRowPlayer, label: string, openable: boolean): MatchCourtPlayer => ({
     key: `${player.playerId ?? ''}-${player.name}`,
@@ -62,6 +89,7 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
     pictureUrl: player.picture,
     onOpen: openable && onOpenPlayer ? () => onOpenPlayer(player) : undefined,
     badge: player.sessionGameNumber,
+    skillGroup: skillRings?.(player),
   })
 
   const left: MatchCourtPlayer[] = [
@@ -79,9 +107,9 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
           ),
         ]
       : []),
-    ...partners.map((p) => face(p, firstName(p.name), known)),
+    ...partners.map((p) => face(p, labelOf(p), known)),
   ]
-  const right = opponents.map((p) => face(p, firstName(p.name), known))
+  const right = opponents.map((p) => face(p, labelOf(p), known))
 
   return (
     <MatchCourt
@@ -97,6 +125,8 @@ export function GameRow({ game, me, onOpenPlayer, onShare, dateLine }: GameRowPr
       note={notRanked ? NOT_RANKED_NOTE : game.note || undefined}
       plainNote={notRanked}
       dateLine={dateLine}
+      onOpen={onOpen}
+      skillRings={!!skillRings}
       action={
         onShare && !partial ? (
           <button

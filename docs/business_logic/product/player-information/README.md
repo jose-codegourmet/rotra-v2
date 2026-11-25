@@ -38,3 +38,15 @@ A club has a public page in the Player app at `/clubs/[clubId]`, opened from the
 - **Members page** `/clubs/[clubId]/members`: all members, searchable by name or nickname, filterable by level, grouped by first letter with an A–Z index, like Queue's Saved players. Masked members are listed without a button and never match a search.
 - **Profile dialog.** A member opens a dialog instead of leaving the page: banner, picture (opens the full photo), the display name (nickname, else full name) with the full name under it when there is a nickname and a copy-player-ID button ([D-2026-11-13-04](../../../mvp/decisions/2026-11-13.md#d-2026-11-13-04)), level, overall position when there is one, **About** (registered in, RTR ID) and **Latest stats** (the year as a chip; split in two on the podium's green grid background: the left 30% is **Win rate**, a big accent percentage with a pixel fire beside it that grows with the rate; the right 70% has “Latest stats” and the year over Games, Wins and Losses, [mockup log](../../../mockup-changes/2026-11-13-profile-stats-redesign.md)) (this calendar year, reset on January 1, [D-2026-11-13-03](../../../mvp/decisions/2026-11-13.md#d-2026-11-13-03)). A private member's dialog shows picture and banner only.
 - The page is served per request, never indexed and never static.
+
+## Public match page
+
+Owner decision, November 25, 2026 ([mockup log](../../../mockup-changes/2026-11-25-player-match-page.md), screen [P-MATCH-PAGE](../../../screens/product/modules/player-information/match-page.md)). Mockup only so far; not ticketed.
+
+- **One page per match.** Every recorded game has a public page at `/matches/[matchId]`. The id is the match's own id, so every player in that match opens the same page. Anyone can open it, signed out too. It is read-only, like all history: no edit, dispute or score-later action.
+- **What it shows.** The game as a court (format, score or “No score”, Won / Lost read from the left side, the games badge on each face, each player's skill group), the session title, date and club, then **Before this game**: for each player in the game, their earlier games of the same session in play order.
+- **Who is on the left.** A signed-in player who played in the game sees their own side on the left as “You”. Everyone else sees the first team (Team A) on the left.
+- **Privacy.** Names follow each player's profile visibility for the viewer, as on profiles and the public session page: a visitor sees Private players and guests masked, an Always private player is masked for everyone but themselves, pictures stay visible. A player whose level is hidden from the viewer shows no skill group.
+- **What counts is unchanged.** Fun, partial and not ranked games keep their notes; the page adds no counting rule.
+- **Opening it.** Tapping any game court in ROTRA Player opens its match page; the faces still open the profile card and the share icon still shares. **Share game** links to the match page (see [What a player may share](modules/ranking/README.md#what-a-player-may-share)).
+- **Unknown id.** A match id that doesn't exist shows a not-found state.

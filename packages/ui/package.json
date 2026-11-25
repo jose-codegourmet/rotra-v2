@@ -520,6 +520,7 @@
     "./share-dialog": "./src/components/share-dialog/ShareDialog.tsx",
     "./session-title-link": "./src/components/session-title-link/SessionTitleLink.tsx",
     "./match-court": "./src/components/match-court/MatchCourt.tsx",
+    "./match-page": "./src/components/match-page/MatchPage.tsx",
     "./public-match-history": "./src/components/public-match-history/PublicMatchHistory.tsx",
     "./session-standings": "./src/components/session-standings/SessionStandings.tsx",
     "./leaderboard-share-card": "./src/components/leaderboard-share-card/LeaderboardShareCard.tsx",

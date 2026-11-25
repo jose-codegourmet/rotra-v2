@@ -1,30 +1,26 @@
 import { getSession } from '../auth/fetchers'
 import { unclaimedClubCount } from '../leaderboard/identity'
 import { MockError } from '../mock/errors'
-import { readMockState } from '../mock/store'
+import { type MockState, readMockState } from '../mock/store'
 import type { ProfileVisibility } from './player.types'
 import { PROFILE_LOGIN_MESSAGE, PROFILE_PRIVATE_MESSAGE } from './visibility.rules'
 
 export { PROFILE_LOGIN_MESSAGE, PROFILE_PRIVATE_MESSAGE } from './visibility.rules'
 
 /** The stored level of a profile (`players.profile_visibility`); an identity without one is public. */
-export function profileVisibility(playerId: string): ProfileVisibility {
-  return (
-    readMockState().playerProfiles.find((p) => p.playerId === playerId)?.profileVisibility ??
-    'public'
-  )
+export function profileVisibility(playerId: string, state = readMockState()): ProfileVisibility {
+  return state.playerProfiles.find((p) => p.playerId === playerId)?.profileVisibility ?? 'public'
 }
 /**
  * Masked for visitors who are not signed in: a Private or Always private profile, an unclaimed
  * account, or a guest/unclaimed club identity. Existing fixture identities without an account are
  * public unless explicitly unclaimed/guest.
  */
-export function isPrivatePlayer(playerId: string) {
-  const state = readMockState()
+export function isPrivatePlayer(playerId: string, state: MockState = readMockState()) {
   const account = state.playerAccounts.find((a) => a.playerId === playerId)
   if (unclaimedClubCount(state, playerId) === 1) return false
   return !!(
-    profileVisibility(playerId) !== 'public' ||
+    profileVisibility(playerId, state) !== 'public' ||
     account?.claimed === false ||
     state.clubPlayers.some(
       (p) => p.playerId === playerId && (p.identity === 'guest' || p.identity === 'unclaimed'),
@@ -32,8 +28,11 @@ export function isPrivatePlayer(playerId: string) {
   )
 }
 /** Always private (D-2026-11-12-01): masked for everyone but the player themselves. */
-export function isAlwaysPrivatePlayer(playerId: string | null | undefined) {
-  return !!playerId && profileVisibility(playerId) === 'always_private'
+export function isAlwaysPrivatePlayer(
+  playerId: string | null | undefined,
+  state: MockState = readMockState(),
+) {
+  return !!playerId && profileVisibility(playerId, state) === 'always_private'
 }
 /**
  * Show my profile stats (2026-11-13-player-stats-visibility): off hides Latest stats from everyone

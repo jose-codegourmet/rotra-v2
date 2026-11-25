@@ -3,6 +3,7 @@ import { accountVerificationIn } from '../account-verification/mockVerification'
 import { appOrigin } from '../app-origins'
 import { getSession } from '../auth/fetchers'
 import type { Gender } from '../club-player/clubPlayer.types'
+import { clubPictureState, takesClubPicture } from '../club-player/clubPlayerPicture.rules'
 import { getConnectivity } from '../connectivity/connectivity'
 import { unclaimedClubCount } from '../leaderboard/identity'
 import { LEADERBOARD_LIMIT } from '../leaderboard/leaderboard.types'
@@ -101,10 +102,29 @@ export async function getPlayerGames(
     }),
   }))
 }
-/** A face on a game court: a ROTRA profile by full name or nickname, else a guest (no playerId). */
+/**
+ * The picture a club set for its guest (D-2026-11-09-12), by full name or nickname, resolved to an
+ * image, else null (initials). The same rule as the session page; registered players never match.
+ */
+export function guestClubPicture(name: string, state = readMockState()): string | null {
+  const row = state.clubPlayers.find(
+    (p) =>
+      !p.removedAt &&
+      !p.linkedToClubPlayerId &&
+      takesClubPicture(p) &&
+      p.picture &&
+      (p.fullName === name || p.nickname === name),
+  )
+  const reference = row ? clubPictureState(row, null).reference : null
+  return profileCharacterImage(reference) ?? reference
+}
+/**
+ * A face on a game court: a ROTRA profile by full name or nickname, else a guest (no playerId) with
+ * the picture the club set for it, if any.
+ */
 function gamePlayer(name: string, profiles: PlayerProfile[]): PlayerGamePlayer {
   const profile = profiles.find((p) => p.fullName === name || p.nickname === name)
-  if (!profile) return { name, picture: null, playerId: null }
+  if (!profile) return { name, picture: guestClubPicture(name), playerId: null }
   return {
     name,
     picture: profileCharacterImage(profile.picture) ?? profile.picture ?? null,

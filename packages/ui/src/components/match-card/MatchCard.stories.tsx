@@ -92,7 +92,7 @@ export const WaitOnCourt: Story = {
   args: withWait(matchCardFixtures.ready, { kind: 'on-court' }),
 }
 export const WaitPlaying: Story = {
-  args: withWait(matchCardFixtures.blocked, { kind: 'playing' }),
+  args: withWait(matchCardFixtures.blocked, { kind: 'playing', courtLabel: 'Court 1', minutes: 4 }),
 }
 export const WaitNotHere: Story = {
   args: withWait(matchCardFixtures.needsAttention, { kind: 'not-here' }),
@@ -104,7 +104,10 @@ export const MixedWaits: Story = {
       { kind: 'minutes', minutes: 3 },
       { kind: 'minutes', minutes: 12 },
     ]
-    const waitsB: PlayerWait[] = [{ kind: 'minutes', minutes: 17 }, { kind: 'playing' }]
+    const waitsB: PlayerWait[] = [
+      { kind: 'minutes', minutes: 17 },
+      { kind: 'playing', courtLabel: 'Court 2', minutes: 9 },
+    ]
     return {
       ...base,
       teamA: base.teamA.map((p, i) => ({ ...p, wait: waitsA[i] ?? p.wait })),

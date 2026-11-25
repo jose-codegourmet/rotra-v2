@@ -1,6 +1,6 @@
 import 'server-only'
 import { sharePositions } from '@rotra/data/match/match.rules'
-import { ROWS_PER_FRAME } from '@rotra/data/session-result/sessionResult.rules'
+import { paginateStandings } from '@rotra/data/session-result/sessionResult.rules'
 import type { SessionAwards, StandingRow } from '@rotra/data/session-result/types'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -306,9 +306,9 @@ export async function requestResultExport(
       where: { id: context.clubId },
       select: { name: true, logoRef: true },
     })
-    const rows = (snapshot.standings as unknown as StandingRow[]).length
+    const standings = sharePositions(snapshot.standings as unknown as StandingRow[])
     const standingFrames = slides.includes('standings')
-      ? Math.max(1, Math.ceil(rows / ROWS_PER_FRAME[input.format]))
+      ? paginateStandings(standings, input.format).length
       : 0
     const created = await tx.resultExport.create({
       data: {

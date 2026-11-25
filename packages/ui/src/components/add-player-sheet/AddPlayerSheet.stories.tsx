@@ -146,6 +146,32 @@ type Story = StoryObj<typeof meta>
 /** Saved players tab with 17 of the 23 saved players already in the session. */
 export const SavedPlayers: Story = {}
 
+const showSaved =
+  (filter: RegExp): Story['play'] =>
+  async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.click(await body.findByRole('radio', { name: filter }))
+  }
+
+/** Typing in the saved search: skeleton rows until typing pauses for 0.5 s, then the matches. */
+export const SavedSearching: Story = {
+  play: async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.type(await body.findByRole('searchbox', { name: /Search saved players/ }), 'a')
+  },
+}
+
+/** The Saved players filter on Guest: only guests are listed; the counts follow the search. */
+export const SavedFilterGuest: Story = { play: showSaved(/^Guest · /) }
+export const SavedFilterUnclaimedLight: Story = {
+  play: showSaved(/^Unclaimed · /),
+  globals: { theme: 'light' },
+}
+export const SavedFilterPhone: Story = {
+  play: showSaved(/^Registered · /),
+  globals: { viewport: { value: 'phone' } },
+}
+
 export const AllInSession: Story = {
   args: { inSessionIds: savedCandidates.map((p) => p.id) },
 }

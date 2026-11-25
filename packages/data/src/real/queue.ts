@@ -348,10 +348,12 @@ export type WireSession = Omit<
   | 'finalizedAt'
   | 'playerRecordsUpdatedAt'
   | 'cancelledAt'
+  | 'plannedBeforeStart'
 > & {
   scheduledStartAt: string
   scheduledEndAt: string
   startedAt: string | null
+  plannedBeforeStart?: { startAt: string; endAt: string } | null
   finalizedAt: string | null
   cancelledAt?: string | null
 }
@@ -401,6 +403,12 @@ export function summaryOf(wire: WireSessionSummary, downloadedHere: boolean): Qu
     scheduledStartAt: msOf(session.scheduledStartAt),
     scheduledEndAt: msOf(session.scheduledEndAt),
     startedAt: msOrNull(session.startedAt),
+    plannedBeforeStart: session.plannedBeforeStart
+      ? {
+          startAt: msOf(session.plannedBeforeStart.startAt),
+          endAt: msOf(session.plannedBeforeStart.endAt),
+        }
+      : null,
     finalizedAt: msOrNull(session.finalizedAt),
     cancelledAt: msOrNull(session.cancelledAt ?? null),
     playerRecordsUpdatedAt: null,

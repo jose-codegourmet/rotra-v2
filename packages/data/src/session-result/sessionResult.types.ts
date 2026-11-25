@@ -87,8 +87,12 @@ export type ExportSelection = {
   slides: PublishedSlide[]
   includeOffDay: boolean
 }
-/** One image of a Download images export: its title and the lines it lists. */
-export type ExportFrame = {
-  title: string
-  rows: string[]
-}
+/**
+ * One image of a Download images export. A standings image holds whole positions (a shared
+ * position is never split); `page` and `pages` give its "Standings · 1 of 3" title. Awards and Off
+ * Day are one image each, drawn from the snapshot's awards.
+ */
+export type ExportFrame =
+  | { kind: 'standings'; title: string; rows: StandingRow[]; page: number; pages: number }
+  | { kind: 'awards'; title: 'Awards' }
+  | { kind: 'offDay'; title: 'Off Day' }

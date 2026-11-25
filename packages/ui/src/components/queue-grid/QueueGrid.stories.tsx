@@ -134,7 +134,7 @@ const WAIT_CYCLE: PlayerWait[] = [
   { kind: 'minutes', minutes: 12 },
   { kind: 'minutes', minutes: 17 },
   { kind: 'on-court' },
-  { kind: 'playing' },
+  { kind: 'playing', courtLabel: 'Court 1', minutes: 4 },
   { kind: 'not-here' },
 ]
 

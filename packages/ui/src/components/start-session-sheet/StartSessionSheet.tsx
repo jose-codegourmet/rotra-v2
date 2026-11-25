@@ -109,7 +109,8 @@ export function StartSessionSheet({
             <>
               <Notice tone="warn">
                 This session was planned for {formatPlannedFor(planned.start, planned.end, now)}.
-                Set a new end time to start.
+                {planned.start > now ? ' Starting now moves its start to now.' : ''} Set a new end
+                time to start.
               </Notice>
               <Field label="New end">
                 <DateTimePicker

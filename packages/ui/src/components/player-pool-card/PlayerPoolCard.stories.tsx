@@ -36,7 +36,7 @@ const propsFor = (
 })
 
 // Fixture roles: 0–3 are on Court 1 (match 1), 4 waits in match 2 (queue #1), 5 is away, 10 is free.
-const playing = propsFor(playerAt(0), { kind: 'playing', courtLabel: 'Court 1' })
+const playing = propsFor(playerAt(0), { kind: 'playing', courtLabel: 'Court 1', minutes: 7 })
 const queued = propsFor(playerAt(4), { kind: 'queued', position: 1 }, 12)
 const away = propsFor(playerAt(5), { kind: 'away' })
 const free = propsFor(playerAt(10), { kind: 'free' }, 27)
@@ -60,7 +60,13 @@ type Story = StoryObj<typeof meta>
 /** Present, off court and in no waiting match: shows the wait time and "Free" */
 export const Available: Story = {}
 /** On court: the status line turns accent and no wait time shows */
+/** "Playing 7m"; hovering the pill shows "Playing on Court 1" */
 export const Playing: Story = { args: playing }
+/** On court but not started yet: "Getting ready" */
+export const GettingReady: Story = {
+  args: { ...playing, status: { kind: 'playing', courtLabel: 'Court 2', minutes: null } },
+}
+export const GettingReadyLight: Story = { ...GettingReady, globals: { theme: 'light' } }
 /** Not present: greyed picture, "Away", Present switch off */
 export const Away: Story = { args: away }
 /** Away, no games, in no match: No show (cancelled) is the only button (no Move to waitlist during play) */

@@ -90,7 +90,7 @@ async function barriers(tx: Tx, sessionId: string, now: Date) {
  * are removed the same way. Court usage is closed with no release operation. Runs inside the
  * Session done transaction, so the courts are free the moment it commits.
  */
-async function dropUnstarted(tx: Tx, sessionId: string, now: Date) {
+export async function dropUnstarted(tx: Tx, sessionId: string, now: Date) {
   const placed = await tx.match.findMany({
     where: { sessionId, state: 'on_court', removedAt: null },
     select: { id: true },

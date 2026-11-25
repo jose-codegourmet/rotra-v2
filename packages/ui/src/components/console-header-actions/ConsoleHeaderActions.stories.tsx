@@ -17,6 +17,7 @@ const meta = {
     onOpenPublicPage: fn(),
     onCopyFacebookPost: fn(),
     onGoHome: fn(),
+    onBackToPreparation: fn(),
   },
   // In place: the title block on the left, the cluster at the upper right (under it on phones).
   render: (args) => (
@@ -55,7 +56,7 @@ export const MatchRequestsWaitingLight: Story = {
   globals: { theme: 'light' },
 }
 
-/** The ⋯ More menu open: Public page, Copy Facebook post, Home. */
+/** The ⋯ More menu open: Public page, Copy Facebook post, Home, Back to preparation…. */
 export const MoreMenuOpen: Story = { play: openMore }
 export const MoreMenuOpenLight: Story = { play: openMore, globals: { theme: 'light' } }
 
@@ -93,4 +94,14 @@ export const PhoneLight: Story = {
 export const Desktop: Story = {
   args: { matchRequestCount: matchRequests.length },
   globals: { viewport: { value: 'desktop' } },
+}
+
+/** A game has started: Back to preparation… is disabled with its reason. */
+export const BackToPreparationDisabled: Story = {
+  args: { backToPreparationDisabledReason: 'Not available once a game has started.' },
+  play: openMore,
+}
+export const BackToPreparationDisabledLight: Story = {
+  ...BackToPreparationDisabled,
+  globals: { theme: 'light' },
 }

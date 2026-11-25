@@ -5,6 +5,8 @@ export const matchCardMeta = {
   description:
     'One waiting match in the shared queue: queue position, format, origin, flow arrow and drag handle; Team A, VS, Team B (44 px faces, 15 px names, optional per-name wait); a status line (ready, needs attention, blocked, waiting for courts) that is always icon + text; Start, Edit and Remove.',
   usage: [
+    'Compact (owner, November 25, 2026): the two teams side by side with VS between, each a picture stack above its names joined by "&".',
+    "Each live face shows a StatusPill through PlayerFaceButton's wait (owner, November 25, 2026): In queue Nm, Playing Nm with the court on hover, Getting ready, or Away.",
     'Search highlights matching players and dims other cards without modifying the queue.',
     'readOnly removes the drag handle, operator metadata, profile buttons and actions for a signed-in Player on a public session page.',
     "Use for every waiting match in the Queue tab grid and in the Session view's upcoming row.",
@@ -24,6 +26,7 @@ export const matchCardMeta = {
     screen: 'Q-QUEUE › queueCard() (.qtile, .qt-head, .qfaces, .status-line)',
   },
   docs: [
+    'docs/mockup-changes/2026-11-25-queue-upcoming-side-by-side.md',
     'docs/screens/product/modules/queue/match-queue.md',
     'docs/screens/product/modules/queue/session-console.md',
     'docs/business_logic/product/queue/modules/queueing/README.md',

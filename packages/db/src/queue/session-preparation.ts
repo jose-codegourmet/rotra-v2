@@ -16,8 +16,9 @@ import { notifyWaitlistPlace } from '../player/notification-events'
 import { requireClubEntitlement, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { courtDto, levelRestrictionInput, requestFormatsInput, sessionDto } from './dto'
+import { dropUnstarted } from './finalization'
 import { autoFillCourts } from './match-control'
-import { liveOpenRequests } from './match-request-store'
+import { closeSessionMatchRequests, liveOpenRequests } from './match-request-store'
 import { assignSessionHostsIn, type HostRegistration, hostIdsInput } from './session-hosts'
 import {
   derivedId,
@@ -587,7 +588,15 @@ export async function startSession(
         data: {
           state: 'active',
           startedAt: now,
+          // Back to preparation puts these back (owner, November 25, 2026).
+          plannedStartBeforeStartAt: session.scheduledStartAt,
+          plannedEndBeforeStartAt: session.scheduledEndAt,
           ...(late && newEnd != null ? { scheduledEndAt: new Date(newEnd) } : {}),
+          // Started on an earlier day than planned (owner, November 25, 2026): the planned start
+          // moves to now, so the window is now → the new end. Courts that follow it open now.
+          ...(late && newEnd != null && plannedStartAt > now.getTime()
+            ? { scheduledStartAt: now }
+            : {}),
           startLicenseTermId: entitlement.effectiveTermId,
           revision: { increment: 1 },
         },
@@ -600,6 +609,75 @@ export async function startSession(
       // #1011: pending slot transfers expire at Start; every slot stays with its holder.
       await closePendingSlotTransfers(tx, sessionId, 'expired', now)
       return { ...sessionDto(session), joinRequestsClosed: closed.count }
+    })
+  } catch (error) {
+    mapDatabaseError(error)
+  }
+}
+
+/**
+ * Back to preparation (owner, November 25, 2026): undoes Start while no game has started. Refuses
+ * once any match is Playing, done or invalid. Removes every waiting and On court match (holds
+ * released), closes open match requests and drop-out notices, sets the session prepared with no start
+ * time or license term, puts the planned window back to what it was at Start (sessions started
+ * before that was kept keep their current times), clears early-opened courts and unlocks every
+ * level. Join requests closed at Start stay closed. Returns how many matches were removed as
+ * `matchesRemoved`. A retry after a lost response returns the prepared session (0 removed).
+ */
+export async function backToPreparation(
+  context: ClubContext,
+  sessionId: string,
+  expectedRevision: string,
+) {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      let session = await lockSession(tx, context, sessionId)
+      await requireSessionAccess(context, session, tx)
+      if (session.state === 'prepared' && session.startedAt === null)
+        return { ...sessionDto(session), matchesRemoved: 0 }
+      requireState(session, ['active'], 'Only a live session can go back to preparation.')
+      requireRevision(session.revision, expectedRevision)
+      const played = await tx.match.count({
+        where: { sessionId, state: { in: ['active', 'completed', 'invalid'] } },
+      })
+      if (played)
+        throw new ServiceError('conflict', {
+          session: 'Not available once a game has started.',
+        })
+      const now = new Date()
+      const matchesRemoved = await tx.match.count({
+        where: { sessionId, state: { in: ['waiting', 'on_court'] }, removedAt: null },
+      })
+      await dropUnstarted(tx, sessionId, now)
+      await closeSessionMatchRequests(tx, sessionId, now)
+      // The session is prepared first: the level-lock trigger allows an unlock only then.
+      session = await tx.queueSession.update({
+        where: { id: sessionId },
+        data: {
+          state: 'prepared',
+          startedAt: null,
+          startLicenseTermId: null,
+          ...(session.plannedStartBeforeStartAt && session.plannedEndBeforeStartAt
+            ? {
+                scheduledStartAt: session.plannedStartBeforeStartAt,
+                scheduledEndAt: session.plannedEndBeforeStartAt,
+              }
+            : {}),
+          plannedStartBeforeStartAt: null,
+          plannedEndBeforeStartAt: null,
+          revision: { increment: 1 },
+        },
+      })
+      await tx.sessionCourt.updateMany({
+        where: { sessionId, openedEarlyAt: { not: null } },
+        data: { openedEarlyAt: null, revision: { increment: 1 } },
+      })
+      await tx.sessionPlayer.updateMany({
+        where: { sessionId, levelLockedAt: { not: null } },
+        data: { levelLockedAt: null, revision: { increment: 1 } },
+      })
+      session = await recomputeMinimum(tx, session)
+      return { ...sessionDto(session), matchesRemoved }
     })
   } catch (error) {
     mapDatabaseError(error)

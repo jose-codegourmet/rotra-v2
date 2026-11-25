@@ -324,8 +324,8 @@ textarea.input { min-height: 80px; resize: vertical; }
 .open-pitch:hover { filter: brightness(1.08); }
 .open-pitch { cursor: grab; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .court-ghost { border-radius: 8px; opacity: .9; }
-body.court-dragging [data-free-court] { outline: 2px dashed var(--accent); outline-offset: 2px; }
-body.court-dragging [data-free-court].court-drop { background: var(--accent-subtle); outline-style: solid; }
+body.court-dragging [data-free-court], body.court-dragging [data-swap-court]:not(.court-self) { outline: 2px dashed var(--accent); outline-offset: 2px; }
+body.court-dragging .court-drop { background: var(--accent-subtle); outline-style: solid; }
 body.court-dragging { cursor: grabbing; }
 /* Set games played: Now on the left, To on the right (owner artifact comment, November 19, 2026). */
 .gcmp { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 8px; }
@@ -346,6 +346,17 @@ body.court-dragging { cursor: grabbing; }
 .qs-f .avatar { width: 34px; height: 34px; font-size: 12px; outline: 2px solid var(--ring); outline-offset: 0; box-shadow: 0 0 0 3px var(--surface); }
 .qs-f:hover { position: relative; z-index: 1; }
 .qs-names { font-size: 13px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Owner, November 25, 2026 ("to save space"): a compact card puts the two pairs side by side, pictures above the names, VS between. */
+.qt-vs { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
+.qt-vs .qstack-row { flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.qt-vs .qs-names { max-width: 100%; }
+.qtile.compact .qt-vs .vs { margin: 0; }
+/* Owner, November 25, 2026: a free court's Next eligible line shows each pair's pictures before their names. */
+.ne-line { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+.ne-pair { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.ne-pair .qstack { padding-left: 6px; }
+.ne-pair .qs-f { cursor: default; margin-left: -6px; }
+.ne-pair .qs-f .avatar { width: 26px; height: 26px; font-size: 10px; }
 /* Owner artifact comment, November 19, 2026: bigger court buttons in Put on court and Move match. */
 .court-picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
 .court-pick { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 76px; padding: 14px 16px; border: 1.5px solid var(--border-strong); border-radius: var(--r); background: var(--surface); color: var(--fg); font: inherit; text-align: left; cursor: pointer; transition: border-color .15s, background .15s; }
@@ -715,6 +726,12 @@ body.swapping, body.swapping * { cursor: grabbing !important; }
 button.qf { border: 0; background: none; padding: 2px; margin: -2px; font: inherit; color: inherit; cursor: pointer; border-radius: 8px; }
 button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .qf-n { font-size: 15px; font-weight: 600; max-width: 88px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--bg); color: var(--fg2); font-size: 12px; font-weight: 600; line-height: 1.3; white-space: nowrap; font-variant-numeric: tabular-nums; cursor: default; }
+.spill.warn { color: var(--warn); border-color: var(--warn); }
+.spill.err { color: var(--error); border-color: var(--error); }
+.spill.play { color: var(--accent); border-color: var(--accent); background: var(--accent-subtle); }
+.spill.away { color: var(--fg3, var(--fg2)); border-style: dashed; }
+.qfaces .spill { font-size: 11px; padding: 1px 6px; }
 .qf-w { font-size: 12px; font-weight: 600; line-height: 1.2; color: var(--fg2); white-space: nowrap; }
 .qf-w.warn { color: var(--warn); }
 .qf-w.err { color: var(--error); }
@@ -849,6 +866,24 @@ button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .opt { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r-sm); border: 1px solid var(--border-strong); background: var(--bg); cursor: pointer; text-align: left; width: 100%; }
 .opt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-subtle); }
 .opt:disabled { opacity: .45; cursor: not-allowed; }
+/* Add player › Saved players: the RTR ID and the club's level for the player on one line (owner, November 25, 2026). */
+.pl-tools .pl-sort-btns { margin-left: auto; }
+.pl-sort-btns .sort-dir { display: inline-flex; margin-left: 4px; vertical-align: -3px; }
+.pl-sort-sel { display: none; }
+/* Phones keep the compact Sort dropdown; desktop shows the sort buttons on the right (owner, November 25, 2026). */
+@media (max-width: 760px) { .pl-sort-btns { display: none; } .pl-sort-sel { display: inline-block; } }
+.add-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.add-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.add-lvl { display: inline-flex; align-items: center; gap: 6px; color: var(--fg); font-weight: 600; }
+.add-lvl.none { color: var(--fg2); font-weight: 500; }
+/* Skeleton rows while the search waits; the shimmer stops for reduced motion. */
+.skel { display: block; background: var(--border); border-radius: 6px; animation: skel 1.2s ease-in-out infinite; }
+.skel.circle { width: 36px; height: 36px; border-radius: 50%; flex: none; }
+.skel.line { height: 12px; width: 60%; } .skel.line.short { width: 40%; margin-top: 6px; }
+.skel.pill { width: 72px; height: 22px; border-radius: 999px; flex: none; }
+.skel-row { cursor: default; } .skel-row .main { flex: 1; }
+@keyframes skel { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .skel { animation: none; } }
 .opt .main { flex: 1; min-width: 0; }
 /* Q-NEXT-MATCH: two equal cards side by side at every width; the pair follows a touch swipe. */
 .nm-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; touch-action: pan-y; will-change: transform; }
@@ -1602,15 +1637,12 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .wiz-steps button:disabled { cursor: default; opacity: .55; }
 .wiz-steps .num { font-family: var(--mono); font-size: 11px; }
 @media (max-width: 520px) { .wiz-steps .lbl { display: none; } .wiz-steps button { align-items: center; } }
-.score-fixed { display: flex; align-items: center; justify-content: center; border-color: var(--accent); background: var(--accent-subtle); color: var(--fg); font-family: var(--mono); }
+.score-win { border-color: var(--accent); background: var(--accent-subtle); color: var(--fg); }
 .res-foot { align-items: flex-start; }
 .res-foot > .err, .res-foot > .hint { flex: 1; min-width: 0; }
 .res-foot > .btn { margin-left: auto; flex: none; }
-.res-deuce { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.res-deuce .small { color: var(--fg2); }
 .game-row { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--surface); }
 .game-row .g-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.game-row .g-deuce { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--fg2); }
 .res-tally { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: var(--r); background: var(--accent-subtle); border: 1px solid var(--accent); }
 .or-sep { display: flex; align-items: center; gap: 12px; color: var(--fg2); font-size: 12px; font-weight: 800; letter-spacing: 2px; }
 .or-sep::before, .or-sep::after { content: ""; flex: 1; height: 1px; background: var(--border-strong); }
@@ -1652,6 +1684,14 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .ptile.sm .avatar { width: 44px; height: 44px; font-size: 15px; margin-bottom: 4px; }
 .ptile.sm .pt-name { font-size: 13px; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ptile.sm .pt-meta { font-size: 11px; color: var(--fg2); white-space: nowrap; }
+/* Owner, November 25, 2026: picker pictures show the level ring and the games badge; rest time takes the wait colours. */
+.ptile.sm { --ring: var(--border-strong); }
+.ptile.sm.lv-beginner { --ring: var(--lv-beg); } .ptile.sm.lv-intermediate { --ring: var(--lv-int); } .ptile.sm.lv-advanced { --ring: var(--lv-adv); }
+.ptile.sm .sp-face { margin-bottom: 6px; }
+.ptile.sm .sp-face .avatar { margin-bottom: 0; outline: 3px solid var(--ring); outline-offset: 2px; }
+.ptile.sm .sp-face .pf-g { top: -6px; right: -9px; min-width: 18px; height: 18px; font-size: 11px; }
+.sp-rest.warn { color: var(--warn); font-weight: 700; }
+.sp-rest.bad { color: var(--error); font-weight: 700; }
 /* Artifact comment, same day: the search is a full-width row of its own under the heading. */
 .sp-q { width: 100%; max-width: none; min-height: 44px; }
 .sp-filters { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1796,6 +1836,14 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .st-table td { padding: 7px 6px; border-bottom: 1px solid var(--border); }
 .st-table .n { text-align: right; width: 42px; }
 .st-table tbody tr:first-child td { font-weight: 700; color: var(--accent); }
+.st-table td { vertical-align: middle; }
+.st-who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.st-stack { flex-wrap: nowrap; }
+.st-stack > * { box-shadow: 0 0 0 2px var(--bg); }
+/* A shared position shows at most four faces; more read as three faces and a +N chip, so the names keep their width. */
+.st-more { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--surface); color: var(--fg2); font-size: 10px; font-weight: 700; }
+.st-stack .avatar { width: 26px; height: 26px; font-size: 10px; }
+.st-names { min-width: 0; overflow-wrap: anywhere; }
 .award { display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--border); }
 .award .big { font-size: 22px; font-weight: 800; }
 .award.aw-row { flex-direction: row; align-items: center; gap: 14px; }
@@ -1844,9 +1892,14 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .qs-why { font-size: 13px; line-height: 1.4; color: var(--qc-dim); }
 .private-band { display: flex; gap: 8px; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--warn); border: 1px dashed var(--warn); border-radius: var(--r-sm); padding: 6px; }
 .frames { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
-.frame { flex: none; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--bg); padding: 10px; display: flex; flex-direction: column; gap: 3px; font-size: 10px; overflow: hidden; }
+.frame { flex: none; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--bg); overflow: hidden; position: relative; }
 .frame.story { width: 108px; height: 192px; } .frame.feed { width: 144px; height: 180px; }
-.frame .fh { font-weight: 800; font-size: 11px; }
+/* The image at a 480 px width, scaled into the preview: story 480x853 at 0.225, feed 480x600 at 0.3. */
+.frame-art { position: absolute; top: 0; left: 0; width: 480px; transform-origin: top left; pointer-events: none; }
+.frame.story .frame-art { height: 853px; transform: scale(.225); } .frame.feed .frame-art { height: 600px; transform: scale(.3); }
+.frame-art .slide { max-width: none; height: 100%; margin: 0; border: 0; border-radius: 0; overflow: hidden; }
+.frame-art .slide .foot { margin-top: auto; }
+.frame-art .aw-share { display: none; }
 .frame .ff { margin-top: auto; color: var(--accent); font-weight: 700; font-size: 9px; }
 
 /* Public page */
@@ -2242,8 +2295,8 @@ function seedScore(key, aWins, lose) {
 // ---- Match result dialog (Q22.1): what each mode asks for, and what it refuses ----
 const filledV = (v) => v !== '' && v != null;
 const wholeNum = (v) => filledV(v) && /^\d+$/.test(String(v).trim());
-const newResultGame = () => ({ w: null, deuce: false, lose: '', a: '', b: '' });
-const newResultSheet = (id) => ({ type: 'result', id, winner: null, deuce: false, lose: '', a: '', b: '', g: [newResultGame(), newResultGame(), newResultGame()], err: '' });
+const newResultGame = () => ({ w: null, a: '', b: '' });
+const newResultSheet = (id) => ({ type: 'result', id, winner: null, a: '', b: '', g: [newResultGame(), newResultGame(), newResultGame()], err: '' });
 // Best of 3: which game rows show (Game 3 only when games 1 and 2 were split), the games each pair won, and the winner when one pair has 2.
 function gamesState(sh) {
   const g = sh.g || [], vis = [0, 1].concat(g[0] && g[1] && g[0].w && g[1].w && g[0].w !== g[1].w ? [2] : []);
@@ -2251,33 +2304,53 @@ function gamesState(sh) {
   return { vis, wins, played: vis.filter((i) => g[i].w), decided: wins.A >= 2 ? 'A' : wins.B >= 2 ? 'B' : null };
 }
 const syncGames = (sh) => { const st = gamesState(sh); if (st.decided) sh.winner = st.decided; };
-const gameEntered = (o) => (o.deuce ? filledV(o.a) || filledV(o.b) : filledV(o.lose));
+// Owner, November 25, 2026: no deuce switch. Both boxes are always typed; the winner's box starts at the target and can be raised for deuce.
+// A score counts only when both boxes are filled; the winner's box alone is a winner-only result.
+const gameEntered = (o) => filledV(o.a) && filledV(o.b);
+// Who the boxes say won: the higher of two whole scores, or one box alone at the target or more. Typing scores picks the winner.
+function scoreWinner(T, o) {
+  const fa = wholeNum(o.a), fb = wholeNum(o.b);
+  if (fa && fb) return +o.a === +o.b ? null : +o.a > +o.b ? 'A' : 'B';
+  if (fa && !filledV(o.b) && +o.a >= T) return 'A';
+  if (fb && !filledV(o.a) && +o.b >= T) return 'B';
+  return null;
+}
+// The boxes decide the winner (single game) and each game's winner (best of 3); a picked card follows them.
+function syncScores(sc, sh) {
+  if (sc.games === 1) { const w = scoreWinner(sc.target, sh); if (w) sh.winner = w; return; }
+  (sh.g || []).forEach((o) => { const w = scoreWinner(sc.target, o); if (w) o.w = w; });
+  syncGames(sh);
+}
+// Picking a team (or a game's winner) fills its box with the target; picking the other team after a mistake trades the two scores.
+function pickScoreWinner(T, o, t) {
+  const k = t === 'A' ? 'a' : 'b', other = t === 'A' ? 'b' : 'a';
+  if (wholeNum(o[other]) && +o[other] >= T && (!wholeNum(o[k]) || +o[k] < +o[other])) { const v = o[k]; o[k] = o[other]; o[other] = v ?? ''; }
+  else if (!wholeNum(o[k]) || (wholeNum(o[other]) && +o[k] <= +o[other])) o[k] = String(T);
+}
 // One game: { err } or { scored, a, b }. `o.w` is the game's winner.
-function gameOutcome(sc, o, pre, row) {
-  const T = sc.target, W = o.w;
-  if (o.deuce) {
-    if (!gameEntered(o)) return { scored: false };
-    const a = +o.a, b = +o.b;
-    if (!wholeNum(o.a) || !wholeNum(o.b) || Math.max(a, b) <= T || Math.abs(a - b) !== 2) return { err: `${pre}A deuce game ends when one pair leads by 2, like ${T + 1}–${T - 1}.` };
-    const by = a > b ? 'A' : 'B';
-    if (by !== W) return { err: `${pre}The score says Team ${by} won, but Team ${W} is picked. Fix one of them.` };
-    return { scored: true, a, b };
+function gameOutcome(sc, o, pre) {
+  const T = sc.target, fa = filledV(o.a), fb = filledV(o.b);
+  if (!fa && !fb) return { scored: false };
+  if (!fa || !fb) return (fa ? 'A' : 'B') === o.w ? { scored: false } : { err: `${pre}Enter both scores, or clear them.` };
+  if (!wholeNum(o.a) || !wholeNum(o.b)) return { err: `${pre}Scores are whole numbers.` };
+  const a = +o.a, b = +o.b, w = Math.max(a, b), l = Math.min(a, b);
+  if (a === b) return { err: `${pre}A game can't end level. One pair needs ${T}.` };
+  if (!gameValid(T, sc.deuce, w, l)) {
+    if (!sc.deuce) return { err: `${pre}The winner has ${T} and the other pair 0 to ${T - 1}.` };
+    if (w === T && l === T - 1) return { err: `${pre}At ${T - 1}–${T - 1} the game goes to deuce: the winner needs a 2-point lead, like ${T + 1}–${T - 1}.` };
+    return { err: `${pre}Enter a finished game: ${T} against 0 to ${T - 2}, or past ${T - 1}–${T - 1} a 2-point lead, like ${T + 1}–${T - 1}.` };
   }
-  if (!gameEntered(o)) return { scored: false };
-  const max = sc.deuce ? T - 2 : T - 1, l = +o.lose;
-  if (!wholeNum(o.lose) || l > max) {
-    if (sc.deuce && wholeNum(o.lose) && l === T - 1) return { err: `${pre}At ${T - 1}–${T - 1} the game goes to deuce. Turn on ${row ? 'Deuce for this game' : 'Went to deuce'} and type both scores.` };
-    return { err: `${pre}Enter the losing score as a whole number from 0 to ${max}.` };
-  }
-  return { scored: true, a: W === 'A' ? T : l, b: W === 'A' ? l : T };
+  return { scored: true, a, b };
 }
 // The whole result from the sheet state: { err } or { winner, scoreA?, scoreB?, games? }. No score at all is a winner-only result.
 function resultCheck(sc, sh) {
   if (sc.games === 1) {
     if (!sh.winner) return { err: 'Pick the winner.' };
-    const o = gameOutcome(sc, { w: sh.winner, deuce: sh.deuce, lose: sh.lose, a: sh.a, b: sh.b }, '', false);
+    syncScores(sc, sh);
+    const o = gameOutcome(sc, { w: sh.winner, a: sh.a, b: sh.b }, '');
     return o.err ? { err: o.err } : o.scored ? { winner: sh.winner, scoreA: o.a, scoreB: o.b } : { winner: sh.winner };
   }
+  syncScores(sc, sh);
   const g = sh.g, used = g.some((x) => x.w || gameEntered(x));
   if (!used) return sh.winner ? { winner: sh.winner } : { err: 'Pick the winner.' };
   const st = gamesState(sh);
@@ -2286,23 +2359,17 @@ function resultCheck(sc, sh) {
   const entered = st.played.filter((i) => gameEntered(g[i])).length;
   if (entered && entered < st.played.length) return { err: 'Enter a score for every game played, or clear them all.' };
   const outs = [];
-  for (const i of st.played) { const o = gameOutcome(sc, g[i], `Game ${i + 1}: `, true); if (o.err) return { err: o.err }; outs.push(o); }
+  for (const i of st.played) { const o = gameOutcome(sc, g[i], `Game ${i + 1}: `); if (o.err) return { err: o.err }; outs.push(o); }
   if (!entered) return { winner: st.decided };
   return { winner: st.decided, scoreA: st.wins.A, scoreB: st.wins.B, games: outs.map((o) => ({ a: o.a, b: o.b })) };
 }
-// The score cells for one game: the winner's side shows the fixed target, the other side is the losing-score box; deuce shows two boxes.
+// The score cells for one game: two boxes, always typeable. The winner's box is green and starts at the target; raise it for deuce.
 function scoreEntry(m, o) {
-  const T = o.T, tn = (t) => (t === 'A' ? m.teamA : m.teamB);
+  const tn = (t) => (t === 'A' ? m.teamA : m.teamB);
   const lab = (t) => (o.short ? `Team ${t}` : `Team ${t} · ${esc(listNames(tn(t)))}`);
-  const box = (k, text, aria) => `<label class="field"><span>${text}</span><input class="input tnum" id="${o.id}-${k}" type="number" min="0" step="1" inputmode="numeric" data-bind="${o.base}.${k}" data-rerender value="${esc(o.v[k] ?? '')}" placeholder="0" aria-label="${esc(aria)}"></label>`;
-  let ca, cb;
-  if (o.deuce) { ca = box('a', lab('A'), `${o.gl}Team A score`); cb = box('b', lab('B'), `${o.gl}Team B score`); }
-  else {
-    const L = o.w === 'A' ? 'B' : 'A', fix = (t) => `<div class="field"><span>${lab(t)}</span><div class="input score-fixed tnum" role="img" aria-label="${o.gl}Team ${t} score, ${T}">${T}</div></div>`;
-    const lose = box('lose', o.short ? `Team ${L} scored` : `${esc(listNames(tn(L)))} scored (optional)`, `${o.gl}${listNames(tn(L))} scored`);
-    ca = o.w === 'A' ? fix('A') : lose; cb = o.w === 'A' ? lose : fix('B');
-  }
-  return `<div class="score-row">${ca}<span class="vs" style="padding-bottom:12px">–</span>${cb}</div>`;
+  const box = (t) => { const k = t.toLowerCase(), win = o.w === t;
+    return `<label class="field"><span>${lab(t)}${win ? ' · won' : ''}</span><input class="input tnum${win ? ' score-win' : ''}" id="${o.id}-${k}" type="number" min="0" step="1" inputmode="numeric" data-bind="${o.base}.${k}" data-rerender value="${esc(o.v[k] ?? '')}" placeholder="${win ? o.T : 0}" aria-label="${esc(`${o.gl}Team ${t} score`)}"></label>`; };
+  return `<div class="score-row">${box('A')}<span class="vs" style="padding-bottom:12px">–</span>${box('B')}</div>`;
 }
 
 // ---------- Seed data (fictional) ----------
@@ -2637,6 +2704,26 @@ const onCourt = (s) => s.matches.filter((m) => m.status === 'oncourt');
 // Matches holding a court: On court and Playing. Their players are busy everywhere else.
 const courtMatches = (s) => s.matches.filter((m) => m.status === 'oncourt' || m.status === 'active');
 const busyOf = (s, pid, except) => courtMatches(s).find((m) => m !== except && all(m).includes(pid));
+// Owner, November 25, 2026 ("to save space … it should just say pill label"): a player's live status as one short pill,
+// on the Players cards and under each face in the Main Queue. "Wait 2m" (free), "In queue 2m" (in a waiting match; the
+// minutes are still their wait since their last game), "Playing 1m" (since the match began; hover names the court),
+// "Getting ready" (on court, not started), "Away". Wait and In queue turn warning at 10 min and error at 16, as before.
+const shortMins = (mins) => { const m = Math.max(0, Math.floor(mins)); if (m < 60) return `${m}m`; if (m >= 1440) return '1d+'; const h = Math.floor(m / 60), r = m % 60; return r ? `${h}h ${r}m` : `${h}h`; };
+function statusPill(s, pid, except) {
+  const r = R(s, pid), busy = busyOf(s, pid, except);
+  if (busy) {
+    const court = courtsOf(s, busy);
+    if (busy.status === 'oncourt') return `<span class="spill play" title="Getting ready · ${esc(court)}">Getting ready</span>`;
+    const mins = busy.startedAt ? (Date.now() - busy.startedAt) / 6e4 : 0;
+    return `<span class="spill play" title="Playing on ${esc(court)}" aria-label="Playing on ${esc(court)} for ${shortMins(mins)}">Playing ${shortMins(mins)}</span>`;
+  }
+  if (!r || !r.present) return '<span class="spill away">Away</span>';
+  const mins = restInfo(s, pid).mins, tone = mins >= 16 ? ' err' : mins >= 10 ? ' warn' : '';
+  const queued = waiting(s).find((m) => m !== except && all(m).includes(pid)) || (except && all(except).includes(pid) ? except : null);
+  return queued
+    ? `<span class="spill${tone}" title="In the Main Queue · waiting ${shortMins(mins)} since their last game">In queue ${shortMins(mins)}</span>`
+    : `<span class="spill${tone}" title="Free · waiting ${shortMins(mins)} since their last game">Wait ${shortMins(mins)}</span>`;
+}
 // Expected finish (owner, November 23, 2026). ROTRA has no live score, so this is an estimate from time only: the session's
 // scoring mode (typical / long minutes) and the minutes played. left = expected minutes left; tag = the lowercase wording for drafts.
 // Almost done (D-2026-11-25-02): the Queue Master's switch on a Playing court card, after asking the players. While it is on, the
@@ -5377,6 +5464,7 @@ function viewConsole() {
             <button role="menuitem" data-act="go" data-to="public">${I.ext}<span>Public page</span></button>
             <button role="menuitem" data-act="openPost">${I.link}<span>Copy Facebook post</span></button>
             <button role="menuitem" data-act="go" data-to="home">${I.back}<span>Home</span></button>
+            ${(() => { const why = backToPrepBlocker(s); return `<button role="menuitem" data-act="openBackToPrep" ${why ? `aria-disabled="true" disabled title="${esc(why)}"` : ''}>${I.edit}<span>Back to preparation…${why ? `<br><span class="small muted">${esc(why)}</span>` : ''}</span></button>`; })()}
           </div>` : ''}</div></div>`; })()}</div>
     </div>
     ${!S.online ? notice('warn', 'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.') : ''}
@@ -5487,12 +5575,14 @@ function courtsPane(s) {
     if (m) {
       const merged = m.courts.length > 1;
       m.courts.forEach((x) => { if (x !== c.id) skip.add(x); });
+      // Owner, November 25, 2026: a one-court match can be dropped onto another busy court; the two matches trade courts.
+      const swapAttr = merged ? '' : ` data-swap-court="${c.id}" data-swap-match="${m.id}"`;
       const head = (label) => `<div class="ct"><div><h3>${esc(merged ? courtsOf(s, m) : c.label)}</h3>${courtTimeLine(s, c)}</div><div class="row" style="gap:6px;flex-wrap:nowrap">${label}${courtMenu(s, c, true)}</div></div>
         <div class="pitch open-pitch ${merged ? 'tall' : ''}" role="img" data-act="openMatch" data-id="${m.id}" title="Open match" aria-label="${esc(`Team A ${listNames(m.teamA)} versus Team B ${listNames(m.teamB)}`)}">${courtSVG(merged ? 2 : 1)}${courtSides(s, m)}</div>`;
       if (m.status === 'oncourt') {
         // On court: placed, getting ready. Normal border; the Queue Master starts it.
         const b = blockOf(s, m);
-        return `<div class="court oncourt ${merged ? 'merged' : ''}">${head(chip(merged ? 'Merged · Getting ready' : 'Getting ready'))}
+        return `<div class="court oncourt ${merged ? 'merged' : ''}"${swapAttr}>${head(chip(merged ? 'Merged · Getting ready' : 'Getting ready'))}
         <p class="small muted">${matchLabel(m)} · Match ${m.seq} · waiting to start</p>
         ${b ? `<span class="status-line warn">${I.alert} ${esc(b.text)}</span>` : ''}
         <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="startOnCourt" data-id="${m.id}" ${b ? `disabled title="${esc(b.text)}"` : ''}>Start match</button><button class="btn sm" data-act="openMatch" data-id="${m.id}">Open match</button></div></div>`;
@@ -5500,7 +5590,7 @@ function courtsPane(s) {
       const mins = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
       const subs = (m.subs || []).length;
       // D-2026-11-25-02: the Almost done switch, Playing only, under the players. Optional; the Queue Master flips it after asking the players.
-      return `<div class="court busy ${merged ? 'merged' : ''}">${head(chip(merged ? 'Merged · Playing' : 'Playing', 'ok'))}
+      return `<div class="court busy ${merged ? 'merged' : ''}"${swapAttr}>${head(chip(merged ? 'Merged · Playing' : 'Playing', 'ok'))}
         <label class="between" style="flex-wrap:nowrap"><span class="small"><b>Almost done</b></span>${sw(almostDoneOf(m), 'toggleAlmostDone', `data-id="${m.id}"`, `Almost done, ${courtsOf(s, m)}`)}</label>
         <p class="small muted">${matchLabel(m)} · Match ${m.seq} · ${elapsedTime(mins)}${subs ? ` · ${subs} substitution${subs > 1 ? 's' : ''}` : ''}</p>
         ${(() => { const f = finishOf(s, m); return f.phase === 'soon' || f.phase === 'almost' ? `<p class="small" style="color:var(--accent)">${esc(f.text)}</p>` : f.phase === 'long' ? `<p class="small" style="color:var(--warn)">${esc(f.text)}</p>` : `<p class="small muted">${esc(f.text)}</p>`; })()}
@@ -5518,7 +5608,7 @@ function courtsPane(s) {
       const put = courtsNeeded(eligible) === 2 ? `data-act="openDispatch" data-id="${eligible.id}" data-court="${c.id}"` : `data-act="placeOnCourt" data-id="${eligible.id}" data-court="${c.id}"`;
       body = `${first && first.id !== eligible.id ? `<p class="small muted">Skipped #1: ${esc(blockOf(s, first).text)}.</p>` : ''}
         <p class="small"><span class="muted">Next eligible:</span> #${list.indexOf(eligible) + 1} · ${matchLabel(eligible)}</p>
-        <p class="small">${esc(listNames(eligible.teamA))} <span class="muted">vs</span> ${esc(listNames(eligible.teamB))}</p>
+        <p class="small ne-line">${nePair(s, eligible.teamA)}<span class="muted">vs</span>${nePair(s, eligible.teamB)}</p>
         <div class="row" style="margin-top:auto"><button class="btn sm primary" ${put}>Put on court</button>${list.length > 1 ? `<button class="btn sm" data-act="openChooseMatch" data-court="${c.id}">Pick another</button>` : ''}</div>`;
     } else {
       body = `<p class="small muted">${need && freeN < need ? 'Not enough free players.' : list.length ? `No waiting match can go on: ${esc(blockOf(s, first).text)}.` : 'The queue is empty.'}</p>
@@ -5906,25 +5996,18 @@ function queueCard(s, m, i, n, cols, compact = false) {
     : `<span class="status-line muted">${I.info} ${esc(b.text)}</span>`;
   // Under each name: how long the player has waited since their last game (or since arriving). Under 10 min plain,
   // 10–15 min warning, 16 min or more error. Busy or absent players show why instead of a timer.
-  const wait = (p) => {
-    if (s.status !== 'active') return '';
-    const busy = busyOf(s, p, m), r = R(s, p);
-    if (busy) return `<span class="qf-w muted">${busy.status === 'oncourt' ? 'On court' : 'Playing'}</span>`;
-    if (!r || !r.present) return '<span class="qf-w muted">Not here</span>';
-    const mins = restInfo(s, p).mins;
-    return `<span class="qf-w tnum ${mins >= 16 ? 'err' : mins >= 10 ? 'warn' : ''}">${queueTime(mins)}</span>`;
-  };
+  const wait = (p) => (s.status === 'active' ? statusPill(s, p, m) : '');
   const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${queueTime(restInfo(s, p).mins)}` : ''; };
   // Owner artifact comment, November 19, 2026: each picture has the level ring and the player's games so far on it.
   let faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}${waitLabel(p)}. View profile. Left or right arrow switches sides"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span><span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
   // Owner artifact comment, November 19, 2026 (Courts tab › Upcoming queued matches): compact cards with no wait times; each
   // team is a stack of overlapping pictures with the level ring, and the names on one line beside it.
-  const stack = (ids, team) => `<div class="qstack-row"><div class="qstack">${ids.map((p, j) => `<button class="qs-f lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}" aria-label="${esc(nm(p))}, ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}. View profile">${avatar(P(p))}</button>`).join('')}</div><span class="qs-names">${ids.map((p) => esc(short(p))).join(', ')}</span></div>`;
+  const stack = (ids, team) => `<div class="qstack-row"><div class="qstack">${ids.map((p, j) => `<button class="qs-f lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}" aria-label="${esc(nm(p))}, ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}. View profile">${avatar(P(p))}</button>`).join('')}</div><span class="qs-names">${ids.map((p) => esc(short(p))).join(' & ')}</span></div>`;
   if (compact) faces = stack;
   return `<article class="qtile${compact ? ' compact' : ''} ${b && b.kind === 'attention' ? 'attn' : ''} ${!b ? 'ready' : ''}${qs ? (hitIds.length ? ' hit' : ' dim') : ''}" data-qid="${m.id}" style="grid-row:${row + 1};grid-column:${col + 1}" aria-label="Queue position ${i + 1}">
     ${!b ? `<span class="qt-ready">${I.check} Ready for court</span>` : ''}
     <div class="qt-head"><span class="qt-pos">#${i + 1}</span>${chip(matchLabel(m), 'solid')}${m.protected ? `<span class="muted" title="Manual · protected from regeneration">${I.lock}</span>` : `<span class="small muted">${m.origin === 'suggested' ? 'Suggested' : 'Generated'}</span>`}<span class="grow"></span><span class="qt-flow" aria-hidden="true">${flow}</span><button class="qt-grip" data-drag-handle data-id="${m.id}" aria-label="Reorder match ${i + 1}: drag, or use the arrow keys" title="Drag to reorder">⠿</button></div>
-    ${faces(m.teamA, 'teamA')}<div class="vs">VS</div>${faces(m.teamB, 'teamB')}
+    ${compact ? `<div class="qt-vs">${faces(m.teamA, 'teamA')}<div class="vs">VS</div>${faces(m.teamB, 'teamB')}</div>` : `${faces(m.teamA, 'teamA')}<div class="vs">VS</div>${faces(m.teamB, 'teamB')}`}
     ${status}
     <div class="row qt-actions">
       <button class="btn xs ${!b ? 'primary' : ''}" data-act="openDispatch" data-id="${m.id}" ${b && !(b.kind === 'courts' && s.status === 'active' && s.courts.some((c) => !courtOpen(s, c))) ? 'disabled' : ''}>Put on court</button>
@@ -5934,6 +6017,8 @@ function queueCard(s, m, i, n, cols, compact = false) {
     </div>
   </article>`;
 }
+// A free court's Next eligible pair: the overlapping pictures with the level ring, then "Danna & Darryn".
+const nePair = (s, ids) => `<span class="ne-pair"><span class="qstack" aria-hidden="true">${ids.map((p) => `<span class="qs-f lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}">${avatar(P(p))}</span>`).join('')}</span><span>${ids.map((p) => esc(short(p))).join(' & ')}</span></span>`;
 function playersPane(s) {
   const f = { show: 'avail', sort: 'wait', ...(S.ui.pl || {}) };
   const sel = (S.ui.sel || []).filter((pid) => R(s, pid));
@@ -5948,22 +6033,30 @@ function playersPane(s) {
   if (f.show === 'present') rows = rows.filter((x) => x.r.present || held(x.r.pid));
   // Owner artifact comment, November 19, 2026: "Add Not Here and Waitlist". Not here: roster players marked away. Waitlist: the waitlist itself.
   if (f.show === 'away') rows = rows.filter((x) => !x.r.present || held(x.r.pid));
+  // Owner, November 25, 2026: four sorts, each either way. Name (A–Z), Games (the card's Total: played plus queued),
+  // Wait (time since the last game; playing players last, away after present) and Level. `dir` 1 is the sort's first
+  // direction: Name A–Z, Games fewest first, Wait longest first, Level highest first; tapping the active sort flips it.
+  const { key: sortKey, dir: sortDir } = plSortOf(f);
+  const tot = (x) => x.g + queuedCount(s, x.r.pid), byName = (a, b) => shownName(a.p).localeCompare(shownName(b.p), undefined, { sensitivity: 'base' });
+  // Owner, November 25, 2026: Name sorts by the name the card shows (club nickname, nickname, then full name), ignoring case.
+  const shownName = (p) => clubNickOf(p) || p.nick || p.name;
   const sorters = {
-    wait: (a, b) => (a.a ? 1 : 0) - (b.a ? 1 : 0) || (b.r.present ? 1 : 0) - (a.r.present ? 1 : 0) || b.mins - a.mins,
-    least: (a, b) => a.g - b.g || b.mins - a.mins,
-    most: (a, b) => b.g - a.g || a.p.name.localeCompare(b.p.name),
-    level: (a, b) => (b.r.level ?? -1) - (a.r.level ?? -1) || a.p.name.localeCompare(b.p.name),
+    name: (a, b) => sortDir * byName(a, b),
+    games: (a, b) => sortDir * (tot(a) - tot(b)) || b.mins - a.mins || byName(a, b),
+    wait: (a, b) => (a.a ? 1 : 0) - (b.a ? 1 : 0) || (b.r.present ? 1 : 0) - (a.r.present ? 1 : 0) || sortDir * (b.mins - a.mins) || byName(a, b),
+    level: (a, b) => sortDir * ((b.r.level ?? -1) - (a.r.level ?? -1)) || byName(a, b),
   };
-  rows.sort(sorters[f.sort] || sorters.wait);
+  rows.sort(sorters[sortKey]);
   if (heldPresence?.filter === f.show && presencePending.size) rows.sort((a,b) => { const rank = (pid) => { const i = heldPresence.ids.indexOf(pid); return i < 0 ? Infinity : i; }; return rank(a.r.pid) - rank(b.r.pid); });
   const counts = { avail: s.roster.filter((r) => r.present && !busyOf(s, r.pid)).length, present: s.roster.filter((r) => r.present).length, away: s.roster.filter((r) => !r.present).length, waitlist: (s.waitlist || []).length, all: s.roster.length };
   const plan = matchPlan(s, sel);
   const draftState = S.ui.autoDraft && S.ui.autoDraft.sid === s.id ? S.ui.autoDraft : null;
   const currentDrafts = draftState?.batches[draftState.tab]?.cards || [];
-  return `<div class="between"><div><h2>Players</h2><p class="small muted">Tap players to pick them, then make a match. ${counts.present} present of ${counts.all}.</p></div><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="openSetGames">Set games for all…</button><button class="btn sm" data-act="openAdd">Add late player</button></div></div>
-    <div class="row" style="gap:10px">
+  return `<div class="between"><div><h2>Players</h2><p class="small muted">Tap players to pick them, then make a match. ${counts.present} present of ${counts.all}.</p></div><div class="row" style="flex-wrap:wrap;justify-content:flex-end"><button class="btn sm" data-act="allPresent" ${counts.away ? '' : 'disabled'}>All present</button><button class="btn sm" data-act="allAway" ${counts.present ? '' : 'disabled'}>All away</button><button class="btn sm" data-act="openSetGames">Set games for all…</button><button class="btn sm" data-act="openAdd">Add late player</button></div></div>
+    <div class="row pl-tools" style="gap:10px">
       <div class="seg" role="group" aria-label="Show">${[['avail', `Available · ${counts.avail}`], ['present', `Present · ${counts.present}`], ['away', `Not here · ${counts.away}`], ['waitlist', `Waitlist · ${counts.waitlist}`], ['all', `Everyone · ${counts.all}`]].map(([k, l]) => `<button aria-pressed="${f.show === k}" data-act="plSet" data-k="show" data-v="${k}">${l}</button>`).join('')}</div>
-      ${f.show === 'waitlist' ? '' : `<select class="input inline" id="pl-sort" data-act-change="plSet" data-k="sort" aria-label="Sort players">${[['wait', 'Sort: longest wait'], ['least', 'Sort: least games'], ['most', 'Sort: most games'], ['level', 'Sort: level, high to low']].map(([v, l]) => `<option value="${v}" ${f.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`}
+      ${f.show === 'waitlist' ? '' : `<div class="seg pl-sort-btns" role="group" aria-label="Sort players">${PL_SORTS.map(([k, l]) => { const on = sortKey === k, d = on ? sortDir : 1; return `<button aria-pressed="${on}" data-act="plSort" data-k="${k}" title="${esc(PL_SORT_DIRS[k][d === 1 ? 0 : 1])}${on ? ' · tap to flip' : ''}" aria-label="Sort by ${l.toLowerCase()}, ${esc(PL_SORT_DIRS[k][d === 1 ? 0 : 1])}">${l}${on ? `<span class="sort-dir" aria-hidden="true">${d === 1 ? (k === 'name' || k === 'games' ? I.up : I.down) : (k === 'name' || k === 'games' ? I.down : I.up)}</span>` : ''}</button>`; }).join('')}</div>
+      <select class="input inline pl-sort-sel" id="pl-sort" data-act-change="plSortSel" aria-label="Sort players">${PL_SORTS.flatMap(([k]) => [1, -1].map((d) => [`${k}:${d}`, `Sort: ${PL_SORT_DIRS[k][d === 1 ? 0 : 1]}`])).map(([v, l]) => `<option value="${v}" ${v === `${sortKey}:${sortDir}` ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`}
     </div>
     ${f.show === 'waitlist' ? waitlistPanel(s) : rows.length ? `<div class="pgrid3">${rows.map((x) => {
       const i = sel.indexOf(x.r.pid);
@@ -5972,17 +6065,25 @@ function playersPane(s) {
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
         <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile" title="${esc(lvLabel(x.r.level))}">${avatar(x.p)}</button><div class="row" style="min-width:0;flex:1;gap:4px;flex-wrap:nowrap"><div class="pc3-name" style="min-width:0" title="${esc(x.p.name)}">${esc(clubNickOf(x.p) || x.p.nick || x.p.name)}</div>${hcOf(x.r).length ? `<span class="hc-ico" role="img" title="${esc(hcText(hcOf(x.r)))}" aria-label="${esc(hcText(hcOf(x.r)))}">${I.alert}</span>` : ''}</div><button class="btn xs ghost icon-btn" data-act="openEditLive" data-pid="${x.r.pid}" aria-label="Edit ${esc(x.p.name)}" title="Edit player">${I.edit}</button></div>
         <div class="pc3-games"><button type="button" class="pg-played" data-act="openSetGames" data-pid="${x.r.pid}" title="Set games played" aria-label="${x.g} games played. Set games played for ${esc(x.p.name)}"><b class="tnum">${x.g}</b><span>Current</span></button><i aria-hidden="true"></i><div class="pg-total" title="Played plus queued for the night" aria-label="${x.g + queuedCount(s, x.r.pid)} for the night, played plus queued"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>Total</span></div></div>
-        <div class="between" style="flex-wrap:nowrap"><span class="pc3-st small">${st}${x.a || !x.r.present ? '' : queueTime(x.mins) === LONG_AGO ? ` · ${LONG_AGO}` : ` · ${queueTime(x.mins)} wait`}</span>${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
+        <div class="between" style="flex-wrap:nowrap">${statusPill(s, x.r.pid)}${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
         <div class="row">${!x.r.present && !x.g && !x.a ? `<button class="btn xs ghost" style="color:var(--error)" data-act="openNoShow" data-pid="${x.r.pid}" aria-label="Mark ${esc(x.p.name)} as No show (cancelled)">No show (cancelled)</button>` : ''}</div>
       </article>`;
     }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : f.show === 'away' ? 'Everyone on the roster is here.' : 'No players yet.'}</div>`}
     ${sel.length ? `<div class="selbar" role="region" aria-label="Selected players">
       <div class="row" style="gap:6px;flex-wrap:nowrap;min-width:0"><span class="sel-faces">${sel.map((pid) => avatar(P(pid))).join('')}</span><span class="small"><b>${sel.length} selected</b> · ${esc(plan.label)}</span></div>
-      <div class="row" style="flex-wrap:nowrap"><button class="btn sm ghost" data-act="selClear">Clear</button><button class="btn sm primary" data-act="makeMatch" ${plan.ok ? '' : 'disabled'}>Make match</button></div></div>` : ''}
+      <div class="row" style="flex-wrap:nowrap"><button class="btn sm ghost" data-act="selClear">Clear</button><button class="btn sm" data-act="selPresence" data-v="1" ${sel.some((pid) => !R(s, pid)?.present) ? '' : 'disabled'}>Set present</button><button class="btn sm" data-act="selPresence" data-v="0" ${sel.some((pid) => R(s, pid)?.present) ? '' : 'disabled'}>Set away</button><button class="btn sm primary" data-act="makeMatch" ${plan.ok ? '' : 'disabled'}>Make match</button></div></div>` : ''}
     ${noShowPanel(s)}
     ${f.show !== 'waitlist' && ((s.waitlist || []).length || !openSlots(s)) ? waitlistPanel(s) : ''}
     <p class="small muted">Make match splits the players into teams balanced by level and adds it to the end of the queue. Present controls who can be paired automatically; turning someone off never ends their current game.</p>`;
 }
+// Players tab sorts (owner, November 25, 2026): the label and each direction's wording, first direction first.
+const PL_SORTS = [['name', 'Name'], ['games', 'Games'], ['wait', 'Wait'], ['level', 'Level']];
+const PL_SORT_DIRS = { name: ['name A–Z', 'name Z–A'], games: ['fewest games', 'most games'], wait: ['longest wait', 'shortest wait'], level: ['level, high to low', 'level, low to high'] };
+// Older saved choices (least / most games) map onto the new keys.
+const plSortOf = (f) => { const old = { least: ['games', 1], most: ['games', -1] }[f.sort]; const key = old ? old[0] : PL_SORTS.some(([k]) => k === f.sort) ? f.sort : 'wait'; return { key, dir: old ? old[1] : f.dir === -1 ? -1 : 1 }; };
+// Owner, November 25, 2026 ("we should have an option to back to preparation"): undo Start while no game has begun.
+// Refused once any match has started or been recorded, and offline (like Start).
+const backToPrepBlocker = (s) => (s.matches.some((m) => ['active', 'done', 'invalid'].includes(m.status)) ? 'Not available once a game has started.' : !S.online ? 'Needs an internet connection.' : null);
 function boardPane(s) {
   const st = standings(s);
   return `${recordedOf(s) ? '' : notice('', NOT_RANKED)}<div><h2>Leaderboard</h2><p class="small muted">Tonight's standings from completed games: most wins, then fewest losses. Players with the same wins and losses share a position. It updates each time you confirm a result. Partial and invalid games don't count, unless you gave a substitute the game.</p></div>
@@ -6047,7 +6148,8 @@ function standings(s) {
 const standGroups = (st) => st.reduce((out, r) => { const g = out[out.length - 1]; if (g && g.pos === r.pos) g.rows.push(r); else out.push({ pos: r.pos, w: r.w, l: r.l, rows: [r] }); return out; }, []);
 // Counted games can differ inside a shared position (a games adjustment adds no result): then the cell shows the range.
 const groupGames = (g) => { const a = g.rows.map((r) => r.g), lo = Math.min(...a), hi = Math.max(...a); return lo === hi ? `${lo}` : `${lo}–${hi}`; };
-const tiedNames = (names) => names.map((n) => esc(n)).join(', ');
+// Owner, November 25, 2026: two tied names read "A & B"; three or more "A, B, C".
+const tiedNames = (names) => names.map((n) => esc(n)).join(names.length === 2 ? ' & ' : ', ');
 // ---------- Podium (D-2026-11-25-04) ----------
 // Owner, November 25, 2026: "a leaderboard in the queue page should look like this too" (the ROTRA Player podium), "I want the
 // leaderboards to always show the PODIUM", "multiple people can be in the podium per place as long as it is stacked" and "if
@@ -6136,9 +6238,14 @@ function awards(s) {
 function slideFrame(s, inner, title) {
   return `<div class="slide"><div class="sh">${clubLogo('lg')}<div><div class="label">${esc(S.club.name)}</div><h2>${esc(title)}</h2><p class="small muted">${esc(s.title)} · ${fmtDate(s.start)}</p></div></div>${inner}<div class="foot"><span>${esc(s.venue)}</span><b>powered by rotra</b></div></div>`;
 }
-function slideStandings(s, hlPid) {
+// Owner, November 25, 2026 ("same standings should be 1 (faces) name 1, name 2, name 3"): the standings image has one row per
+// position, like the Results table. A shared position stacks its players' faces and lists their names ("A & B" for two).
+// page: one downloaded image's share of the positions ({ groups, n, of }); long standings continue onto extra images.
+function slideStandings(s, hlPid, page) {
   const st = standings(s);
-  return slideFrame(s, st.length ? `<table class="st-table"><thead><tr><th>#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">G</th></tr></thead><tbody>${st.map((r, i) => `<tr${hlPid && r.pid === hlPid ? ' style="background:var(--accent-subtle);font-weight:700" aria-current="true"' : ''}><td class="tnum">${r.pos}</td><td>${esc(r.name)}</td><td class="n">${r.w}</td><td class="n">${r.l}</td><td class="n">${r.g}</td></tr>`).join('')}</tbody></table>` : '<p class="empty">No counted games were recorded in this session.</p>', 'Standings');
+  const row = (g) => { const ps = g.rows.map((r) => P(r.pid)), hl = hlPid && g.rows.some((r) => r.pid === hlPid);
+    return `<tr${hl ? ' style="background:var(--accent-subtle);font-weight:700" aria-current="true"' : ''}><td class="tnum">${g.pos}</td><td><div class="st-who"><span class="lb-stack st-stack">${ps.slice(0, ps.length > 4 ? 3 : 4).map((p) => `<span>${avatar(p)}</span>`).join('')}${ps.length > 4 ? `<span class="st-more">+${ps.length - 3}</span>` : ''}</span><span class="st-names">${tiedNames(ps.map((p) => p.name))}</span></div></td><td class="n">${g.w}</td><td class="n">${g.l}</td><td class="n">${groupGames(g)}</td></tr>`; };
+  return slideFrame(s, st.length ? `<table class="st-table"><thead><tr><th>#</th><th>Player</th><th class="n">W</th><th class="n">L</th><th class="n">G</th></tr></thead><tbody>${(page ? page.groups : standGroups(st)).map(row).join('')}</tbody></table>` : '<p class="empty">No counted games were recorded in this session.</p>', page && page.of > 1 ? `Standings · ${page.n} of ${page.of}` : 'Standings');
 }
 // Artifact comment, November 13, 2026: award cards show the player's face beside the name (MVP with an accent ring).
 // On the public page a signed-in player can tap the face to open the profile card.
@@ -6519,7 +6626,11 @@ function swapPicker(s, m, sh, outLabel, extra = '', actions = '', title = '', sw
   const lineup = new Set(all(m));
   const tile = (pid, k, pressed, disabled, note) => { const p = P(pid), r = R(s, pid), a = busyOf(s, pid), mins = restInfo(s, pid).mins;
     const st = note || (a ? (a.status === 'oncourt' ? 'On court' : 'Playing') : r && !r.present ? 'Away' : `rest ${mins}m`);
-    return `<button type="button" class="ptile sm${a ? ' busy' : ''}${r && r.present ? '' : ' away'}" data-act="sheetSet" data-k="${k}" data-v="${pid}" aria-pressed="${pressed}" ${disabled ? 'disabled' : ''} aria-label="${esc(p.name)}, ${gamesOf(s, pid)} of ${s.minimum} games, ${esc(st)}">${avatar(p)}<span class="pt-name">${esc(nm(pid).split(' ')[0])}</span><span class="pt-meta">${gamesOf(s, pid)}/${s.minimum} · ${esc(st)}</span></button>`; };
+    // Owner, November 25, 2026: the picture carries the level ring and the games badge, like the Main Queue faces (so the line
+    // under the name drops "0/5 ·"), and a free
+    // player's rest takes the wait colours: warning from 10 min, error from 16 (the text always says the time).
+    const resting = !note && !a && r && r.present, tone = resting ? (mins >= 16 ? ' bad' : mins >= 10 ? ' warn' : '') : '';
+    return `<button type="button" class="ptile sm lv-${r ? rvBand(r) : 'none'}${a ? ' busy' : ''}${r && r.present ? '' : ' away'}" data-act="sheetSet" data-k="${k}" data-v="${pid}" aria-pressed="${pressed}" ${disabled ? 'disabled' : ''} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${gamesOf(s, pid)} of ${s.minimum} games, ${esc(st)}"><span class="pf-face sp-face">${avatar(p)}<span class="pf-g tnum" aria-hidden="true">${gamesOf(s, pid)}</span></span><span class="pt-name">${esc(nm(pid).split(' ')[0])}</span><span class="pt-meta"><span class="sp-rest${tone}">${esc(st)}</span></span></button>`; };
   const free = s.roster.filter((r) => r.present && !lineup.has(r.pid) && !busyOf(s, r.pid)).sort((a, b) => gamesOf(s, a.pid) - gamesOf(s, b.pid) || restInfo(s, b.pid).mins - restInfo(s, a.pid).mins);
   const q = (sh.q || '').trim().toLowerCase();
   // Artifact comment, same day: filter All players by skill level and sort by longest wait or fewest games.
@@ -7391,11 +7502,34 @@ const SHEETS = {
     body += `<div class="seg" role="group" aria-label="How to add">${[['saved', 'Saved players'], ['global', 'Player Information'], ['new', 'New player']].filter(([k]) => !club || k !== 'saved').map(([k, l]) => `<button aria-pressed="${tab === k}" data-act="sheetSet" data-k="tab" data-v="${k}">${l}</button>`).join('')}</div>${club && sh.err && !sh.pick && tab === 'global' ? notice('bad', esc(sh.err)) : ''}`;
     if (tab === 'saved') {
       // Players already on the roster or waitlist are left out of the list rather than shown greyed out.
-      const list = saved().filter((p) => !inRoster.has(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || clubNickOf(p).toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q)));
+      // Owner, November 25, 2026: the search waits 0.5 s after the last keystroke (the typed text is sh.qi, the applied search
+      // sh.q); skeleton rows stand in for the list while it waits.
+      const typed = sh.qi ?? sh.q ?? '';
+      const waiting = typed !== (sh.q || '');
+      if (waiting) { clearTimeout(addSearchTimer); addSearchTimer = setTimeout(() => { if (S.ui.sheet === sh) { sh.q = sh.qi; render(); } }, 500); }
+      const matched = saved().filter((p) => !inRoster.has(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || clubNickOf(p).toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q)));
+      // Owner, November 25, 2026 ("please add filters All, Registered, Unclaimed and Guest"; then "add a skill filter"): two
+      // filters over the matches, an account filter and a skill dropdown (level bands, owner's pick). Each option's count applies
+      // the other filter, so the counts always match what that option would list. Both are All every time the sheet opens; a
+      // lookup-pending player shows under All only.
+      const who = sh.who || 'all', lvl = sh.lvl || 'all';
+      const WHO = [['all', 'All'], ['registered', 'Registered'], ['unclaimed', 'Unclaimed'], ['guest', 'Guest']];
+      const LVL = [['all', 'All levels'], ['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced'], ['none', 'No level']];
+      const byWho = (k) => (p) => k === 'all' || p.identity === k;
+      const byLvl = (k) => (p) => k === 'all' || bandOf(p) === k;
+      const countWho = (k) => matched.filter((p) => byWho(k)(p) && byLvl(lvl)(p)).length;
+      const countLvl = (k) => matched.filter((p) => byWho(who)(p) && byLvl(k)(p)).length;
+      const list = matched.filter((p) => byWho(who)(p) && byLvl(lvl)(p));
       const added = saved().filter((p) => inRoster.has(p.id)).length;
-      body += `<label class="field"><span>Search saved players</span><input class="input" id="add-q" data-bind="ui.sheet.q" data-rerender value="${esc(sh.q || '')}" placeholder="Name, nickname or RTR ID" data-autofocus></label>
+      const filtered = who !== 'all' || lvl !== 'all';
+      // Owner, November 25, 2026 ("add skill label so I know if the player has a registered skill already"): each row shows the
+      // club's level for the player with the Saved players level bars, or "No level yet".
+      const levelTag = (p) => { const b = p.sugg == null ? 0 : ['beginner', 'intermediate', 'advanced'].indexOf(bandOf(p)) + 1; return `<span class="add-lvl${p.sugg == null ? ' none' : ''}"><span class="lvl-bars b${b}" aria-hidden="true"><i></i><i></i><i></i></span>${p.sugg == null ? 'No level yet' : esc(lvLabel(p.sugg))}</span>`; };
+      body += `<label class="field"><span>Search saved players</span><input class="input" id="add-q" type="search" data-bind="ui.sheet.qi" data-rerender value="${esc(typed)}" placeholder="Name, nickname or RTR ID" data-autofocus></label>
+        <div class="add-filters"><div class="seg" role="group" aria-label="Show saved players">${WHO.map(([k, l]) => `<button aria-pressed="${who === k}" data-act="sheetSet" data-k="who" data-v="${k}">${l} · ${countWho(k)}</button>`).join('')}</div>
+        <select class="input inline" id="add-lvl" data-bind="ui.sheet.lvl" data-rerender aria-label="Skill">${LVL.map(([k, l]) => `<option value="${k}" ${lvl === k ? 'selected' : ''}>${k === 'all' ? 'Skill: ' : ''}${l} · ${countLvl(k)}</option>`).join('')}</select></div>
         ${added ? `<p class="small muted">${added} saved player${added > 1 ? 's are' : ' is'} already in this session and not listed.</p>` : ''}
-        <div class="sel-list">${list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main">${nameB(p)}<div class="small muted">${idLine(p)}</div></div>${identChip(p)}</button>`).join('') || (added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
+        <div class="sel-list"${waiting ? ' aria-busy="true"' : ''}>${waiting ? `<span class="sr-only" role="status">Searching saved players…</span>${'<div class="opt skel-row" aria-hidden="true"><span class="skel circle"></span><span class="main"><span class="skel line"></span><span class="skel line short"></span></span><span class="skel pill"></span></div>'.repeat(4)}` : list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main">${nameB(p)}<div class="small muted add-sub"><span>${idLine(p)}</span>${levelTag(p)}</div></div>${identChip(p)}</button>`).join('') || (filtered && matched.length ? `<div class="empty">No saved player${q ? ' matches these filters' : 's to add with these filters'}. <button class="btn sm" data-act="addClearFilters">Show all</button></div>` : added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
     } else if (tab === 'global') {
       // Exact RTR ID, email or social link (D-2026-11-16-04), or (owner, November 23, 2026) part of an unclaimed player's name.
       const key = (sh.q || '').trim().toLowerCase();
@@ -7424,9 +7558,26 @@ const SHEETS = {
     }
     return sheetShell('Add player', body, `<button class="btn" data-act="closeSheet">${sh.added ? 'Done' : 'Cancel'}</button>`);
   },
+  backToPrep() {
+    const s = cur(), why = backToPrepBlocker(s);
+    const queued = s.matches.filter((m) => ['waiting', 'oncourt'].includes(m.status)).length;
+    const planned = s.beforeStart || { start: s.start, end: s.end };
+    return sheetShell('Back to preparation?', `<p>${esc(s.title)} goes back to preparation, as if it had not started.</p>
+      <ul class="small" style="margin:0;padding-left:18px;display:grid;gap:4px">
+        <li>Every player's level unlocks.</li>
+        <li>The start time clears, and the planned time goes back to ${esc(plannedFor({ start: planned.start, end: planned.end }))}.</li>
+        ${queued ? `<li>${queued} match${queued === 1 ? '' : 'es'} in the Main Queue or on court ${queued === 1 ? 'is' : 'are'} removed.</li>` : ''}
+        <li>Join requests closed at Start stay closed. The session link takes new requests again.</li>
+      </ul>
+      ${why ? notice('warn', esc(why)) : ''}`,
+      `<button class="btn" data-act="closeSheet">Keep it live</button><button class="btn primary" data-act="confirmBackToPrep" ${why ? 'disabled' : ''}>Back to preparation</button>`);
+  },
   start(sh) {
     const s = cur(), now = Date.now(), late = startNeedsEnd(s, now);
-    const endPicker = late ? `${notice('warn', `This session was planned for ${plannedFor(s)}. Set a new end time to start.`)}
+    // Owner, November 25, 2026 ("Start now, move start"): a session started on an earlier day than planned starts now, so
+    // its planned start moves to now; the notice says so.
+    const early = late && s.start > now;
+    const endPicker = late ? `${notice('warn', `This session was planned for ${plannedFor(s)}. ${early ? 'Starting now moves its start to now. ' : ''}Set a new end time to start.`)}
       ${dtPicker({ k: 'sheet.endAt', label: 'New end', id: 'st-end', value: sh.endAt, days: daysBetween(now, now + 864e5), base: dayStart(now), ok: (t) => t > now && t <= now + 864e5, set: (t) => { sh.endAt = t; }, autofocus: true })}` : '';
     return sheetShell('Start session?', `${endPicker}<dl class="kv"><dt>Session</dt><dd>${esc(s.title)}</dd><dt>Courts</dt><dd>${s.courts.length}</dd><dt>Formats</dt><dd>${fmtFormats(s)}</dd><dt>Mode</dt><dd>${MODES[s.mode].label}</dd><dt>Levels</dt><dd>${restrictText(s)}</dd><dt>Scoring</dt><dd>${scoringDef(s).label}</dd><dt>Record games</dt><dd>${recordedOf(s) ? 'On' : 'Off · not ranked'}</dd><dt>Minimum</dt><dd>${s.minimum} games</dd><dt>Roster</dt><dd>${s.roster.length} confirmed · ${s.roster.filter((r) => r.present).length} present${(s.waitlist || []).length ? ` · ${s.waitlist.length} on the waitlist` : ''}</dd></dl>
       ${notice('', "Every player's level locks now. Players you add later get a level when you add them, and it locks too.")}
@@ -7547,34 +7698,32 @@ const SHEETS = {
         ${notice('warn', `<b>This result cannot be changed after confirmation.</b> ${m.courts.length > 1 ? 'Both courts' : 'The court'} will become available.`)}`,
         `<button class="btn" data-act="sheetSet" data-k="step" data-v="">Back to result</button><button class="btn primary" data-act="confirmResult">Confirm Team ${w} wins</button>`);
     }
+    syncScores(sc, sh);
     const best3 = sc.games === 3, g = sh.g || [];
     const anyScore = best3 ? g.some(gameEntered) : gameEntered(sh);
     const pick = `<span class="label">Pick the winner</span>
       <div class="choices">${['A', 'B'].map((t) => `<button class="choice" aria-pressed="${sh.winner === t}" data-act="resWinner" data-v="${t}"><span class="label">Team ${t}</span><b>${nmT(t)}</b></button>`).join('')}</div>`;
-    const dsw = (on, attrs, label) => `<div class="res-deuce"><span><b>Went to deuce</b><br><span class="small">${T - 1}–${T - 1} and on: the first to lead by 2 wins.</span></span>${sw(on, 'resDeuce', attrs, label)}</div>`;
     const foot = (hint) => `<div class="between res-foot">${sh.err ? `<span class="err" role="alert">${esc(sh.err)}</span>` : `<span class="hint">${hint}</span>`}${anyScore ? `<button class="btn xs ghost" data-act="clearScores">${best3 ? 'Clear scores' : 'Clear score'}</button>` : ''}</div>`;
     let body;
     if (!best3) {
       body = `${pick}
-      ${!sh.winner ? `<span class="hint">${sh.err ? `<span class="err" role="alert">${esc(sh.err)}</span>` : 'Pick the winner first. The score is optional.'}</span>`
-        : `${sc.deuce ? dsw(!!sh.deuce, '', 'Went to deuce') : ''}
-      ${scoreEntry(m, { T, w: sh.winner, deuce: !!sh.deuce, base: 'ui.sheet', id: 'score', v: sh, gl: '' })}
-      ${foot(sh.deuce ? `Deuce at ${T - 1}–${T - 1}: the first to lead by 2 wins. Type both scores.` : `Game to ${T}. Enter the losing score, or leave it empty.`)}`}`;
+      ${scoreEntry(m, { T, w: sh.winner, base: 'ui.sheet', id: 'score', v: sh, gl: '' })}
+      ${foot(`Game to ${T}. Pick the winner or type the scores; the score is optional.${sc.deuce ? ` Past ${T - 1}–${T - 1}, change the green box too, like ${T + 1}–${T - 1}.` : ''}`)}`;
     } else {
       const st = gamesState(sh), any = st.played.length > 0;
       const rows = st.vis.map((i) => {
         const o = g[i];
         return `<div class="game-row" role="group" aria-label="Game ${i + 1}">
-          <div class="g-head"><b>Game ${i + 1}</b>${sc.deuce ? `<span class="g-deuce">Deuce ${sw(!!o.deuce, 'resDeuce', `data-g="${i}"`, `Game ${i + 1} went to deuce`)}</span>` : ''}</div>
+          <div class="g-head"><b>Game ${i + 1}</b></div>
           <div class="seg" role="group" aria-label="Game ${i + 1} winner">${['A', 'B'].map((t) => `<button aria-pressed="${o.w === t}" data-act="resGameWin" data-g="${i}" data-v="${t}">Team ${t}</button>`).join('')}</div>
-          ${o.w ? scoreEntry(m, { T, w: o.w, deuce: !!o.deuce, base: `ui.sheet.g.${i}`, id: `score-g${i + 1}`, v: o, short: true, gl: `Game ${i + 1}, ` }) : ''}</div>`;
+          ${scoreEntry(m, { T, w: o.w, base: `ui.sheet.g.${i}`, id: `score-g${i + 1}`, v: o, short: true, gl: `Game ${i + 1}, ` })}</div>`;
       }).join('');
       body = `${pick}
       <div class="or-sep" role="separator"><span>OR</span></div>
       <span class="label">Enter each game</span>
       ${any ? `<div class="res-tally" aria-live="polite"><span>Games won · Team A <b class="tnum">${st.wins.A} – ${st.wins.B}</b> Team B</span>${st.decided ? `<span>Winner: <b>Team ${st.decided}</b> · ${nmT(st.decided)}</span>` : ''}</div>` : ''}
       ${rows}
-      ${foot(`Best of 3 to ${T}. The first pair to win 2 games wins. Scores are optional.`)}`;
+      ${foot(`Best of 3 to ${T}. The first pair to win 2 games wins. Scores are optional.${sc.deuce ? ` Past ${T - 1}–${T - 1}, change the green box too.` : ''}`)}`;
     }
     return sheetShell(`Match ${m.seq} result`, body, `<button class="btn" data-act="openMatch" data-id="${m.id}">Back</button><button class="btn primary" data-act="reviewResult">Review result</button>`);
   },
@@ -7885,17 +8034,23 @@ const SHEETS = {
   export(sh) {
     const s = cur();
     const st = standings(s);
-    const per = sh.fmt === 'story' ? 14 : 10;
-    const a = awards(s);
+    // Rows per image; a shared position with many names wraps, so it counts as more than one row.
+    const per = sh.fmt === 'story' ? 14 : 9;
     const frames = [];
-    if (sh.slides.includes(0)) for (let i = 0; i < Math.max(1, Math.ceil(st.length / per)); i++) frames.push({ t: `Standings${st.length > per ? ` ${i + 1}` : ''}`, rows: st.slice(i * per, i * per + per).map((r) => r.name) });
-    if (sh.slides.includes(1)) frames.push({ t: 'Awards', rows: [a.mvp ? `MVP · ${a.mvp.p.name}` : 'MVP · none', a.improved ? `Most Improved · ${a.improved.p.name}` : ''].filter(Boolean) });
-    if (sh.offDay) frames.push({ t: 'Off Day', rows: a.offDay.map((x) => x.p.name) });
+    // Owner, November 25, 2026 ("this looks unpolished"): each preview is the image itself, scaled down: one row per position
+    // with stacked faces ("1  A, B, C"), never a clipped list of names.
+    if (sh.slides.includes(0)) {
+      const pages = [[]]; let used = 0;
+      standGroups(st).forEach((g) => { const lines = Math.ceil(g.rows.length / 3); if (used + lines > per && pages[pages.length - 1].length) { pages.push([]); used = 0; } pages[pages.length - 1].push(g); used += lines; });
+      pages.forEach((groups, i) => frames.push(slideStandings(s, null, { groups, n: i + 1, of: pages.length })));
+    }
+    if (sh.slides.includes(1)) frames.push(slideAwards(s));
+    if (sh.offDay) frames.push(slideOffDay(s, true));
     return sheetShell('Download images', `
       <div class="seg" role="group" aria-label="Image format">${[['story', 'Story · tall'], ['feed', 'Feed post · 4:5']].map(([k, l]) => `<button aria-pressed="${sh.fmt === k}" data-act="sheetSet" data-k="fmt" data-v="${k}">${l}</button>`).join('')}</div>
       <div class="row"><label class="check"><input type="checkbox" id="ex-0" data-act-change="pubSlide" data-k="0" ${sh.slides.includes(0) ? 'checked' : ''}>Standings</label><label class="check"><input type="checkbox" id="ex-1" data-act-change="pubSlide" data-k="1" ${sh.slides.includes(1) ? 'checked' : ''}>Awards</label><label class="check" style="border-color:var(--warn)"><input type="checkbox" id="ex-off" data-bind="ui.sheet.offDay" data-rerender ${sh.offDay ? 'checked' : ''}>Include Off Day</label></div>
       <p class="small muted">${frames.length} image${frames.length === 1 ? '' : 's'}. Long standings continue onto extra images so every name stays readable.</p>
-      <div class="frames">${frames.map((f) => `<div class="frame ${sh.fmt}"><span class="fh">${esc(S.club.name)}</span><span class="muted">${esc(f.t)}</span>${f.rows.map((r) => `<span>${esc(r)}</span>`).join('')}<span class="ff">powered by rotra</span></div>`).join('')}</div>
+      <div class="frames">${frames.map((html, i) => `<div class="frame ${sh.fmt}" role="img" aria-label="Image ${i + 1} of ${frames.length}"><div class="frame-art" aria-hidden="true" inert>${html}</div></div>`).join('')}</div>
       <p class="small muted">Downloading is turned off in this prototype.</p>`,
       `<button class="btn" data-act="closeSheet">Close</button><button class="btn primary" disabled>Download ${frames.length} image${frames.length === 1 ? '' : 's'}</button>`, true);
   },
@@ -7943,6 +8098,8 @@ function addMatch(s, m, origin, prot, pos) {
 
 // ---------- Actions ----------
 function openSheet(sh) { S.ui.sheet = sh; render(); }
+// Add player › Saved players search debounce (0.5 s, owner, November 25, 2026).
+let addSearchTimer = 0;
 // Adding a player keeps the Add player dialog open on the same tab, cleared and ready for the next one.
 // #735 (proposed): when the roster is full, ask once before the Queue Master adds one more (the same sheet serves Add player and Give slot).
 let overOk = false;
@@ -8882,6 +9039,7 @@ const ACT = {
   overfillYes: () => { const sh = S.ui.sheet; S.ui.sheet = sh.back || null; overOk = true; ACT[sh.act](sh.data); overOk = false; },
   removeRoster: (d) => { const s = cur(); s.roster = s.roster.filter((r) => r.pid !== d.pid); save(); render(); toast(`${nm(d.pid)} removed from the roster`); },
   openAdd: () => openSheet({ type: 'add', tab: 'saved', q: '' }),
+  addClearFilters: () => { S.ui.sheet.who = 'all'; S.ui.sheet.lvl = 'all'; render(); },
   openAddSaved: () => openSheet({ type: 'add', tab: 'global', q: '', club: true }),
   setGender: (d) => { const sh = S.ui.sheet; if (!sh) return; if (d.path === 'd') sh.d.gender = d.v; else sh.gender = d.v; render(); },
   sheetSet: (d, el) => {
@@ -8890,7 +9048,7 @@ const ACT = {
     if (el.hasAttribute('data-num') && v != null) v = +v;
     sh[d.k] = v;
     if (d.k === 'in' || (d.k === 'out' && sh.from === 'match')) { sh.from = null; if (d.k === 'out') sh.in = null; }
-    if (d.k === 'tab') { sh.q = ''; sh.pick = null; sh.err = ''; sh.level = null; }
+    if (d.k === 'tab') { sh.q = ''; sh.qi = ''; sh.pick = null; sh.err = ''; sh.level = null; }
     if (d.k === 'mode') sh.err = '';
     if (d.k === 'band' || d.k === 'sort') sh.pg = 0;
     if (d.k === 'in' && innerWidth < 900 && sh.all) sh.all = false; // phone: picking in the stacked All players closes it
@@ -8966,13 +9124,36 @@ const ACT = {
   },
   // Late or on another day: the new end is pre-filled with now plus the planned length, rounded up to the next 15 minutes.
   openStart: () => { const s = cur(); openSheet({ type: 'start', endAt: startNeedsEnd(s) ? ceil15(Date.now() + (s.end - s.start)) : null }); },
+  openBackToPrep: () => { S.ui.courtMenu = null; openSheet({ type: 'backToPrep' }); },
+  confirmBackToPrep: () => {
+    const s = cur();
+    if (backToPrepBlocker(s)) { render(); return; }
+    const removed = s.matches.filter((m) => ['waiting', 'oncourt'].includes(m.status)).length;
+    s.matches = s.matches.filter((m) => !['waiting', 'oncourt'].includes(m.status));
+    const before = s.beforeStart;
+    if (before) {
+      s.start = before.start; s.end = before.end;
+      before.courts.forEach((b) => { const c = s.courts.find((x) => x.id === b.id); if (c) c.startsAt = b.startsAt; });
+    }
+    delete s.beforeStart;
+    s.status = 'prepared'; s.startedAt = null;
+    s.roster.forEach((r) => { r.locked = false; });
+    S.ui.sheet = null; S.ui.sel = []; S.screen = 'prepare';
+    commit(`Back to preparation · levels unlocked${removed ? ` · ${removed} match${removed === 1 ? '' : 'es'} removed` : ''}`); render(); window.scrollTo(0, 0);
+  },
   confirmStart: () => {
     const s = cur(), sh = S.ui.sheet || {};
     const newEnd = startNeedsEnd(s);
     if (newEnd && !(sh.endAt > Date.now())) { if (sh.endAt == null) sh.endAt = ceil15(Date.now() + (s.end - s.start)); toast('Set a new end time after now to start.'); render(); return; }
+    // Kept so Back to preparation can put the planned times back exactly (owner, November 25, 2026).
+    s.beforeStart = { start: s.start, end: s.end, courts: s.courts.map((c) => ({ id: c.id, startsAt: c.startsAt })) };
     if (newEnd) s.end = sh.endAt;
     s.status = 'active'; s.startedAt = Date.now();
-    s.courts.forEach((c) => { if (!c.startsAt || c.startsAt === s.start) c.startsAt = s.startedAt; });
+    // Started on an earlier day than planned (owner, November 25, 2026): the planned start moves to now. Courts that follow
+    // the session start move with it (below); a court with its own later start keeps it.
+    const planned = s.start;
+    if (newEnd && s.start > s.startedAt) s.start = s.startedAt;
+    s.courts.forEach((c) => { if (!c.startsAt || c.startsAt === planned) c.startsAt = s.startedAt; });
     s.roster.forEach((r) => { r.locked = true; if (r.present) r.presentAt = s.startedAt; });
     // Owner comment, November 11, 2026: join requests end at Start. Pending ones close; the public page tells visitors to ask at the venue.
     const closed = (s.requests || []).filter((r) => r.status === 'pending');
@@ -8985,6 +9166,12 @@ const ACT = {
   prepTab: (d) => { S.ui.prepTab = d.k; render(); const b = document.getElementById(`ptb-${d.k}`); if (b) b.focus(); },
   rvSet: (d) => { S.ui.rv = { ...(S.ui.rv || {}), [d.k]: d.v }; render(); },
   plSet: (d) => { S.ui.pl = { ...(S.ui.pl || {}), [d.k]: d.v }; render(); },
+  // Tapping the active sort flips its direction; another sort starts in its first direction.
+  plSort: (d) => { const cur0 = plSortOf({ sort: 'wait', ...(S.ui.pl || {}) }); S.ui.pl = { ...(S.ui.pl || {}), sort: d.k, dir: cur0.key === d.k ? -cur0.dir : 1 }; render(); },
+  // Selection bar (owner, November 25, 2026): set the picked players present or away, then clear the picks.
+  selPresence: (d) => { const s = cur(), on = d.v === '1'; const ids = (S.ui.sel || []).filter((pid) => R(s, pid) && R(s, pid).present !== on); ids.forEach((pid) => { const r = R(s, pid); r.present = on; if (on) { r.presentAt = Date.now(); r.selfLeft = false; } else r.selfCheckedIn = false; }); S.ui.sel = []; commit(`${ids.length} player${ids.length === 1 ? '' : 's'} marked ${on ? 'present' : 'away'}`); render(); },
+  // All away (owner, November 25, 2026): everyone on the roster; a game in play carries on.
+  allAway: () => { cur().roster.forEach((r) => { r.present = false; r.selfCheckedIn = false; }); commit('Everyone marked away'); render(); },
   selPlayer: (d) => { const cur_ = S.ui.sel || []; S.ui.sel = cur_.includes(d.pid) ? cur_.filter((x) => x !== d.pid) : [...cur_, d.pid]; render(); const el = document.querySelector(`.pc3[data-pid="${d.pid}"]`); if (el) el.focus(); },
   selClear: () => { S.ui.sel = []; render(); },
   // Owner request, November 9, 2026: Make match opens a confirmation with the court and each player's games; the teams start in pick order and Arrange to balance evens them out by level.
@@ -9130,15 +9317,14 @@ const ACT = {
   openMatch: (d) => { const m = cur().matches.find((x) => x.id === d.id); openSheet({ type: m && m.status === 'oncourt' ? 'onCourt' : 'match', id: d.id }); },
   openChooseMatch: (d) => openSheet({ type: 'chooseMatch', court: d.court }),
   openResult: (d) => openSheet(newResultSheet(d.id)),
-  resWinner: (d) => { const sh = S.ui.sheet; sh.winner = d.v; sh.err = ''; render(); },
-  resDeuce: (d) => { const sh = S.ui.sheet, o = d.g != null ? sh.g[+d.g] : sh; o.deuce = !o.deuce; o.lose = ''; o.a = ''; o.b = ''; sh.err = ''; render(); },
-  resGameWin: (d) => { const sh = S.ui.sheet; sh.g[+d.g].w = d.v; sh.err = ''; syncGames(sh); render(); },
+  resWinner: (d) => { const sh = S.ui.sheet, sc = scoringDef(cur()); sh.winner = d.v; if (sc.games === 1) pickScoreWinner(sc.target, sh, d.v); sh.err = ''; render(); },
+  resGameWin: (d) => { const sh = S.ui.sheet, o = sh.g[+d.g]; o.w = d.v; pickScoreWinner(scoringDef(cur()).target, o, d.v); sh.err = ''; syncGames(sh); render(); },
   reviewResult: () => {
     const sh = S.ui.sheet, m = cur().matches.find((x) => x.id === sh.id), r = resultCheck(scoringDef(cur()), sh);
     if (r.err) { sh.err = r.err; render(); return; }
     sh.res = r; sh.winner = r.winner; sh.err = ''; sh.step = 'review'; render();
   },
-  clearScores: () => { const sh = S.ui.sheet; [sh, ...(sh.g || [])].forEach((o) => { o.lose = ''; o.a = ''; o.b = ''; }); sh.err = ''; render(); },
+  clearScores: () => { const sh = S.ui.sheet; [sh, ...(sh.g || [])].forEach((o) => { o.a = ''; o.b = ''; }); sh.err = ''; render(); },
   confirmResult: () => {
     const s = cur(), sh = S.ui.sheet, m = s.matches.find((x) => x.id === sh.id), r = sh.res;
     if (m.status !== 'active') { closeSheet(); return; }
@@ -9364,6 +9550,7 @@ const CHANGE = {
   autoSelect: (el) => ACT.autoSelect(el.dataset, el),
   draftShuttleItem: (el) => { S.ui.draft.shuttles[+el.dataset.i].itemId = el.value; render(); },
   plSet: (el) => { S.ui.pl = { ...(S.ui.pl || {}), [el.dataset.k]: el.value }; render(); },
+  plSortSel: (el) => { const [k, d] = el.value.split(':'); S.ui.pl = { ...(S.ui.pl || {}), sort: k, dir: +d }; render(); },
   rvSet: (el) => { S.ui.rv = { ...(S.ui.rv || {}), [el.dataset.k]: el.value }; render(); },
   trLevel: (el) => { const t = (cur().transfers || []).find((x) => x.id === el.dataset.id); if (!t) return; t.level = el.value === '' ? null : +el.value; t.err = ''; render(); },
   reqLevel: (el) => { const r = (cur().requests || []).find((x) => x.id === el.dataset.id); r.level = el.value === '' ? null : +el.value; r.err = ''; render(); },
@@ -9817,29 +10004,42 @@ document.addEventListener('touchmove', (e) => {
 document.addEventListener('touchend', () => { if (pdrag && pdrag.touch) pdEnd(true); });
 document.addEventListener('touchcancel', () => { if (pdrag && pdrag.touch) pdEnd(false); });
 // Owner artifact comment, November 19, 2026: drag a busy court's drawing onto a free court to move that match there (Getting
-// ready or Playing). Mouse: start dragging after 6 px. Touch: press and hold, then drag. A tap still opens the match.
+// ready or Playing). Owner, November 25, 2026: dropping it on another busy one-court match trades the two courts (a match put on
+// the wrong court). Mouse: start dragging after 6 px. Touch: press and hold, then drag. A tap still opens the match.
 let cdrag = null;
 function cdLift() {
   const d = cdrag, r = d.el.getBoundingClientRect(), g = d.el.cloneNode(true);
   g.classList.add('swap-ghost', 'court-ghost'); g.removeAttribute('data-act'); g.setAttribute('aria-hidden', 'true');
   Object.assign(g.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
   document.body.appendChild(g); d.g = g; d.on = true; document.body.classList.add('court-dragging');
+  const self = d.el.closest('[data-swap-court]'); if (self) { self.classList.add('court-self'); d.self = self; }
   if (d.touch && navigator.vibrate) navigator.vibrate(10);
 }
 function cdMove(x, y) {
   const d = cdrag; d.g.style.transform = `translate(${x - d.x}px, ${y - d.y}px)`;
-  const el = document.elementFromPoint(x, y), t = el && el.closest('[data-free-court]');
+  const el = document.elementFromPoint(x, y), hit = el && el.closest('[data-free-court], [data-swap-court]');
+  const t = hit && hit.dataset.swapMatch === d.id ? null : hit;
   if (d.over && d.over !== t) d.over.classList.remove('court-drop');
   d.over = t || null; if (t) t.classList.add('court-drop');
+}
+// Two one-court matches trade courts; each keeps its state and start time. Nothing else moves, so Auto Queue does nothing.
+function swapCourts(m, otherId) {
+  const s = cur(), n = s.matches.find((x) => x.id === otherId);
+  const ok = (x) => x && ['oncourt', 'active'].includes(x.status) && x.courts.length === 1;
+  if (!ok(m) || !ok(n) || courtsNeeded(m) > 1 || courtsNeeded(n) > 1) { toast('Something changed. Review the match again.'); render(); return; }
+  const a = m.courts[0], b = n.courts[0];
+  m.courts = [b]; n.courts = [a];
+  commit(`Match ${m.seq} now on ${courtsOf(s, m)} · Match ${n.seq} now on ${courtsOf(s, n)}`); render();
 }
 function cdEnd(apply) {
   const d = cdrag; if (!d) return; cdrag = null; clearTimeout(d.timer);
   if (!d.on) return;
-  d.g.remove(); document.body.classList.remove('court-dragging'); if (d.over) d.over.classList.remove('court-drop');
+  d.g.remove(); document.body.classList.remove('court-dragging'); if (d.over) d.over.classList.remove('court-drop'); if (d.self) d.self.classList.remove('court-self');
   swallowClick = true; setTimeout(() => { swallowClick = false; }, 400);
   if (!apply || !d.over) return;
   const s = cur(), m = s.matches.find((x) => x.id === d.id), cid = d.over.dataset.freeCourt;
   if (!m) return;
+  if (d.over.dataset.swapMatch) { swapCourts(m, d.over.dataset.swapMatch); return; }
   // A two-court match needs a second free court: open Move match with this one picked.
   if (courtsNeeded(m) > 1) { openSheet({ type: 'moveCourt', id: m.id, courts: [cid] }); return; }
   S.ui.sheet = { type: 'moveCourt', id: m.id, courts: [cid] }; curAct = 'confirmMove'; ACT.confirmMove();

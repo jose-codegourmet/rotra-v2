@@ -41,6 +41,8 @@ export function freeCourtDropClass({
     '[:is(body[data-court-dragging])_&]:outline-2 [:is(body[data-court-dragging])_&]:outline-accent [:is(body[data-court-dragging])_&]:outline-offset-2',
     '[:is(body[data-court-dragging])_&:not([data-court-drop])]:outline-dashed',
     'data-court-drop:bg-accent-subtle!',
+    // The dragged drawing's own busy court is no target (owner, November 25, 2026: trade courts)
+    'data-court-source:outline-none!',
     dragging && !dragOver && 'outline-2 outline-dashed outline-accent outline-offset-2',
     dragOver && 'outline-2 outline-accent outline-offset-2 bg-accent-subtle!',
   )

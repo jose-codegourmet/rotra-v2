@@ -1,3 +1,4 @@
+import { resultExportFixtures } from '@rotra/data/fixtures/result-exports'
 import { resultSlideFixtures } from '@rotra/data/fixtures/result-slides'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { StandingsSlide } from './StandingsSlide'
@@ -40,3 +41,18 @@ export const OwnRowHighlighted: Story = {
   },
 }
 export const OwnRowHighlightedLight: Story = { ...OwnRowHighlighted, globals: { theme: 'light' } }
+
+/** Shared positions: one row each, faces stacked, "A & B" for two, "A, B, C" for three, "+N" past four faces. */
+export const SharedPositions: Story = {
+  args: { rows: resultExportFixtures.standingsRows30.slice(0, 15) },
+}
+export const SharedPositionsLight: Story = { ...SharedPositions, globals: { theme: 'light' } }
+export const SharedPositionsPhone: Story = {
+  ...SharedPositions,
+  globals: { viewport: { value: 'phone' } },
+}
+
+/** The second of three downloaded images: the title reads "Standings · 2 of 3". */
+export const DownloadPage: Story = {
+  args: { rows: resultExportFixtures.standingsRows30.slice(15), page: { n: 2, of: 3 } },
+}

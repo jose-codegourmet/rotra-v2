@@ -1,10 +1,42 @@
 import { resultExportFixtures } from '@rotra/data/fixtures/result-exports'
+import { resultSlideFixtures } from '@rotra/data/fixtures/result-slides'
+import { paginateStandings } from '@rotra/data/session-result/sessionResult.rules'
+import { AwardsSlide } from '@rotra/ui/awards-slide'
+import { OffDaySlide } from '@rotra/ui/off-day-slide'
+import { StandingsSlide } from '@rotra/ui/standings-slide'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
-import { ExportImagesSheet } from './ExportImagesSheet'
+import {
+  type ExportImagesFormat,
+  type ExportImagesPreview,
+  ExportImagesSheet,
+} from './ExportImagesSheet'
 
-const { clubName, storyFrames30, feedFrames30, awardsOnlyFrames, withOffDayFrames } =
-  resultExportFixtures
+const { standingsRows30, offDayNames } = resultExportFixtures
+const { frame, mvp, mostImproved } = resultSlideFixtures
+
+const standings = (format: ExportImagesFormat): ExportImagesPreview[] =>
+  paginateStandings(standingsRows30, format).map((page) => ({
+    key: `standings-${page.page}`,
+    label: page.title,
+    image: <StandingsSlide {...frame} rows={page.rows} page={{ n: page.page, of: page.pages }} />,
+  }))
+const awards: ExportImagesPreview = {
+  key: 'awards',
+  label: 'Awards',
+  image: <AwardsSlide {...frame} mvp={mvp} mostImproved={mostImproved} showFormulaNote />,
+}
+const offDay: ExportImagesPreview = {
+  key: 'off-day',
+  label: 'Off Day',
+  image: (
+    <OffDaySlide
+      {...frame}
+      variant="public"
+      rows={offDayNames.map((name) => ({ name, priorSessions: 6 }))}
+    />
+  ),
+}
 
 const meta = {
   title: 'Queue/ExportImagesSheet',
@@ -14,8 +46,7 @@ const meta = {
     onOpenChange: fn(),
     format: 'story',
     selection: { standings: true, awards: true, includeOffDay: false },
-    frames: storyFrames30,
-    clubName,
+    previews: [...standings('story'), awards],
     onFormatChange: fn(),
     onSelectionChange: fn(),
     onDownload: fn(),
@@ -26,25 +57,28 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** 30 players as Story images: three standings frames (14, 14, 2) plus Awards, four images. */
+/** 30 players with 2-, 3- and 6-way ties as Story images: standings pages plus Awards. */
 export const Story30Players: Story = {}
+export const Story30PlayersLight: Story = { globals: { theme: 'light' } }
 
-/** 30 players as Feed post images: three standings frames of 10 plus Awards. */
-export const Feed30Players: Story = { args: { format: 'feed', frames: feedFrames30 } }
+/** The same players as Feed post images: 9 rows per image, a tie never split. */
+export const Feed30Players: Story = {
+  args: { format: 'feed', previews: [...standings('feed'), awards] },
+}
 
 /** Only Awards ticked: one image. */
 export const AwardsOnly: Story = {
   args: {
     selection: { standings: false, awards: true, includeOffDay: false },
-    frames: awardsOnlyFrames,
+    previews: [awards],
   },
 }
 
-/** Off Day explicitly included: the Off Day frame joins the previews. */
+/** Off Day explicitly included: the Off Day image joins the previews. */
 export const WithOffDay: Story = {
   args: {
     selection: { standings: true, awards: true, includeOffDay: true },
-    frames: withOffDayFrames,
+    previews: [...standings('story'), awards, offDay],
   },
 }
 
@@ -52,7 +86,7 @@ export const WithOffDay: Story = {
 export const NothingSelected: Story = {
   args: {
     selection: { standings: false, awards: false, includeOffDay: false },
-    frames: [],
+    previews: [],
   },
 }
 

@@ -25,9 +25,33 @@ function respond(status: number, body: unknown, headers: Record<string, string>)
   return new Response(JSON.stringify(toJson(body)), { status, headers })
 }
 
+/** Prisma's code and the database's own code (SQLSTATE), wherever the driver adapter puts it. */
+function errorCodes(error: unknown) {
+  const e = error as { code?: unknown; meta?: { code?: unknown }; cause?: { code?: unknown } }
+  const code = typeof e?.code === 'string' ? e.code : undefined
+  const dbCode = [e?.meta?.code, e?.cause?.code].find((c): c is string => typeof c === 'string')
+  return { code, dbCode }
+}
+
+/** A malformed id in the URL (Postgres 22P02, e.g. not a UUID) names nothing: answer 404, not 500. */
+const isMalformedId = (error: unknown) =>
+  errorCodes(error).dbCode === '22P02' ||
+  (error instanceof Error && /invalid input syntax for type uuid/.test(error.message))
+
 function failure(error: unknown, headers: Record<string, string>) {
   if (error instanceof ServiceError) return respond(error.status, errorBody(error), headers)
-  console.error('[service] unexpected error', error instanceof Error ? error.name : typeof error)
+  if (isMalformedId(error)) {
+    const notFound = new ServiceError('not_found')
+    return respond(notFound.status, errorBody(notFound), headers)
+  }
+  // Codes only (never the message or values): enough to find the failing rule in the database log.
+  const { code, dbCode } = errorCodes(error)
+  console.error(
+    '[service] unexpected error',
+    error instanceof Error ? error.name : typeof error,
+    ...(code ? [`code=${code}`] : []),
+    ...(dbCode ? [`db=${dbCode}`] : []),
+  )
   return respond(500, { error: { code: 'internal', message: 'Something went wrong.' } }, headers)
 }
 

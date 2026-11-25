@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const startSessionSheetMeta = {
   name: 'StartSessionSheet',
   description:
-    'D-START-SESSION on ConfirmSheet: Session, Courts, Formats, Mode, Scoring, Record games, Minimum and Roster, the level-lock notice, the offline notice (Starting needs an internet connection.) with Start session disabled, Back and Start session. A late or other-day start (T3) first shows "This session was planned for … Set a new end time to start." and a required New end date-and-time picker.',
+    'D-START-SESSION on ConfirmSheet: Session, Courts, Formats, Mode, Scoring, Record games, Minimum and Roster, the level-lock notice, the offline notice (Starting needs an internet connection.) with Start session disabled, Back and Start session. A late or other-day start (T3) first shows "This session was planned for … Set a new end time to start." and a required New end date-and-time picker; started on an earlier day than planned (the planned start is still ahead) the notice adds "Starting now moves its start to now." and Start moves the planned start to now (owner, November 25, 2026, docs/mockup-changes/2026-11-25-queue-early-day-start.md).',
   usage: [
     'D-2026-11-19-12: pass levelsLabel ("All levels" or "6 beginner · 5 intermediate · 5 advanced") for the Levels row after Mode; omitted reads as All levels.',
     'scoringLabel is the Scoring row after Mode (SCORING[key].label from @rotra/schema/scoring); omitted reads as 16/31.',

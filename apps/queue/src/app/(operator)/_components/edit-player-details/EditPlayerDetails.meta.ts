@@ -3,9 +3,9 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const editPlayerDetailsMeta = {
   name: 'EditPlayerDetails',
   description:
-    'Saved players container for Edit details: loads ClubPlayerDetails, saves with useUpdateClubPlayerDetails, toasts "Details saved · NAME" (plus what the email did) and returns to the profile dialog. Profile picture changes (useSetClubPlayerPicture, useRemoveClubPlayerPicture, useUseClubPlayerPreviousPicture) apply at once without closing, toast "Picture updated · NAME", "Using initials · NAME" or "Previous picture restored · NAME", and show failures under the field. Characters seed from the same id and name as every other avatar.',
+    'Operator container for Edit details: loads ClubPlayerDetails, saves with useUpdateClubPlayerDetails, toasts "Details saved · NAME" (plus what the email did) and returns to the profile dialog. Profile picture changes (useSetClubPlayerPicture, useRemoveClubPlayerPicture, useUseClubPlayerPreviousPicture) apply at once without closing, toast "Picture updated · NAME", "Using initials · NAME" or "Previous picture restored · NAME", and show failures under the field. Characters seed from the same id and name as every other avatar.',
   usage: [
-    'Mounted by SavedPlayers when Edit details is chosen on a guest or unclaimed profile.',
+    'Mounted by usePlayerProfileActions when Edit details is chosen on a guest or unclaimed profile (Saved players, the session console and the Preparation roster).',
     'When the email typed already belongs to another saved player, useUpdateClubPlayerDetails answers samePerson (the email is not applied): the sheet becomes the Same person as NAME? ConfirmSheet. Back returns to Edit details; Move to NAME calls useMoveSavedPlayer, toasts "Moved to NAME" and opens that player\'s profile through onMoved.',
   ],
   prototype: {

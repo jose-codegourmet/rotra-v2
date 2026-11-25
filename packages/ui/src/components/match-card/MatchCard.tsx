@@ -21,7 +21,7 @@ export type MatchCardPlayer = {
   level: PlayingLevel | null
   photoUrl?: string
   /**
-   * Live session wait under the name ("M min", On court, Playing, Not here). Omit when the session
+   * Live session status pill under the name (In queue Nm, Playing Nm, Getting ready, Away). Omit when the session
    * is not live; the console computes the minutes (Q12.22).
    */
   wait?: PlayerWait
@@ -354,8 +354,9 @@ function CompactFace({
 }
 
 /**
- * The compact variant's team (prototype .qstack-row): an overlapping stack of 34 px pictures with level
- * rings, then the short names on one line ("Rafa, Migo, Pau"). No wait times, no games badge.
+ * The compact variant's team (prototype .qt-vs .qstack-row, owner, November 25, 2026): an overlapping
+ * stack of 34 px pictures with level rings above the short names ("Rafa & Migo"); the two teams sit
+ * side by side with VS between. No wait times, no games badge.
  * Pictures open the profile and, inside a SwapSidesArea, can be dragged onto the other team.
  */
 function CompactFaces({
@@ -374,7 +375,7 @@ function CompactFaces({
   highlightedPlayerIds?: string[]
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-2.5">
+    <div className="flex min-w-0 flex-col items-center gap-1.5 text-center">
       <div className="flex flex-none pl-2">
         {players.map((p, i) => {
           const canSwap = swappable && !readOnly
@@ -397,7 +398,7 @@ function CompactFaces({
         })}
       </div>
       <span className="min-w-0 truncate text-[13px] font-semibold text-fg">
-        {players.map((p) => p.shortName).join(', ')}
+        {players.map((p) => p.shortName).join(' & ')}
       </span>
     </div>
   )
@@ -569,56 +570,55 @@ export function MatchCard({
         ) : null}
       </div>
       {compact ? (
-        <CompactFaces
-          players={teamA}
-          team="A"
-          swappable={swappable}
-          readOnly={readOnly}
-          onSelectPlayer={onSelectPlayer}
-          highlightedPlayerIds={highlightedPlayerIds}
-        />
-      ) : readOnly ? (
-        <StaticFaces players={teamA} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+          <CompactFaces
+            players={teamA}
+            team="A"
+            swappable={swappable}
+            readOnly={readOnly}
+            onSelectPlayer={onSelectPlayer}
+            highlightedPlayerIds={highlightedPlayerIds}
+          />
+          <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
+          <CompactFaces
+            players={teamB}
+            team="B"
+            swappable={swappable}
+            readOnly={readOnly}
+            onSelectPlayer={onSelectPlayer}
+            highlightedPlayerIds={highlightedPlayerIds}
+          />
+        </div>
       ) : (
-        <Faces
-          players={teamA}
-          team="A"
-          swappable={swappable}
-          onSelectPlayer={onSelectPlayer}
-          onOpenGames={onOpenGames}
-          gamesBadge={badgeMode}
-          highlightedPlayerIds={highlightedPlayerIds}
-        />
-      )}
-      <div
-        className={cn(
-          'text-center text-[10px] font-extrabold tracking-[1px] text-fg3',
-          compact && '-my-0.5',
-        )}
-      >
-        VS
-      </div>
-      {compact ? (
-        <CompactFaces
-          players={teamB}
-          team="B"
-          swappable={swappable}
-          readOnly={readOnly}
-          onSelectPlayer={onSelectPlayer}
-          highlightedPlayerIds={highlightedPlayerIds}
-        />
-      ) : readOnly ? (
-        <StaticFaces players={teamB} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
-      ) : (
-        <Faces
-          players={teamB}
-          team="B"
-          swappable={swappable}
-          onSelectPlayer={onSelectPlayer}
-          onOpenGames={onOpenGames}
-          gamesBadge={badgeMode}
-          highlightedPlayerIds={highlightedPlayerIds}
-        />
+        <>
+          {readOnly ? (
+            <StaticFaces players={teamA} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
+          ) : (
+            <Faces
+              players={teamA}
+              team="A"
+              swappable={swappable}
+              onSelectPlayer={onSelectPlayer}
+              onOpenGames={onOpenGames}
+              gamesBadge={badgeMode}
+              highlightedPlayerIds={highlightedPlayerIds}
+            />
+          )}
+          <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
+          {readOnly ? (
+            <StaticFaces players={teamB} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
+          ) : (
+            <Faces
+              players={teamB}
+              team="B"
+              swappable={swappable}
+              onSelectPlayer={onSelectPlayer}
+              onOpenGames={onOpenGames}
+              gamesBadge={badgeMode}
+              highlightedPlayerIds={highlightedPlayerIds}
+            />
+          )}
+        </>
       )}
       {statusLine}
       {!readOnly && (onStart || onEdit || onRemove) ? (

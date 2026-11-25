@@ -14,6 +14,8 @@ import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PlayerProfileSheet } from '@rotra/ui/player-profile-sheet'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { useParams } from 'next/navigation'
+import { useState } from 'react'
+import { usePlayerProfileActions } from '@/app/(operator)/_components/player-profile-actions/PlayerProfileActions'
 import { longDateLabel } from '@/lib/dates'
 
 export type PlayerProfileProps = {
@@ -28,7 +30,8 @@ export type PlayerProfileProps = {
 /**
  * The player profile dialog shared by the console views: PlayerProfileSheet on useClubPlayers for
  * the saved player a court, queue card, pool card or leaderboard row points at, with the session's
- * roster level (“LEVEL tonight”) while the session is prepared or live, the status pill while it is
+ * roster level (“LEVEL tonight”), the profile's own actions (Edit details, Invite, Club nickname,
+ * Delete player) while the session is prepared or live, the status pill while it is
  * live, and Stats · YEAR (D-PARTICIPANT-PROFILE). Renders nothing until the player is known.
  */
 export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: PlayerProfileProps) {
@@ -42,7 +45,19 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
   const profile = clubPlayerId
     ? clubPlayers.data?.players.find((p) => p.id === clubPlayerId)
     : undefined
-  if (!profile) return null
+  // Hidden while Edit details, Invite, Club nickname or the delete check takes its place.
+  const [hidden, setHidden] = useState(false)
+  const close = () => {
+    setHidden(false)
+    onClose()
+  }
+  const actions = usePlayerProfileActions(profile, {
+    hideProfile: () => setHidden(true),
+    // A move into another saved player ends here: the console opened this one.
+    showProfile: (id) => (id === clubPlayerId ? setHidden(false) : close()),
+    closeProfile: close,
+  })
+  if (!profile) return actions.sheets
   const entry = roster.data?.roster.find((r) => r.clubPlayerId === profile.id)
   const state = session.data?.state
   const live = state === 'prepared' || state === 'active' || state === 'finalizing'
@@ -59,9 +74,9 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
   return (
     <>
       <PlayerProfileSheet
-        open={clubPlayerId !== null}
+        open={clubPlayerId !== null && !hidden}
         onOpenChange={(open) => {
-          if (!open) onClose()
+          if (!open) close()
         }}
         name={profile.fullName}
         photoUrl={photoUrl}
@@ -92,7 +107,9 @@ export function PlayerProfile({ clubPlayerId, onClose, backLabel, onBack }: Play
         detailsRequired={profile.detailsRequired}
         backLabel={backLabel}
         onBack={onBack}
+        {...actions.profileProps(profile)}
       />
+      {actions.sheets}
       {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </>
   )

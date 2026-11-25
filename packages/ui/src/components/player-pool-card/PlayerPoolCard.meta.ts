@@ -3,8 +3,9 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const playerPoolCardMeta = {
   name: 'PlayerPoolCard',
   description:
-    'One player in the live Players view: the picture in a level-band ring (no level text), one name (club nickname, nickname, full name; two lines at most), the Current | Total games strip, "M min wait" when available, status (On Court X, Away, Queued · #P, Free) and the Present switch. Tapping the card picks the player for the next match and shows the pick order.',
+    'One player in the live Players view: the picture in a level-band ring (no level text), one name (club nickname, nickname, full name; two lines at most), the Current | Total games strip, the status pill (Wait Nm, In queue Nm, Playing Nm, Getting ready, Away) and the Present switch. Tapping the card picks the player for the next match and shows the pick order.',
   usage: [
+    'The status is a StatusPill (owner, November 25, 2026, docs/mockup-changes/2026-11-25-queue-status-pills.md): Wait Nm (free), In queue Nm (queued; waitMinutes), Playing Nm (status.minutes since the match began; hover names the court), Getting ready (status.minutes null) or Away. The queue position no longer shows on the card.',
     'Pass onNoShow only on the live Players view for a player who is away, has played no games and is in no match: "No show (cancelled)" opens the Mark NAME as No show? confirmation.',
     'There is no Move to waitlist on the live card: the session is already running (2026-11-19-queue-live-no-move-to-waitlist).',
     'Pass name as the full name, plus nickname and clubNickname when present: the card shows one name (club nickname, nickname, full name) and keeps the full name as hover text and screen-reader label.',

@@ -3,19 +3,19 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const exportFramePreviewMeta = {
   name: 'ExportFramePreview',
   description:
-    'One thumbnail in the Download images sheet (Q-EXPORT): the club name, the slide title ("Standings 2", "Awards", "Off Day"), its rows and the "powered by rotra" footer at Story (tall) or Feed post (4:5) proportions.',
+    'One thumbnail in the Download images sheet (Q-EXPORT): the image itself (the result slide it downloads as) drawn 480 px wide and scaled into Story (108 × 192) or Feed post (144 × 180) proportions.',
   usage: [
-    'Rendered by ExportImagesSheet for every frame the container computed; one preview per image file that will be downloaded.',
-    'A preview only: rows past the frame are clipped, like the prototype. The real slides are ResultSlideFrame / StandingsSlide / AwardsSlide / OffDaySlide, and the image files come from the export (Q08.5).',
+    'Rendered by ExportImagesSheet for every image; pass the slide as children and a label ("Standings · 1 of 3", "Awards", "Off Day") for its accessible name.',
+    'Purely visual: the slide inside is inert and hidden from assistive tech, so its buttons never take focus. The image files themselves come from the export (Q08.5).',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'SHEETS.export › .frames .frame.story / .frame.feed',
+    screen: 'SHEETS.export › .frames .frame.story / .frame.feed (.frame-art)',
   },
   docs: [
     'docs/screens/product/modules/queue/results-sharing.md#q-export--download-images',
     'docs/business_logic/product/queue/modules/results/README.md#image-downloads',
   ],
   variants: ['story', 'feed'],
-  related: ['ExportImagesSheet', 'ResultSlideFrame'],
+  related: ['ExportImagesSheet', 'StandingsSlide', 'AwardsSlide', 'OffDaySlide'],
 } satisfies ComponentMeta

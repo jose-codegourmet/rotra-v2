@@ -1,15 +1,25 @@
 'use client'
 
 import { cn } from '@rotra/ui/cn'
+import { Icon } from '@rotra/ui/icon'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Select } from '@rotra/ui/select'
+import { tabFocusClass } from '@rotra/ui/tabs'
 
 /**
  * Which players the grid shows: present and off court, present, away (Not here), the waitlist
  * panel instead of cards, or the whole roster
  */
 export type PlayerPoolShow = 'available' | 'present' | 'away' | 'waitlist' | 'everyone'
-export type PlayerPoolSort = 'wait' | 'least' | 'most' | 'level'
+/** The four sorts (owner, November 25, 2026) */
+export type PlayerPoolSortKey = 'name' | 'games' | 'wait' | 'level'
+/**
+ * A sort and its direction. `dir` 1 is the sort's first direction: Name A–Z, Games fewest first,
+ * Wait longest first, Level high to low; -1 is the other way.
+ */
+export type PlayerPoolSort = { key: PlayerPoolSortKey; dir: 1 | -1 }
+
+export const DEFAULT_PLAYER_POOL_SORT: PlayerPoolSort = { key: 'wait', dir: 1 }
 
 export type PlayerPoolToolbarProps = {
   show: PlayerPoolShow
@@ -21,22 +31,42 @@ export type PlayerPoolToolbarProps = {
   className?: string
 }
 
-export const PLAYER_POOL_SORT_LABELS: Record<PlayerPoolSort, string> = {
-  wait: 'Sort: longest wait',
-  least: 'Sort: least games',
-  most: 'Sort: most games',
-  level: 'Sort: level, high to low',
+const SORT_KEYS: { key: PlayerPoolSortKey; label: string }[] = [
+  { key: 'name', label: 'Name' },
+  { key: 'games', label: 'Games' },
+  { key: 'wait', label: 'Wait' },
+  { key: 'level', label: 'Level' },
+]
+
+/** Each sort's wording, first direction then the other */
+export const PLAYER_POOL_SORT_DIRECTIONS: Record<PlayerPoolSortKey, [string, string]> = {
+  name: ['name A–Z', 'name Z–A'],
+  games: ['fewest games', 'most games'],
+  wait: ['longest wait', 'shortest wait'],
+  level: ['level, high to low', 'level, low to high'],
 }
 
-const SORT_OPTIONS = (Object.keys(PLAYER_POOL_SORT_LABELS) as PlayerPoolSort[]).map((value) => ({
-  value,
-  label: PLAYER_POOL_SORT_LABELS[value],
-}))
+const directionOf = ({ key, dir }: PlayerPoolSort) =>
+  PLAYER_POOL_SORT_DIRECTIONS[key][dir === 1 ? 0 : 1]
+
+/** Name and Games read upwards in their first direction; Wait and Level downwards. */
+const arrowOf = ({ key, dir }: PlayerPoolSort) =>
+  (key === 'name' || key === 'games') === (dir === 1) ? 'up' : 'down'
+
+/** The phone dropdown: every sort both ways, "name:1" … "level:-1" */
+const SORT_OPTIONS = SORT_KEYS.flatMap(({ key }) =>
+  ([1, -1] as const).map((dir) => ({
+    value: `${key}:${dir}`,
+    label: `Sort: ${directionOf({ key, dir })}`,
+  })),
+)
 
 /**
- * The Players view filter and sort row (the prototype's .seg + #pl-sort): Available · N (default),
- * Present · N, Not here · N, Waitlist · N, Everyone · N, and the "Sort players" select (hidden
- * while Waitlist is shown).
+ * The Players view filter and sort row: Available · N (default), Present · N, Not here · N,
+ * Waitlist · N, Everyone · N; then the sort (hidden while Waitlist is shown). On desktop the sort is
+ * a row of buttons at the right, Name · Games · Wait · Level: the active one shows its direction
+ * arrow and tapping it again flips it; another starts in its first direction. At 760 px and
+ * narrower it is the "Sort players" dropdown with both directions of each (owner, November 25, 2026).
  */
 export function PlayerPoolToolbar({
   show,
@@ -61,13 +91,46 @@ export function PlayerPoolToolbar({
         ]}
       />
       {show === 'waitlist' ? null : (
-        <Select
-          aria-label="Sort players"
-          value={sort}
-          onChange={(value) => onSortChange(value as PlayerPoolSort)}
-          options={SORT_OPTIONS}
-          className="w-auto min-h-[42px]"
-        />
+        <>
+          <fieldset
+            aria-label="Sort players"
+            className="m-0 ml-auto inline-flex flex-wrap gap-[3px] rounded-lg border border-border-strong p-[3px] max-[760px]:hidden"
+          >
+            {SORT_KEYS.map(({ key, label }) => {
+              const on = sort.key === key
+              const next: PlayerPoolSort = { key, dir: on ? (sort.dir === 1 ? -1 : 1) : 1 }
+              const current: PlayerPoolSort = on ? sort : { key, dir: 1 }
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  aria-pressed={on}
+                  aria-label={`Sort by ${label.toLowerCase()}, ${directionOf(current)}`}
+                  title={on ? `${directionOf(current)} · tap to flip` : directionOf(current)}
+                  onClick={() => onSortChange(next)}
+                  className={cn(
+                    'inline-flex min-h-9 items-center gap-1 rounded-[7px] border-0 bg-transparent px-3.5 font-semibold text-fg2',
+                    'aria-pressed:bg-elev aria-pressed:text-fg touch:min-h-11 touch:px-4',
+                    tabFocusClass,
+                  )}
+                >
+                  {label}
+                  {on ? <Icon name={arrowOf(sort)} size={14} /> : null}
+                </button>
+              )
+            })}
+          </fieldset>
+          <Select
+            aria-label="Sort players"
+            value={`${sort.key}:${sort.dir}`}
+            onChange={(value) => {
+              const [key, dir] = value.split(':')
+              onSortChange({ key: key as PlayerPoolSortKey, dir: dir === '-1' ? -1 : 1 })
+            }}
+            options={SORT_OPTIONS}
+            className="w-auto min-h-[42px] min-[761px]:hidden"
+          />
+        </>
       )}
     </div>
   )

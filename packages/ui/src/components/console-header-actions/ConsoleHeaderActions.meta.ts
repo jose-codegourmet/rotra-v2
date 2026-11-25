@@ -3,7 +3,7 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const consoleHeaderActionsMeta = {
   name: 'ConsoleHeaderActions',
   description:
-    'The live console header\'s compact control cluster at the upper right: "Match requests · N" (always shown; warn-coloured and bold while any match request is waiting), "Courts and time", "Payments" and a ⋯ "More for this session" menu with Public page, Copy Facebook post and Home.',
+    'The live console header\'s compact control cluster at the upper right: "Match requests · N" (always shown; warn-coloured and bold while any match request is waiting), "Courts and time", "Payments" and a ⋯ "More for this session" menu with Public page, Copy Facebook post, Home and Back to preparation… (D-BACK-TO-PREP; disabled with its reason once a game has started or offline).',
   usage: [
     'Pass it as PageHeader actions on the live console only; on narrow screens it wraps under the title.',
     'matchRequestCount is open match requests only: join requests close at Start, so none are counted after it.',

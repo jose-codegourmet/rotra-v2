@@ -10,6 +10,7 @@ import {
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
+import { backToPreparationBlocker } from '@rotra/data/queue-session/queueSession.rules'
 import { recordsGames, sessionScoring } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { isRealDataMode } from '@rotra/data/real/mode'
@@ -36,6 +37,7 @@ import { type ComponentType, useCallback, useEffect, useMemo, useRef, useState }
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { ActiveMatch } from '@/app/(operator)/sessions/[sessionId]/_components/active-match/ActiveMatch'
+import { BackToPreparation } from '@/app/(operator)/sessions/[sessionId]/_components/back-to-preparation/BackToPreparation'
 import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
 import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { GenerateQueueView } from '@/app/(operator)/sessions/[sessionId]/_components/generate-queue-view/GenerateQueueView'
@@ -109,6 +111,7 @@ export type ConsoleSheet =
   | 'adjust'
   | 'add-court'
   | 'session-done'
+  | 'back-to-prep'
   | null
 /** The Queue › Match editing and generation sheets: Add match / Edit lineup, Suggested match, Auto queue */
 export type MatchSheet =
@@ -401,6 +404,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
                   onOpenPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
                   onCopyFacebookPost={() => setSheet('post')}
                   onGoHome={() => router.push('/')}
+                  onBackToPreparation={() => setSheet('back-to-prep')}
+                  backToPreparationDisabledReason={backToPreparationBlocker(all, online)}
                 />
               </div>
             }
@@ -517,6 +522,15 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           <PaymentsPanel sessionId={sessionId} asSheet />
         </Sheet>
         <ShareSession sessionId={sessionId} open={shareOpen} onOpenChange={setShareOpen} />
+        {s ? (
+          <BackToPreparation
+            session={s}
+            matches={all}
+            online={online}
+            open={sheet === 'back-to-prep'}
+            onOpenChange={(open) => setSheet(open ? 'back-to-prep' : null)}
+          />
+        ) : null}
         <FacebookPost
           sessionId={sessionId}
           open={sheet === 'post'}

@@ -28,6 +28,11 @@ export type QueueSession = {
   playersPerCourt: number
   expectedPlayers: number | null
   startedAt: number | null
+  /**
+   * The planned window as it was at Start, before a late or other-day start moved it. **Back to
+   * preparation** puts it back (owner, November 25, 2026). Null or missing: keep the current times.
+   */
+  plannedBeforeStart?: { startAt: number; endAt: number } | null
   finalizedAt: number | null
   playerRecordsUpdatedAt: number | null
   seriesId: string | null

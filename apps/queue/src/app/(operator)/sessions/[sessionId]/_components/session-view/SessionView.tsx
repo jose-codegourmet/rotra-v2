@@ -1,11 +1,12 @@
 'use client'
 
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
-import { canPauseMatch } from '@rotra/data/match/liveMatch.rules'
+import { canPauseMatch, canTradeCourts } from '@rotra/data/match/liveMatch.rules'
 import {
   activeMatchFor,
   courtFreeSince,
   courtMatches,
+  courtNames,
   courtOpen,
   courtsNeeded,
   FORMAT_LABELS,
@@ -32,6 +33,7 @@ import { usePlaceOnCourt } from '@rotra/data/match/usePlaceOnCourt'
 import { useRemoveWaitingMatch } from '@rotra/data/match/useRemoveWaitingMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useStartMatch } from '@rotra/data/match/useStartMatch'
+import { useTradeCourts } from '@rotra/data/match/useTradeCourts'
 import { courtFillModeOf } from '@rotra/data/queue-session/courtFill'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
 import { sessionScoring } from '@rotra/data/queue-session/types'
@@ -151,6 +153,7 @@ export function SessionView({
   const startMatch = useStartMatch()
   const pauseMatch = usePauseMatch()
   const moveCourt = useMoveCourt()
+  const tradeCourts = useTradeCourts()
   const setCourtFill = useSetCourtFillMode()
   const fillOpened = useFillOpenedCourts()
   const updateCourt = useUpdateCourt()
@@ -273,7 +276,13 @@ export function SessionView({
       ...player(id),
       games,
       wait: busy
-        ? { kind: busy.state === 'on_court' ? 'on-court' : 'playing' }
+        ? busy.state === 'on_court'
+          ? { kind: 'on-court', courtLabel: courtNames(busy, s.courts) }
+          : {
+              kind: 'playing',
+              courtLabel: courtNames(busy, s.courts),
+              minutes: busy.startedAt != null ? (now - busy.startedAt) / 60_000 : 0,
+            }
         : !p || !p.present
           ? { kind: 'not-here' }
           : { kind: 'minutes', minutes: waitMinutes(p, ctx.matches, s.startedAt, now) },
@@ -404,9 +413,20 @@ export function SessionView({
   /**
    * A drawing was dropped on a free court: a one-court match moves there with the command's toast;
    * a two-court match opens Move match with that court preselected so the second can be chosen.
-   * Dropping on a busy court or on nothing never reaches here.
+   * Dropped on another busy one-court court (owner, November 25, 2026), the two matches trade
+   * courts. Dropping on nothing never reaches here.
    */
   const dropOnCourt = (m: Match, courtId: string) => {
+    const other = onCourts.find((x) => x.id !== m.id && x.courtIds.includes(courtId))
+    if (other) {
+      if (!canTradeCourts(m, other) || committing.current || tradeCourts.isPending) return
+      committing.current = true
+      tradeCourts.mutate(
+        { matchId: m.id, withMatchId: other.id, operationId: crypto.randomUUID() },
+        commit,
+      )
+      return
+    }
     if (!free.some((c) => c.id === courtId) || free.length < courtsNeeded(m)) return
     if (courtsNeeded(m) === 2) {
       if (m.state === 'active') onOpenMatch?.(m.id, { courtId })
@@ -449,6 +469,8 @@ export function SessionView({
         formatLabel: FORMAT_LABELS[m.format],
         matchNo: m.matchNo,
         onDragMove: (courtId: string) => dropOnCourt(m, courtId),
+        // Owner, November 25, 2026: a one-court match's court takes a dropped drawing (trade courts).
+        dropCourtId: merged ? undefined : c.id,
         ...menuFor(c),
       }
       if (m.state === 'on_court') {
@@ -517,6 +539,8 @@ export function SessionView({
             formatLabel: FORMAT_LABELS[next.match.format],
             teamA: names(next.match.teamA),
             teamB: names(next.match.teamB),
+            facesA: next.match.teamA.map(queuePlayer),
+            facesB: next.match.teamB.map(queuePlayer),
           }
         : null,
       notEnoughFreePlayers: next.notEnoughFreePlayers,

@@ -75,7 +75,11 @@ export const WaitOnCourt: Story = {
   decorators: queueDecorators,
 }
 export const WaitPlaying: Story = {
-  args: { ...faceAt(1), size: 'queue', wait: { kind: 'playing' } },
+  args: {
+    ...faceAt(1),
+    size: 'queue',
+    wait: { kind: 'playing', courtLabel: 'Court 1', minutes: 4 },
+  },
   decorators: queueDecorators,
 }
 export const WaitNotHere: Story = {

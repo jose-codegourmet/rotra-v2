@@ -10,6 +10,10 @@ Every dialog names the target session/player/match, shows the actual selected va
 
 Title **Start session?** Show session, court count, formats, mode, minimum, roster “N confirmed · M present”. Copy: **“Every player's level locks now. Players you add later get a level when you add them, and it locks too.”** Offline adds “Starting needs an internet connection.” and Start session is disabled. Primary **Start session**; secondary Back. Eligibility/license/other-active-session checks still apply; a dialog does not bypass them. Started late or on another day than planned (November 6, 2026): first “This session was planned for 6:00–9:00 PM yesterday. Set a new end time to start.” and a required **New end**, pre-filled with now + the planned length rounded up to 15 minutes; Start session is disabled until it is after now ([Q-START](modules/queue/session-setup.md#q-start--start-review)).
 
+## D-BACK-TO-PREP — Undo Start
+
+Opened from the live console's ⋯ **Back to preparation…** (owner, November 25, 2026, [log](../../mockup-changes/2026-11-25-queue-back-to-preparation.md)). Title **Back to preparation?** Copy: “TITLE goes back to preparation, as if it had not started.”, then a list: “Every player's level unlocks.”; “The start time clears, and the planned time goes back to PLANNED.” (the planned time from before Start, e.g. “Sat, Nov 28, 7:00–9:00 PM”); “N match(es) in the Main Queue or on court is/are removed.” (only when there are any); “Join requests closed at Start stay closed. The session link takes new requests again.” Actions **Keep it live** and primary **Back to preparation**. Only before any game starts (no match active, completed or invalid) and online; otherwise the primary is disabled with the reason as a warning notice. Success opens the preparation page with the toast “Back to preparation · levels unlocked · N matches removed”.
+
 ## D-DELETE-SESSION — Delete session
 
 Always shown before a delete; it has two forms. Both show session, when, venue, and roster “N confirmed · M on the waitlist · K join requests”.

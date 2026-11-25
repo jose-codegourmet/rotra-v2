@@ -2,7 +2,7 @@
 // `NODE_OPTIONS=--import <this file>` (see src/stack.ts appServerEnv). Never import it from app code.
 //
 // It does nothing unless ROTRA_E2E_CLOCK=1, and then refuses to start (throws, so the server exits)
-// unless DATABASE_URL, DIRECT_URL and SUPABASE_URL pass the e2e guard. Once active it replaces the
+// unless DATABASE_URL, DIRECT_URL and ROTRA_GO_API_URL pass the e2e guard. Once active it replaces the
 // global Date so that now = (virtual base set by the control call) + real time elapsed since then,
 // and serves a control endpoint on 127.0.0.1:$ROTRA_E2E_CLOCK_PORT:
 //

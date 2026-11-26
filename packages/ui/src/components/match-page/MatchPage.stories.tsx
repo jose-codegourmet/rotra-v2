@@ -194,7 +194,6 @@ export const NotFound: Story = {
 }
 export const NotFoundLight: Story = { ...NotFound, globals: { theme: 'light' } }
 
-
 export const PlayerPicked: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: /^Jose Buctuanon, .*show stats/i }))

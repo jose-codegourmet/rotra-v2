@@ -87,7 +87,9 @@ export const GuestPicked: Story = { args: { picked: [guestId] } }
 export const MaskedPlayerPicked: Story = { args: { picked: [maskedPlayerId] } }
 export const You: Story = {
   args: {
-    left: left.map((player) => (player.id === JOSE_PLAYER_ID ? { ...player, name: 'You' } : player)),
+    left: left.map((player) =>
+      player.id === JOSE_PLAYER_ID ? { ...player, name: 'You' } : player,
+    ),
     picked: [JOSE_PLAYER_ID],
   },
 }

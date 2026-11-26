@@ -59,7 +59,8 @@ function Team({
       className={cn(
         'flex min-w-0 flex-col justify-center gap-2 self-stretch rounded-lg bg-elev p-2.5',
         side === 'right' && 'text-right @max-[440px]:text-left',
-        won && 'bg-accent-subtle shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--accent)_45%,transparent)]',
+        won &&
+          'bg-accent-subtle shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--accent)_45%,transparent)]',
         teamPicked && 'shadow-[inset_0_0_0_2px_var(--accent)]',
       )}
     >
@@ -72,7 +73,9 @@ function Team({
           className="-mt-1 flex min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md border-0 bg-transparent px-1.5 py-1 text-fg hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent touch:min-h-11"
         >
           <span className={cn(TEAM_LABEL, 'text-fg2')}>{label}</span>
-          <span className="text-xs font-bold text-accent">{teamPicked ? 'Showing both' : seeTeam}</span>
+          <span className="text-xs font-bold text-accent">
+            {teamPicked ? 'Showing both' : seeTeam}
+          </span>
         </button>
       ) : (
         <span className={cn(TEAM_LABEL, won ? 'text-accent' : 'text-fg2')}>{label}</span>

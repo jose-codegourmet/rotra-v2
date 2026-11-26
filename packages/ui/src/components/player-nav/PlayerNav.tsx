@@ -46,7 +46,14 @@ function navItems({ signedIn, leaderboard, profile, signIn, session, settings }:
       ? { label: 'My profile', key: 'profile' as const, target: profile, icon: 'user' as const }
       : { label: 'Sign in', key: 'sign-in' as const, target: signIn, icon: 'user' as const },
     ...(signedIn && settings
-      ? [{ label: 'Settings', key: 'settings' as const, target: settings, icon: 'nav-gear' as const }]
+      ? [
+          {
+            label: 'Settings',
+            key: 'settings' as const,
+            target: settings,
+            icon: 'nav-gear' as const,
+          },
+        ]
       : []),
   ]
 }

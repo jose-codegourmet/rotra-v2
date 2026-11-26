@@ -49,6 +49,7 @@
   text-shadow: 0 1px 0 var(--px-top);
   text-transform: uppercase;
   background: linear-gradient(
+    180deg,
     var(--px-top) 0 4px,
     var(--px-fill) 4px calc(100% - 5px),
     var(--px-low) calc(100% - 5px)

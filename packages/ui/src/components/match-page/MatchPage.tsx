@@ -225,7 +225,9 @@ function MatchPageContent({
   const leftWon = (page.winner === 'a') !== flipped
   const score = flipped && page.score ? flipScore(page.score) : page.score
   const skill = new Map(
-    players.flatMap(({ player }) => (player.playerId ? [[player.playerId, player.skillGroup]] : [])),
+    players.flatMap(({ player }) =>
+      player.playerId ? [[player.playerId, player.skillGroup]] : [],
+    ),
   )
   const label = (player: MatchPagePlayer) =>
     viewer && player.playerId === viewer ? 'You' : firstName(player.name)
@@ -277,14 +279,18 @@ function MatchPageContent({
                   }}
                   onOpenPlayer={onOpenPlayer}
                   onShare={shareCourt ? () => shareCourt(page.matchId) : undefined}
-                  skillRings={(player) => (player.playerId ? (skill.get(player.playerId) ?? null) : null)}
+                  skillRings={(player) =>
+                    player.playerId ? (skill.get(player.playerId) ?? null) : null
+                  }
                 />
               ) : null}
             </section>
           </Card>
           <Card asChild>
             <section aria-label="Session" className={SESSION_CARD}>
-              <span className="text-[11px] font-bold tracking-[0.6px] text-fg2 uppercase">Session</span>
+              <span className="text-[11px] font-bold tracking-[0.6px] text-fg2 uppercase">
+                Session
+              </span>
               <b className="text-[17px] [overflow-wrap:anywhere]">
                 {page.session.sessionPageUrl ? (
                   <a
@@ -322,7 +328,8 @@ function MatchPageContent({
           aria-live="polite"
           className={cn(
             'grid grid-cols-[minmax(0,1fr)] gap-5',
-            pickedPlayers.length > 1 && 'min-[900px]:grid-cols-[repeat(auto-fit,minmax(420px,1fr))]',
+            pickedPlayers.length > 1 &&
+              'min-[900px]:grid-cols-[repeat(auto-fit,minmax(420px,1fr))]',
           )}
         >
           {pickedPlayers.map(({ id, player }) => (

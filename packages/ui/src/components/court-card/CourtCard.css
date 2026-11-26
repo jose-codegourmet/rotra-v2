@@ -1,6 +1,6 @@
 /* The pulsing dot on a court's Ending / Ending soon pill (the mockup's .ct-end i::after). */
 .court-status-dot::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: 50%;

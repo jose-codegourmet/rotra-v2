@@ -421,11 +421,7 @@ export function AlmostDoneRow({
     // biome-ignore lint/a11y/noLabelWithoutControl: the label wraps the switch button
     <label className="flex flex-nowrap items-center justify-between gap-2">
       <span className="text-[13px] font-bold">Almost done</span>
-      <Switch
-        checked={checked}
-        onChange={onChange}
-        aria-label={`Almost done, ${courtLabel}`}
-      />
+      <Switch checked={checked} onChange={onChange} aria-label={`Almost done, ${courtLabel}`} />
     </label>
   )
 }

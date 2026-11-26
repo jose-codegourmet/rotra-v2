@@ -333,7 +333,9 @@ export const CourtsGrid: Story = {
   decorators: [gridDecorator],
   render: () => (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
-      <CourtCard {...inGame(playing, { onPause: fn(), onMatchDone: fn(), onAlmostDoneChange: fn() })} />
+      <CourtCard
+        {...inGame(playing, { onPause: fn(), onMatchDone: fn(), onAlmostDoneChange: fn() })}
+      />
       <CourtCard {...onCourt(ready, { swapWith: null })} />
       <CourtCard {...free(courtAt(2), [playing, blocked])} />
       <AddCourtTile nextNumber={courts.length + 1} onAdd={fn()} />

@@ -3579,7 +3579,7 @@ function viewInventory() {
         <button class="btn xs" data-act="openInvItem" data-id="${i.id}">Edit</button>
       </article>`).join('')}</div>` : `<div class="card empty">No ${c.toLowerCase()} yet.</div>`}</section>`;
     }).join('')}
-    <p class="small muted">Shuttlecock prices here fill in the session cost estimate. Stock isn't deducted automatically yet; adjust it with − and + after a session.</p>
+    <p class="small muted">Shuttlecock prices here fill in the session cost estimate. Session done takes the planned tubes off stock; adjust it with − and + if a night used a different amount.</p>
   </main>`;
 }
 
@@ -9519,6 +9519,8 @@ const ACT = {
     (s.requests || []).forEach((r) => { if (r.status === 'pending') r.status = 'closed'; });
     (s.matchRequests || []).forEach((r) => { if (r.status === 'open') r.status = 'closed'; });
     (s.dropOuts || []).forEach((r) => { if (r.status === 'open') r.status = 'closed'; });
+    // D-2026-11-26-01: Session done takes the planned tubes off stock, never below zero.
+    ((s.finance || {}).shuttles || []).forEach((x) => { const it = S.inventory.find((i) => i.id === x.itemId); if (it) it.stock = Math.max(0, it.stock - (+x.tubes || 0)); });
     S.ui.sheet = null; S.ui.finalStage = 0; S.screen = 'finalizing'; render();
     const tick = () => {
       S.ui.finalStage += 1; render();

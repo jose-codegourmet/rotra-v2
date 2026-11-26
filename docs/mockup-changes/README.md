@@ -174,7 +174,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 13 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 274 · CANCELLED: 4 · MOCKUP ONLY: 4
+NEW: 13 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 275 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -495,4 +495,5 @@ NEW: 13 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 274 · CANCELLED: 4 ·
 | [2026-11-25-queue-standings-image-shared-rows](2026-11-25-queue-standings-image-shared-rows.md) | Standings images: one row per position, and previews that are the images | result-slide-frame, export-images-sheet (export-frame-preview) | NEW |
 | [2026-11-25-queue-status-pills](2026-11-25-queue-status-pills.md) | Players cards and Main Queue: one status pill per player | player-pool-card, match-card (queue tile faces), a new status pill | NEW |
 | [2026-11-25-queue-upcoming-side-by-side](2026-11-25-queue-upcoming-side-by-side.md) | Courts tab: pairs side by side on upcoming cards, faces on Next eligible | match-card (compact), court card (free state) | NEW |
+| [2026-11-26-queue-inventory-deduct-at-session-done](2026-11-26-queue-inventory-deduct-at-session-done.md) | Session done takes the planned tubes off inventory stock | inventory-screen | IN MOCK APP — PR #1116 |
 <!-- status-index:end -->

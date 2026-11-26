@@ -74,6 +74,8 @@ export function CardCarousel({
     align: 'start',
     containScroll: 'trimSnaps',
     startIndex,
+    // Reduced motion: a swipe or a button lands on the slide at once
+    duration: reduced ? 0 : 25,
     watchDrag: (_, event) =>
       !(event.target instanceof Element && event.target.closest(DRAG_IGNORE)),
   })

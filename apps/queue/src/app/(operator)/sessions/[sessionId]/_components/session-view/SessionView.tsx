@@ -35,6 +35,7 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useSetAlmostDone } from '@rotra/data/match/useSetAlmostDone'
 import { useStartMatch } from '@rotra/data/match/useStartMatch'
 import { useTradeCourts } from '@rotra/data/match/useTradeCourts'
+import { MockError } from '@rotra/data/mock/errors'
 import { courtFillModeOf } from '@rotra/data/queue-session/courtFill'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
 import { sessionScoring } from '@rotra/data/queue-session/types'
@@ -328,10 +329,24 @@ export function SessionView({
     `${formatTime(c.openUntil ?? s.scheduledEndAt)}${courtNextDay(c.openUntil ?? s.scheduledEndAt, s.scheduledStartAt) ? ' · next day' : ''}`
   const startLabel = (c: SessionCourt) =>
     `${formatTime(c.startsAt ?? s.scheduledStartAt)}${courtNextDay(c.startsAt ?? s.scheduledStartAt, s.scheduledStartAt) ? ' · next day' : ''}`
+  /**
+   * A command refused because the match changed meanwhile (another tab, another host: Almost done on
+   * a match that left Playing, a trade onto a court whose match changed, Put on court on a match
+   * that is no longer ready) shows the refusal toast and refreshes the cards.
+   */
+  const refreshOnConflict = (error: unknown) => {
+    if (error instanceof MockError && error.kind === 'conflict') {
+      void session.refetch()
+      void roster.refetch()
+      void matches.refetch()
+    }
+  }
   const options = {
     onSuccess: (result: { message: string }) => toast(result.message),
-    onError: (error: unknown) =>
-      toast.error(error instanceof Error ? error.message : 'Something went wrong. Try again.'),
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Something went wrong. Try again.')
+      refreshOnConflict(error)
+    },
   }
   const onRemoveCourt = (c: SessionCourt) => {
     if (removeCourt.isPending) return

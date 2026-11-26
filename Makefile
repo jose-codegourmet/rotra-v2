@@ -1,9 +1,15 @@
-.PHONY: install dev dev-queue dev-player dev-admin storybook lint check-fix type-check build check observability-up observability-down e2e e2e-ui e2e-down
+.PHONY: install reinstall dev dev-queue dev-player dev-admin storybook lint check-fix type-check build check observability-up observability-down e2e e2e-ui e2e-down
 
 # Every target loads nvm first so the Node version always matches .nvmrc
 NVM := . $(HOME)/.nvm/nvm.sh && nvm use
 
 install:
+	@$(NVM) && pnpm install
+
+# Delete every .turbo and .next cache, then install dependencies
+reinstall:
+	@echo "Removing .turbo and .next caches"
+	@find . \( -name node_modules -o -name .git \) -prune -o -type d \( -name .turbo -o -name .next \) -prune -exec rm -rf {} +
 	@$(NVM) && pnpm install
 
 # All three apps: queue :9000, player :9001, admin :9002

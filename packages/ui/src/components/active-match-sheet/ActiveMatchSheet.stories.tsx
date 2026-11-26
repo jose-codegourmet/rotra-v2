@@ -16,6 +16,7 @@ const propsFor = (m: ActiveMatchFixture): ActiveMatchSheetProps => ({
   teamB: m.teamB,
   minimumGames: m.minimumGames,
   substitutions: m.substitutions,
+  onAlmostDoneChange: fn(),
   freeCourtCount: 2,
   onMoveToFree: fn(),
   onSelectPlayer: fn(),
@@ -34,8 +35,24 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** A doubles match on Court 1, 30 minutes in */
+/** A doubles match on Court 1, 30 minutes in: the head row (#N, format pill, time pill, status pill), Started, Almost done */
 export const ActiveDoubles: Story = {}
+/** Owner, November 26, 2026: the status pill follows the court card (Playing, Ending, Ending soon, Running long in warn) */
+export const StatusEnding: Story = {
+  args: { status: { label: 'Ending', tone: 'accent', title: 'Ends in about 4 min' } },
+}
+/** Almost done on: the switch is checked and the status reads Ending soon (hover: Almost done) */
+export const AlmostDoneOn: Story = {
+  args: {
+    almostDone: true,
+    status: { label: 'Ending soon', tone: 'accent', title: 'Almost done' },
+  },
+}
+export const AlmostDoneOnLight: Story = { ...AlmostDoneOn, globals: { theme: 'light' } }
+export const StatusRunningLong: Story = {
+  args: { status: { label: 'Ending soon', tone: 'warn', title: 'Running long' } },
+}
+export const StatusEndingLight: Story = { ...StatusEnding, globals: { theme: 'light' } }
 /** Playing: drag a player onto someone in the other pair to swap partners; the card opens Change NAME?, the picture the profile. */
 export const SwapPartners: Story = { args: { onSwapPartners: fn() } }
 /** Move to a free court is disabled with "No court is free". */

@@ -4,7 +4,7 @@ import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { PlayerFaceButton } from '@rotra/ui/player-face-button'
-import { type MouseEvent, useRef } from 'react'
+import { type KeyboardEvent, type MouseEvent, useRef } from 'react'
 import { useCourtDrag } from './CourtDrawing.drag'
 import {
   courtFaceClass,
@@ -52,9 +52,16 @@ export type CourtDrawingProps = {
   /**
    * Getting ready and Playing courts: tapping the drawing anywhere but a face opens the match. It
    * shows a grab cursor, brightens a little on hover and carries the tooltip "Open match". The
-   * Open match button stays for keyboards and screen readers.
+   * drawing is itself the button for keyboards and screen readers (`role="button"`, Enter or Space).
    */
   onOpenMatch?: () => void
+  /**
+   * A free open court: the drawing is a button (Enter or Space) with a dashed + disc over FREE and
+   * "Tap to fill", titled "Pick a match or generate one". Needs `free` and `fillLabel`.
+   */
+  onFill?: () => void
+  /** The accessible name of the fill button: "Court 1 is free. Pick a match from the queue or generate one" */
+  fillLabel?: string
   /**
    * Makes the drawing draggable (mouse after 6 px, touch after press and hold). Dropping on a free
    * court that carries `dropCourtId` (CourtCard) calls this with that court's id; anywhere else does
@@ -104,6 +111,8 @@ export function CourtDrawing({
   onOpenGames,
   plainProfileLabel = false,
   onOpenMatch,
+  onFill,
+  fillLabel,
   onDragMove,
   className,
 }: CourtDrawingProps) {
@@ -113,6 +122,11 @@ export function CourtDrawing({
   const onRootClick = (e: MouseEvent<HTMLDivElement>) => {
     if (e.target instanceof Element && e.target.closest('button')) return
     onOpenMatch?.()
+  }
+  const onKeyActivate = (e: KeyboardEvent<HTMLDivElement>, act: () => void) => {
+    if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return
+    e.preventDefault()
+    act()
   }
   const height = COURT_H * courts
   const label = free
@@ -226,15 +240,37 @@ export function CourtDrawing({
   }
 
   const interactive = !free && (!!onOpenMatch || !!onDragMove)
+  const opensMatch = interactive && !!onOpenMatch
+  const fills = free && !!onFill
+  const buttonProps = opensMatch
+    ? {
+        role: 'button' as const,
+        tabIndex: 0,
+        title: 'Open match',
+        'aria-label': `Open match: ${label}`,
+        onClick: onRootClick,
+        onKeyDown: (e: KeyboardEvent<HTMLDivElement>) => onKeyActivate(e, () => onOpenMatch?.()),
+      }
+    : fills
+      ? {
+          role: 'button' as const,
+          tabIndex: 0,
+          title: 'Pick a match or generate one',
+          'aria-label': fillLabel,
+          onClick: () => onFill?.(),
+          onKeyDown: (e: KeyboardEvent<HTMLDivElement>) => onKeyActivate(e, () => onFill?.()),
+        }
+      : {}
   return (
-    // biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/noStaticElementInteractions: a mouse and touch shortcut; the Open match button is the keyboard and screen-reader path
     <div
       ref={rootRef}
-      title={interactive && onOpenMatch ? 'Open match' : undefined}
-      onClick={interactive && onOpenMatch ? onRootClick : undefined}
+      {...buttonProps}
       onPointerDown={interactive ? onPointerDown : undefined}
       className={cn(
-        '@container relative overflow-hidden rounded-md',
+        'group/pitch @container relative overflow-hidden rounded-md',
+        (opensMatch || fills) &&
+          'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent',
+        fills && 'cursor-pointer transition-[filter] duration-150',
         interactive &&
           'select-none transition-[filter] duration-150 [-webkit-touch-callout:none] hover:brightness-[1.08]',
         interactive && (onDragMove ? 'cursor-grab' : 'cursor-pointer'),
@@ -284,7 +320,22 @@ export function CourtDrawing({
           vectorEffect="non-scaling-stroke"
         />
       </svg>
-      {free ? (
+      {free && fills ? (
+        <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 group-hover/pitch:shadow-[inset_0_0_0_2px_var(--color-accent)]">
+          <span
+            aria-hidden
+            className="grid size-10 place-items-center rounded-full border-[1.5px] border-dashed border-accent bg-surface/80 text-2xl leading-none font-bold text-accent transition-[transform,background-color] duration-150 group-hover/pitch:scale-[1.08] group-hover/pitch:border-solid group-hover/pitch:bg-accent group-hover/pitch:text-on-accent group-focus-visible/pitch:scale-[1.08] group-focus-visible/pitch:border-solid group-focus-visible/pitch:bg-accent group-focus-visible/pitch:text-on-accent @max-[220px]:size-[30px] @max-[220px]:text-lg motion-reduce:transition-none"
+          >
+            +
+          </span>
+          <b className="text-[13px] font-extrabold tracking-[1.5px] text-fg uppercase">
+            {freeLabel}
+          </b>
+          <small className="text-[11px] font-semibold text-fg2 @max-[220px]:hidden">
+            Tap to fill
+          </small>
+        </span>
+      ) : free ? (
         <span className="absolute inset-0 grid place-items-center text-xs font-extrabold tracking-[2px] text-fg2 uppercase">
           {freeLabel}
         </span>

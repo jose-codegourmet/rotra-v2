@@ -48,10 +48,11 @@ import { useUpdateCourt } from '@rotra/data/queue-session/useUpdateCourt'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { courtNextDay } from '@rotra/schema/court-window'
+import { scoringMode } from '@rotra/schema/scoring'
 import { AddCourtTile } from '@rotra/ui/add-court-tile'
 import { Button } from '@rotra/ui/button'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
-import { CourtCard, type CourtCardProps } from '@rotra/ui/court-card'
+import { CourtCard, type CourtCardProps, type CourtCardStatus } from '@rotra/ui/court-card'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { CourtFillSwitch } from '@rotra/ui/court-fill-switch'
 import { CourtLabelForm } from '@rotra/ui/forms/court-label-form'
@@ -252,17 +253,22 @@ export function SessionView({
   })
   const names = (ids: string[]) => ids.map((id) => player(id).shortName)
   const scoring = sessionScoring(s)
-  /** The expected finish line of a Playing court: Finishing soon is accent, Running long is warn */
-  const finishLine = (m: Match) => {
+  /**
+   * The top-right status of a Playing court (the mockup's st): Playing for the first half of a typical
+   * game, Ending for the second half, Ending soon from Finishing soon on (Running long keeps it, in warn).
+   * The hover is the estimate text.
+   */
+  const courtStatus = (m: Match): CourtCardStatus => {
     const finish = matchExpectedFinish(m, scoring, now)
+    const typical = scoringMode(scoring).typical
+    if (finish.phase === 'mid')
+      return finish.minutesLeft > typical / 2
+        ? { label: 'Playing', tone: 'accent' }
+        : { label: 'Ending', tone: 'accent', title: finish.text }
     return {
-      text: finish.text,
-      tone:
-        finish.phase === 'soon'
-          ? ('accent' as const)
-          : finish.phase === 'long'
-            ? ('warn' as const)
-            : ('muted' as const),
+      label: 'Ending soon',
+      tone: finish.phase === 'long' ? 'warn' : 'accent',
+      title: finish.text,
     }
   }
   const live = s.state === 'active'
@@ -502,7 +508,7 @@ export function SessionView({
         variant: 'in-game',
         minutes: Math.max(0, Math.round((now - (m.startedAt ?? now)) / 60000)),
         substitutions: m.substitutions.length,
-        expectedFinish: finishLine(m),
+        status: courtStatus(m),
         onOpenMatch: onOpenMatch ? () => onOpenMatch(m.id) : undefined,
         onPause: live && canPauseMatch(m) ? () => pauseOnCourt(m) : undefined,
         onMoveToFree: onOpenMatch ? () => onOpenMatch(m.id, {}) : undefined,

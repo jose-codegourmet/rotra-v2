@@ -1,9 +1,14 @@
 'use client'
 
 import type { MatchFormat } from '@rotra/data/match/types'
-import { isLongTimeAgo, queueTime } from '@rotra/schema/queue-time'
 import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
+import {
+  AlmostDoneRow,
+  type CourtCardStatus,
+  CourtMatchLine,
+  CourtStatusPill,
+} from '@rotra/ui/court-card'
 import { Icon } from '@rotra/ui/icon'
 import { Sheet } from '@rotra/ui/sheet'
 import { type MatchLineupTeam, TeamLineup, type TeamLineupPlayer } from '@rotra/ui/team-lineup'
@@ -28,6 +33,14 @@ export type ActiveMatchSheetProps = {
   /** "Court 1", or "Court 1 + Court 2" for a merged 5v5 */
   courtLabel: string
   format: MatchFormat
+  /** The format pill with its category, as on the court card ("Genderless Doubles"); defaults to the format's name */
+  formatLabel?: string
+  /** The status pill after the time pill: the same Playing / Ending / Ending soon as the court card; omitted reads Playing */
+  status?: CourtCardStatus
+  /** Almost done is on: the switch is checked */
+  almostDone?: boolean
+  /** The Almost done switch row under the head; the row renders only with this callback */
+  onAlmostDoneChange?: (on: boolean) => void
   /** When Start match was confirmed (ms since epoch) */
   startedAt: number
   /** The clock "M min in" is computed against; defaults to the time of render */
@@ -89,8 +102,9 @@ function substitutionLine(s: ActiveMatchSubstitution) {
 }
 
 /**
- * Q-ACTIVE-MATCH: the in-game control sheet for a match on court. "Match N · Court X", the format
- * with the start time and minutes in, Team A VS Team B (drag a player onto someone in the other pair to
+ * Q-ACTIVE-MATCH: the in-game control sheet for a match on court. "Match N · Court X", the head row as
+ * on the court card (#N, format pill, time pill, status pill), "Started TIME · Scoring · LABEL", the
+ * Almost done switch row, Team A VS Team B (drag a player onto someone in the other pair to
  * swap partners; a player's card opens Substitute or Replace, the picture opens the profile), one line per substitution (credit or neither), and the reminder that
  * closing the sheet does not end the game. Footer: Pause match (when offered), Mark invalid (destructive) and the primary Match
  * done. No level
@@ -102,6 +116,10 @@ export function ActiveMatchSheet({
   matchNo,
   courtLabel,
   format,
+  formatLabel,
+  status = { label: 'Playing', tone: 'accent' },
+  almostDone = false,
+  onAlmostDoneChange,
   startedAt,
   now,
   teamA,
@@ -142,10 +160,18 @@ export function ActiveMatchSheet({
         </>
       }
     >
+      <CourtMatchLine
+        matchNo={matchNo}
+        formatLabel={formatLabel ?? FORMAT_LABEL[format]}
+        minutes={minutesIn}
+        trailing={<CourtStatusPill status={status} />}
+      />
       <p className="m-0 text-[13px] text-fg2">
-        {FORMAT_LABEL[format]} · started {formatTime(startedAt)} ·{' '}
-        {isLongTimeAgo(minutesIn) ? '' : `${queueTime(minutesIn)} in · `}Scoring · {scoringLabel}
+        Started {formatTime(startedAt)} · Scoring · {scoringLabel}
       </p>
+      {onAlmostDoneChange ? (
+        <AlmostDoneRow courtLabel={courtLabel} checked={almostDone} onChange={onAlmostDoneChange} />
+      ) : null}
       <TeamLineup
         teamA={teamA}
         teamB={teamB}

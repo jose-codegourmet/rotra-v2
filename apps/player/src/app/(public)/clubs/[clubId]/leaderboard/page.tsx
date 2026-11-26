@@ -1,5 +1,5 @@
+import { dataMode } from '@rotra/api-proxy/data-mode'
 import { clubs } from '@rotra/data/fixtures/clubs'
-import { dataMode } from '@rotra/db/auth/data-mode'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { connection } from 'next/server'

@@ -82,7 +82,9 @@ export const NameError: Story = {
     const name = await screen.findByLabelText('Full name')
     await userEvent.clear(name)
     await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
-    await expect(await screen.findByText('Enter the full name, at least 2 characters.')).toBeVisible()
+    await expect(
+      await screen.findByText('Enter the full name, at least 2 characters.'),
+    ).toBeVisible()
     await expect(name).toHaveFocus()
     await expect(args.onSave).not.toHaveBeenCalled()
   },

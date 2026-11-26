@@ -65,8 +65,8 @@ export type PlayerPoolCardProps = {
    */
   onSetGames?: () => void
   /**
-   * Edit player (D-EDIT-LIVE-PLAYER): a ghost pencil button at the card's top right named
-   * “Edit NAME”. Pressing it never selects the card.
+   * Edit player (D-EDIT-LIVE-PLAYER): a 28 px accent circle with a pencil on the card's top-right
+   * corner, over the border, named “Edit NAME”. Pressing it never selects the card.
    */
   onEdit?: () => void
   /**
@@ -83,8 +83,8 @@ export type PlayerPoolCardProps = {
 }
 
 /**
- * The card's status pill (owner, November 25, 2026): Wait / In queue with the wait minutes, Playing
- * with the minutes since the match began (Getting ready before it starts), or Away.
+ * The card's status pill (owner, November 25, 2026): an icon with the wait minutes (free, in queue), the minutes
+ * since the match began (playing), Ready (getting ready) or Away (owner, November 26, 2026).
  */
 function pillOf(status: PlayerPoolCardStatus, waitMinutes: number): StatusPillValue {
   switch (status.kind) {
@@ -111,8 +111,8 @@ const RING = {
 /**
  * One player in the live Players view (the prototype's .pc3): a role=button card with the picture in
  * a level-band ring, one name (club nickname, nickname, full name; two lines at most), the
- * Current | Total games strip, the status pill (StatusPill: Wait / In queue / Playing / Getting
- * ready / Away) and the Present switch. Tapping, Enter or Space
+ * Current | Total games strip, the footer (StatusPill icon and time, then the Present switch). The
+ * Edit player pencil is a 28 px circle on the top-right corner, over the border. Tapping, Enter or Space
  * toggles selection; selected cards show their pick order in a badge. No Move to waitlist: the
  * session is already running.
  */
@@ -176,6 +176,26 @@ export function PlayerPoolCard({
           {pickOrder}
         </span>
       ) : null}
+      {onEdit ? (
+        // The pencil sits on the card's top-right corner, over the border (.pc3-edit): stop its
+        // clicks and keys from selecting the card.
+        // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
+        <span
+          className="absolute -top-[9px] -right-[9px] z-[2]"
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
+          <button
+            type="button"
+            aria-label={`Edit ${name}`}
+            title="Edit player"
+            onClick={onEdit}
+            className="grid size-7 min-h-0 min-w-7 cursor-pointer place-items-center rounded-full border-[1.5px] border-accent bg-[color-mix(in_srgb,var(--accent)_16%,var(--elev))] p-0 text-accent shadow-md transition-[background-color,color,transform] duration-150 hover:scale-[1.08] hover:bg-accent hover:text-on-accent focus-visible:scale-[1.08] focus-visible:bg-accent focus-visible:text-on-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none"
+          >
+            <Icon name="edit" size={14} />
+          </button>
+        </span>
+      ) : null}
       <div className="flex min-w-0 items-center gap-2">
         {/* The ring is the level band; hovering the picture names the level. */}
         {onOpenProfile ? (
@@ -230,25 +250,6 @@ export function PlayerPoolCard({
             </span>
           ) : null}
         </div>
-        {onEdit ? (
-          // The pencil sits inside the card: stop its clicks and keys from selecting the card.
-          // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
-          <span
-            className="flex-none self-start"
-            onClick={(event) => event.stopPropagation()}
-            onKeyDown={(event) => event.stopPropagation()}
-          >
-            <Button
-              size="xs"
-              variant="ghost"
-              aria-label={`Edit ${name}`}
-              title="Edit player"
-              onClick={onEdit}
-            >
-              <Icon name="edit" size={16} />
-            </Button>
-          </span>
-        ) : null}
       </div>
       {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}
       <div
@@ -301,7 +302,7 @@ export function PlayerPoolCard({
           </span>
         </div>
       </div>
-      <div className="flex flex-nowrap items-center justify-between gap-3">
+      <div className="flex min-w-0 flex-nowrap items-center justify-between gap-1.5">
         <StatusPill status={pillOf(status, waitMinutes ?? 0)} />
         {/* The switch sits inside the card: stop its clicks and keys from reaching the card's selection. */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the Switch */}

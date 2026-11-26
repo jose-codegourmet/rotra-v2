@@ -192,6 +192,35 @@ export const ICONS = {
       </>
     ),
   },
+  // The status pill icons (ST_ICO in rotra-queue.html): 13 px, stroke 2.2. `clock` and `moon` above
+  // match ST_ICO's ready and away glyphs; `list` is a different glyph, so the queue one is its own.
+  hourglass: {
+    size: 13,
+    strokeWidth: 2.2,
+    body: <path d="M6 3h12M6 21h12M7 3v3a5 5 0 0 0 10 0V3M7 21v-3a5 5 0 0 1 10 0v3" />,
+  },
+  'status-queue': {
+    size: 13,
+    strokeWidth: 2.2,
+    body: (
+      <>
+        <path d="M10 6h11M10 12h11M10 18h11" />
+        <circle cx="4.5" cy="6" r="1.5" />
+        <circle cx="4.5" cy="12" r="1.5" />
+        <circle cx="4.5" cy="18" r="1.5" />
+      </>
+    ),
+  },
+  shuttlecock: {
+    size: 13,
+    strokeWidth: 2.2,
+    body: (
+      <>
+        <circle cx="12" cy="18.5" r="3" />
+        <path d="M9.6 16.8 6 3h12l-3.6 13.8M10.4 3l.9 12.6M13.6 3l-.9 12.6" />
+      </>
+    ),
+  },
   sun: {
     size: 16,
     strokeWidth: 2.2,

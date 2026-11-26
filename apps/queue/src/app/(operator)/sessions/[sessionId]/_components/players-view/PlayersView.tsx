@@ -289,6 +289,9 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   })
   const counts = {
     available: rows.filter((r) => r.player.present && !r.playing).length,
+    // Counting In queue and Playing (and filtering by them) is Q30.5; the toolbar only gained the keys.
+    queue: 0,
+    playing: rows.filter((r) => r.playing).length,
     present: rows.filter((r) => r.player.present).length,
     away: rows.filter((r) => !r.player.present).length,
     waitlist: waitlist.length,

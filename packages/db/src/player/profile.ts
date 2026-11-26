@@ -572,7 +572,7 @@ export async function setMyGender(
       where: { id: player.id },
       select: PUBLIC_PLAYER_SELECT,
     })
-    return ownProfile(tx, await profileWithBanner(tx, row, true))
+    return ownProfile(tx, await profileWithBanner(tx, row, row.id))
   })
 }
 

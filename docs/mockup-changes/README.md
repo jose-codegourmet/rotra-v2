@@ -176,7 +176,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 40 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 4 · CANCELLED: 4 · MOCKUP ONLY: 4
+TICKETED: 34 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 11 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -499,7 +499,7 @@ TICKETED: 40 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 4 · CANCELL
 | [2026-11-25-queue-upcoming-side-by-side](2026-11-25-queue-upcoming-side-by-side.md) | Courts tab: pairs side by side on upcoming cards, faces on Next eligible | match-card (compact), court card (free state) | IN REAL MODE — #1121 |
 | [2026-11-26-player-dock-settings-session](2026-11-26-player-dock-settings-session.md) | Player app: Settings page and a session slot in the main navigation | top bar, mobile dock, settings list (new) | IN REAL MODE — #1149 |
 | [2026-11-26-player-match-court-vs-card](2026-11-26-player-match-court-vs-card.md) | Player app: Game page is the court beside a VS card; stats only for a tapped player | match court (unchanged), VS card (new), player stats card (new) | IN REAL MODE — #1150 |
-| [2026-11-26-player-session-button-options](2026-11-26-player-session-button-options.md) | Player app: four style options for the dock's session button | mobile dock | IN REAL MODE — #1149 |
+| [2026-11-26-player-session-button-options](2026-11-26-player-session-button-options.md) | Player app: four style options for the dock's session button | mobile dock | IN REAL MODE — #1149 (superseded by 2026-11-27-player-desktop-session-pill.md (desktop top-bar style only)) |
 | [2026-11-26-player-weekly-summary-box](2026-11-26-player-weekly-summary-box.md) | Player app: Weekly Performance summary in one box | weekly performance summary | IN REAL MODE — #1146 |
 | [2026-11-26-queue-console-no-courts-and-time](2026-11-26-queue-console-no-courts-and-time.md) | Queue app: live session header trimmed; Payments becomes a console tab | live session header actions | TICKETED — #1136 |
 | [2026-11-26-queue-court-match-line](2026-11-26-queue-court-match-line.md) | Queue app: court card match line as #N header and pills | court card | IN REAL MODE — #1124 |
@@ -508,4 +508,5 @@ TICKETED: 40 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 4 · CANCELL
 | [2026-11-26-queue-inventory-deduct-at-session-done](2026-11-26-queue-inventory-deduct-at-session-done.md) | Session done takes the planned tubes off inventory stock | inventory-screen | IN MOCK APP — PR #1116 |
 | [2026-11-26-queue-name-hierarchy](2026-11-26-queue-name-hierarchy.md) | Queue app: player names read club nickname › nickname › full name everywhere | player name label (all face and tile variants) | TICKETED — #1127 |
 | [2026-11-26-queue-player-status-icons](2026-11-26-queue-player-status-icons.md) | Queue app: player status pill uses icons; Players card footer holds edit and Present | StatusPill, LivePlayerCard | TICKETED — #1127 |
+| [2026-11-27-player-desktop-session-pill](2026-11-27-player-desktop-session-pill.md) | Player desktop session link returns to the green pill | player-nav | IN REAL MODE — #1156 |
 <!-- status-index:end -->

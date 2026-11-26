@@ -9,7 +9,7 @@ Screen ID: all P- screens (mobile dock)
 Artifact: https://claude.ai/artifact/FhosJSGnngPse4r1xGj6jN
 Components: mobile dock
 Supersedes: none
-Superseded by: none
+Superseded by: 2026-11-27-player-desktop-session-pill.md (desktop top-bar style only)
 
 ## What changed
 - Owner asked for options. Prototype › Session button style switches the dock's Back to session / Incoming session

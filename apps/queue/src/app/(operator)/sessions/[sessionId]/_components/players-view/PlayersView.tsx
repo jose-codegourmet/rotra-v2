@@ -605,7 +605,9 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             {shown.map((row) => {
               const order = selection.indexOf(row.player.id)
               // The Queue Master's last action wins; hide the mark while a presence change is saving.
-              const mark = setPresence.pending.has(row.player.id) ? null : selfCheckInMark(row.player)
+              const mark = setPresence.pending.has(row.player.id)
+                ? null
+                : selfCheckInMark(row.player)
               return (
                 <PlayerPoolCard
                   key={row.player.id}

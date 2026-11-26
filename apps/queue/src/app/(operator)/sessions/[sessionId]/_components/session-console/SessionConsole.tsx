@@ -3,6 +3,8 @@
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import {
   activeMatches,
+  courtMatches,
+  freeCourts,
   matchStatus,
   queueMasterName,
   waitingMatches,
@@ -118,7 +120,7 @@ export type MatchSheet =
   | MatchLineupRequest
   | { mode: 'suggest' }
   /** Open match on an in-game court card: the active match sheet (Queue › Match control) */
-  | { mode: 'active'; matchId: string; move?: { courtId?: string } }
+  | { mode: 'active'; matchId: string; move?: { courtId?: string }; result?: boolean }
   /** Review and start, Start on a queue card, Pick another: the Start match and Choose match sheets (Queue › Match control) */
   | StartMatchRequest
 
@@ -258,7 +260,10 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const recorded = all.filter((m) => m.state === 'completed').length
   // The Match History tab's "N played": finished matches, invalid ones included (the prototype's count).
   const played = all.filter((m) => m.state === 'completed' || m.state === 'invalid').length
-  const inUse = active.reduce((n, m) => n + m.courtIds.length, 0)
+  // The Courts chip (owner, November 26, 2026): Vacant N in warn while N open courts are free,
+  // N/N full in the accent when none are. N counts courts held by a Getting ready or Playing match.
+  const vacant = freeCourts(courts, all, now).length
+  const held = courtMatches(all).reduce((n, m) => n + m.courtIds.length, 0)
   const attention = waiting.filter((m) => matchStatus(m, ctx).kind === 'needs-attention').length
   const present = rosterList.filter((p) => p.present).length
   // Match requests · N: open match requests, carried by the live session read. Join requests close
@@ -276,7 +281,11 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
     {
       value: 'courts',
       label: 'Courts',
-      badges: [{ text: `${inUse}/${courts.length}`, longText: ' courts in use' }],
+      badges: [
+        vacant
+          ? { text: `Vacant ${vacant}`, tone: 'warn' as const }
+          : { text: `${held}/${courts.length} full`, tone: 'accent' as const },
+      ],
     },
     ...(VIEWS.queue
       ? [
@@ -455,6 +464,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               }}
               {...matchEditing}
               onOpenMatch={(matchId, move) => setMatchSheet({ mode: 'active', matchId, move })}
+              onMatchDone={(matchId) => setMatchSheet({ mode: 'active', matchId, result: true })}
               onStartMatch={onStartMatch}
               onPickAnother={onPickAnother}
             />
@@ -569,6 +579,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           now={now}
           matchId={matchSheet?.mode === 'active' ? matchSheet.matchId : null}
           moveFirst={matchSheet?.mode === 'active' ? (matchSheet.move ?? null) : null}
+          resultFirst={matchSheet?.mode === 'active' && !!matchSheet.result}
           onClose={() => setMatchSheet(null)}
         />
         <StartMatch

@@ -185,7 +185,7 @@ export async function setPresent(page: Page, names: string[], present = true) {
 /** Session › Court filling › Auto Queue. */
 export async function turnOnAutoQueue(page: Page) {
   await consoleTab(page, 'Session').click()
-  const auto = page.getByRole('radio', { name: 'Auto Queue', ...exact })
+  const auto = page.getByRole('switch', { name: 'Auto Queue', ...exact })
   await auto.click()
   await expect(auto).toBeChecked()
 }

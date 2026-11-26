@@ -3,6 +3,7 @@ import {
   type ExpectedFinish,
   type ExpectedFinishPhase,
   expectedFinish,
+  scoringMode,
 } from '@rotra/schema/scoring'
 import { type QueueSession, sessionScoring } from '../queue-session/queueSession.types'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
@@ -76,6 +77,38 @@ export function matchExpectedFinish(
       ? minutesPlayed(match.startedAt, now)
       : null,
   )
+}
+/**
+ * The top-right status of a Playing court and of the match dialog's head (owner, November 26, 2026):
+ * the court card and ActiveMatchSheet draw the same one.
+ */
+export type MatchCourtStatus = {
+  label: 'Playing' | 'Ending' | 'Ending soon'
+  tone: 'accent' | 'warn'
+  /** The finish text on hover: "Ends in about 4 min", "Almost done" */
+  title?: string
+}
+
+/**
+ * Playing for the first half of a typical game, Ending for the second half (phase mid with at most
+ * half the typical length left), Ending soon from Finishing soon, Almost done or Could end any time
+ * on; Running long keeps Ending soon in warn. The title is the finish text (none while Playing).
+ */
+export function matchCourtStatus(
+  match: Pick<Match, 'state' | 'startedAt' | 'almostDoneAt'>,
+  scoring: unknown,
+  now = Date.now(),
+): MatchCourtStatus {
+  const finish = matchExpectedFinish(match, scoring, now)
+  if (finish.phase === 'mid')
+    return finish.minutesLeft > scoringMode(scoring).typical / 2
+      ? { label: 'Playing', tone: 'accent' }
+      : { label: 'Ending', tone: 'accent', title: finish.text }
+  return {
+    label: 'Ending soon',
+    tone: finish.phase === 'long' ? 'warn' : 'accent',
+    title: finish.text,
+  }
 }
 /**
  * Almost done, Finishing soon, Could end any time or Running long: the phases Plan Ahead may draw

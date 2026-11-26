@@ -1,6 +1,6 @@
 # Courts: drag a busy court onto another busy court to trade courts
 
-Status: TICKETED — #1118
+Status: IN REAL MODE — #1124
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Courts tab court cards (`data-swap-court`), cdMove/cdEnd, swapCourts()

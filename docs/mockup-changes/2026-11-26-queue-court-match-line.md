@@ -1,6 +1,6 @@
 # Queue app: court card match line as #N header and pills
 
-Status: TICKETED — #1118
+Status: IN REAL MODE — #1124
 Date: 2026-11-26
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `courtsPane` (`.ct-meta`, `.ct-num`, `.ct-time`)

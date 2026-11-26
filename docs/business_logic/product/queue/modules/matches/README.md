@@ -40,9 +40,9 @@ The buttons stay **Start match** and **Match done**.
 
 ### Almost done
 
-**Owner decision, November 25, 2026 ([D-2026-11-25-02](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-02); mockup only; [log](../../../../../mockup-changes/2026-11-25-queue-almost-done-switch.md)).** A **Playing** court card has an **Almost done** switch in a row under the players. It is not offered on a Getting ready (On court) match or a free court. It is optional: the Queue Master flips it after asking the players.
+**Owner decision, November 25, 2026 ([D-2026-11-25-02](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-02); in real mode from November 26, 2026, online only; [log](../../../../../mockup-changes/2026-11-25-queue-almost-done-switch.md)).** A **Playing** court card has an **Almost done** switch in a row under the players. It is not offered on a Getting ready (On court) match or a free court. It is optional: the Queue Master flips it after asking the players.
 
-- While it is on, the court's time line reads **Almost done**, in place of the expected finish (Ends in about N min, Finishing soon, Could end any time, Running long), in the same style as Finishing soon.
+- While it is on, the card's top-right status reads **Ending soon** (hover: **Almost done**), the same pill as Finishing soon; the match dialog shows the same switch and status.
 - [Plan Ahead](../queueing/README.md#generate-matches-workspace) treats those players as free soon with **0 minutes left** (top of the tie order), whatever the time estimate says.
 - It resets by itself at **Match done**, and whenever the match leaves Playing: **Pause match** and **Mark invalid**. It records nothing about the result.
 - It is a live aid for the Queue Master only; players, the public page and results never show it.

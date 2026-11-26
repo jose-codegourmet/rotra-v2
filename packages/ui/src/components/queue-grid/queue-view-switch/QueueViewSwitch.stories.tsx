@@ -22,3 +22,12 @@ export const Interactive: Story = {
     return <QueueViewSwitch {...args} value={mode} onChange={setMode} />
   },
 }
+
+/** The Courts header's layout switch: Grid mode first, Slide mode second (list icon) */
+export const CourtLayout: Story = {
+  args: { value: 'grid', label: 'Court layout', gridFirst: true, slideIcon: 'list' },
+}
+export const CourtLayoutSlide: Story = {
+  args: { value: 'slide', label: 'Court layout', gridFirst: true, slideIcon: 'list' },
+}
+export const CourtLayoutLight: Story = { ...CourtLayout, globals: { theme: 'light' } }

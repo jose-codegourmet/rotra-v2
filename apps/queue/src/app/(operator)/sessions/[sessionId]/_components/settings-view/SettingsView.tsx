@@ -233,11 +233,17 @@ export function SettingsView({
             size="sm"
             disabled={Boolean(backToPreparationDisabledReason)}
             title={backToPreparationDisabledReason}
+            aria-describedby={backToPreparationDisabledReason ? 'back-to-prep-reason' : undefined}
             onClick={onBackToPreparation}
           >
             <Icon name="edit" />
             Back to preparation…
           </Button>
+          {backToPreparationDisabledReason ? (
+            <span id="back-to-prep-reason" className="sr-only">
+              {backToPreparationDisabledReason}
+            </span>
+          ) : null}
         </div>
       </div>
       <SettingsCourtsBox

@@ -149,10 +149,9 @@ It passes (as an expected failure) only when that exact bug happens. Any other e
 one in the steps before the bug, is an ordinary red failure. When the bug no longer happens, the
 test runs on and shows a `defect-fixed` annotation: remove the wrapper and the title suffix then.
 
-- **REG-DEF-01:** Session done returns 500 when a match is On court and never started.
-  `finalization.ts` `dropUnstarted` sets `released_at` without `release_operation_id`, which breaks
-  `match_court_usage_release_check`. UI-08 hits the same bug in the browser: round 3 plans a
-  second match that never starts, and Session done's POST finalization returns 500.
+- **REG-DEF-01 (fixed 2026-11-26):** Session done returned 500 when a match was On court and never
+  started: `finalization.ts` `dropUnstarted` set `released_at` without `release_operation_id`
+  (`match_court_usage_release_check`). It now sets one; REG-DEF-01 and UI-08 run as ordinary tests.
 - **REG-09 #3:** Longest Wait breaks ties by roster order, not games played. Seed 2189437517, Small,
   spread 3.
 - **Not a defect:** sheets that stayed on screen after closing (UI-08, UI-17) were the tests: with

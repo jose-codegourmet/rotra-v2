@@ -525,8 +525,8 @@ export class Engine {
 
   /**
    * At the planned end the Queue Master stops new placements (Manual Queue), so no match goes On
-   * court after the end. (Session done with a match left On court fails on the server: see
-   * REG-DEF-01.)
+   * court after the end, as a Queue Master winding down would. (Session done with a match left On
+   * court is covered by REG-DEF-01.)
    */
   private async stopPlacingAtEnd() {
     if (!this.ended || this.manualAtEnd) return

@@ -1,5 +1,4 @@
 import 'server-only'
-import { randomUUID } from 'node:crypto'
 import {
   publicSlugFor,
   sessionEndCourtConflict,
@@ -648,12 +647,6 @@ export async function backToPreparation(
       const now = new Date()
       const matchesRemoved = await tx.match.count({
         where: { sessionId, state: { in: ['waiting', 'on_court'] }, removedAt: null },
-      })
-      // Court usage closes here with its own release operation: `match_court_usage_release_check`
-      // needs one with `released_at`, and `dropUnstarted` (shared with Session done) sets none.
-      await tx.matchCourtUsage.updateMany({
-        where: { sessionId, releasedAt: null },
-        data: { releasedAt: now, releaseOperationId: randomUUID() },
       })
       await dropUnstarted(tx, sessionId, now)
       await closeSessionMatchRequests(tx, sessionId, now)

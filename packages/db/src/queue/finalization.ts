@@ -1,4 +1,5 @@
 import 'server-only'
+import { randomUUID } from 'node:crypto'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { Prisma, ProjectionKind, SessionFinalization } from '../generated/prisma/client'
@@ -87,8 +88,10 @@ async function barriers(tx: Tx, sessionId: string, now: Date) {
 /**
  * Drops every match that never started. Waiting ones leave the queue; On court ones (placed, never
  * started, so not results) first give up their court and player holds, then go back to waiting and
- * are removed the same way. Court usage is closed with no release operation. Runs inside the
- * Session done transaction, so the courts are free the moment it commits.
+ * are removed the same way. Court usage closes with one release operation id for the whole drop
+ * (`match_court_usage_release_check` needs `released_at` and `release_operation_id` together). Runs
+ * inside the Session done (or Back to preparation) transaction, so the courts are free the moment it
+ * commits.
  */
 export async function dropUnstarted(tx: Tx, sessionId: string, now: Date) {
   const placed = await tx.match.findMany({
@@ -99,7 +102,7 @@ export async function dropUnstarted(tx: Tx, sessionId: string, now: Date) {
   if (ids.length) {
     await tx.matchCourtUsage.updateMany({
       where: { matchId: { in: ids }, releasedAt: null },
-      data: { releasedAt: now },
+      data: { releasedAt: now, releaseOperationId: randomUUID() },
     })
     await tx.activeCourtHold.deleteMany({ where: { matchId: { in: ids } } })
     await tx.activePlayerHold.deleteMany({ where: { matchId: { in: ids } } })

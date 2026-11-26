@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test'
 import { resetClock } from '../../src/clock.ts'
-import { knownDefect } from '../../src/known-defect.ts'
 import { liveSession } from '../../src/ui/journeys.ts'
 import {
   abandonCreatedSessions,
@@ -29,12 +28,6 @@ test.afterEach(async () => {
 
 const COURTS = ['Court 1', 'Court 2']
 
-/** REG-DEF-01 in the browser: Session done with a planned match that never started returns 500. */
-const SESSION_DONE_500 = {
-  id: 'UI-08',
-  bug: 'Session done returns 500 with a match that never started (REG-DEF-01)',
-  match: /^Session done: POST …\/finalization -> 500$/,
-}
 const GAME = 12 * MINUTE
 
 /**
@@ -133,17 +126,16 @@ test('UI-08 late player, injury and a meal break; Session done lists the shortfa
   await jumpTo(Math.max(now, endMs) + MINUTE, [qm])
   await qm.reload()
   // Round 3 planned a second match that never started; Session done must drop it.
-  await knownDefect(SESSION_DONE_500, async () => {
-    const finalization = qm.waitForResponse(
-      (response) =>
-        response.request().method() === 'POST' &&
-        new URL(response.url()).pathname.endsWith('/finalization'),
-    )
-    const listed = await sessionDone(qm)
-    expect(listed.map((line) => line.replace(/\s+/g, ' ')).sort()).toEqual(expected.sort())
-    const response = await finalization
-    if (response.status() >= 500)
-      throw new Error(`Session done: POST …/finalization -> ${response.status()}`)
-  })
+  // (REG-DEF-01, fixed: this used to return 500.)
+  const finalization = qm.waitForResponse(
+    (response) =>
+      response.request().method() === 'POST' &&
+      new URL(response.url()).pathname.endsWith('/finalization'),
+  )
+  const listed = await sessionDone(qm)
+  expect(listed.map((line) => line.replace(/\s+/g, ' ')).sort()).toEqual(expected.sort())
+  const response = await finalization
+  if (response.status() >= 500)
+    throw new Error(`Session done: POST …/finalization -> ${response.status()}`)
   await expect.poll(async () => (await sessionTimes(live.sessionId)).state).toBe('completed')
 })

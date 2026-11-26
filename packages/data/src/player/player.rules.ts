@@ -241,7 +241,10 @@ export function yearGameStats(
 
 /** Counted games and wins this calendar year (the profile card and Share profile “In YEAR”). */
 export function countYearCountedWins(
-  sessions: readonly PlayerSessionRecord[],
+  sessions: readonly {
+    finishedAt: string | null
+    games: readonly { counting: string; result: string }[]
+  }[],
   now: Date | number,
 ): { games: number; wins: number } {
   const end = Number(now),
@@ -249,8 +252,8 @@ export function countYearCountedWins(
   let games = 0,
     wins = 0
   for (const session of sessions) {
-    const at = Date.parse(session.finishedAt)
-    if (at < start || at > end) continue
+    const at = session.finishedAt ? Date.parse(session.finishedAt) : Number.NaN
+    if (!Number.isFinite(at) || at < start || at > end) continue
     for (const game of session.games)
       if (game.counting === 'counted') {
         games += 1

@@ -46,6 +46,41 @@ export const Phone: Story = {
   globals: { viewport: { value: 'phone' } },
 }
 
+function DrawerTabs() {
+  const [value, setValue] = useState('live')
+  const tabs: TabItem[] = [
+    { value: 'live', label: 'Courts', badges: [{ text: 'Vacant 1', tone: 'warn' }] },
+    ...CONSOLE_TABS.slice(1),
+  ]
+  return (
+    <Tabs
+      items={tabs}
+      value={value}
+      onChange={setValue}
+      aria-label="Console views"
+      menuLabel="Console view"
+      phoneMenu="drawer"
+      drawerTitle="Live session"
+    >
+      {tabs.map((tab) => (
+        <TabsContent key={tab.value} value={tab.value}>
+          <p className="text-fg2">{tab.label} view</p>
+        </TabsContent>
+      ))}
+    </Tabs>
+  )
+}
+
+export const PhoneDrawer: Story = {
+  render: () => <DrawerTabs />,
+  globals: { viewport: { value: 'phone' } },
+}
+
+export const PhoneDrawerLight: Story = {
+  render: () => <DrawerTabs />,
+  globals: { viewport: { value: 'phone' }, theme: 'light' },
+}
+
 export const Plain: Story = {
   args: {
     'aria-label': 'Facebook post',

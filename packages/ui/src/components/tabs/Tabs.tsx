@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@rotra/ui/cn'
+import { TabDrawer } from '@rotra/ui/tab-drawer'
 import { TabMenu } from '@rotra/ui/tab-menu'
 import { Tabs as TabsPrimitive } from 'radix-ui'
 import { type ComponentProps, type ReactNode, useEffect } from 'react'
@@ -32,8 +33,14 @@ export type TabsProps = {
   /** The panels: one TabsContent per item */
   children?: ReactNode
   className?: string
-  /** Replace the tab row with a menu at 640 px and below. */
-  phoneMenu?: boolean
+  /**
+   * Replace the tab row at 640 px and below: `true` (or "menu") with a dropdown menu; "drawer"
+   * with a full-width button that opens a left drawer listing every view with its chip (the live
+   * console). Needs `drawerTitle`.
+   */
+  phoneMenu?: boolean | 'menu' | 'drawer'
+  /** The phone drawer's heading ("Live session"); used with phoneMenu="drawer" */
+  drawerTitle?: string
   /** The phone menu button's label before the current tab ("Console view: Courts"); defaults to aria-label */
   menuLabel?: string
 }
@@ -86,6 +93,7 @@ export function Tabs({
   className,
   phoneMenu = false,
   menuLabel,
+  drawerTitle,
   ...aria
 }: TabsProps) {
   useKeyboardNav()
@@ -97,12 +105,23 @@ export function Tabs({
     >
       {phoneMenu ? (
         <div className="hidden max-[640px]:block">
-          <TabMenu
-            items={items}
-            value={value}
-            onChange={onChange}
-            aria-label={menuLabel ?? aria['aria-label']}
-          />
+          {phoneMenu === 'drawer' ? (
+            <TabDrawer
+              items={items}
+              value={value}
+              onChange={onChange}
+              aria-label={aria['aria-label']}
+              menuLabel={menuLabel}
+              title={drawerTitle ?? aria['aria-label']}
+            />
+          ) : (
+            <TabMenu
+              items={items}
+              value={value}
+              onChange={onChange}
+              aria-label={menuLabel ?? aria['aria-label']}
+            />
+          )}
         </div>
       ) : null}
       <TabsPrimitive.List

@@ -119,9 +119,14 @@ jobs:
       - name: Vet
         if: steps.present.outputs.yes == 'true'
         run: go vet ./...
+      # internal/liveupdates only publishes events below pg_snapshot_xmin, which is cluster-wide: a transaction another package
+      # holds open in its own database on this one Postgres stalls it (BL-20). So it runs alone, after the rest.
       - name: Test (race, coverage)
         if: steps.present.outputs.yes == 'true'
-        run: go test ./... -race -cover
+        run: go test $(go list ./... | grep -v '/internal/liveupdates$') -race -cover
+      - name: Test live updates (alone)
+        if: steps.present.outputs.yes == 'true'
+        run: go test ./internal/liveupdates -race -cover
       - name: Build
         if: steps.present.outputs.yes == 'true'
         run: go build ./...

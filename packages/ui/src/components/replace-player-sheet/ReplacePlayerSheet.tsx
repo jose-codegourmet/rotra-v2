@@ -13,6 +13,14 @@ export type ReplacePlayer = {
   name: string
   /** Nickname or first name under the picture; the first name when omitted */
   shortName?: string
+  /**
+   * The full name (the picker tile's last stack line and accessible name) when `name` is the one
+   * short name used in sentences; `name` is the full name when omitted.
+   */
+  fullName?: string
+  /** The player's own nickname and the club nickname (registered only): either given turns on the name stack */
+  nickname?: string | null
+  clubNickname?: string | null
   photoUrl?: string
   /** The level locked for this session; null when none was set */
   level: PlayingLevel | null

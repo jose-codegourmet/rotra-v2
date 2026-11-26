@@ -93,6 +93,8 @@ export function pickerPlayer(
     id: string
     name: string
     shortName?: string
+    /** The full name when `name` is the short sentence name */
+    fullName?: string
     nickname?: string | null
     clubNickname?: string | null
     photoUrl?: string
@@ -104,7 +106,7 @@ export function pickerPlayer(
 ): SwapPickerPlayer {
   return {
     id: p.id,
-    name: p.name,
+    name: p.fullName ?? p.name,
     shortName: p.shortName ?? p.name.split(' ')[0] ?? p.name,
     nickname: p.nickname,
     clubNickname: p.clubNickname,

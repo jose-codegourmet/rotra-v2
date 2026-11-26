@@ -216,6 +216,8 @@ function OpenOnCourt({
       id,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       level: p?.level ?? null,
       games: countedGames(id, ctx.matches),
       photoUrl: photoOf(p),
@@ -390,6 +392,8 @@ function OpenOnCourt({
       games: countedGames(id, ctx.matches),
       restMinutes: p ? waitMinutes(p, ctx.matches, session.startedAt, now) : 0,
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       photoUrl: photoOf(p),
     }
   }

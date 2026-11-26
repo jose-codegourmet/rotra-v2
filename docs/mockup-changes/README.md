@@ -176,7 +176,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 31 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 14 · CANCELLED: 4 · MOCKUP ONLY: 4
+TICKETED: 30 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 15 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -506,7 +506,7 @@ TICKETED: 31 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 14 · CANCEL
 | [2026-11-26-queue-edit-player-name](2026-11-26-queue-edit-player-name.md) | Queue app: Edit player has Full name and Club nickname for every player | EditLivePlayerSheet | IN REAL MODE — #1132 |
 | [2026-11-26-queue-free-court-flow](2026-11-26-queue-free-court-flow.md) | Queue app: free court flow (pick or generate), Suggested match rework, stacked dialogs go back | free court card, Court N is free (new), Put a match on Court N, Suggested match, Replace player (new), How courts get matches (new) | IN REAL MODE — #1125 |
 | [2026-11-26-queue-inventory-deduct-at-session-done](2026-11-26-queue-inventory-deduct-at-session-done.md) | Session done takes the planned tubes off inventory stock | inventory-screen | IN MOCK APP — PR #1116 |
-| [2026-11-26-queue-name-hierarchy](2026-11-26-queue-name-hierarchy.md) | Queue app: player names read club nickname › nickname › full name everywhere | player name label (all face and tile variants) | TICKETED — #1127 |
+| [2026-11-26-queue-name-hierarchy](2026-11-26-queue-name-hierarchy.md) | Queue app: player names read club nickname › nickname › full name everywhere | player name label (all face and tile variants) | IN REAL MODE — #1133 |
 | [2026-11-26-queue-player-status-icons](2026-11-26-queue-player-status-icons.md) | Queue app: player status pill uses icons; Players card footer holds edit and Present | StatusPill, LivePlayerCard | IN REAL MODE — #1132 |
 | [2026-11-27-player-desktop-session-pill](2026-11-27-player-desktop-session-pill.md) | Player desktop session link returns to the green pill | player-nav | IN REAL MODE — #1156 |
 <!-- status-index:end -->

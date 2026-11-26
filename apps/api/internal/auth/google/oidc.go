@@ -146,7 +146,7 @@ func (c *Client) Exchange(ctx context.Context, code, verifier, redirectURI, nonc
 	if err != nil {
 		return Verified{}, ErrExchange
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	body, err := io.ReadAll(io.LimitReader(res.Body, maxBody))
 	if err != nil || res.StatusCode != http.StatusOK {
 		return Verified{}, ErrExchange
@@ -314,7 +314,7 @@ func (c *Client) fetchKeys(ctx context.Context) (map[string]*rsa.PublicKey, erro
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("keys: status %d", res.StatusCode)
 	}

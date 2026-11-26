@@ -51,7 +51,10 @@ export type StartMatchProps = {
   onRequestChange: (request: StartMatchRequest) => void
   /** Edit on a card in Put a match on Court N: the shell opens the lineup editor for that match */
   onEditMatch: (matchId: string) => void
+  /** ×, Escape, the scrim and ← Back: one level back (Court N is free), or closed when first */
   onClose: () => void
+  /** The match was put on court: the shell closes the whole stack */
+  onDone: () => void
 }
 
 const CHANGED = 'Something changed. Review the match again.'
@@ -86,6 +89,7 @@ export function StartMatch({
   onRequestChange,
   onEditMatch,
   onClose,
+  onDone,
 }: StartMatchProps) {
   const now = useNow(1000, false, true)
   const session = useQueueSession(sessionId)
@@ -113,6 +117,7 @@ export function StartMatch({
         courtId={request.courtId}
         ctx={ctx}
         onClose={onClose}
+        onDone={onDone}
         onOpenPutOnCourt={(matchId) =>
           onRequestChange({ mode: 'start', matchId, courtId: request.courtId })
         }
@@ -134,6 +139,7 @@ export function StartMatch({
       courtId={request.courtId}
       ctx={ctx}
       onClose={onClose}
+      onDone={onDone}
       onRefresh={refresh}
     />
   )
@@ -143,6 +149,7 @@ type ChooseMatchProps = {
   courtId: string
   ctx: MatchContext
   onClose: () => void
+  onDone: () => void
   /** A 5v5 needs a second court, so it goes through the Put on court sheet */
   onOpenPutOnCourt: (matchId: string) => void
   /** Edit: the shell opens the lineup editor for that waiting match */
@@ -153,9 +160,17 @@ type ChooseMatchProps = {
  * Q-CHOOSE-MATCH, Put a match on Court N: every waiting match as a compact MatchCard in a carousel,
  * Put on Court N on the ready ones and Edit. A one-court match goes straight on this court
  * (usePlaceOnCourt, "Match N on Court X · getting ready"); a 5v5 opens the Put on court sheet for
- * its second court. ← Back closes the sheet until the stacked-dialog back stack arrives (Q29.7).
+ * its second court. Putting one on court closes the whole stack; ×, Escape, the scrim and ← Back
+ * call onClose (one level back to Court N is free, or closed when Pick another opened this).
  */
-function ChooseMatch({ courtId, ctx, onClose, onOpenPutOnCourt, onEditMatch }: ChooseMatchProps) {
+function ChooseMatch({
+  courtId,
+  ctx,
+  onClose,
+  onDone,
+  onOpenPutOnCourt,
+  onEditMatch,
+}: ChooseMatchProps) {
   const placeOnCourt = usePlaceOnCourt()
   const clubPlayers = useClubPlayers()
   const [profileId, setProfileId] = useState<string | null>(null)
@@ -173,7 +188,7 @@ function ChooseMatch({ courtId, ctx, onClose, onOpenPutOnCourt, onEditMatch }: C
       {
         onSuccess: (result) => {
           toast(result.message)
-          onClose()
+          onDone()
         },
         onError: (failure) => toast.error(errorMessage(failure)),
         onSettled: () => {
@@ -250,6 +265,7 @@ type OpenStartMatchProps = {
   courtId?: string
   ctx: MatchContext
   onClose: () => void
+  onDone: () => void
   /** The recheck refused the start: refetch so the sheet shows the current players and courts */
   onRefresh: () => void
 }
@@ -272,6 +288,7 @@ function OpenStartMatch({
   courtId,
   ctx,
   onClose,
+  onDone,
   onRefresh,
 }: OpenStartMatchProps) {
   const placeOnCourt = usePlaceOnCourt()
@@ -365,7 +382,7 @@ function OpenStartMatch({
       {
         onSuccess: (result) => {
           toast(result.message)
-          onClose()
+          onDone()
         },
         onError: (failure) => {
           toast.error(errorMessage(failure))

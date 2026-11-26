@@ -31,6 +31,7 @@ import { formatWhen } from '@rotra/ui/now-card/helpers'
 import { OverdueBanner, sessionEndStatus } from '@rotra/ui/overdue-banner'
 import { PageHeader } from '@rotra/ui/page-header'
 import { SessionTitleLink } from '@rotra/ui/session-title-link'
+import { FreeCourtSheet } from '@rotra/ui/free-court-sheet'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { type TabItem, Tabs, TabsContent } from '@rotra/ui/tabs'
@@ -119,6 +120,8 @@ export type ConsoleSheet =
 export type MatchSheet =
   | MatchLineupRequest
   | { mode: 'suggest' }
+  /** A free court's picture: Court N is free (Pick from the queue, Generate a match) */
+  | { mode: 'free'; courtId: string }
   /** Open match on an in-game court card: the active match sheet (Queue › Match control) */
   | { mode: 'active'; matchId: string; move?: { courtId?: string }; result?: boolean }
   /** Review and start, Start on a queue card, Pick another: the Start match and Choose match sheets (Queue › Match control) */
@@ -186,6 +189,9 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const tabParam = searchParams.get('tab')
   const [sheet, setSheet] = useState<ConsoleSheet>(resumeSessionDone ? 'session-done' : null)
   const [matchSheet, setMatchSheet] = useState<MatchSheet | null>(null)
+  // Stacked dialogs: the dialogs this one was opened from, oldest first. × / Escape / the scrim / Back
+  // pop one level; finishing the task (Put on court, Add to queue, Save lineup) clears them all.
+  const [matchBack, setMatchBack] = useState<MatchSheet[]>([])
   const [profileId, setProfileId] = useState<string | null>(null)
   // The header Share button's Share this session dialog
   const [shareOpen, setShareOpen] = useState(false)
@@ -348,15 +354,40 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   // Queue › Match editing and generation: the sheets live here so Edit works from the Session tab
   // too, and a save, an accepted suggestion or an auto queue run switches the console to the Queue
   // tab.
+  /** Opens a first dialog: nothing underneath it, so its × closes everything */
+  const openMatchSheet = (next: MatchSheet) => {
+    setMatchBack([])
+    setMatchSheet(next)
+  }
+  /** Opens a dialog over the current one, which its × / Escape / scrim / Back return to */
+  const pushMatchSheet = (next: MatchSheet) => {
+    setMatchBack((stack) => (matchSheet ? [...stack, matchSheet] : stack))
+    setMatchSheet(next)
+  }
+  /** One level back, or closed when this was the first dialog */
+  const backMatchSheet = () => {
+    setMatchSheet(matchBack.at(-1) ?? null)
+    setMatchBack((stack) => stack.slice(0, -1))
+  }
+  /** The task is finished: close the whole stack */
+  const closeMatchSheets = () => {
+    setMatchSheet(null)
+    setMatchBack([])
+  }
   const matchEditing = {
-    onAddMatch: () => setMatchSheet({ mode: 'add' }),
-    onEditMatch: (matchId: string) => setMatchSheet({ mode: 'edit', matchId }),
+    onAddMatch: () => openMatchSheet({ mode: 'add' }),
+    // Edit on a card in Put a match on Court N opens over it; closing the editor returns there.
+    onEditMatch: (matchId: string) =>
+      matchSheet?.mode === 'choose'
+        ? pushMatchSheet({ mode: 'edit', matchId })
+        : openMatchSheet({ mode: 'edit', matchId }),
   }
   // Queue › Match control: Review and start (with its court), Start on a queue card (first free
   // court) and Pick another open the StartMatch sheets; no match starts without that confirmation.
   const onStartMatch = (matchId: string, courtId?: string) =>
-    setMatchSheet({ mode: 'start', matchId, courtId })
-  const onPickAnother = (courtId: string) => setMatchSheet({ mode: 'choose', courtId })
+    openMatchSheet({ mode: 'start', matchId, courtId })
+  const onPickAnother = (courtId: string) => openMatchSheet({ mode: 'choose', courtId })
+  const freeCourtId = matchSheet?.mode === 'free' ? matchSheet.courtId : null
   const showQueue = () => setView(VIEWS.queue ? 'queue' : 'courts')
 
   if (session.isError)
@@ -463,10 +494,11 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
                 setSheet('add-court')
               }}
               {...matchEditing}
-              onOpenMatch={(matchId, move) => setMatchSheet({ mode: 'active', matchId, move })}
-              onMatchDone={(matchId) => setMatchSheet({ mode: 'active', matchId, result: true })}
+              onOpenMatch={(matchId, move) => openMatchSheet({ mode: 'active', matchId, move })}
+              onMatchDone={(matchId) => openMatchSheet({ mode: 'active', matchId, result: true })}
               onStartMatch={onStartMatch}
               onPickAnother={onPickAnother}
+              onFillCourt={(courtId) => openMatchSheet({ mode: 'free', courtId })}
             />
           </TabsContent>
           <TabsContent value="queue" className="flex flex-col gap-3">
@@ -475,7 +507,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
                 {...viewProps}
                 {...matchEditing}
                 onStartMatch={onStartMatch}
-                onSuggest={() => setMatchSheet({ mode: 'suggest' })}
+                onSuggest={() => openMatchSheet({ mode: 'suggest' })}
                 onOpenGenerate={() => setView('generate')}
               />
             ) : (
@@ -565,14 +597,31 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               ? matchSheet
               : null
           }
-          onClose={() => setMatchSheet(null)}
-          onSaved={showQueue}
+          onClose={backMatchSheet}
+          onSaved={() => {
+            closeMatchSheets()
+            showQueue()
+          }}
+        />
+        <FreeCourtSheet
+          open={freeCourtId !== null}
+          onOpenChange={(open) => {
+            if (!open) backMatchSheet()
+          }}
+          courtLabel={courts.find((c) => c.id === freeCourtId)?.label ?? 'Court'}
+          waitingCount={waiting.length}
+          onPick={() => freeCourtId && pushMatchSheet({ mode: 'choose', courtId: freeCourtId })}
+          onGenerate={() => pushMatchSheet({ mode: 'suggest' })}
         />
         <SuggestMatch
           sessionId={sessionId}
           open={matchSheet?.mode === 'suggest'}
-          onOpenChange={(open) => setMatchSheet(open ? { mode: 'suggest' } : null)}
-          onAdded={showQueue}
+          now={now}
+          onBack={backMatchSheet}
+          onAdded={() => {
+            closeMatchSheets()
+            showQueue()
+          }}
         />
         <ActiveMatch
           sessionId={sessionId}
@@ -580,7 +629,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           matchId={matchSheet?.mode === 'active' ? matchSheet.matchId : null}
           moveFirst={matchSheet?.mode === 'active' ? (matchSheet.move ?? null) : null}
           resultFirst={matchSheet?.mode === 'active' && !!matchSheet.result}
-          onClose={() => setMatchSheet(null)}
+          onClose={closeMatchSheets}
         />
         <StartMatch
           sessionId={sessionId}
@@ -589,9 +638,11 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               ? matchSheet
               : null
           }
-          onRequestChange={setMatchSheet}
-          onEditMatch={(matchId) => setMatchSheet({ mode: 'edit', matchId })}
-          onClose={() => setMatchSheet(null)}
+          // A 5v5's Put on court opens over Put a match on Court N, so Back returns to it.
+          onRequestChange={pushMatchSheet}
+          onEditMatch={matchEditing.onEditMatch}
+          onClose={backMatchSheet}
+          onDone={closeMatchSheets}
         />
         <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />
         <SessionDoneFlow

@@ -1,6 +1,6 @@
 # Queue app: free court flow (pick or generate), Suggested match rework, stacked dialogs go back
 
-Status: TICKETED — #1118
+Status: IN REAL MODE — #1125
 Date: 2026-11-26
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `courtsPane` (`.free-pitch`), SHEETS `freeCourt`, `chooseMatch`, `suggest`, `sgPick`, `fillInfo`; `closeSheet`, `setupChooseSlider`, actions `openFreeCourt`, `reshuffleSuggest`, `sgReplace`, `sgChoose`, `sheetBack`

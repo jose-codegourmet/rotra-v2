@@ -48,10 +48,8 @@ const wholeNumber = (value: string): number | null => {
   return /^\d+$/.test(trimmed) ? Number(trimmed) : null
 }
 
-/** A score counts only when both boxes are filled; the winner's box alone is a winner-only result */
+/** A score counts only when both boxes are filled (Clear score shows then); the winner's box alone is a winner-only result */
 export const scoreTyped = (o: Boxes) => !isBlank(o.a) && !isBlank(o.b)
-/** Anything in either box (Clear score shows) */
-export const anyBoxTyped = (o: Boxes) => !isBlank(o.a) || !isBlank(o.b)
 
 /**
  * Who the boxes say won: the higher of two whole scores, or one box alone at the target or more.

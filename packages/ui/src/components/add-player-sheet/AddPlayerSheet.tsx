@@ -16,6 +16,7 @@ import { IdentityChip } from '@rotra/ui/identity-chip'
 import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { LevelPill } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
+import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import { PlayerConfirmCard } from '@rotra/ui/player-confirm-card'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Select } from '@rotra/ui/select'
@@ -52,6 +53,8 @@ export type AddPlayerCandidate = {
   id: string
   name: string
   nickname?: string | null
+  /** The club's own nickname for a registered saved player; read by the Saved players search and the name lines */
+  clubNickname?: string | null
   photoUrl?: string
   rtrId: string | null
   identity: Identity
@@ -171,7 +174,7 @@ const NAME_ERROR = 'Enter a name.'
 
 const matches = (candidate: AddPlayerCandidate, query: string) =>
   !query ||
-  [candidate.name, candidate.nickname, candidate.rtrId].some((v) =>
+  [candidate.name, candidate.nickname, candidate.clubNickname, candidate.rtrId].some((v) =>
     v?.toLowerCase().includes(query),
   )
 
@@ -219,7 +222,15 @@ function CandidateRow({
     >
       <Avatar name={candidate.name || 'Not registered'} src={candidate.photoUrl} />
       <span className="flex min-w-0 flex-1 flex-col">
-        <b className="[overflow-wrap:anywhere]">{candidate.name || 'Not registered yet'}</b>
+        {showLevel && candidate.name ? (
+          <PlayerNameBlock
+            fullName={candidate.name}
+            nickname={candidate.nickname}
+            clubNickname={candidate.clubNickname}
+          />
+        ) : (
+          <b className="[overflow-wrap:anywhere]">{candidate.name || 'Not registered yet'}</b>
+        )}
         {showLevel ? (
           <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-fg2">
             <span>{subtitle}</span>

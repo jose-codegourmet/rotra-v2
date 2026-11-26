@@ -2,7 +2,7 @@ import type { MatchCardFixture } from '@rotra/data/fixtures/match-cards'
 import { matchCardFixtures } from '@rotra/data/fixtures/match-cards'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
-import { ChooseMatchSheet, type ChooseMatchItem } from './ChooseMatchSheet'
+import { type ChooseMatchItem, ChooseMatchSheet } from './ChooseMatchSheet'
 
 const itemOf = (c: MatchCardFixture, position: number): ChooseMatchItem => ({
   matchId: `${c.match.id}-${position}`,

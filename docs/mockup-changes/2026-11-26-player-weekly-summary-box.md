@@ -1,6 +1,6 @@
 # Player app: Weekly Performance summary in one box
 
-Status: TICKETED — #1142
+Status: IN REAL MODE — #1146
 Date: 2026-11-26
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `weeklyPerf` (`.wp-sum`, `.wp-cells`, `.wp-split`) and styles

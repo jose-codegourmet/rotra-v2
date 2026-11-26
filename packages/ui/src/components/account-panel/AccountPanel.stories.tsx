@@ -31,3 +31,4 @@ export const WithRequestSlot: Story = {
   },
 }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
+export const WithSettings: Story = { args: { onOpenSettings: () => {} } }

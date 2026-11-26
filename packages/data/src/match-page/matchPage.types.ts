@@ -69,4 +69,8 @@ export type MatchPagePlayer = {
    * from this viewer (always private, or private to a visitor) or none came before.
    */
   earlierGames: PlayerGame[]
+  /** Real mode: the record from earlierGames, null when those games are hidden. */
+  beforeGame?: { played: number; wins: number; losses: number; winRate: number | null } | null
+  /** Real mode: counted-game win rate this calendar year, where the viewer can see it. */
+  yearWinRate?: number | null
 }

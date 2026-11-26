@@ -31,15 +31,33 @@ const player = (
   playerId: string | null,
   skillGroup: MatchPagePlayer['skillGroup'],
   earlierGames: PlayerGame[] = [],
-): MatchPagePlayer => ({
-  playerId,
-  name,
-  picture: null,
-  skillGroup,
-  sessionGameNumber: earlierGames.length + 1,
-  counting: 'counted',
-  earlierGames,
+): MatchPagePlayer => {
+  const wins = earlierGames.filter((game) => game.result === 'won').length
+  const played = earlierGames.length
+  return {
+    playerId,
+    name,
+    picture: null,
+    skillGroup,
+    sessionGameNumber: played + 1,
+    counting: 'counted',
+    earlierGames,
+    beforeGame: {
+      played,
+      wins,
+      losses: played - wins,
+      winRate: played ? Math.round((wins / played) * 100) : null,
+    },
+    yearWinRate: playerId && played ? 64 : null,
+  }
+}
+const firstGamePlayer = (player: MatchPagePlayer): MatchPagePlayer => ({
+  ...player,
+  earlierGames: [],
+  beforeGame: { played: 0, wins: 0, losses: 0, winRate: null },
+  sessionGameNumber: 1,
 })
+
 const page: MatchPageData = {
   matchId: match.id,
   format: match.format,
@@ -76,7 +94,7 @@ const page: MatchPageData = {
         score: '18–21',
       },
     ]),
-    player('J*** R***', 'jasper', null),
+    { ...player('J*** R***', 'jasper', null), beforeGame: null },
   ],
   viewerPlayerId: null,
 }
@@ -97,7 +115,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** A visitor: Team A on the left with first names, no share icon. */
+/** A visitor: Team A on the left, with no stats or share icon. */
 export const Visitor: Story = { globals: { theme: 'dark' } }
 export const VisitorLight: Story = { globals: { theme: 'light' } }
 /** The signed-in player played: their side on the left as You, the share icon on their games. */
@@ -119,7 +137,7 @@ export const PlayedOnTeamBPhoneLight: Story = {
   ...PlayedOnTeamB,
   globals: { theme: 'light', viewport: { value: 'phone' } },
 }
-/** A fun game: “Fun game · not counted” under the court, no Won / Lost rings. */
+/** A fun game: “Fun game · not counted” under the court. */
 export const FunGame: Story = {
   args: {
     page: {
@@ -154,14 +172,14 @@ export const NotRanked: Story = {
     },
   },
 }
-/** First game of the night and the session page gone: every block “No earlier games”, plain title. */
+/** First game of the night with an expired public session page. */
 export const FirstGameExpiredPage: Story = {
   args: {
     page: {
       ...page,
       session: { ...page.session, sessionPageUrl: null },
-      teamA: page.teamA.map((p) => ({ ...p, earlierGames: [], sessionGameNumber: 1 })),
-      teamB: page.teamB.map((p) => ({ ...p, earlierGames: [], sessionGameNumber: 1 })),
+      teamA: page.teamA.map(firstGamePlayer),
+      teamB: page.teamB.map(firstGamePlayer),
     },
   },
 }
@@ -175,3 +193,63 @@ export const NotFound: Story = {
   globals: { theme: 'dark' },
 }
 export const NotFoundLight: Story = { ...NotFound, globals: { theme: 'light' } }
+
+export const PlayerPicked: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /^Jose Buctuanon, .*show stats/i }))
+  },
+  globals: { theme: 'dark' },
+}
+export const PlayerPickedLight: Story = { ...PlayerPicked, globals: { theme: 'light' } }
+
+export const TeamPicked: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /^Won team: show stats/i }))
+  },
+  globals: { theme: 'dark' },
+}
+export const TeamPickedLight: Story = { ...TeamPicked, globals: { theme: 'light' } }
+
+export const FirstGamePlayerPicked: Story = {
+  ...FirstGameExpiredPage,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /^Dalton, .*show stats/i }))
+  },
+  globals: { theme: 'dark' },
+}
+export const FirstGamePlayerPickedLight: Story = {
+  ...FirstGamePlayerPicked,
+  globals: { theme: 'light' },
+}
+
+export const GuestPicked: Story = {
+  args: {
+    page: { ...page, teamA: [...page.teamA.slice(0, 1), player('A***', null, null)] },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'A***, Guest. Show stats' }))
+  },
+  globals: { theme: 'dark' },
+}
+export const GuestPickedLight: Story = { ...GuestPicked, globals: { theme: 'light' } }
+
+export const MaskedPlayerPicked: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'J*** R***, No skill group shown. Show stats' }),
+    )
+  },
+  globals: { theme: 'dark' },
+}
+export const MaskedPlayerPickedLight: Story = {
+  ...MaskedPlayerPicked,
+  globals: { theme: 'light' },
+}
+
+export const YourStatsPicked: Story = {
+  ...PlayedIn,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /^You, .*show stats/i }))
+  },
+}
+export const YourStatsPickedLight: Story = { ...YourStatsPicked, globals: { theme: 'light' } }

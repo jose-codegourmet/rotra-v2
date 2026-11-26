@@ -1,3 +1,4 @@
+import { queueSessionFixtures } from '@rotra/data/fixtures/queueSessions'
 import { SignOutSheet } from '@rotra/ui/sign-out-sheet'
 import { Toaster, toast } from '@rotra/ui/toaster'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -6,10 +7,28 @@ import { fn } from 'storybook/test'
 import { PlayerNav, PlayerNavDock } from './PlayerNav'
 
 const noop = () => undefined
+const settings = { onNavigate: noop }
+const session = queueSessionFixtures.sessions[0]
+if (!session) throw new Error('Queue Session fixture missing')
+const href = `/queue/s/${encodeURIComponent(session.publicSlug)}`
+const play = {
+  label: 'Play',
+  live: true,
+  href,
+  accessibleName: `Back to session: ${session.title}`,
+} as const
+const ready = {
+  label: 'Ready',
+  live: false,
+  href,
+  accessibleName: `Incoming session: ${session.title}`,
+} as const
+const nextUp = { ...ready, label: 'Next up' } as const
 
 const meta = {
   title: 'Player/PlayerNav',
   component: PlayerNav,
+  globals: { viewport: { value: 'desktop' } },
   args: {
     signedIn: false,
     current: 'leaderboard',
@@ -25,11 +44,24 @@ type Story = StoryObj<typeof meta>
 export const SignedOutOnLeaderboard: Story = {}
 
 export const SignedInOnMyProfile: Story = {
-  args: { signedIn: true, current: 'profile' },
+  args: { signedIn: true, current: 'profile', settings },
 }
 
 export const SignedInOnLeaderboard: Story = {
-  args: { signedIn: true, current: 'leaderboard' },
+  args: { signedIn: true, current: 'leaderboard', settings },
+}
+
+export const Play: Story = {
+  args: { signedIn: true, current: null, session: play },
+}
+export const Ready: Story = {
+  args: { signedIn: true, current: null, session: ready },
+}
+export const NextUp: Story = {
+  args: { signedIn: true, current: null, session: nextUp, settings },
+}
+export const SettingsCurrent: Story = {
+  args: { signedIn: true, current: 'settings', settings },
 }
 
 export const Phone: Story = {
@@ -51,15 +83,22 @@ export const DockVisitorOnSignIn: Story = {
 }
 export const DockSignedInOnLeaderboard: Story = {
   ...DockVisitorOnLeaderboard,
-  args: { signedIn: true, current: 'leaderboard' },
+  args: SignedInOnLeaderboard.args,
 }
 export const DockSignedInOnMyProfile: Story = {
   ...DockVisitorOnLeaderboard,
-  args: { signedIn: true, current: 'profile' },
+  args: { signedIn: true, current: 'profile', settings },
 }
 export const DockNoCurrentPage: Story = {
   ...DockVisitorOnLeaderboard,
-  args: { signedIn: true, current: null },
+  args: { signedIn: true, current: null, settings },
+}
+export const DockPlay: Story = { ...DockVisitorOnLeaderboard, args: Play.args }
+export const DockReady: Story = { ...DockVisitorOnLeaderboard, args: Ready.args }
+export const DockNextUp: Story = { ...DockVisitorOnLeaderboard, args: NextUp.args }
+export const DockSettingsCurrent: Story = {
+  ...DockVisitorOnLeaderboard,
+  args: SettingsCurrent.args,
 }
 export const DockDialogOpen: Story = {
   ...DockSignedInOnMyProfile,

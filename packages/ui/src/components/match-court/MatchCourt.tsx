@@ -29,7 +29,7 @@ export type MatchCourtPlayer = {
 }
 
 /** The public session tiles' skill-group colours, as the ring under the winner ring. */
-const SKILL_RINGS = {
+export const MATCH_COURT_SKILL_RINGS = {
   beginner: '[--ring:var(--lv-beg)]',
   intermediate: '[--ring:var(--lv-int)]',
   advanced: '[--ring:var(--lv-adv)]',
@@ -98,6 +98,8 @@ export type MatchCourtProps = {
    * 2 px dark gap and a 3 px accent outer ring; hover and focus swap the accent for a light ring.
    */
   skillRings?: boolean
+  /** Fills the Game page's court card, with larger faces and vertical teams on wide screens. */
+  size?: 'match-page'
   className?: string
 }
 
@@ -165,8 +167,10 @@ export function MatchCourt({
   versus = false,
   onOpen,
   skillRings = false,
+  size,
   className,
 }: MatchCourtProps) {
+  const tall = size === 'match-page'
   const face = (player: MatchCourtPlayer, won: boolean) => {
     const games = player.badge ? `, game ${player.badge} of that session` : ''
     const highlighted = highlightedPlayerKey !== undefined && player.key === highlightedPlayerKey
@@ -181,7 +185,7 @@ export function MatchCourt({
               'size-[46px] text-sm max-[480px]:size-9 max-[480px]:text-xs',
               skillRings
                 ? [
-                    SKILL_RINGS[player.skillGroup ?? 'none'],
+                    MATCH_COURT_SKILL_RINGS[player.skillGroup ?? 'none'],
                     won
                       ? 'shadow-[0_0_0_3px_var(--ring),0_0_0_5px_var(--court-level-label),0_0_0_8px_var(--accent)]'
                       : 'shadow-[0_0_0_3px_var(--ring)]',
@@ -193,6 +197,7 @@ export function MatchCourt({
                     player.onOpen &&
                       'group-hover/face:ring-3 group-hover/face:ring-accent group-focus-visible/face:ring-3 group-focus-visible/face:ring-accent',
                   ],
+              tall && 'min-[900px]:size-[60px] min-[900px]:text-lg',
               highlighted && 'outline-3 outline-offset-2 outline-warn',
             )}
           />
@@ -243,6 +248,7 @@ export function MatchCourt({
     'relative z-1 flex min-w-0 items-center justify-evenly gap-1.5',
     skillRings ? 'px-1.5 py-4' : 'px-1 py-3',
     onOpen && 'pointer-events-none',
+    tall && 'min-[900px]:flex-col min-[900px]:px-2 min-[900px]:pt-10 min-[900px]:pb-4',
   )
   const names = (players: MatchCourtPlayer[]) => players.map((p) => p.name).join(' and ')
   const leftWon = winner === 'left'
@@ -266,6 +272,8 @@ export function MatchCourt({
             : playerVariant
               ? 'pt-2.5 max-[480px]:min-h-[100px]'
               : 'pt-3 max-[480px]:min-h-[112px]',
+          tall &&
+            'min-h-[220px] flex-1 min-[900px]:min-h-[280px] min-[900px]:items-stretch max-[480px]:min-h-[220px]',
           now &&
             'shadow-[0_0_0_3px_var(--accent),0_0_18px_2px_color-mix(in_srgb,var(--accent)_35%,transparent)]',
         )}
@@ -306,12 +314,18 @@ export function MatchCourt({
           className={cn(
             'relative z-1 mx-1 flex min-w-24 flex-col items-center justify-center gap-1.5 rounded-xl bg-court-level-label px-3.5 py-2.5 text-center text-on-photo max-[480px]:mx-0.5 max-[480px]:min-w-0 max-[480px]:px-2 max-[480px]:py-2',
             onOpen && 'pointer-events-none',
+            tall && 'min-[900px]:self-center',
           )}
         >
           {versus ? (
             <span className="text-[13px] font-extrabold tracking-[1px] text-on-photo/80">VS</span>
           ) : invalid ? null : score ? (
-            <span className="font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]">
+            <span
+              className={cn(
+                'font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]',
+                tall && 'min-[900px]:text-[30px]',
+              )}
+            >
               <span className="sr-only">Score </span>
               {score}
             </span>

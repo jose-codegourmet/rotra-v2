@@ -1,0 +1,19 @@
+{
+  "id": "go-main-catch-up_20261126",
+  "title": "Catch Go up with main: Queue and Player behaviour added since 2026-11-23",
+  "type": "refactor",
+  "priority": "high",
+  "order": 17,
+  "status": "pending",
+  "created": "2026-11-26",
+  "updated": "2026-11-26",
+  "depends_on": "regression-go, go-sign-in-catch-up",
+  "phases": {
+    "total": 6,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 29,
+    "completed": 0
+  }
+}

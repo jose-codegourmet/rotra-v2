@@ -113,7 +113,7 @@ const openOther: Story['play'] = async ({ canvasElement, userEvent }) => {
   await userEvent.click(await body.findByRole('button', { name: /Other/ }))
 }
 
-/** Compact: Who's coming out, Suggested with the Other tile, the notice and the action */
+/** Compact: Who's coming out, Suggestion with the Other tile, the notice and the action */
 export const Compact: Story = {}
 /** 900 px and wider: Other widens the dialog and shows All players on the right */
 export const Expanded: Story = { play: openOther }

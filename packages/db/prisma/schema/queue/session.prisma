@@ -31,6 +31,16 @@ enum SessionMode {
   @@map("session_mode")
 }
 
+/// Restrictions (D-2026-11-19-12): which levels may take a slot, by level band.
+enum LevelRestriction {
+  all
+  beginners
+  beginners_intermediate
+  slots_per_band
+
+  @@map("level_restriction")
+}
+
 model QueueSession {
   id                   String            @id @db.Uuid
   clubId               String            @map("club_id") @db.Uuid
@@ -62,6 +72,11 @@ model QueueSession {
   expectedPlayers      Int?              @map("expected_players")
   queueRevision        BigInt            @default(1) @map("queue_revision")
   startedAt            DateTime?         @map("started_at") @db.Timestamptz(6)
+  /// The planned window as it was at Start, before a late or other-day start moved it. Set together
+  /// at Start, cleared by Back to preparation, which puts them back. Null for sessions started before
+  /// 2026-11-25 (then going back keeps the current planned times).
+  plannedStartBeforeStartAt DateTime?    @map("planned_start_before_start_at") @db.Timestamptz(6)
+  plannedEndBeforeStartAt   DateTime?    @map("planned_end_before_start_at") @db.Timestamptz(6)
   finalizedAt          DateTime?         @map("finalized_at") @db.Timestamptz(6)
   /// Shared by sessions created together as a repeating series; each stays independent.
   seriesId             String?           @map("series_id") @db.Uuid
@@ -77,6 +92,14 @@ model QueueSession {
   /// score, and Session done writes no facts, summaries, result snapshot or publication. Existing
   /// rows read true. Fixed once the session leaves prepared (trigger queue_sessions_record_games_lock).
   recordGames          Boolean           @default(true) @map("record_games")
+  /// Restrictions (D-2026-11-19-12): which levels may take a slot. Existing rows read all. Enforced
+  /// on public join requests; the Queue Master can add or confirm anyone after a warning.
+  levelRestriction     LevelRestriction  @default(all) @map("level_restriction")
+  /// Slots per level: set together, only with slots_per_band (CHECK in SQL), each 0 or more. Their
+  /// sum equals the session's slots when saved (checked in the service: slots follow the courts).
+  beginnerSlots        Int?              @map("beginner_slots")
+  intermediateSlots    Int?              @map("intermediate_slots")
+  advancedSlots        Int?              @map("advanced_slots")
   /// Players can request (D-2026-11-09-05): the formats a signed-in Player may ask for with Request
   /// a match, in any order; empty = the session takes no match requests. New sessions get the
   /// prototype default (2 v 2, plus 1 v 1 when singles is on) from the create command.
@@ -141,7 +164,13 @@ model SessionCourt {
   id            String    @id @db.Uuid
   clubId        String    @map("club_id") @db.Uuid
   sessionId     String    @map("session_id") @db.Uuid
+  /// Not unique: two courts in a session may share a label (owner decision, 2026-11-25).
   label         String
+  /// Court order in the session, from 1 (owner decision, 2026-11-25): every court list and Auto
+  /// Queue's fill read courts by position, then created_at, id. A new court takes the session's
+  /// highest position + 1; Reorder courts rewrites the live courts 1..n. Not unique, and removed
+  /// courts keep theirs.
+  position      Int
   /// Planned start. Null = the session start.
   startsAt      DateTime? @map("starts_at") @db.Timestamptz(6)
   /// Start anyway: opened before the planned start; cleared by Undo early open while free.

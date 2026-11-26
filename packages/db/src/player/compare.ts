@@ -101,7 +101,11 @@ export async function readPlayerCompare(
     comparePlayer(otherProfile, places),
     prisma.$queryRaw<ComparePageRow[]>`
       WITH shared AS MATERIALIZED (
-        SELECT * FROM public.rotra_player_compare(${context.playerId}::uuid, ${otherId}::uuid)
+        SELECT c.* FROM public.rotra_player_compare(${context.playerId}::uuid, ${otherId}::uuid) c
+        -- A session with Record games off is not ranked (D-2026-11-20-02): out of the win rates.
+        WHERE NOT EXISTS (
+          SELECT 1 FROM "queue_sessions" s WHERE s."id" = c.session_id AND s."record_games" = false
+        )
       ), totals AS (
         SELECT count(*)::integer AS all_count,
           (count(*) FILTER (WHERE NOT together))::integer AS h2h_count,

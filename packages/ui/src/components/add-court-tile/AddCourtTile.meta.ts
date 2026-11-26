@@ -7,6 +7,7 @@ export const addCourtTileMeta = {
   usage: [
     'Use as the last tile in Q-COURTS, after every CourtCard. Pass the next court number.',
     'It only opens Q-ADD-COURT; it never adds the court itself.',
+    'Pass description to change the muted second line (the Settings Courts box uses "Set its label and hours").',
     'Do not use in Session setup or Courts and time; those list courts as rows.',
   ],
   prototype: {

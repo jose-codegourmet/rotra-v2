@@ -121,7 +121,7 @@ func (q *Queries) InsertDemotedWaitlistEntry(ctx context.Context, arg InsertDemo
 
 const listQueueLiveRoster = `-- name: ListQueueLiveRoster :many
 
-SELECT id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, created_at, updated_at, revision, games_adjustment, no_show_at, self_checked_in_at, left_at FROM session_players WHERE session_id = $1 AND released_at IS NULL AND no_show_at IS NULL
+SELECT id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, created_at, updated_at, revision, games_adjustment, no_show_at, self_checked_in_at, left_at, handicap_spots FROM session_players WHERE session_id = $1 AND released_at IS NULL AND no_show_at IS NULL
 ORDER BY confirmed_at ASC, id ASC
 `
 
@@ -161,6 +161,7 @@ func (q *Queries) ListQueueLiveRoster(ctx context.Context, sessionID pgtype.UUID
 			&i.NoShowAt,
 			&i.SelfCheckedInAt,
 			&i.LeftAt,
+			&i.HandicapSpots,
 		); err != nil {
 			return nil, err
 		}

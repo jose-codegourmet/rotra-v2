@@ -1,4 +1,11 @@
 import {
+  movedCourtText,
+  pausedText,
+  swappedPartnersText,
+  swappedPlacesText,
+  tradedCourtsText,
+} from '../match/liveMatch.rules'
+import {
   computeStandings,
   courtNames,
   FORMAT_LABELS,
@@ -327,7 +334,7 @@ export async function realSwapPlayers(input: {
 }) {
   const read = await lastRead(input.sessionId)
   const m = shownMatch(read, input.matchId)
-  if (m.state !== 'waiting')
+  if (m.state !== 'waiting' && m.state !== 'on_court' && m.state !== 'active')
     throw new MockError('permission', 'Only a waiting match can be changed.')
   const a = m.teamA.includes(input.a) ? input.a : input.b,
     b = m.teamB.includes(input.b) ? input.b : input.a
@@ -337,6 +344,24 @@ export async function realSwapPlayers(input: {
   const pa = roster.find((p) => p.id === input.a),
     pb = roster.find((p) => p.id === input.b)
   if (!pa || !pb) throw new MockError('permission', 'Player not available.')
+  // On a court (real mode November 25, 2026): the server trades the two players' teams in place.
+  // `aTeam` is where this screen saw `a`, so a retry never switches them back.
+  if (m.state === 'on_court' || m.state === 'active') {
+    await onCourtCommand<WireMatch>(input.sessionId, m.id, 'switch-sides', {
+      operationId: opId({ operationId: input.operationId }),
+      aId: a,
+      bId: b,
+      aTeam: 'A',
+    })
+    const nameA = queueMasterName(a === input.a ? pa : pb),
+      nameB = queueMasterName(a === input.a ? pb : pa)
+    return accepted(
+      null,
+      m.state === 'active'
+        ? swappedPartnersText(m.matchNo, nameA, nameB)
+        : `Match ${m.matchNo}: ${nameA} and ${nameB} switched sides · protected from regeneration`,
+    )
+  }
   const lineup: MatchLineup = {
     format: m.format,
     teamA: m.teamA.map((id) => (id === a ? b : id)),
@@ -439,6 +464,83 @@ export async function realSendBackToQueue(input: { matchId: string; operationId:
   )
 }
 
+/** Pause match: a Playing match goes back to Getting ready on the same court(s). Online only. */
+export async function realPauseMatch(input: { matchId: string; operationId: string }) {
+  requireOperationId(input.operationId)
+  const { sessionId, courts } = await controlContext(input.matchId)
+  const match = matchOf(
+    await onCourtCommand<WireMatch>(sessionId, input.matchId, 'pause', {
+      operationId: input.operationId,
+    }),
+  )
+  return accepted(null, pausedText(match.matchNo, courtNames(match, courts)))
+}
+
+/**
+ * Swap from match: the player coming out and an opponent in this match trade places. `aTeam` is
+ * where this screen saw the player coming out, so a retry never trades them back. Online only.
+ */
+export async function realSwapFromMatch(input: {
+  matchId: string
+  outId: string
+  inId: string
+  operationId: string
+}) {
+  requireOperationId(input.operationId)
+  const sessionId = sessionOf(input.matchId)
+  const shown = shownMatch(await lastRead(sessionId), input.matchId)
+  const aTeam = shown.teamA.includes(input.outId) ? 'A' : 'B'
+  const { roster } = await realGetSessionRoster(sessionId)
+  const out = roster.find((p) => p.id === input.outId),
+    opponent = roster.find((p) => p.id === input.inId)
+  if (!out || !opponent) throw new MockError('permission', 'Player not available.')
+  await onCourtCommand<WireMatch>(sessionId, input.matchId, 'swap-from-match', {
+    operationId: input.operationId,
+    aId: input.outId,
+    bId: input.inId,
+    aTeam,
+  })
+  return accepted(
+    null,
+    swappedPlacesText(shown.matchNo, queueMasterName(out), queueMasterName(opponent)),
+  )
+}
+
+/** Trade courts: two one-court matches swap courts; nothing frees. Online only. */
+export async function realTradeCourts(input: {
+  matchId: string
+  withMatchId: string
+  operationId: string
+}) {
+  requireOperationId(input.operationId)
+  const { sessionId, courts } = await controlContext(input.matchId)
+  const done = await onCourtCommand<{ match: WireMatch; other: WireMatch }>(
+    sessionId,
+    input.matchId,
+    'trade-courts',
+    { operationId: input.operationId, withMatchId: input.withMatchId },
+  )
+  const m = matchOf(done.match),
+    n = matchOf(done.other)
+  return accepted(
+    null,
+    tradedCourtsText(m.matchNo, courtNames(m, courts), n.matchNo, courtNames(n, courts)),
+  )
+}
+
+/** Clear queue: every waiting match removed in one write. Online only. */
+export async function realClearQueue(sessionId: string) {
+  const { removed } = await queueCommand<{ removed: number }>(sessionId, '/matches/clear', {
+    body: {},
+  })
+  return accepted(
+    removed,
+    removed
+      ? `Queue cleared · ${removed} waiting match${removed === 1 ? '' : 'es'} removed`
+      : 'Queue is empty',
+  )
+}
+
 /** Move to another court: free open court(s), two for 5v5; still On court. */
 export async function realMoveCourt(input: {
   matchId: string
@@ -455,7 +557,7 @@ export async function realMoveCourt(input: {
   const match = matchOf(done.result)
   return accepted(
     null,
-    `Match ${match.matchNo} moved from ${courtNames(shown, courts)} to ${courtNames(match, courts)} · getting ready${await autoNote(sessionId, done.autoPlaced, courts)}`,
+    `${movedCourtText(match.matchNo, courtNames(shown, courts), courtNames(match, courts), shown.state === 'active')}${await autoNote(sessionId, done.autoPlaced, courts)}`,
   )
 }
 

@@ -47,10 +47,18 @@ const NAMES = [
   'Tess Uy',
   'Paolo',
 ]
+/** Rings: beginner blue, intermediate yellow, advanced red, grey when not assessed. */
+const LEVELS = [
+  'beginner_mid',
+  'intermediate_mid',
+  'advanced_low',
+  null,
+  'intermediate_high',
+] as const
 const side = (seed: number, size: number) =>
   Array.from({ length: size }, (_, i) => ({
     name: NAMES[(seed + i) % NAMES.length] ?? 'Player',
-    level: 'intermediate_mid' as const,
+    level: LEVELS[(seed + i) % LEVELS.length] ?? null,
   }))
 const match = (matchNo: number, a: number, b: number): PlayerSessionAccess['queue'][number] => ({
   matchNo,
@@ -106,5 +114,51 @@ export const MixedSizes: Story = {
       [4, 4],
       [5, 5],
     ]),
+  },
+}
+
+/** Every tile kind in one list: Next (doubles), singles, doubles, 1v2 and 5v5. */
+export const AllTileKinds: Story = {
+  args: {
+    access: accessOf([
+      [2, 2],
+      [1, 1],
+      [2, 2],
+      [1, 2],
+      [5, 5],
+    ]),
+  },
+}
+export const AllTileKindsLight: Story = { ...AllTileKinds, globals: { theme: 'light' } }
+/** Phones: a big team wraps onto a second row. */
+export const AllTileKindsPhone: Story = {
+  ...AllTileKinds,
+  globals: { viewport: { value: 'phone' } },
+}
+export const AllTileKindsPhoneLight: Story = {
+  ...AllTileKinds,
+  globals: { viewport: { value: 'phone' }, theme: 'light' },
+}
+/** Masked guests ("Y***") and a player with no level (grey ring). */
+export const MaskedAndNotAssessed: Story = {
+  args: {
+    access: {
+      ...accessOf([[2, 2]]),
+      queue: [
+        {
+          matchNo: 1,
+          format: 'doubles',
+          label: 'Genderless Doubles',
+          teamA: [
+            { name: 'Y***', level: null, masked: true },
+            { name: 'Maya', level: 'beginner_low' },
+          ],
+          teamB: [
+            { name: 'K***', level: null, masked: true },
+            { name: 'Dexter', level: 'advanced_high' },
+          ],
+        },
+      ],
+    },
   },
 }

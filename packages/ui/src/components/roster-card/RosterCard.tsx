@@ -12,6 +12,7 @@ import type { Identity } from '@rotra/ui/identity-chip/variants'
 import { LevelDiffIndicator } from '@rotra/ui/level-diff-indicator'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { LevelSelectMenu } from '@rotra/ui/level-select-menu'
+import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import { Switch } from '@rotra/ui/switch'
 import { useId } from 'react'
 
@@ -25,6 +26,10 @@ const LEVEL_BLOCK = {
 
 export type RosterCardProps = {
   name: string
+  /** The player's own nickname; the name block shows club nickname, nickname, then `name` (full name) */
+  nickname?: string | null
+  /** The club nickname (registered players only) */
+  clubNickname?: string | null
   photoUrl?: string
   identity: Identity
   /** The Player Information suggestion; null when there is none */
@@ -53,6 +58,11 @@ export type RosterCardProps = {
    */
   onStepDown?: () => void
   /**
+   * Hide Move to waitlist even when `onStepDown` is given: the read-only grid during play
+   * (2026-11-19-queue-live-no-move-to-waitlist). Before Start leave it off.
+   */
+  hideStepDown?: boolean
+  /**
    * In the roster's Grid view: at 640 px and narrower the card turns compact for the two-column grid
    * (56 px picture centred on top, name under it, chips and buttons centred, remove × in the card's
    * top-right corner). Unchanged from 641 px up.
@@ -76,10 +86,12 @@ const COMPACT = {
  * picture, name, remove, a full-width Present band (accent tint when present) and a level block
  * tinted in the skill group's color (level select or "LEVEL · Fixed after start", plus the
  * suggestion indicator). Second level: one small muted line with the identity chip, Paid / Not
- * paid and "Suggestion: LEVEL". Last, Move to waitlist when `onStepDown` is given (#735).
+ * paid and "Suggestion: LEVEL". Last, Move to waitlist when `onStepDown` is given and `hideStepDown` is not (#735).
  */
 export function RosterCard({
   name,
+  nickname,
+  clubNickname,
   photoUrl,
   identity,
   suggestion,
@@ -97,6 +109,7 @@ export function RosterCard({
   onPresentChange,
   onRemove,
   onStepDown,
+  hideStepDown = false,
   compactOnPhone = false,
   className,
 }: RosterCardProps) {
@@ -119,7 +132,7 @@ export function RosterCard({
             className={compact('avatar')}
           />
           <div className={cn('flex min-w-0 flex-1 flex-col gap-1', compact('main'))}>
-            <b className="font-semibold [overflow-wrap:anywhere]">{name}</b>
+            <PlayerNameBlock fullName={name} nickname={nickname} clubNickname={clubNickname} />
           </div>
           {!afterStart ? (
             <IconButton
@@ -210,7 +223,7 @@ export function RosterCard({
           </span>
           <span>{suggestion ? `Suggestion: ${levelLabel(suggestion)}` : 'No suggestion'}</span>
         </div>
-        {onStepDown ? (
+        {onStepDown && !hideStepDown ? (
           <div className={cn('flex flex-wrap items-center gap-2', compact('centre'))}>
             <Button size="xs" aria-label={`Move ${name} to the waitlist`} onClick={onStepDown}>
               Move to waitlist

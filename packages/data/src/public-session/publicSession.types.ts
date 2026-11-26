@@ -1,3 +1,4 @@
+import type { LevelRestriction } from '@rotra/schema/level-restriction'
 import type { ScoringKey } from '@rotra/schema/scoring'
 import type { MatchFormat } from '../match/match.types'
 import type { PlayingLevel } from '../player/player.types'
@@ -93,7 +94,10 @@ export type PublicSkillMix = {
   advanced: number
   unrated: number
 }
-/** A published standings row: position and counts only, no internal ids. */
+/**
+ * A published standings row: position and counts only, no internal ids. A leaderboard: the full name
+ * and picture for every viewer, never masked (D-2026-11-25-04); positions shared without gaps.
+ */
 export type PublicStandingRow = PublicResultFace & {
   position: number
   wins: number
@@ -166,6 +170,11 @@ export type PublicSessionPage = {
    * the setting, and real mode, which does not store it yet.
    */
   scoring?: ScoringKey
+  /**
+   * **Restrictions** (D-2026-11-19-12): which levels may take a slot, for the Levels row in
+   * Details. Missing reads as All levels (`levelRestrictionOf`): older wire shapes.
+   */
+  levelRestriction?: LevelRestriction
   minimum: number
   notes?: string | null
   /** Total before the anonymous 12-tile server cap. */
@@ -200,14 +209,13 @@ export type PublicSessionPage = {
   /** The operator's device has changes that have not synced yet */
   hasPendingChanges: boolean
   /**
-   * **Record games** (D-2026-11-18-06): false when the session keeps no results, so the page says
-   * "Not recorded" (Details) and "This session's games were not recorded." (Match history). Missing
-   * reads as true (older wire shapes).
+   * **Record games** (D-2026-11-20-02): false when the session is not ranked, so Details shows the
+   * Rankings tile "Not ranked". Games and results are kept as usual. Missing reads as true (older
+   * wire shapes).
    */
   recordGames?: boolean
   /**
-   * null until results are published (always null for prepared, active and invalid sessions, and
-   * for an unrecorded one)
+   * null until results are published (always null for prepared, active and invalid sessions)
    */
   results: PublicSessionResults | null
   /**
@@ -265,6 +273,11 @@ export type PublicQueuedMatch = {
   format: MatchFormat
   teamA: PublicMatchPlayer[]
   teamB: PublicMatchPlayer[]
+  /**
+   * The match's name for the View match dialog's title ("Mixed Doubles", D-2026-11-19-07). Missing
+   * reads as the format's own label ("Doubles").
+   */
+  label?: string
 }
 
 /**
@@ -397,6 +410,8 @@ export type MyNight = {
   } | null
   /** Same as `PlayerSessionAccess.isClubMember` (D-2026-11-12-02), for the mock-mode join card */
   isClubMember: boolean
+  /** Same as `PlayerSessionAccess.levelBlock` (D-2026-11-19-12), for the mock-mode join card */
+  levelBlock?: PlayerLevelBlock | null
   /** Invite shows only while Prepared, requests are on, and the Player has a slot or waitlist place */
   canInvite: boolean
   /** The Player's Session invite code if one was made already; read-only here, `useSessionInviteCode` makes it */
@@ -423,6 +438,19 @@ export type MyJoinRequest = {
   placement?: JoinRequestPlacement
 }
 
+/** Why a signed-in Player can't request a slot, and their level at the club ("Your level here is …"). */
+export type PlayerLevelBlock = { reason: string; level: PlayingLevel }
+
+/** A face in a queued match on the read-only Queue: first name, level ring band, picture. */
+export type PublicQueueFace = {
+  name: string
+  level: PlayingLevel | null
+  pictureUrl?: string | null
+  /** True when the name is masked (guest or unclaimed profile) */
+  masked?: boolean
+  participant?: number
+}
+
 /** Narrow Player-hosted projection; never a club session or operator data. */
 export type PlayerSessionAccess = {
   playerId: string
@@ -443,10 +471,24 @@ export type PlayerSessionAccess = {
    * sends a request and the Queue Master sets the level).
    */
   isClubMember: boolean
+  /**
+   * **Not open to your level** (D-2026-11-19-12): set while the Player holds no slot or waitlist
+   * place and their level at the club is outside the session's restriction, or their band's slots
+   * are full; the page then offers no request. Null or missing when they may request (a Player
+   * with no level at the club always may).
+   */
+  levelBlock?: PlayerLevelBlock | null
   /** The Player's latest request for this session (any status), or null */
   joinRequest: MyJoinRequest | null
+  /** Real mode: always true, a signed-in Player gets the whole roster (D-2026-11-25-05) */
   fullRoster: boolean
   participants: PublicSessionParticipant[]
+  /**
+   * Real mode: the waitlist by the same signed-in name rule as `participants`, in the public
+   * page's order (D-2026-11-25-05). Missing in mock mode and on a server from before it was sent;
+   * the page then keeps the public page's masked waitlist.
+   */
+  waitlist?: PublicSessionParticipant[]
   /** Real mode: the Hosts section by the same signed-in name rule as `participants` (#1006) */
   hosts?: PublicSessionParticipant[]
   /**
@@ -457,9 +499,14 @@ export type PlayerSessionAccess = {
   queue: {
     matchNo: number
     format: MatchFormat
-    /** participant: index in the signed-in read's participants (the face opens their card) */
-    teamA: { name: string; level: PlayingLevel | null; participant?: number }[]
-    teamB: { name: string; level: PlayingLevel | null; participant?: number }[]
+    /** The View match dialog's match name ("Mixed Doubles"); missing reads as the format's label */
+    label?: string
+    /**
+     * participant: index in the signed-in read's participants (the face opens their card).
+     * level: the ring's band (grey when null); pictureUrl: the face's picture; masked: the name is masked.
+     */
+    teamA: PublicQueueFace[]
+    teamB: PublicQueueFace[]
   }[]
 }
 

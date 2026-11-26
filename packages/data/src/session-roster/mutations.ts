@@ -1,7 +1,8 @@
 import { normalizeSocialLink } from '@rotra/schema/social-link'
 import { flushSessionBatches, flushSessionPresence } from '../batch/flushBatches'
 import { savedPlayerName, withClubNickname } from '../club-player/clubNickname.rules'
-import type { ClubPlayer } from '../club-player/clubPlayer.types'
+import type { ClubPlayer, Gender } from '../club-player/clubPlayer.types'
+import { clubPictureState } from '../club-player/clubPlayerPicture.rules'
 import { clubPlayerForProfile, createClubPlayer } from '../club-player/mutations'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { leaderboardLevels, leaderboardPlayers } from '../fixtures/players'
@@ -19,6 +20,7 @@ import { isRtrId, normalizeRtrId } from '../player/rtrId'
 import {
   accountByEmail,
   accountBySocialKey,
+  clubRecordsOf,
   isCurrentRecord,
   isUnclaimedPerson,
   savedDisplayName,
@@ -44,6 +46,8 @@ import {
   realSetAcceptJoinRequests,
   realSetAlwaysRequireRequest,
 } from '../real/session-live'
+import { type HandicapSpot, handicapSpotsOf, isHandicapSpot } from './handicap.rules'
+import { levelRestrictionBlockFor } from './levelRestriction.rules'
 import {
   inUnfinishedMatch,
   levelLabel,
@@ -90,7 +94,41 @@ export function settleRoster<T>(s: MockState, sessionId: string, result: T) {
  * is **Add anyway** (a slot beyond the budget), `toWaitlist` is **Add to waitlist**. Neither keeps
  * the old rule: before start a full roster waits.
  */
-export type RosterAddPlacement = { allowOverfill?: boolean; toWaitlist?: boolean }
+export type RosterAddPlacement = {
+  allowOverfill?: boolean
+  toWaitlist?: boolean
+  /**
+   * Level restrictions (D-2026-11-19-12): the Queue Master's second press, after the warning, adds
+   * a player outside the session's restriction (or into a full band). Without it the add is
+   * refused with the reason. Add to waitlist is never checked.
+   */
+  allowOutsideLevels?: boolean
+}
+/** A join request confirmed with the level the Queue Master chose; `allowOutsideLevels` as above. */
+export type ConfirmRequestInput = {
+  requestId: string
+  level: PlayingLevel
+  allowOutsideLevels?: boolean
+}
+/**
+ * Level restrictions on slots (D-2026-11-19-12) for the Queue Master's add and confirm: refused
+ * with the reason when the level is outside the session's restriction or its band is full, unless
+ * they pressed again (`allowOutsideLevels`). The waitlist isn't checked.
+ */
+export function requireLevelAllowed(
+  s: MockState,
+  sessionId: string,
+  level: PlayingLevel,
+  { toWaitlist, allowOutsideLevels }: Pick<RosterAddPlacement, 'toWaitlist' | 'allowOutsideLevels'>,
+) {
+  if (toWaitlist || allowOutsideLevels) return
+  const reason = levelRestrictionBlockFor(
+    sessionIn(s, sessionId).levelRestriction,
+    level,
+    s.roster.filter((r) => r.sessionId === sessionId).map((r) => r.level),
+  )
+  if (reason) fail(reason)
+}
 /**
  * Gives a club player a slot, or a waitlist place once a prepared session is full. `toWaitlist`
  * (a Be waitlisted request, D-2026-11-11-02, or Add to waitlist) always gives the waitlist place,
@@ -145,6 +183,7 @@ export function addSavedPlayerChange(s: MockState, input: AddSavedPlayerInput) {
   const p = s.clubPlayers.find((p) => p.id === input.clubPlayerId && p.clubId === DEMO_CLUB_ID)
   if (!p || (p.playerId && s.adminPlayerRecords[p.playerId]?.archivedAt))
     fail('Player not available.')
+  requireLevelAllowed(s, input.sessionId, input.level, input)
   const data = place(
       s,
       input.sessionId,
@@ -169,6 +208,47 @@ export async function addSavedPlayerToSession(input: AddSavedPlayerInput) {
   )
 }
 const NO_MATCH: PlayerLookup = { player: null, savedName: null }
+
+/**
+ * An unclaimed player as Player lookup shows them (D-2026-11-23-01): the name and picture of the
+ * club that saved them first. This club still enters its own name when it adds them.
+ */
+function unclaimedResult(s: MockState, player: { id: string; rtrId: string }): DirectoryPlayer {
+  const first = clubRecordsOf(s, player.id)[0]
+  const profile = s.playerProfiles.find((entry) => entry.playerId === player.id)
+  return {
+    id: player.id,
+    fullName: first?.fullName ?? profile?.fullName ?? '',
+    nickname: null,
+    rtrId: player.rtrId,
+    identity: 'unclaimed',
+    picture: first ? clubPictureState(first, profile?.picture ?? null).reference : null,
+    suggestion: null,
+    rankLabel: 'Not ranked',
+    ownNameRequired: true,
+  }
+}
+
+/** D-2026-11-23-01: unclaimed players whose name (any club's) contains the query, not saved here. */
+function unclaimedByName(s: MockState, query: string): DirectoryPlayer[] {
+  const q = query.trim().toLowerCase()
+  if (q.length < 2) return []
+  const mine = new Set(
+    s.clubPlayers
+      .filter((c) => c.clubId === DEMO_CLUB_ID && isCurrentRecord(c) && c.playerId)
+      .map((c) => c.playerId),
+  )
+  return s.players
+    .filter(
+      (p) =>
+        isUnclaimedPerson(s, p.id) &&
+        !mine.has(p.id) &&
+        !s.adminPlayerRecords[p.id]?.archivedAt &&
+        clubRecordsOf(s, p.id).some((r) => r.fullName.toLowerCase().includes(q)),
+    )
+    .slice(0, 20)
+    .map((p) => unclaimedResult(s, p))
+}
 
 /**
  * Player lookup (D-2026-11-16-04): the one ROTRA player, registered or unclaimed, whose RTR ID or
@@ -209,22 +289,10 @@ export async function lookupPlayer(q: string): Promise<PlayerLookup> {
       ? savedRecordBySocialKey(s, DEMO_CLUB_ID, link.key)
       : savedRecordByEmail(s, DEMO_CLUB_ID, query)
   if (saved) return { player: null, savedName: savedDisplayName(s, saved) }
-  if (!player || s.adminPlayerRecords[player.id]?.archivedAt) return NO_MATCH
+  if (!player) return { ...NO_MATCH, matches: unclaimedByName(s, query) }
+  if (s.adminPlayerRecords[player.id]?.archivedAt) return NO_MATCH
   if (isUnclaimedPerson(s, player.id))
-    return {
-      player: {
-        id: player.id,
-        fullName: '',
-        nickname: null,
-        rtrId: player.rtrId,
-        identity: 'unclaimed',
-        picture: null,
-        suggestion: null,
-        rankLabel: 'Not ranked',
-        ownNameRequired: true,
-      },
-      savedName: null,
-    }
+    return { player: unclaimedResult(s, player), savedName: null }
   const profile = s.playerProfiles.find((entry) => entry.playerId === player.id)
   if (!isListedInDirectory(profile)) return NO_MATCH
   const listed = leaderboardPlayers.findIndex((entry) => entry.id === player.id)
@@ -263,6 +331,7 @@ export type AddDirectoryPlayerInput = RosterAddPlacement & {
   level: PlayingLevel
 }
 export function addDirectoryPlayerChange(s: MockState, input: AddDirectoryPlayerInput) {
+  requireLevelAllowed(s, input.sessionId, input.level, input)
   const p = clubPlayerForProfile(s, input.playerId, undefined, 'added', input.name).player
   const data = place(
     s,
@@ -289,16 +358,21 @@ export type AddNewPlayerInput = RosterAddPlacement & {
   sessionId: string
   name: string
   nickname?: string
+  /** Optional gender (D-2026-11-19-01); missing = not given */
+  gender?: Gender | null
   /** No email adds a guest; an email adds an unclaimed player or links a ROTRA player */
   email?: string
   /** #1019: a social link is an entry key too, and wins over the email */
   socialLink?: string
   /** Optional, private to the club; kept for an unclaimed player only */
   phone?: string
+  /** The new saved player's id, chosen on the device (see `RosterBatchOperation`) */
+  clubPlayerId?: string
   level: PlayingLevel
 }
 export function addNewPlayerChange(s: MockState, input: AddNewPlayerInput) {
-  const { player: p, how } = createClubPlayer(s, input),
+  requireLevelAllowed(s, input.sessionId, input.level, input)
+  const { player: p, how } = createClubPlayer(s, { ...input, id: input.clubPlayerId }),
     data = place(
       s,
       input.sessionId,
@@ -364,7 +438,8 @@ export function removeRosterPlayer(input: { sessionId: string; rosterId: string 
 }
 export type StepDownInput = { sessionId: string; rosterId: string; operationId?: string }
 /**
- * Move to waitlist (#735): the admitted player goes to the **front** of the waitlist, before and
+ * Move to waitlist (#735): the admitted player goes to the **back** of the waitlist (strict first
+ * come, first served by waitlist time, D-2026-11-23-06), before and
  * after Start. Their level rides on the waitlist entry and their paid mark (kept per club player)
  * stays, so both come back with a slot. Refused while they are in any waiting, On court or Playing
  * match. The mock leaderboard is built from the roster, so a stepped-down player's finished games
@@ -381,15 +456,13 @@ export function stepDownChange(s: MockState, input: StepDownInput, blocked?: str
     )
   )
     throw new MockError('conflict', blocked ?? stepDownBlockedText(nameIn(s, p)))
-  const waiting = s.waitlist.filter((w) => w.sessionId === input.sessionId)
-  const front = Math.min(Date.now(), ...waiting.map((w) => w.addedAt)) - 1
   s.roster = s.roster.filter((r) => r.id !== p.id)
   s.waitlist.push({
     id: crypto.randomUUID(),
     sessionId: input.sessionId,
     clubPlayerId: p.clubPlayerId,
     level: p.level,
-    addedAt: front,
+    addedAt: Date.now(),
   })
   return { data: null, text: `${p.nameSnapshot} moved to the waitlist` }
 }
@@ -556,6 +629,42 @@ export function setGamesPlayed(input: SetGamesPlayedInput) {
     ),
   )
 }
+export type SetHandicapInput = {
+  sessionId: string
+  rosterId: string
+  /** Every marked spot (the whole set, not a change); empty clears the handicap */
+  spots: HandicapSpot[]
+  operationId?: string
+}
+/**
+ * Handicap · tonight (D-2026-11-25-03): saves the marked spots on one live roster entry, from the
+ * live Edit player sheet's Save changes. Live sessions only; an ordinary Roster write offline, like
+ * presence. Session done clears it.
+ */
+export function setHandicap(input: SetHandicapInput) {
+  return dispatch('roster.handicap', input, () =>
+    queueMutation(
+      {
+        area: 'Roster',
+        sessionId: input.sessionId,
+        operationId: input.operationId,
+        fingerprint: input.operationId
+          ? JSON.stringify([input.rosterId, handicapSpotsOf(input.spots)])
+          : undefined,
+      },
+      (s) => {
+        if (sessionIn(s, input.sessionId).state !== 'active') fail('Start the session first.')
+        if (!input.spots.every(isHandicapSpot)) fail('Choose spots on the figure.')
+        const p = row(s, input.rosterId, input.sessionId)
+        p.handicapSpots = handicapSpotsOf(input.spots)
+        return {
+          data: { rosterId: p.id, spots: p.handicapSpots },
+          text: `Handicap saved · ${nameIn(s, p)}`,
+        }
+      },
+    ),
+  )
+}
 export function setAllPresence(input: { sessionId: string; present: boolean }) {
   return dispatch('roster.presenceAll', input, () =>
     rosterMutation(input.sessionId, (s) => {
@@ -689,12 +798,13 @@ function pending(s: MockState, id: string) {
  * place. Nothing links a returning guest's request to an earlier record, so it makes a second one
  * (D-2026-11-16-04).
  */
-export function confirmJoinRequestChange(
-  s: MockState,
-  input: { requestId: string; level: PlayingLevel },
-) {
-  const request = pending(s, input.requestId),
-    { player: p } = createClubPlayer(s, {
+export function confirmJoinRequestChange(s: MockState, input: ConfirmRequestInput) {
+  const request = pending(s, input.requestId)
+  requireLevelAllowed(s, request.sessionId, input.level, {
+    toWaitlist: request.placement === 'waitlist',
+    allowOutsideLevels: input.allowOutsideLevels,
+  })
+  const { player: p } = createClubPlayer(s, {
       name: request.name,
       nickname: request.nickname ?? undefined,
     }),
@@ -714,7 +824,7 @@ export function confirmJoinRequestChange(
     text: `${p.fullName} confirmed from a join request · ${data.waitlistPosition ? `waitlist #${data.waitlistPosition}` : levelLabel(input.level)}`,
   }
 }
-export function confirmJoinRequest(input: { requestId: string; level: PlayingLevel }) {
+export function confirmJoinRequest(input: ConfirmRequestInput) {
   if (isRealDataMode()) return realConfirmJoinRequest(input)
   const r = pending(readMockState(), input.requestId)
   return rosterMutation(r.sessionId, (s) => confirmJoinRequestChange(s, input))

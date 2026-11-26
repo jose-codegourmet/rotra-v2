@@ -1,10 +1,14 @@
 import { withClubNickname } from '../club-player/clubNickname.rules'
+import { withGender } from '../club-player/gender.rules'
+import { getConnectivity } from '../connectivity/connectivity'
 import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, requireSessionWrite, sessionIn } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
 import { autoFillCourts, autoFillNote } from '../queue-session/courtFill'
+import { realClearQueue } from '../real/match'
 import { isRealDataMode } from '../real/mode'
+import { swappedPartnersText } from './liveMatch.rules'
 import {
   allPlayers,
   completeLineup,
@@ -17,7 +21,9 @@ import { balanceTeams, formatForSelection, generateMatches } from './queue.rules
 export function matchContext(s: MockState, sessionId: string) {
   return {
     // Rows carry the club nickname so every message names players as the Queue Master sees them.
-    roster: s.roster.filter((r) => r.sessionId === sessionId).map((r) => withClubNickname(s, r)),
+    roster: s.roster
+      .filter((r) => r.sessionId === sessionId)
+      .map((r) => withGender(s, withClubNickname(s, r))),
     matches: s.matches.filter((m) => m.sessionId === sessionId),
     courts: s.courts.filter((c) => c.sessionId === sessionId && !c.removedAt),
   }
@@ -272,8 +278,11 @@ export function removeWaitingMatch(input: { sessionId: string; matchId: string }
 }
 /** Remove every waiting match in one write, leaving court and finished matches untouched. */
 export function clearQueue(sessionId: string) {
-  if (isRealDataMode())
-    throw new MockError('permission', 'Clear queue is not available in real mode.')
+  if (isRealDataMode()) {
+    if (getConnectivity() === 'offline')
+      throw new MockError('offline', 'Clear queue needs an internet connection.')
+    return realClearQueue(sessionId)
+  }
   const snapshot = readMockState()
   requireSessionWrite(snapshot, sessionId)
   requireLive(snapshot, sessionId)
@@ -291,11 +300,23 @@ export function clearQueue(sessionId: string) {
 export const canClearQueue = (matches: Match[]) =>
   matches.some((match) => match.state === 'waiting')
 
+/**
+ * Two players on different teams trade places. Waiting and Getting ready: “switched sides”, and
+ * the match becomes manual and protected from regeneration. Playing (owner, November 19, 2026):
+ * “swapped partners”; no substitution is recorded, so the result follows the pairs as they are at
+ * Match done. On a court (Getting ready or Playing) real mode needs to be online.
+ */
 export function swapPlayers(input: { sessionId: string; matchId: string; a: string; b: string }) {
   return dispatch('queue.swapPlayers', input, () =>
     change(input.sessionId, (s) => {
-      const m = waiting(s, input.matchId, input.sessionId),
-        a = m.teamA.includes(input.a) ? input.a : input.b,
+      const m = s.matches.find((x) => x.id === input.matchId && x.sessionId === input.sessionId)
+      if (!m || m.decision || !['waiting', 'on_court', 'active'].includes(m.state))
+        throw new MockError('permission', 'Only a waiting match can be changed.')
+      // Offline in real mode this runs over the downloaded copy: only a waiting swap can be queued;
+      // a swap on a court goes to the server online (switch-sides, November 25, 2026).
+      if (m.state !== 'waiting' && isRealDataMode())
+        throw new MockError('offline', 'Swapping players on a court needs an internet connection.')
+      const a = m.teamA.includes(input.a) ? input.a : input.b,
         b = m.teamB.includes(input.b) ? input.b : input.a
       if (a === b || !m.teamA.includes(a) || !m.teamB.includes(b))
         throw new MockError('permission', 'Choose one player from each team.')
@@ -304,11 +325,14 @@ export function swapPlayers(input: { sessionId: string; matchId: string; a: stri
       if (!pa || !pb) throw new MockError('permission', 'Player not available.')
       m.teamA = m.teamA.map((id) => (id === a ? b : id))
       m.teamB = m.teamB.map((id) => (id === b ? a : id))
-      validate(s, input.sessionId, m, true)
-      m.origin = 'manual'
-      m.manualProtected = true
       const nameA = queueMasterName(withClubNickname(s, pa)),
         nameB = queueMasterName(withClubNickname(s, pb))
+      if (m.state === 'active')
+        return { data: null, text: swappedPartnersText(m.matchNo, nameA, nameB) }
+      // The same players, so the session's format switches are only rechecked for a waiting match.
+      if (m.state === 'waiting') validate(s, input.sessionId, m, true)
+      m.origin = 'manual'
+      m.manualProtected = true
       return {
         data: null,
         text: `Match ${m.matchNo}: ${nameA} and ${nameB} switched sides · protected from regeneration`,

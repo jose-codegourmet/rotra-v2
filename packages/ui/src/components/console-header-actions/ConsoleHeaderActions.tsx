@@ -17,10 +17,14 @@ export type ConsoleHeaderActionsProps = {
   onOpenPublicPage: () => void
   /** ⋯ More menu › Copy Facebook post */
   onCopyFacebookPost: () => void
-  /** ⋯ More menu › Session settings (the preparation page) */
-  onOpenSessionSettings: () => void
   /** ⋯ More menu › Home */
   onGoHome: () => void
+  /**
+   * ⋯ More menu › Back to preparation… (D-BACK-TO-PREP, owner November 25, 2026). `disabledReason`
+   * greys it out with the reason under the label ("Not available once a game has started.").
+   */
+  onBackToPreparation?: () => void
+  backToPreparationDisabledReason?: string | null
   className?: string
 }
 
@@ -28,7 +32,7 @@ export type ConsoleHeaderActionsProps = {
  * The live console header's controls (Q-CONSOLE), at the upper right of the title block and wrapping
  * under it on narrow screens: one compact cluster with **Match requests · N** (warn-coloured while any
  * is waiting), **Courts and time**, **Payments** and a ⋯ **More for this session** menu holding Public
- * page, Copy Facebook post, Session settings and Home. The menu closes on Escape and on a tap outside.
+ * page, Copy Facebook post, Home and Back to preparation… (the settings live in the Settings tab). The menu closes on Escape and on a tap outside.
  */
 export function ConsoleHeaderActions({
   matchRequestCount,
@@ -37,16 +41,25 @@ export function ConsoleHeaderActions({
   onOpenPayments,
   onOpenPublicPage,
   onCopyFacebookPost,
-  onOpenSessionSettings,
   onGoHome,
+  onBackToPreparation,
+  backToPreparationDisabledReason,
   className,
 }: ConsoleHeaderActionsProps) {
   const waiting = matchRequestCount > 0
   const more: OverflowMenuItem[] = [
     { label: 'Public page', icon: 'external', onSelect: onOpenPublicPage },
     { label: 'Copy Facebook post', icon: 'link', onSelect: onCopyFacebookPost },
-    { label: 'Session settings', icon: 'nav-gear', onSelect: onOpenSessionSettings },
     { label: 'Home', icon: 'back', onSelect: onGoHome },
+    ...(onBackToPreparation
+      ? [
+          {
+            label: 'Back to preparation…',
+            onSelect: onBackToPreparation,
+            disabledReason: backToPreparationDisabledReason ?? undefined,
+          },
+        ]
+      : []),
   ]
   return (
     <div className={cn('flex flex-none flex-wrap items-center justify-end gap-2', className)}>

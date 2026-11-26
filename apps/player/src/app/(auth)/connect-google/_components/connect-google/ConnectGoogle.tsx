@@ -66,7 +66,7 @@ function GoogleLink({ link }: { link: NonNullable<ReturnType<typeof selectPendin
             onSuccess: ({ session }) => {
               dispatch(setAccount(session.account))
               dispatch(setPendingLink(null))
-              router.replace(returnDestination(link.returnTo, `/players/${session.account.id}`))
+              router.replace(returnDestination(link.returnTo, '/home'))
               toast("Google connected. You're signed in.")
             },
             onError: (error) => toast.error(error.message),

@@ -133,6 +133,20 @@ typed wrapper that `@rotra/data` imports). Every other rule lives only in Go.
 a PR changing one updates its cases in the same PR, and the Go copy follows before the next Go merge.
 Details: [rule-cases track](../conductor/tracks/rule-cases_20261113/spec.md#shipping-a-rule-change-g13g16).
 
+**Written in TypeScript first, Go copy pending.** `expectedFinish` (courts and time; expected finish
+per scoring mode, [D-2026-11-23-08](mvp/decisions/2026-11-23.md#d-2026-11-23-08), #1067) is a new
+rule, not an edit of a live one. It lives in `@rotra/schema/scoring` with its cases in
+`packages/rule-cases/cases/v1/courts/expectedFinish.json`, run by the `@rotra/data` rule-case test.
+Its Go copy in `apps/api/internal/rules/courts`, the runner, the `.wasm` rebuild and the wrapper
+export follow before the next Go merge. Until then the Go tests and the WebAssembly wrapper test
+skip that one file through a named list (`GoCopyPending` in `apps/api/internal/rulecases`,
+`GO_COPY_PENDING` in `packages/rules-wasm/test/rulesWasm.test.ts`); the PR that adds the Go rule
+removes the key from both. `levelRestrictionBlock` (roster; session level restrictions,
+[D-2026-11-19-12](mvp/decisions/2026-11-19.md#d-2026-11-19-12), #1076) is pending the same way: it lives in
+`@rotra/data` (`session-roster/levelRestriction.rules.ts`) with its cases in
+`packages/rule-cases/cases/v1/roster/levelRestrictionBlock.json`. The Plan Ahead pool and ranking are a draft-generation strategy, not a
+shared rule: they live only in `@rotra/data` (`match/planAhead.rules.ts`).
+
 ---
 
 ## 4. Inside an app (Next.js 16 App Router)

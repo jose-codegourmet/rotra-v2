@@ -1,9 +1,11 @@
 import { consoleSessionFixture } from '@rotra/data/fixtures/consoleSessions'
+import { matchLineupFixtures } from '@rotra/data/fixtures/match-lineups'
 import type { Match } from '@rotra/data/match/types'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn, within } from 'storybook/test'
 import {
+  type ExemptionPlayer,
   type MatchRequestCandidate,
   type PlayerPickerCandidate,
   type PlayerPickerLineupProps,
@@ -58,6 +60,16 @@ const edited = matches[2]
 if (!edited) throw new Error('Console fixture missing match 3')
 const currentId = edited.teamA[1] ?? null
 const takenIds = [...edited.teamA, ...edited.teamB].filter((id) => id !== currentId)
+
+/** Every present roster player from the bagging fixture, with a few games each; one is away. */
+const exemptionPlayers: ExemptionPlayer[] = matchLineupFixtures.bagging.players.map((p, i) => ({
+  id: p.id,
+  name: p.name,
+  shortName: p.shortName,
+  level: p.level,
+  games: i % 5,
+  present: i % 7 !== 6,
+}))
 
 // The props are a union (lineup | matchRequest); the meta and its args cover the lineup picker,
 // and the match-request stories supply their own render.
@@ -187,6 +199,62 @@ export const MatchRequestPhone: Story = {
 export const MatchRequestDesktop: Story = {
   ...matchRequest(),
   globals: { viewport: { value: 'desktop' } },
+}
+
+// Exemption list mode: every roster player, the saved list opening first.
+type ExemptionArgs = Partial<Extract<PlayerPickerSheetProps, { variant: 'exemption' }>>
+const exemption = (args: ExemptionArgs = {}): Story => ({
+  render: () => (
+    <PlayerPickerSheet
+      variant="exemption"
+      open
+      onOpenChange={fn()}
+      players={exemptionPlayers}
+      exemptIds={[]}
+      onSave={fn()}
+      {...args}
+    />
+  ),
+})
+
+/** Exemption list, nobody picked: "0 exempt", Save list without a count */
+export const Exemption: Story = exemption()
+
+/** Several already exempt: they come first, accent border and check badge, "N exempt · Clear all" */
+export const ExemptionSeveral: Story = exemption({
+  exemptIds: exemptionPlayers.slice(3, 8).map((p) => p.id),
+})
+
+/** Search: only matching names stay */
+export const ExemptionSearch: Story = {
+  ...exemption(),
+  play: async ({ canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.type(await body.findByRole('searchbox', { name: 'Search players' }), 'zzz')
+  },
+}
+
+/** Level filter: Beginner */
+export const ExemptionBeginner: Story = {
+  ...exemption({ exemptIds: exemptionPlayers.slice(0, 2).map((p) => p.id) }),
+  play: async ({ canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.click(await body.findByRole('radio', { name: 'Beginner' }))
+  },
+}
+
+/** Clear all empties the picks; Cancel closes without saving */
+export const ExemptionClearAll: Story = {
+  ...exemption({ exemptIds: exemptionPlayers.slice(0, 4).map((p) => p.id) }),
+  play: async ({ canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.click(await body.findByRole('button', { name: 'Clear all' }))
+  },
+}
+
+export const ExemptionPhone: Story = {
+  ...exemption({ exemptIds: exemptionPlayers.slice(0, 3).map((p) => p.id) }),
+  globals: { viewport: { value: 'phone' } },
 }
 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

@@ -11,6 +11,8 @@
     "./money": "./src/money.ts",
     "./password": "./src/password.ts",
     "./name": "./src/name.ts",
+    "./gender": "./src/gender.ts",
+    "./getting-to-know": "./src/getting-to-know.ts",
     "./personal-details": "./src/personal-details.ts",
     "./social-link": "./src/social-link.ts",
     "./club-price": "./src/club-price.ts",
@@ -19,7 +21,9 @@
     "./court-label": "./src/court-label.ts",
     "./admin-player": "./src/admin-player.ts",
     "./rule-cases": "./src/rule-cases.ts",
-    "./scoring": "./src/scoring.ts"
+    "./scoring": "./src/scoring.ts",
+    "./queue-time": "./src/queue-time.ts",
+    "./level-restriction": "./src/level-restriction.ts"
   },
   "scripts": {
     "lint": "biome check .",

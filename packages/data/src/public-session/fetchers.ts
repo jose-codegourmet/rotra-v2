@@ -12,9 +12,10 @@ import {
   waitMinutes,
 } from '../match/match.rules'
 import type { Match } from '../match/match.types'
+import { matchLabel } from '../match/matchCategory.rules'
 import { allowedRequestFormats } from '../match-request/matchRequest.rules'
 import { requireOnline } from '../mock/bridge'
-import { MockError } from '../mock/errors'
+import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore } from '../mock/store'
 import { yearGameStats } from '../player/player.rules'
@@ -26,7 +27,11 @@ import {
 } from '../player/visibility'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { slotCapacity } from '../queue-session/queueSession.rules'
-import { recordsGames, sessionScoring } from '../queue-session/queueSession.types'
+import {
+  recordsGames,
+  sessionLevelRestriction,
+  sessionScoring,
+} from '../queue-session/queueSession.types'
 import { sessionRecordHistory } from '../queue-session/sessionRecord.rules'
 import { RealRequestError } from '../real/client'
 import { realGetMatchRequestOptions } from '../real/match-request'
@@ -52,6 +57,7 @@ import {
   maskPublicName,
   memberClubPlayer,
   myMatchLabel,
+  playerLevelBlock,
   playerSlot,
   publicFirstName,
   publicLevel,
@@ -123,9 +129,10 @@ function sessionBySlug(state: MockState, slug: string) {
 type Viewer = { playerId: string }
 
 /**
- * Only the published slides; Off Day only when that publication explicitly included it. Names and
- * pictures follow the page's masking rule (2026-11-13-queue-awards-faces-share), like every other
- * face on the page; award lines carry the winner's standing tonight.
+ * Only the published slides; Off Day only when that publication explicitly included it. Award and
+ * Off Day names and pictures follow the page's masking rule (2026-11-13-queue-awards-faces-share);
+ * award lines carry the winner's standing tonight. The standings are a leaderboard: full names and
+ * pictures for everyone (D-2026-11-25-04).
  */
 function publishedResults(
   state: MockState,
@@ -136,10 +143,8 @@ function publishedResults(
   const publication = state.publications[sessionId],
     saved = state.resultSnapshots[sessionId],
     // Shown with shared positions without gaps (owner, November 20, 2026); the saved rows never change.
-    snapshot = saved && { ...saved, standings: sharePositions(saved.standings) },
-    session = state.sessions.find((s) => s.id === sessionId)
-  // An unrecorded session has no results, whatever rows exist for it.
-  if (!publication || !snapshot || (session && !recordsGames(session))) return null
+    snapshot = saved && { ...saved, standings: sharePositions(saved.standings) }
+  if (!publication || !snapshot) return null
   const roster = state.roster
     .filter((r) => r.sessionId === sessionId)
     .sort((a, b) => a.confirmedAt - b.confirmedAt)
@@ -179,11 +184,17 @@ function publishedResults(
     standing: standingOf(row.sessionPlayerId),
   })
   const results: PublicSessionResults = {}
+  // The Leaderboard tab shows full names to everyone, guests and always-private players too
+  // (D-2026-11-25-04); awards and Off Day keep the page's masking rule.
+  const fullName = (sessionPlayerId: string, fallbackName: string) =>
+    roster.find((r) => r.id === sessionPlayerId)?.nameSnapshot ?? fallbackName
   if (publication.publishedSlides.includes('standings'))
     results.standings = snapshot.standings.map((r) => {
       const { isViewer: _viewer, ...person } = face(r.sessionPlayerId, r.clubPlayerId, r.name)
       return {
         ...person,
+        name: fullName(r.sessionPlayerId, r.name),
+        masked: false,
         position: r.position,
         wins: r.wins,
         losses: r.losses,
@@ -401,12 +412,20 @@ function projectQueue(
   session: MockState['sessions'][number],
   viewer: Viewer,
 ): PublicQueuedMatch[] {
+  // The match's name ("Mixed Doubles") reads each player's gender from their saved record.
+  const genders = state.roster
+    .filter((r) => r.sessionId === session.id)
+    .map((r) => ({
+      id: r.id,
+      gender: state.clubPlayers.find((c) => c.id === r.clubPlayerId)?.gender ?? null,
+    }))
   return waitingMatches(state, session.id).map((m, i) => ({
     matchNo: m.matchNo,
     position: i + 1,
     format: m.format,
     teamA: m.teamA.map((id) => matchPlayerOf(state, id, viewer)),
     teamB: m.teamB.map((id) => matchPlayerOf(state, id, viewer)),
+    label: matchLabel(m, genders),
   }))
 }
 
@@ -481,6 +500,7 @@ function project(
     formats: { singles: s.allowSingles, doubles: s.allowDoubles },
     mode: s.sessionMode,
     scoring: sessionScoring(s),
+    levelRestriction: sessionLevelRestriction(s),
     minimum: s.minimumGames,
     notes: s.notes || null,
     participantCount: roster.length,
@@ -524,9 +544,7 @@ function project(
     hasPendingChanges: sync.hasPendingChanges,
     recordGames: recordsGames(s),
     results: status === 'completed' ? publishedResults(state, s.id, viewer, viewerIds) : null,
-    ...(status === 'completed'
-      ? { resultsPublished: recordsGames(s) && state.publications[s.id] !== undefined }
-      : {}),
+    ...(status === 'completed' ? { resultsPublished: state.publications[s.id] !== undefined } : {}),
   }
 }
 
@@ -563,8 +581,13 @@ function sessionPageAccountOf(state: MockState, playerId: string): SessionPageAc
   }
 }
 
-/** The signed-in Player for the session page's account bar (#693). Mock only. */
+/**
+ * The signed-in Player for the session page's account bar (#693). Mock only: real mode reads the
+ * same fields from the Player app's access read (`usePlayerSessionAccess`), so this is never
+ * called there and says so instead of reading the mock store.
+ */
 export async function getSessionPageAccount(playerId: string): Promise<SessionPageAccount> {
+  if (isRealDataMode()) throw new NotConnectedError()
   await delay()
   const { state } = serverState()
   requireSignedInPlayer(state, playerId)
@@ -579,14 +602,18 @@ function requireSignedInPlayer(state: MockState, playerId: string) {
 /**
  * The signed-in version of the shared snapshot (D-2026-11-09-09): registered players' full name,
  * nickname and RTR ID, guests masked, no cap, the viewer's rows flagged `isViewer`, plus Courts
- * now and the Queue. Built from the last synced state like the visitor version. Mock only: real
- * mode has no route yet (NotConnectedError); the Player-hosted read stays `usePlayerSessionAccess`.
+ * now and the Queue. Built from the last synced state like the visitor version. Mock only, on
+ * purpose: the Queue app holds no Player session in real mode, so the signed-in view there is the
+ * Player app's own credentialed reads (`usePlayerSessionAccess` for names, the roster, Hosts,
+ * Courts now and the Queue; `useMyNight`; `usePublicMatchHistory`) laid over the visitor page.
+ * Real mode refuses with NotConnectedError instead of reading the mock store.
  * Works offline (owner, 2026-11-10): it shows the last-loaded data, like the operator's reads.
  */
 export async function getSignedInSession(
   slug: string,
   playerId: string,
 ): Promise<SignedInPublicSession> {
+  if (isRealDataMode()) throw new NotConnectedError()
   await delay()
   const { state, ...sync } = serverState()
   requireSignedInPlayer(state, playerId)
@@ -604,23 +631,22 @@ export async function getSignedInSession(
 /**
  * A finished session's Match history (2026-11-13 finished session and match history courts logs):
  * every finished or invalid match, newest first, with the replay bounds. Until the club shares the
- * results, only the viewer's own matches (the same rule as their own standing only). An unrecorded
- * session has no match history: no matches, `total` 0 and never `shared`.
+ * results, only the viewer's own matches (the same rule as their own standing only). A session with
+ * Record games off has its match history as usual.
  */
 function projectHistory(
   state: MockState,
   session: MockState['sessions'][number],
   viewer: Viewer,
 ): PublicMatchHistory {
-  const recorded = recordsGames(session)
-  const matches = recorded ? state.matches.filter((m) => m.sessionId === session.id) : []
+  const matches = state.matches.filter((m) => m.sessionId === session.id)
   const record = sessionRecordHistory({
     fallbackStart: session.startedAt ?? session.scheduledStartAt,
     courts: state.courts.filter((c) => c.sessionId === session.id),
     roster: state.roster.filter((r) => r.sessionId === session.id),
     matches,
   })
-  const shared = recorded && state.publications[session.id] !== undefined
+  const shared = state.publications[session.id] !== undefined
   const all = record.matches
     .map((m) => ({
       id: m.id,
@@ -800,6 +826,11 @@ export async function getMyNight(slug: string, playerId: string): Promise<MyNigh
         }
       : null,
     isClubMember: !!memberClubPlayer(state, session.clubId, playerId),
+    // D-2026-11-19-12: Not open to your level, while they hold no slot or waitlist place.
+    levelBlock:
+      slot.roster || slot.waitlist || session.state !== 'prepared'
+        ? null
+        : playerLevelBlock(state, session, playerId),
     canInvite:
       session.state === 'prepared' && session.acceptJoinRequests && (!!row || !!slot.waitlist),
     inviteCode:
@@ -990,6 +1021,11 @@ export function mockPlayerSessionAccess(slug: string, playerId: string): PlayerS
     ...sessionPageAccountOf(state, playerId),
     inSession: !!slot.roster || !!slot.waitlist,
     isClubMember: !!memberClubPlayer(state, session.clubId, playerId),
+    // D-2026-11-19-12: Not open to your level, while they hold no slot or waitlist place.
+    levelBlock:
+      slot.roster || slot.waitlist || session.state !== 'prepared'
+        ? null
+        : playerLevelBlock(state, session, playerId),
     waitlistPosition: slot.waitlist
       ? waitlist.findIndex((w) => w.id === slot.waitlist?.id) + 1 || null
       : null,

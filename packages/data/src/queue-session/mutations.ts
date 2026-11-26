@@ -1,4 +1,5 @@
 import { courtWindowError } from '@rotra/schema/court-window'
+import { levelRestrictionOf, levelSlotsError } from '@rotra/schema/level-restriction'
 import { scoringOf } from '@rotra/schema/scoring'
 import { DEMO_CLUB_ID } from '../fixtures/clubs'
 import { checkMockSave, getMockDevState, requireOnline } from '../mock/bridge'
@@ -12,6 +13,7 @@ import { realDownloadSession } from '../real/device'
 import { isRealDataMode } from '../real/mode'
 import { realCreateQueueSession } from '../real/queue'
 import {
+  realBackToPreparation,
   realCancelSession,
   realDeleteSession,
   realStartSession,
@@ -26,6 +28,8 @@ import { closePendingSlotTransfers } from '../slot-transfer/closeSlotTransfers'
 import { saveToastText } from '../sync/fetchers'
 import {
   atWhenLabel,
+  backToPreparationBlocker,
+  backToPreparationToast,
   cancelBlocker,
   cancelReasonError,
   cancelReasonOf,
@@ -115,6 +119,11 @@ function validate(state: MockState, input: QueueSessionInput) {
     8
   if (!Number.isInteger(budget) || budget < 2 || budget > 20)
     throw new MockError('permission', 'Players per court must be between 2 and 20.')
+  // Restrictions (D-2026-11-19-12): slots per level add up to the session's slots before saving.
+  if (input.levelRestriction) {
+    const error = levelSlotsError(input.levelRestriction, input.courts.length, budget)
+    if (error) throw new MockError('permission', error)
+  }
   return { venue, budget }
 }
 export function createQueueSession(input: QueueSessionInput) {
@@ -168,15 +177,18 @@ export function createQueueSession(input: QueueSessionInput) {
         requestFormats: input.requestFormats ?? prototypeDefaultRequestFormats(input),
         recordGames: input.recordGames ?? true,
         scoring: scoringOf(input.scoring),
+        // Every date of a series gets the same restriction; left out is All levels.
+        levelRestriction: levelRestrictionOf(input.levelRestriction),
       }
       state.sessions.push(s)
       const cost = normalizeSessionCost(input.costEstimate)
       if (cost) state.costEstimates[id] = { ...cost, sessionId: id, currency: 'PHP' }
       state.courts.push(
-        ...input.courts.map((c) => ({
+        ...input.courts.map((c, i) => ({
           id: crypto.randomUUID(),
           sessionId: id,
           label: c.label.trim(),
+          position: i + 1,
           startsAt: date.start + ((c.startsAt ?? input.scheduledStartAt) - input.scheduledStartAt),
           openUntil:
             c.openUntil == null ? null : date.start + (c.openUntil - input.scheduledStartAt),
@@ -247,13 +259,19 @@ export function updateQueueSession({
         ...(values.recordGames === undefined ? {} : { recordGames: values.recordGames }),
         // Scoring too (Q22): missing keeps the stored mode; an unknown value reads as 16/31.
         ...(values.scoring === undefined ? {} : { scoring: scoringOf(values.scoring) }),
+        // Restrictions (D-2026-11-19-12): missing keeps the stored pick.
+        ...(values.levelRestriction === undefined
+          ? {}
+          : { levelRestriction: levelRestrictionOf(values.levelRestriction) }),
       })
       state.courts = state.courts.filter((c) => c.sessionId !== sessionId)
       state.courts.push(
-        ...values.courts.map((c) => ({
+        ...values.courts.map((c, i) => ({
           id: crypto.randomUUID(),
           sessionId,
           label: c.label.trim(),
+          // The form's list order is the court order.
+          position: i + 1,
           startsAt: c.startsAt ?? date.start,
           openUntil: c.openUntil ?? null,
           removedAt: null,
@@ -265,11 +283,8 @@ export function updateQueueSession({
         state.waitlist.filter((w) => w.sessionId === sessionId && w.level),
         slotCapacity(values.courts.length, budget),
       )
-      const earliest =
-        Math.min(
-          Date.now(),
-          ...state.waitlist.filter((w) => w.sessionId === sessionId).map((w) => w.addedAt),
-        ) - b.movedOut.length
+      // Moved-out players join the back of the waitlist in slot order (D-2026-11-23-06).
+      const movedAt = Date.now()
       state.roster = state.roster.filter((p) => !b.movedOut.some((m) => m.id === p.id))
       state.waitlist.push(
         ...b.movedOut.map((p, i) => ({
@@ -277,7 +292,7 @@ export function updateQueueSession({
           sessionId,
           clubPlayerId: p.clubPlayerId,
           level: p.level,
-          addedAt: earliest + i,
+          addedAt: movedAt + i,
         })),
       )
       for (const w of b.movedIn) promoteWaiter(state, w)
@@ -363,6 +378,8 @@ export function startSession(input: string | { sessionId: string; newEndAt?: num
     if (reason) throw new MockError('permission', reason)
     // The minimum freezes from the planned window, before a late start moves the end.
     recomputeMinimum(state, sessionId)
+    // Back to preparation puts the planned window back (owner, November 25, 2026).
+    s.plannedBeforeStart = { startAt: s.scheduledStartAt, endAt: s.scheduledEndAt }
     const courts = state.courts.filter((c) => c.sessionId === sessionId)
     for (const court of courts) {
       if (court.startsAt === undefined || court.startsAt === s.scheduledStartAt)
@@ -372,6 +389,8 @@ export function startSession(input: string | { sessionId: string; newEndAt?: num
       const conflict = sessionEndCourtConflict(courts, newEndAt, now, now)
       if (conflict) throw new MockError('permission', conflict)
       s.scheduledEndAt = newEndAt
+      // Started on an earlier day than planned (owner, November 25, 2026): the start moves to now.
+      if (s.scheduledStartAt > now) s.scheduledStartAt = now
     }
     s.state = 'active'
     s.startedAt = now
@@ -392,6 +411,52 @@ export function startSession(input: string | { sessionId: string; newEndAt?: num
       data: s,
       text: `Session started · levels locked${late ? ` · ends ${atWhenLabel(s.scheduledEndAt, now)}` : ''}${joinRequestsClosedNote(closed)}`,
     }
+  })
+}
+/**
+ * Back to preparation (owner, November 25, 2026): undoes Start while no game has started. Waiting
+ * and On court matches are removed, open match requests close, the start time clears, the planned
+ * window goes back to what it was at Start, courts that followed the start follow it again, early
+ * opens clear and every level unlocks. Join requests closed at Start stay closed.
+ */
+export function backToPreparation(sessionId: string) {
+  if (isRealDataMode()) return realBackToPreparation(sessionId)
+  return queueMutation({ area: 'Session', onlineOnly: true }, (state) => {
+    const s = sessionIn(state, sessionId)
+    if (s.state !== 'active')
+      throw new MockError('permission', 'Only a live session can go back to preparation.')
+    const matches = state.matches.filter((m) => m.sessionId === sessionId)
+    const reason = backToPreparationBlocker(matches, true)
+    if (reason) throw new MockError('conflict', reason)
+    const now = Date.now()
+    const startedAt = s.startedAt
+    state.matches = state.matches.filter((m) => m.sessionId !== sessionId)
+    for (const m of state.matchRequests)
+      if (m.sessionId === sessionId && m.status === 'open') {
+        m.status = 'closed'
+        m.decidedAt = now
+      }
+    for (const d of state.dropOutNotices)
+      if (d.sessionId === sessionId && d.status === 'open') {
+        d.status = 'closed'
+        d.closedAt = now
+      }
+    if (s.plannedBeforeStart) {
+      s.scheduledStartAt = s.plannedBeforeStart.startAt
+      s.scheduledEndAt = s.plannedBeforeStart.endAt
+    }
+    s.plannedBeforeStart = null
+    s.state = 'prepared'
+    s.startedAt = null
+    for (const court of state.courts)
+      if (court.sessionId === sessionId) {
+        // Start set the courts that followed the session start to the start time.
+        if (startedAt != null && court.startsAt === startedAt) court.startsAt = undefined
+        court.openedEarlyAt = null
+      }
+    for (const p of state.roster) if (p.sessionId === sessionId) p.levelLockedAt = null
+    recomputeMinimum(state, sessionId)
+    return { data: s, text: backToPreparationToast(matches.length) }
   })
 }
 /** Deletes a prepared session that nobody holds a slot in; confirmed players block it. */

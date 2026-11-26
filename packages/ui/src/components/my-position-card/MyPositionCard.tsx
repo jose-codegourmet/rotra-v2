@@ -17,9 +17,11 @@ export type MyPositionCardProps = {
   period?: LeaderboardPeriod
   wins?: number
   previousPosition?: number | null
-  /** Wins of the player in place 50, used when the viewer is below the top 50. */
+  /** The viewer shares this place with others: adds " · shared place" */
+  shared?: boolean
+  /** Wins of the last player in the top 50, used when the viewer is below the top 50. */
   cutoffWins?: number
-  /** Whether place 50 has a higher win rate when the wins are tied. */
+  /** Whether the last player in the top 50 has a higher win rate when the wins are tied. */
   cutoffHasBetterWinRate?: boolean
   status?: {
     label: string
@@ -40,6 +42,7 @@ export function MyPositionCard({
   period,
   wins,
   previousPosition,
+  shared = false,
   cutoffWins,
   cutoffHasBetterWinRate,
   status,
@@ -71,6 +74,7 @@ export function MyPositionCard({
             <p className="text-[13px] text-fg2">Your position{when ? ` ${when}` : ''}</p>
             <p>
               <b className="font-mono text-xl">#{position.toLocaleString('en-PH')}</b> · {detail}
+              {shared ? ' · shared place' : ''}
             </p>
             {movement ? <p className="text-[13px] text-fg2">{movement.sentence}</p> : null}
           </div>
@@ -88,7 +92,7 @@ export function MyPositionCard({
         <div>
           <h3>You&apos;re not in the top 50 {when}</h3>
           <p className="text-[13px] text-fg2">
-            {leaderboardWinsLabel(wins)} {when}. The player in place 50 has{' '}
+            {leaderboardWinsLabel(wins)} {when}. The last player in the top 50 has{' '}
             {cutoffWins.toLocaleString('en-PH')}
             {wins === cutoffWins && cutoffHasBetterWinRate ? ' and a better win rate' : ''}.
           </p>

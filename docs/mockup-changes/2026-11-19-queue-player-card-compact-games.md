@@ -1,6 +1,6 @@
 # Queue app: the live player card's game counts become one compact strip, Current | Total
 
-Status: NEW
+Status: IN MOCK APP — #1048
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console › Players card (`playersPane()`, CSS `.pc3-games`)

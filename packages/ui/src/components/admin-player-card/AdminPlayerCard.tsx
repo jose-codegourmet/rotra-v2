@@ -105,7 +105,7 @@ export function AdminPlayerCard({
           <p className="text-xs text-fg2">Not registered yet</p>
         )}
         <div className={grid ? 'flex flex-wrap justify-center gap-1.5' : 'flex flex-wrap gap-1.5'}>
-          <PlayerAccountChip claimed={p.claimed} />
+          <PlayerAccountChip claimed={p.claimed} verification={p.verification} />
           {detailsRequired && !p.claimed ? (
             <IdentityChip identity="unclaimed" detailsRequired />
           ) : null}

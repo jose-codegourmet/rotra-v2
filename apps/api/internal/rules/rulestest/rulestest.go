@@ -70,6 +70,9 @@ func inspect(root string, version int, area string, runners map[string]rules.Run
 		}
 		rule := strings.TrimSuffix(e.Name(), ".json")
 		key := area + "/" + rule
+		if rulecases.GoCopyPending[key] {
+			continue // TypeScript first; the Go copy follows
+		}
 		haveFile[key] = true
 		f, loadErr := rulecases.Load(root, area, rule)
 		if loadErr != nil {

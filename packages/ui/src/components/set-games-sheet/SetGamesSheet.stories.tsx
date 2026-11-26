@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from 'storybook/test'
+import { fn, within } from 'storybook/test'
 import { SetGamesSheet } from './SetGamesSheet'
 
 const meta = {
@@ -19,6 +19,16 @@ type Story = StoryObj<typeof meta>
 export const OnePlayer: Story = {}
 export const EveryPlayer: Story = {
   args: { target: { kind: 'all', count: 14, median: 2 } },
+}
+/** One game more: the To side turns accent and reads "+1 game" */
+export const Changed: Story = {
+  play: async ({ canvasElement, userEvent }) => {
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.click(await body.findByRole('button', { name: 'One game more' }))
+  },
+}
+export const EveryPlayerRange: Story = {
+  args: { target: { kind: 'all', count: 14, median: 3, range: { min: 2, max: 4 } } },
 }
 export const AtZero: Story = {
   args: { target: { kind: 'one', name: 'Migs Alcantara', current: 0 } },

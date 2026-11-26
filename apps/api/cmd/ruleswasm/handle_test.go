@@ -137,7 +137,14 @@ func TestEveryCaseThroughTheEnvelope(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	files, err := filepath.Glob(filepath.Join(root, "packages", "rule-cases", "cases", "v1", "*", "*.json"))
+	onDisk, err := filepath.Glob(filepath.Join(root, "packages", "rule-cases", "cases", "v1", "*", "*.json"))
+	var files []string
+	for _, path := range onDisk {
+		key := filepath.Base(filepath.Dir(path)) + "/" + strings.TrimSuffix(filepath.Base(path), ".json")
+		if !rulecases.GoCopyPending[key] { // TypeScript first; the Go copy follows
+			files = append(files, path)
+		}
+	}
 	if err != nil || len(files) != 40 {
 		t.Fatalf("%d case files, %v", len(files), err)
 	}
@@ -162,8 +169,8 @@ func TestEveryCaseThroughTheEnvelope(t *testing.T) {
 			}
 		}
 	}
-	if total != 308 {
-		t.Errorf("%d cases, want 308", total)
+	if total != 309 {
+		t.Errorf("%d cases, want 309", total)
 	}
 }
 

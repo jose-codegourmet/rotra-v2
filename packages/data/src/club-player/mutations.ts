@@ -6,12 +6,17 @@ import { MockError } from '../mock/errors'
 import type { MockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
-import { isUnclaimedPerson, savedDisplayName, savedRecordByEmail } from '../player/unclaimed'
+import {
+  clubRecordsOf,
+  isUnclaimedPerson,
+  savedDisplayName,
+  savedRecordByEmail,
+} from '../player/unclaimed'
 import { isRealDataMode } from '../real/mode'
 import { realAddDirectoryPlayerToClub, realAddNewSavedPlayer } from '../real/queue'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 import { savedPlayerName } from './clubNickname.rules'
-import type { ClubPlayer, JoinedVia } from './clubPlayer.types'
+import type { ClubPlayer, Gender, JoinedVia } from './clubPlayer.types'
 import { applyClubEmail, emailAlreadySaved, planClubEmail } from './email'
 import { applyClubSocial, planClubSocial, savedRecordForSocial } from './socialLink'
 
@@ -30,6 +35,8 @@ export const OWN_NAME_ERROR = 'Enter a name.'
 export type NewClubPlayerInput = {
   name: string
   nickname?: string | null
+  /** Optional gender (D-2026-11-19-01); null or missing = not given */
+  gender?: Gender | null
   /** No email saves a guest (D-2026-11-16-04) */
   email?: string | null
   /**
@@ -39,6 +46,8 @@ export type NewClubPlayerInput = {
   phone?: string | null
   /** #1019: a Facebook, Instagram, YouTube or LinkedIn link is an entry key too; it wins over the email */
   socialLink?: string | null
+  /** An id chosen on the device (session Add player), so the picture can follow; else a new one */
+  id?: string
 }
 
 const PHONE_ERROR = 'Enter a Philippine mobile number, like 0917 555 0142, or leave it empty.'
@@ -98,11 +107,12 @@ export function createClubPlayer(
     }
   }
   const player: ClubPlayer = {
-    id: crypto.randomUUID(),
+    id: input.id ?? crypto.randomUUID(),
     clubId: DEMO_CLUB_ID,
     playerId: null,
     fullName: input.name.trim(),
     nickname: input.nickname?.trim() || null,
+    gender: input.gender ?? null,
     identity: 'guest',
     playingLevel,
     addedAt: Date.now(),
@@ -163,6 +173,9 @@ export function clubPlayerForProfile(
     addedAt: Date.now(),
     joinedVia,
   }
+  // D-2026-11-23-01: an unclaimed person keeps the picture lookup showed (the first club's record).
+  const firstPicture = unclaimed ? clubRecordsOf(s, profile.id)[0]?.picture : undefined
+  if (firstPicture) player.picture = { ...firstPicture }
   s.clubPlayers.push(player)
   return { player, created: true }
 }
@@ -183,7 +196,7 @@ function savedLevel(level: PlayingLevel | null | undefined) {
  * never merged.
  */
 export function addNewSavedPlayer(input: NewClubPlayerInput & { level?: PlayingLevel | null }) {
-  // Real data: a level is only recorded with a session, so the player is saved without one.
+  // Real data: the level is the saved level (`club_players.saved_skill_level_id`).
   if (isRealDataMode()) return realAddNewSavedPlayer(input)
   return queueMutation({ area: 'Roster', clubAccess: true }, (s) => {
     const level = savedLevel(input.level)

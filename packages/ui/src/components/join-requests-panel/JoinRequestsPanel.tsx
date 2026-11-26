@@ -71,8 +71,17 @@ export type JoinRequestsPanelProps = {
   loading?: boolean
   isPending?: boolean
   serverError?: string
-  /** Confirm with the level the Queue Master chose for this club */
-  onConfirm: (requestId: string, level: PlayingLevel) => void
+  /**
+   * Confirm with the level the Queue Master chose for this club. `allowOutsideLevels` is true on the
+   * second press after the level restriction warning (D-2026-11-19-12).
+   */
+  onConfirm: (requestId: string, level: PlayingLevel, allowOutsideLevels?: boolean) => void
+  /**
+   * The level restriction check (D-2026-11-19-12): why this request can't take a slot at this
+   * level (outside the session's restriction, or the band is full), or null. The first Confirm shows
+   * the reason with "Press Confirm again to add NAME anyway."; the second sends it.
+   */
+  levelBlock?: (request: SessionJoinRequest, level: PlayingLevel) => string | null
   onDecline: (requestId: string) => void
   className?: string
 }
@@ -115,12 +124,15 @@ export function JoinRequestsPanel({
   isPending = false,
   serverError,
   onConfirm,
+  levelBlock,
   onDecline,
   className,
 }: JoinRequestsPanelProps) {
   const id = useId()
   const [levels, setLevels] = useState<Record<string, PlayingLevel | null>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
+  /** Requests whose level warning was shown: the next Confirm adds anyway */
+  const [warned, setWarned] = useState<Record<string, boolean>>({})
 
   const pending = requests
     .filter((r) => r.status === 'pending')
@@ -134,6 +146,7 @@ export function JoinRequestsPanel({
   const setLevel = (requestId: string, level: PlayingLevel) => {
     setLevels((prev) => ({ ...prev, [requestId]: level }))
     setErrors(({ [requestId]: _, ...rest }) => rest)
+    setWarned(({ [requestId]: _, ...rest }) => rest)
   }
 
   const confirm = (r: SessionJoinRequest) => {
@@ -143,7 +156,16 @@ export function JoinRequestsPanel({
       setErrors((prev) => ({ ...prev, [r.id]: LEVEL_ERROR }))
       return
     }
-    onConfirm(r.id, level)
+    const blocked = levelBlock?.(r, level) ?? null
+    if (blocked && !warned[r.id]) {
+      setWarned((prev) => ({ ...prev, [r.id]: true }))
+      setErrors((prev) => ({
+        ...prev,
+        [r.id]: `${blocked} Press Confirm again to add ${r.name} anyway.`,
+      }))
+      return
+    }
+    onConfirm(r.id, level, blocked ? true : undefined)
   }
 
   const inSheet = variant === 'sheet'

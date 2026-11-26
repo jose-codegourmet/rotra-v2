@@ -22,6 +22,8 @@ import { useReplacePlayer } from '@rotra/data/match/useReplacePlayer'
 import { useSendBackToQueue } from '@rotra/data/match/useSendBackToQueue'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useStartMatch } from '@rotra/data/match/useStartMatch'
+import { useSwapFromMatch } from '@rotra/data/match/useSwapFromMatch'
+import { useSwapPlayers } from '@rotra/data/match/useSwapPlayers'
 import { useSwapWithQueue } from '@rotra/data/match/useSwapWithQueue'
 import { MockError } from '@rotra/data/mock/errors'
 import type { QueueSession } from '@rotra/data/queue-session/types'
@@ -35,6 +37,7 @@ import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { ReplacePlayerSheet } from '@rotra/ui/replace-player-sheet'
 import { SwapMatchSheet } from '@rotra/ui/swap-match-sheet'
 import { pickerPlayer, type SwapPickerPlayer } from '@rotra/ui/swap-picker-sheet'
+import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
 import { useEffect, useRef, useState } from 'react'
@@ -51,6 +54,12 @@ export type OnCourtProps = {
    * back action reads Cancel and closes everything instead of returning to the On court sheet.
    */
   swapFirst?: boolean
+  /**
+   * Open straight on Move match N (the court card's ⋯ menu "Move to another court" or a drawing
+   * dropped on a court: a two-court match arrives with that court preselected). Its back action
+   * closes everything instead of returning to the On court sheet.
+   */
+  moveFirst?: { courtId?: string } | null
   onClose: () => void
 }
 
@@ -77,10 +86,21 @@ const isRecheckFailure = (error: unknown) => error instanceof MockError && error
  * match) on useSwapWithQueue, which rechecks that the same match is still next; success toasts
  * "Match M swapped onto Court X · getting ready · Match N back to #P in the queue" and closes.
  * The court card's ⋯ menu opens the same swap sheet directly (`swapFirst`, Cancel).
- * Player cards open PlayerProfile with Back to match. The sheet closes by itself once the match is
+ * Q25 (mock mode): a card opens Replace player, a picture the profile; dragging a player onto one on
+ * the other team switches sides (useSwapPlayers); Replace player's Swap players row trades the player
+ * with an opponent (useSwapFromMatch); `moveFirst` opens Move match directly (a dropped court arrives
+ * preselected, Back closes everything).
+ * Player pictures open PlayerProfile with Back to match. The sheet closes by itself once the match is
  * no longer On court (started, sent back, swapped out or changed elsewhere).
  */
-export function OnCourt({ sessionId, now, matchId, swapFirst = false, onClose }: OnCourtProps) {
+export function OnCourt({
+  sessionId,
+  now,
+  matchId,
+  swapFirst = false,
+  moveFirst = null,
+  onClose,
+}: OnCourtProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
@@ -115,6 +135,7 @@ export function OnCourt({ sessionId, now, matchId, swapFirst = false, onClose }:
       match={match}
       ctx={ctx}
       swapFirst={swapFirst}
+      moveFirst={moveFirst}
       onClose={onClose}
       onRefresh={refresh}
     />
@@ -126,6 +147,7 @@ type OpenOnCourtProps = {
   match: Match
   ctx: MatchContext
   swapFirst: boolean
+  moveFirst: { courtId?: string } | null
   onClose: () => void
   onRefresh: () => void
 }
@@ -140,16 +162,28 @@ type Callbacks = {
   onSettled: () => void
 }
 
-function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: OpenOnCourtProps) {
+function OpenOnCourt({
+  session,
+  match,
+  ctx,
+  swapFirst,
+  moveFirst,
+  onClose,
+  onRefresh,
+}: OpenOnCourtProps) {
   const startMatch = useStartMatch()
   const sendBack = useSendBackToQueue()
   const moveCourt = useMoveCourt()
   const replacePlayer = useReplacePlayer()
   const swapWithQueue = useSwapWithQueue()
-  const [view, setView] = useState<View>(swapFirst ? 'swap' : 'match')
-  const [moveIds, setMoveIds] = useState<string[]>([])
+  const swapPlayers = useSwapPlayers()
+  const swapFromMatch = useSwapFromMatch()
+  const [view, setView] = useState<View>(swapFirst ? 'swap' : moveFirst ? 'move' : 'match')
+  const [moveIds, setMoveIds] = useState<string[]>(moveFirst?.courtId ? [moveFirst.courtId] : [])
   const [outId, setOutId] = useState<string | null>(null)
   const [inId, setInId] = useState<string | null>(null)
+  /** The opponent picked under Swap from match */
+  const [swapId, setSwapId] = useState<string | null>(null)
   const [message, setMessage] = useState<string | undefined>()
   const [error, setError] = useState<string | undefined>()
   const [profileId, setProfileId] = useState<string | null>(null)
@@ -204,7 +238,7 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
   }
   /** Back / dismiss on a sheet the On court sheet opened (a menu-opened swap closes everything) */
   const backToMatch = () => {
-    if (swapFirst && shown === 'swap') onClose()
+    if ((swapFirst && shown === 'swap') || (moveFirst && shown === 'move')) onClose()
     else go('match')
   }
 
@@ -271,7 +305,8 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
         ),
       () => {
         setMoveIds([])
-        go('match')
+        if (moveFirst) onClose()
+        else go('match')
       },
     )
   }
@@ -289,8 +324,41 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
       () => {
         setOutId(null)
         setInId(null)
+        setSwapId(null)
         go('match')
       },
+    )
+  }
+
+  /** Swap players (Replace player sheet): the player coming out trades places with an opponent */
+  const onSwapFromMatch = (out: string, opponentId: string) => {
+    const key = `swap-from-match:${out}:${opponentId}`
+    run(
+      key,
+      (callbacks) =>
+        swapFromMatch.mutate(
+          { matchId: match.id, outId: out, inId: opponentId, operationId: operationId(key) },
+          callbacks,
+        ),
+      () => {
+        setOutId(null)
+        setInId(null)
+        setSwapId(null)
+        go('match')
+      },
+    )
+  }
+
+  /** Dragging a player onto someone on the other team switches their sides (protected from regeneration) */
+  const onSwapSides = (from: SwapSlot, to: SwapSlot) => {
+    const a = (from.team === 'A' ? match.teamA : match.teamB)[from.index]
+    const b = (to.team === 'A' ? match.teamA : match.teamB)[to.index]
+    if (!a || !b || from.team === to.team) return
+    run(
+      `swap-sides:${a}:${b}`,
+      (callbacks) =>
+        swapPlayers.mutate({ sessionId: match.sessionId, matchId: match.id, a, b }, callbacks),
+      () => {},
     )
   }
 
@@ -391,12 +459,17 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
           }
           canMoveCourt={free.length >= courtsNeeded(match)}
           onSelectPlayer={openProfile}
-          // Switching sides on an On court match has no command yet (swapPlayers takes waiting
-          // matches only), so dragging does nothing until one exists.
-          onSwap={() => {}}
+          onReplace={(playerId) => {
+            setOutId(playerId)
+            setInId(null)
+            setSwapId(null)
+            go('replace')
+          }}
+          onSwap={onSwapSides}
           onReplacePlayer={() => {
             setOutId(null)
             setInId(null)
+            setSwapId(null)
             go('replace')
           }}
           onMoveCourt={() => {
@@ -434,11 +507,23 @@ function OpenOnCourt({ session, match, ctx, swapFirst, onClose, onRefresh }: Ope
           minimumGames={session.minimumGames}
           outId={outId}
           inId={inId}
-          onPickOut={setOutId}
-          onPickIn={setInId}
+          onPickOut={(id) => {
+            setOutId(id)
+            setSwapId(null)
+          }}
+          onPickIn={(id) => {
+            setInId(id)
+            setSwapId(null)
+          }}
+          onPickSwap={(opponentId) => {
+            setSwapId(opponentId)
+            setInId(null)
+          }}
+          swapId={swapId}
+          onSwapFromMatch={onSwapFromMatch}
           onBack={backToMatch}
           onConfirm={onConfirmReplace}
-          isPending={replacePlayer.isPending}
+          isPending={replacePlayer.isPending || swapFromMatch.isPending}
           message={message}
           error={error}
         />

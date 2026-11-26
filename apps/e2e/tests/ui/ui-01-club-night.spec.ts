@@ -100,11 +100,13 @@ test('UI-01 a club night from Admin to Session done to the Player history', asyn
   await expect.poll(async () => (await sessionTimes(sessionId)).state).toBe('completed')
 
   // The registered Player sees the session and tonight's games on top of the earlier ones.
-  await player.goto(`${appUrl('player')}/players/${players[0]?.playerId}`)
+  // Home (P-HOME) holds the sessions; the profile keeps the games.
+  await player.goto(`${appUrl('player')}/home`)
   const mySessions = player.locator('section', {
-    has: player.getByRole('heading', { name: 'My sessions', exact: true }),
+    has: player.getByRole('heading', { name: 'Upcoming sessions', exact: true }),
   })
   await expect(mySessions.getByText(title)).toBeVisible({ timeout: 30_000 })
+  await player.goto(`${appUrl('player')}/players/${players[0]?.playerId}`)
   await expect(
     player.getByRole('button', { name: `All games (${before + firstGames})`, exact: true }),
   ).toBeVisible()

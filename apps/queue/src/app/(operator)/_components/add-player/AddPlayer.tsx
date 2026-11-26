@@ -6,8 +6,12 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useSetClubPlayerPicture } from '@rotra/data/club-player/useSetClubPlayerPicture'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { MockError } from '@rotra/data/mock/errors'
+import type { PlayingLevel } from '@rotra/data/player/types'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
+import { sessionLevelRestriction } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
+import { levelRestrictionBlockFor } from '@rotra/data/session-roster/levelRestriction.rules'
 import type { RosterAddPlacement } from '@rotra/data/session-roster/mutations'
 import { ROSTER_DUPLICATE_ERROR } from '@rotra/data/session-roster/sessionRoster.rules'
 import { useAddDirectoryPlayerToSession } from '@rotra/data/session-roster/useAddDirectoryPlayerToSession'
@@ -100,25 +104,23 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
 
   // The one exact match, or none. Another club's unclaimed player (ownNameRequired) has no name,
   // picture, level or rank to show: the sheet reads "Not registered yet" and asks for this club's name.
+  // The one exact match, or (D-2026-11-23-01) the unclaimed players whose name matches. Another
+  // club's unclaimed player shows the first club's name and picture; this club enters its own name.
   const found = lookup.data?.player
-  const directoryResults: AddPlayerCandidate[] = found
-    ? [
-        {
-          id: found.id,
-          name: found.fullName,
-          nickname: found.nickname,
-          photoUrl: found.ownNameRequired
-            ? undefined
-            : profilePictureSrc(found.picture, found.id, found.fullName),
-          rtrId: found.rtrId,
-          identity: found.identity,
-          suggestion: found.suggestion,
-          phoneHidden: found.phoneHidden,
-          ownNameRequired: found.ownNameRequired,
-          rankLabel: found.ownNameRequired ? undefined : rankLabel(found.rankLabel),
-        },
-      ]
-    : []
+  const directoryResults: AddPlayerCandidate[] = (
+    found ? [found] : (lookup.data?.matches ?? [])
+  ).map((p) => ({
+    id: p.id,
+    name: p.fullName,
+    nickname: p.nickname,
+    photoUrl: profilePictureSrc(p.picture, p.id, p.fullName),
+    rtrId: p.rtrId,
+    identity: p.identity,
+    suggestion: p.suggestion,
+    phoneHidden: p.phoneHidden,
+    ownNameRequired: p.ownNameRequired,
+    rankLabel: p.ownNameRequired ? undefined : rankLabel(p.rankLabel),
+  }))
 
   const options = {
     onSettled: () => {
@@ -166,9 +168,16 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
     return true
   }
 
+  /** Shows the level restriction warning in the sheet's error line (D-2026-11-19-12). */
+  const warn = (message: string) => {
+    setErrorReturnsToList(false)
+    setServerError(message)
+  }
+
   return {
     offline,
     begin,
+    warn,
     options,
     sheet: {
       offline,
@@ -184,6 +193,34 @@ function useAddSheet(open: boolean, returnsToList: (error: unknown) => boolean) 
       addedCount,
     },
     serverError,
+  }
+}
+
+/**
+ * Saves the Profile picture chosen on New player once the player exists (D-2026-11-09-12). A session
+ * add lands with the roster batch, so that batch is sent first (`flushFirst`). If the upload fails
+ * the player stays saved and the toast says to set the picture in Edit details.
+ */
+function useSaveNewPlayerPicture(flushFirst?: () => Promise<unknown>) {
+  const setPicture = useSetClubPlayerPicture()
+  return async (clubPlayerId: string, name: string, picture: ClubPictureChoice | null) => {
+    if (!picture) return
+    const fail = (error: unknown) =>
+      toast.error(
+        `${name.trim()} was saved, but the picture wasn't: ${errorMessage(error)} Set it in Edit details.`,
+      )
+    try {
+      await flushFirst?.()
+    } catch (error) {
+      fail(error)
+      return
+    }
+    setPicture.mutate(
+      picture.kind === 'photo'
+        ? { clubPlayerId, kind: 'photo', file: picture.file }
+        : { clubPlayerId, kind: 'character', characterId: picture.characterId },
+      { onError: fail },
+    )
   }
 }
 
@@ -246,15 +283,49 @@ function SessionAddPlayer({
     name: string
     run: (placement: RosterAddPlacement) => void
   } | null>(null)
+  /**
+   * D-2026-11-19-12: a level outside the session's restriction (or into a full band) shows the
+   * reason once; pressing the same add again adds anyway. Add to waitlist isn't checked.
+   */
+  const warned = useRef<string | null>(null)
+  const guarded =
+    (name: string, level: PlayingLevel, run: (placement: RosterAddPlacement) => void) =>
+    (placement: RosterAddPlacement) => {
+      const reason = placement.toWaitlist
+        ? null
+        : levelRestrictionBlockFor(
+            sessionLevelRestriction(s),
+            level,
+            rosterList.map((r) => r.level),
+          )
+      if (reason) {
+        const key = `${name}|${level}`
+        if (warned.current !== key) {
+          warned.current = key
+          add.warn(`${reason} Press it again to add ${name} anyway.`)
+          return
+        }
+        warned.current = null
+        run({ ...placement, allowOutsideLevels: true })
+        return
+      }
+      warned.current = null
+      run(placement)
+    }
   /** Runs the add now, or asks once first when the roster is already at the slot budget. */
-  const placeOrAsk = (name: string, run: (placement: RosterAddPlacement) => void) => {
-    if (rosterList.length >= capacity) setOverfill({ name, run })
-    else run({})
+  const placeOrAsk = (
+    name: string,
+    level: PlayingLevel,
+    run: (placement: RosterAddPlacement) => void,
+  ) => {
+    const checked = guarded(name, level, run)
+    if (rosterList.length >= capacity) setOverfill({ name, run: checked })
+    else checked({})
   }
 
   const confirm = ({ candidate, source, level, name }: AddPlayerConfirmInput) => {
     if (!s || !roster.data || !clubPlayers.data) return
-    placeOrAsk(candidate.name, (placement) => {
+    placeOrAsk(candidate.name, level, (placement) => {
       if (!add.begin()) return
       if (source === 'saved')
         addSaved.mutate(
@@ -280,22 +351,30 @@ function SessionAddPlayer({
     })
   }
 
-  const submitNewPlayer = (values: NewPlayerFormValues) => {
+  const savePicture = useSaveNewPlayerPicture(() => flushSessionRoster(sessionId))
+  const submitNewPlayer = (values: NewPlayerFormValues, picture: ClubPictureChoice | null) => {
     if (!s || !roster.data) return
-    placeOrAsk(values.name.trim(), (placement) => {
+    placeOrAsk(values.name.trim(), values.level, (placement) => {
       if (!add.begin()) return
       addNew.mutate(
         {
           sessionId,
           name: values.name,
           nickname: values.nickname ?? undefined,
+          gender: values.gender,
           email: values.email ?? undefined,
           socialLink: values.socialLink ?? undefined,
           phone: values.phone ?? undefined,
           level: values.level,
           ...placement,
         },
-        add.options,
+        {
+          ...add.options,
+          onSuccess: (result) => {
+            add.options.onSuccess(result)
+            void savePicture(result.data.clubPlayerId, values.name, picture)
+          },
+        },
       )
     })
   }
@@ -355,13 +434,14 @@ function ClubAddPlayer({ open, onOpenChange }: AddPlayerProps) {
     addDirectory.mutate({ playerId: candidate.id, level, name }, add.options)
   }
 
-  const setPicture = useSetClubPlayerPicture()
+  const savePicture = useSaveNewPlayerPicture()
   const submitNewPlayer = (values: NewSavedPlayerFormValues, picture: ClubPictureChoice | null) => {
     if (!add.begin()) return
     addNew.mutate(
       {
         name: values.name,
         nickname: values.nickname,
+        gender: values.gender,
         email: values.email,
         socialLink: values.socialLink,
         phone: values.phone,
@@ -371,23 +451,7 @@ function ClubAddPlayer({ open, onOpenChange }: AddPlayerProps) {
         ...add.options,
         onSuccess: (result) => {
           add.options.onSuccess(result)
-          // The picture chosen on New player is saved once the player exists (D-2026-11-09-12).
-          if (!picture) return
-          setPicture.mutate(
-            picture.kind === 'photo'
-              ? { clubPlayerId: result.data.clubPlayerId, kind: 'photo', file: picture.file }
-              : {
-                  clubPlayerId: result.data.clubPlayerId,
-                  kind: 'character',
-                  characterId: picture.characterId,
-                },
-            {
-              onError: (error) =>
-                toast.error(
-                  `${values.name.trim()} was saved, but the picture wasn't: ${errorMessage(error)} Set it in Edit details.`,
-                ),
-            },
-          )
+          void savePicture(result.data.clubPlayerId, values.name, picture)
         },
       },
     )

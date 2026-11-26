@@ -146,3 +146,23 @@ export const WithMoveToWaitlistLight: Story = {
   ...WithMoveToWaitlist,
   globals: { theme: 'light' },
 }
+
+/** Club nickname bold, then "Migs · Miguel Santos" (2026-11-19-queue-roster-name-order) */
+export const NameBlockClubNickname: Story = {
+  args: { ...rowAt(0), name: 'Miguel Santos', nickname: 'Migs', clubNickname: 'Migo' },
+}
+export const NameBlockNicknameOnly: Story = {
+  args: { ...rowAt(0), name: 'Miguel Santos', nickname: 'Migs' },
+}
+export const NameBlockClubNicknameLight: Story = {
+  ...NameBlockClubNickname,
+  globals: { theme: 'light' },
+}
+/** Read-only grid during play: Move to waitlist is hidden even when onStepDown is passed */
+export const LiveNoMoveToWaitlist: Story = {
+  args: { ...rowAt(0), levelLocked: true, readOnly: true, onStepDown: fn(), hideStepDown: true },
+}
+/** Before Start: Move to waitlist stays */
+export const PreparationMoveToWaitlist: Story = {
+  args: { ...rowAt(0), showPresence: false, onStepDown: fn() },
+}

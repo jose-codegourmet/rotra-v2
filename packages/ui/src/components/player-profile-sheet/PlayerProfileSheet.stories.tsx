@@ -127,6 +127,14 @@ export const Unclaimed: Story = {
     emailOnFile: true,
   }),
 }
+/** Gender row: the club gave one for an unclaimed player. */
+export const UnclaimedFemale: Story = {
+  args: { ...(Unclaimed.args as PlayerProfileSheetProps), gender: 'female' },
+}
+/** A registered player with no gender: "Not given yet · ROTRA reminds them to add it". */
+export const RegisteredNoGender: Story = {
+  args: propsFor(byName('Aaron'), { sessionsHere: 7, gender: null }),
+}
 export const UnclaimedLight: Story = { ...Unclaimed, globals: { theme: 'light' } }
 export const UnclaimedPhone: Story = { ...Unclaimed, globals: { viewport: { value: 'phone' } } }
 /** An older record with a phone and no email: warn chip, the Details required notice, Email "None on file". */

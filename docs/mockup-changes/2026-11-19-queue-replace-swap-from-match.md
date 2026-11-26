@@ -1,6 +1,6 @@
 # Queue app: Replace player has a second row, Swap from match
 
-Status: NEW
+Status: IN MOCK APP — #1042
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `swapPicker()` (`swapRow`), sheet `replace`, actions `pickSwapIn`, `confirmReplace`

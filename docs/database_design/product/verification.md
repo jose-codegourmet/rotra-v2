@@ -223,3 +223,24 @@ unrecorded session is now rejected ("needs a winner"), and a winner on an unreco
 accepted. The services and routes were not run against a database. **Not applied to the shared
 database.**
 
+
+## Q28.9 (#1080) — Record games off: facts kept, ranking reads skip them (November 24, 2026)
+
+No migration. Disposable local database `rotra_disposable_q289` (local Supabase PostgreSQL,
+127.0.0.1:54322, dropped after the run), `scripts/disposable-db.sh all`: every migration through
+`20261124000100_session_level_restriction` rebuilds with no drift; integrity checks 117 passed, 0
+failed. Then a scratch run of the services (not committed) with two players and two finished
+sessions written as fixture rows, one with `record_games` true (player A beats B twice) and one with
+it false (B beats A three times), reading before and after each:
+
+- Top annual, monthly and weekly (`readPeriodLeaderboard`): A 2 wins, B 2 losses after the recorded
+  session; unchanged after the not ranked one.
+- Year stats and win rate (`readPlayerMatchHistory` + `yearGameStats`): A 2 games, 100%; B 2 games,
+  0%; unchanged after the not ranked one.
+- Rank evidence (`recomputeRank`, `readPlayerRank`): recent standard matches 2, older 0; unchanged.
+- Compare (`readPlayerCompare`): 2 shared games; unchanged (the SQL reader alone returns 5).
+- Match history: the not ranked session is listed with `ranked: false` and its three games as
+  `not_ranked` with their win or loss.
+
+`tests/period-leaderboard.integration.test.js` also passes on that database. **Not run:** Session done
+itself (`finalizeSession` and its jobs) against a database, the Route Handlers, and the e2e suite.

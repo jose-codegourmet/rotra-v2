@@ -149,8 +149,8 @@ export function SetupCourtsSection({ editContext }: SetupCourtsSectionProps) {
       </Notice>
       {editContext && editContext.rosterCount > capacity ? (
         <Notice tone="warn" title={`${editContext.rosterCount} players already have a slot.`}>
-          With {capacity} slots, the last {editContext.rosterCount - capacity} added move to the
-          front of the waitlist when you save, in the order they joined.
+          With {capacity} slots, the last {editContext.rosterCount - capacity} added move to the end
+          of the waitlist when you save, in the order they joined.
         </Notice>
       ) : editContext &&
         Math.min(capacity - editContext.rosterCount, editContext.waitlistCount) > 0 ? (

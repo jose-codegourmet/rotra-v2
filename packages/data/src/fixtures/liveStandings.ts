@@ -19,7 +19,7 @@ export type LiveStandingRow = {
  * Story-only standings for the tonight console fixture. `rows` adds four more completed games so
  * the table has a clear leader and players on the same wins and losses sharing a position (ordered
  * by name inside it). `tiedRows` is the console fixture as is: three players at 1–0 sharing position
- * 1 and four at 0–1 sharing position 4. The normal store starts with no matches.
+ * 1 and four at 0–1 sharing position 2. The normal store starts with no matches.
  */
 export function createLiveStandingsFixtures(now = Date.now()) {
   const fixture = createConsoleFixtures(now)

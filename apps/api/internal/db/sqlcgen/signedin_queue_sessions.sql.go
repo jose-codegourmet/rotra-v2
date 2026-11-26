@@ -191,23 +191,24 @@ func (q *Queries) ListQueueClubInventoryPrices(ctx context.Context, clubID pgtyp
 }
 
 const listQueueLiveCourts = `-- name: ListQueueLiveCourts :many
-SELECT id, session_id, label, starts_at, opened_early_at, open_until, removed_at
+SELECT id, session_id, label, position, starts_at, opened_early_at, open_until, removed_at
 FROM session_courts
 WHERE club_id = $1 AND removed_at IS NULL
-ORDER BY created_at ASC, id ASC
+ORDER BY position ASC, created_at ASC, id ASC
 `
 
 type ListQueueLiveCourtsRow struct {
 	ID            pgtype.UUID
 	SessionID     pgtype.UUID
 	Label         string
+	Position      int32
 	StartsAt      pgtype.Timestamptz
 	OpenedEarlyAt pgtype.Timestamptz
 	OpenUntil     pgtype.Timestamptz
 	RemovedAt     pgtype.Timestamptz
 }
 
-// The live courts of every session of the club, in creation order (liveCourts).
+// The live courts of every session of the club, in court order (liveCourts).
 func (q *Queries) ListQueueLiveCourts(ctx context.Context, clubID pgtype.UUID) ([]ListQueueLiveCourtsRow, error) {
 	rows, err := q.db.Query(ctx, listQueueLiveCourts, clubID)
 	if err != nil {
@@ -221,6 +222,7 @@ func (q *Queries) ListQueueLiveCourts(ctx context.Context, clubID pgtype.UUID) (
 			&i.ID,
 			&i.SessionID,
 			&i.Label,
+			&i.Position,
 			&i.StartsAt,
 			&i.OpenedEarlyAt,
 			&i.OpenUntil,

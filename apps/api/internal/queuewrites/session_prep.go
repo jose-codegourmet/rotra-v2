@@ -448,7 +448,7 @@ func (t *txn) createSessions(commandID string, in writes.Body) (createResult, er
 			}
 			if _, err := t.q.InsertSessionCourt(t.ctx, sqlcgen.InsertSessionCourtParams{
 				ID: derivedID(commandID, "court:"+strconv.Itoa(index)+":"+strconv.Itoa(n)), ClubID: t.club, SessionID: id,
-				Label: fields.JSTrim(court.label), StartsAt: nullableTimestamp(startsAt), OpenUntil: nullableTimestamp(openUntil), Now: t.stamp(),
+				Label: fields.JSTrim(court.label), Position: int32(n + 1), StartsAt: nullableTimestamp(startsAt), OpenUntil: nullableTimestamp(openUntil), Now: t.stamp(),
 			}); err != nil {
 				return createResult{}, err
 			}
@@ -706,7 +706,7 @@ func (t *txn) reconcileCourts(commandID string, v validated) error {
 				return errTypeError // Prisma refuses a court id that is no uuid
 			}
 			if _, err := t.q.EditSessionCourt(t.ctx, sqlcgen.EditSessionCourtParams{
-				Label: fields.JSTrim(c.label), StartsAt: nullableTimestamp(planned), OpenUntil: nullableTimestamp(openUntil), Now: t.stamp(),
+				Label: fields.JSTrim(c.label), Position: pgtype.Int4{Int32: int32(n + 1), Valid: true}, StartsAt: nullableTimestamp(planned), OpenUntil: nullableTimestamp(openUntil), Now: t.stamp(),
 				ClubID: t.club, SessionID: t.sess.ID, ID: id,
 			}); err != nil {
 				return err
@@ -714,7 +714,7 @@ func (t *txn) reconcileCourts(commandID string, v validated) error {
 			continue
 		}
 		if _, err := t.q.InsertSessionCourt(t.ctx, sqlcgen.InsertSessionCourtParams{
-			ID: derivedID(commandID, "court:"+strconv.Itoa(n)), ClubID: t.club, SessionID: t.sess.ID, Label: fields.JSTrim(c.label),
+			ID: derivedID(commandID, "court:"+strconv.Itoa(n)), ClubID: t.club, SessionID: t.sess.ID, Label: fields.JSTrim(c.label), Position: int32(n + 1),
 			StartsAt: nullableTimestamp(planned), OpenUntil: nullableTimestamp(openUntil), Now: t.stamp(),
 		}); err != nil {
 			return err

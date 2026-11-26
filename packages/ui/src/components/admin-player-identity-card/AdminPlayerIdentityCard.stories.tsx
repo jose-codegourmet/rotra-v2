@@ -16,6 +16,9 @@ type Story = StoryObj<typeof meta>
 /** No nickname: shows '—'. */
 export const Default: Story = {}
 export const WithNickname: Story = { args: identity.nicknamed }
+/** The player added a gender. */
+export const WithGender: Story = { args: { ...identity.nicknamed, gender: 'female' } }
+export const WithGenderLight: Story = { ...WithGender, globals: { theme: 'light' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 export const Light: Story = { globals: { theme: 'light' } }

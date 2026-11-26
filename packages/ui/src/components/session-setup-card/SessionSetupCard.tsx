@@ -10,6 +10,8 @@ export type SessionSetupCardProps = {
   formatsLabel: string
   modeLabel: string
   modeDescription: string
+  /** The Levels row (D-2026-11-19-12): "All levels" or "6 beginner · 5 intermediate · 5 advanced"; omitted reads as All levels */
+  levelsLabel?: string
   /** The scoring mode's label ("16/31", "11/21 × 3", from SCORING in @rotra/schema/scoring); omitted reads as 16/31 (a session saved before the setting) */
   scoringLabel?: string
   /** The scoring mode's rule ("One game to 31. Change sides at 16. Deuce at 30–30."), shown after the label like the Mode row */
@@ -47,6 +49,7 @@ export function SessionSetupCard({
   formatsLabel,
   modeLabel,
   modeDescription,
+  levelsLabel = 'All levels',
   scoringLabel = SCORING['31'].label,
   scoringDescription,
   recordGames = true,
@@ -106,6 +109,7 @@ export function SessionSetupCard({
                 </>
               ),
             },
+            { label: 'Levels', value: levelsLabel },
             {
               label: 'Scoring',
               value: (

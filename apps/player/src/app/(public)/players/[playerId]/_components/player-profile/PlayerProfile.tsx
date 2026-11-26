@@ -7,7 +7,6 @@ import { useMyContactChangeRequest } from '@rotra/data/contact-change-request/us
 import { PLAYER_FIXTURE_NOW } from '@rotra/data/fixtures/player-games'
 import { countYearCountedWins, manilaYear, weeklyPerformance } from '@rotra/data/player/rules'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
-import { useMySessions } from '@rotra/data/player/useMySessions'
 import { usePlayerGames } from '@rotra/data/player/usePlayerGames'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import { usePlayerRank } from '@rotra/data/player/usePlayerRank'
@@ -19,12 +18,10 @@ import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { AccountPanel } from '@rotra/ui/account-panel'
 import { Button } from '@rotra/ui/button'
 import { ContactRequestStatus } from '@rotra/ui/contact-request-status'
-import type { RankStatusChip } from '@rotra/ui/eligibility-card'
 import { ErrorState } from '@rotra/ui/error-state'
 import type { GameRowPlayer } from '@rotra/ui/game-row'
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
 import { levelLabel } from '@rotra/ui/level-pill'
-import { MySessionsCard } from '@rotra/ui/my-sessions-card'
 import { Notice } from '@rotra/ui/notice'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PlayerAboutCard } from '@rotra/ui/player-about-card'
@@ -49,23 +46,17 @@ import { useState } from 'react'
 import { ClubCard } from '@/app/_components/club-card/ClubCard'
 import { copyPlayerId } from '@/app/_components/copy-player-id/copyPlayerId'
 import { GamePlayerProfile } from '@/app/_components/game-player-profile/GamePlayerProfile'
+import { useOpenMatch } from '@/app/_components/match-link/useOpenMatch'
 import { useBannerSheet } from '@/app/_components/profile-banner/useBannerSheet'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useProfilePictureSheet } from '@/app/_components/profile-picture/useProfilePictureSheet'
+import { rankStatusFor } from '@/app/_components/rank-status/rankStatus'
 import { usePlayerShareSheet } from '@/app/_components/share/usePlayerShareSheet'
 import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectAccount, setAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
 import Loading from '../../loading'
-
-/** The shared rank's status chip (the prototype's rankStatus chips). */
-const STATUS_CHIPS = {
-  'not-calculated': { label: 'Not calculated', tone: 'neutral' },
-  'needs-reassessment': { label: 'Needs reassessment', tone: 'warn' },
-  updating: { label: 'Updating', tone: 'warn' },
-  provisional: { label: 'Provisional', tone: 'neutral' },
-} satisfies Record<string, RankStatusChip>
 
 /** "yesterday", "3 days ago", measured from the fixtures' clock like the rest of the rank data. */
 function finishedAgo(finishedAt: string) {
@@ -97,18 +88,17 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
     googleSignIn && session.data?.account.id === playerId ? playerId : null,
   )
   const openVerification = () => router.push('/profile/verification')
-  // Clubs show on every readable profile (#766); the read applies the profile's access rule.
-  const clubs = usePlayerClubs(playerId)
+  // Clubs show on another player's readable profile (#766); the own Your clubs card moved to Home (P-HOME).
+  const clubs = usePlayerClubs(isOwn ? null : playerId)
   // D-CLUB-PROFILE: a Clubs card row opens the club's profile card.
   const [clubCard, setClubCard] = useState<string | null>(null)
   // Recent sessions: the session whose matches dialog is open; a face on a court opens its card.
   const [openSessionId, setOpenSessionId] = useState<string | null>(null)
   const [openPlayer, setOpenPlayer] = useState<GameRowPlayer | null>(null)
-  const mySessions = useMySessions(isOwn ? playerId : null)
-  // Own profile only: pull down (or come back to the tab) refreshes the profile, My sessions, recent games and
+  // Own profile only: pull down (or come back to the tab) refreshes the profile, recent games and
   // the rank, once every 10 seconds (mockup change 2026-11-12). A visitor's page has no pull.
   const refreshing = useThrottledRefresh(
-    () => Promise.all([profile.refetch(), mySessions.refetch(), games.refetch(), rank.refetch()]),
+    () => Promise.all([profile.refetch(), games.refetch(), rank.refetch()]),
     { refreshOnReturn: isOwn },
   )
   const player = profile.data,
@@ -116,6 +106,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   // Share profile shows on every readable profile (2026-11-13-profile-card-open-share, pass 3);
   // rank, result, performance and game shares stay on your own.
   const sharing = usePlayerShareSheet(playerId)
+  const openMatch = useOpenMatch(player?.fullName ?? 'Profile')
   const pictureEditor = useProfilePictureSheet(isOwn ? player : null)
   const bannerEditor = useBannerSheet(isOwn ? player : null)
   const photo = usePhotoViewer()
@@ -182,20 +173,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
   const levelCode =
     current.levelIndex === null ? null : (PLAYING_LEVELS[current.levelIndex] ?? null)
   const rankLevel = levelCode ? levelLabel(levelCode) : null
-  let status: RankStatusChip | undefined
-  let rankText: string | undefined
-  if (current.levelIndex === null) {
-    status = STATUS_CHIPS['not-calculated']
-    rankText = `ROTRA calculates a rank once a club has assessed ${subject} and a session with that assessment is done. Until then there is no rank to show.`
-  } else if (current.state === 'needs_reassessment') {
-    status = STATUS_CHIPS['needs-reassessment']
-    rankText = `Last played more than three months ago, so this rank is out of date. A club gives ${subject} a fresh assessment to bring it up to date.`
-  } else if (current.recentCount < requirement) {
-    status = STATUS_CHIPS.provisional
-    rankText = `This rank is still settling: ${current.recentCount} of ${requirement} standard matches in the last three months.`
-  } else if (current.updatePending) {
-    status = STATUS_CHIPS.updating
-  }
+  const { status, rankText } = rankStatusFor(current, requirement, subject)
   // Weekly Performance, read-only (2026-11-13-player-weekly-performance): hidden from others when the
   // player turned off Show my weekly performance; the owner always sees it with the visibility chip.
   const now = Date.now()
@@ -227,9 +205,9 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
       onError: (error) => toast.error(error.message),
     })
   const picture = pictureSrc(player.picture, player.playerId, player.fullName) ?? null
-  const missingDetails = isOwn && (!player.playingStyle || !player.experienceYears)
-  const updatedLabel = mySessions.dataUpdatedAt
-    ? new Date(mySessions.dataUpdatedAt).toLocaleTimeString([], {
+  const missingDetails = isOwn && (!player.playStyle || !player.experienceYears)
+  const updatedLabel = games.dataUpdatedAt
+    ? new Date(games.dataUpdatedAt).toLocaleTimeString([], {
         hour: 'numeric',
         minute: '2-digit',
       })
@@ -300,16 +278,13 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                 onSignOut={leaveSignedOut}
               />
             ) : null}
-            {clubs.isPending ? (
+            {isOwn ? null : clubs.isPending ? (
               <Skeleton className="h-36" />
             ) : clubs.isError ? (
-              <ErrorState
-                title={isOwn ? "Couldn't load your clubs." : "Couldn't load the clubs."}
-                onRetry={() => void clubs.refetch()}
-              />
+              <ErrorState title="Couldn't load the clubs." onRetry={() => void clubs.refetch()} />
             ) : (
               <PlayerClubsCard
-                isOwn={isOwn}
+                isOwn={false}
                 onOpenClub={setClubCard}
                 clubs={(clubs.data ?? []).map((club) => ({
                   ...club,
@@ -342,6 +317,20 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               <Notice title="Not registered yet.">
                 {player.unclaimedSavedBy} saved this player, so this is the club&apos;s version of
                 them. The profile is public until they register with ROTRA.
+              </Notice>
+            ) : null}
+            {isOwn && !player.gender ? (
+              <Notice
+                tone="warn"
+                title="Add your gender."
+                action={
+                  <Button size="xs" onClick={() => router.push('/profile/edit')}>
+                    Add gender
+                  </Button>
+                }
+              >
+                Clubs use it to name your matches: Men&apos;s, Women&apos;s or Mixed Doubles. Until
+                you add it, your matches count as Genderless.
               </Notice>
             ) : null}
             {missingDetails ? (
@@ -385,22 +374,6 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                 }
               />
             ) : null}
-            {isOwn ? (
-              mySessions.isPending ? (
-                <Skeleton className="h-40" />
-              ) : mySessions.isError ? (
-                <ErrorState
-                  title="Couldn't load your sessions."
-                  onRetry={() => void mySessions.refetch()}
-                />
-              ) : (
-                <MySessionsCard
-                  sessions={mySessions.data?.sessions ?? []}
-                  finished={mySessions.data?.finished}
-                  onShareResult={sharing.openResult}
-                />
-              )
-            ) : null}
             <ProfileSessionsCard
               sessions={games.data}
               onOpenSession={setOpenSessionId}
@@ -412,6 +385,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               me={gamesMe}
               onOpenPlayer={setOpenPlayer}
               onShareGame={isOwn ? sharing.openGame : undefined}
+              onOpenGame={openMatch}
             />
             <SessionMatchesSheet
               session={openSession}
@@ -422,6 +396,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
               me={gamesMe}
               onOpenPlayer={setOpenPlayer}
               onShareGame={isOwn ? sharing.openGame : undefined}
+              onOpenGame={openMatch}
               onSharePerformance={isOwn ? sharing.openPerformance : undefined}
             />
             <GamePlayerProfile

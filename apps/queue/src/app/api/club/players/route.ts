@@ -32,6 +32,7 @@ export async function POST(request: Request) {
         playerId: text(body.playerId),
         // This club's own name for another club's unclaimed player (D-2026-11-16-04)
         name: text(body.name) || null,
+        level: text(body.level) || null,
       })
       return { status: 201, body: saved }
     }
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
       phone: phone?.success ? phone.data : null,
       email: text(body.email) || null,
       socialLink: text(body.socialLink) || null,
+      level: text(body.level) || null,
     })
     return { status: 201, body: saved }
   })

@@ -1,13 +1,27 @@
 import { gamesWon } from '@rotra/schema/scoring'
 import { withClubNickname } from '../club-player/clubNickname.rules'
+import { getConnectivity } from '../connectivity/connectivity'
 import { MockError } from '../mock/errors'
 import { type MockState, readMockState } from '../mock/store'
 import { queueMutation } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
 import { autoFillCourts, autoFillNote, putOnCourt } from '../queue-session/courtFill'
 import { sessionScoring } from '../queue-session/queueSession.types'
+import { realPauseMatch, realSwapFromMatch, realTradeCourts } from '../real/match'
+import { isRealDataMode } from '../real/mode'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type { SyncArea } from '../sync/sync.types'
+import {
+  canMovePlaying,
+  canPauseMatch,
+  canSwapFromMatch,
+  canTradeCourts,
+  movedCourtText,
+  pausedText,
+  swappedPlacesText,
+  tradedCourtsText,
+  tradedLineup,
+} from './liveMatch.rules'
 import {
   canMoveCourt,
   canPlace,
@@ -126,21 +140,100 @@ export function sendBackToQueue(input: { matchId: string; operationId: string })
     ),
   )
 }
+/** Online only in real mode (November 25, 2026): never queued offline; `realRequest` refuses offline. */
+function realOnline<T>(action: string, run: () => Promise<T>) {
+  if (getConnectivity() === 'offline')
+    throw new MockError('offline', `${action} needs an internet connection.`)
+  return run()
+}
 /**
- * Move to another court (Q-ON-COURT): the On court match takes free open court(s) (two for 5v5)
- * and releases the ones it held. Still On court, nothing starts. In Auto Queue the court it left
- * is refilled in the same write. Allowed offline (auto filling pauses offline).
+ * Pause match (Q-CONSOLE court card, Q-ACTIVE-MATCH): a Playing match started by mistake goes back
+ * to Getting ready on the same court(s). The start time clears, so Start match gives it a fresh
+ * one; players, sides and substitutions stay and nothing is recorded. Not a timer pause. The court
+ * never frees, so Auto Queue does nothing. Real mode (November 25, 2026): online only.
+ */
+export async function pauseMatch(input: { matchId: string; operationId: string }) {
+  if (isRealDataMode()) return realOnline('Pausing a match', () => realPauseMatch(input))
+  return control(input, 'pause', (s, m) => {
+    if (!canPauseMatch(m)) throw changed()
+    m.state = 'on_court'
+    m.startedAt = null
+    m.placedAt = m.placedAt ?? Date.now()
+    return pausedText(m.matchNo, courtNames(m, s.courts))
+  })
+}
+/**
+ * Move to another court (Q-ON-COURT, Q-ACTIVE-MATCH, court drag): the match takes free open
+ * court(s) (two for 5v5) and releases the ones it held. A Getting ready match stays On court and
+ * nothing starts; a Playing match (owner, November 19, 2026; real mode November 25, 2026) keeps playing with the
+ * same start time. In Auto Queue the court it left is refilled in the same write. Allowed offline
+ * (auto filling pauses offline), except a Playing match, which needs the server.
  */
 export function moveCourt(input: { matchId: string; courtIds: string[]; operationId: string }) {
   return dispatch('match.moveCourt', input, () =>
     control(input, 'move-court', (s, m) => {
-      if (!canMoveCourt(m, input.courtIds, matchContext(s, m.sessionId))) throw changed()
+      const playing = m.state === 'active'
+      // Offline in real mode this runs over the downloaded copy: a Playing move must not be queued;
+      // online it goes to the server (real mode November 25, 2026).
+      if (playing && isRealDataMode())
+        throw new MockError('offline', 'Moving a playing match needs an internet connection.')
+      const allowed = playing ? canMovePlaying : canMoveCourt
+      if (!allowed(m, input.courtIds, matchContext(s, m.sessionId))) throw changed()
       const from = courtNames(m, s.courts)
       m.courtIds = [...input.courtIds]
       const placed = autoFillCourts(s, m.sessionId)
-      return `Match ${m.matchNo} moved from ${from} to ${courtNames(m, s.courts)} · getting ready${autoFillNote(s, placed)}`
+      return `${movedCourtText(m.matchNo, from, courtNames(m, s.courts), playing)}${autoFillNote(s, placed)}`
     }),
   )
+}
+/**
+ * Trade courts (Q-CONSOLE court drag, owner, November 25, 2026): a one-court match dropped on another
+ * busy one-court court; the two matches swap courts and each keeps its state and start time. No
+ * court frees, so Auto Queue does nothing. Real mode: online only.
+ */
+export async function tradeCourts(input: {
+  matchId: string
+  withMatchId: string
+  operationId: string
+}) {
+  if (isRealDataMode()) return realOnline('Swapping courts', () => realTradeCourts(input))
+  return control(input, 'trade-courts', (s, m) => {
+    const n = s.matches.find((x) => x.id === input.withMatchId)
+    if (!n || n.sessionId !== m.sessionId || !canTradeCourts(m, n)) throw changed()
+    const mine = m.courtIds
+    m.courtIds = [...n.courtIds]
+    n.courtIds = [...mine]
+    return tradedCourtsText(m.matchNo, courtNames(m, s.courts), n.matchNo, courtNames(n, s.courts))
+  })
+}
+/**
+ * Swap from match (Replace player sheet, Q-ON-COURT and Q-ACTIVE-MATCH): the player coming out and
+ * an opponent in this same match trade places; nobody new joins and no substitution is recorded.
+ * Like Replace player the match becomes manual and protected from regeneration. Real mode
+ * (November 25, 2026): online only.
+ */
+export async function swapFromMatch(input: {
+  matchId: string
+  /** The player coming out. */
+  outId: string
+  /** The opponent in this match they trade places with. */
+  inId: string
+  operationId: string
+}) {
+  if (isRealDataMode()) return realOnline('Swap from match', () => realSwapFromMatch(input))
+  return control(input, 'swap-from-match', (s, m) => {
+    if (!canSwapFromMatch(m, input.outId, input.inId)) throw changed()
+    const out = s.roster.find((p) => p.id === input.outId),
+      opponent = s.roster.find((p) => p.id === input.inId)
+    if (!out || !opponent) throw changed()
+    const lineup = tradedLineup(m, input.outId, input.inId)
+    m.teamA = lineup.teamA
+    m.teamB = lineup.teamB
+    m.origin = 'manual'
+    m.manualProtected = true
+    const nameOf = (p: SessionPlayer) => queueMasterName(withClubNickname(s, p))
+    return swappedPlacesText(m.matchNo, nameOf(out), nameOf(opponent))
+  })
 }
 /**
  * Replace player (Q-ON-COURT): a plain lineup change on an On court match. The incoming player

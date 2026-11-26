@@ -8,7 +8,6 @@ import {
 import type { SessionRecordSummary } from '@rotra/data/queue-session/types'
 import { useSessionRecordHistory } from '@rotra/data/queue-session/useSessionRecordHistory'
 import { InvalidSessionNotice } from '@rotra/ui/invalid-session-notice'
-import { NotRecordedNotice } from '@rotra/ui/not-recorded-notice'
 import { RecordCourtColumns } from '@rotra/ui/record-court-columns'
 import { RecordTabHeader } from '@rotra/ui/record-tab-header'
 import { ReplayCard } from '@rotra/ui/replay-card'
@@ -35,8 +34,7 @@ const EXPLAINER =
  * court of matches drawn on the shared MatchCourt in start order, with the matches on court at the replay moment
  * highlighted. Replay state is local: Play advances one session minute every 120 ms and stops at
  * the end; scrubbing pauses and moves the moment. Switching tabs unmounts the panel, which stops
- * playback. An invalid session shows the no-match-history notice; a session with Record games off shows the
- * not-recorded notice.
+ * playback. An invalid session shows the no-match-history notice.
  */
 export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
   const invalid = record.state === 'invalid'
@@ -60,8 +58,6 @@ export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
   }, [playing, h, moment])
 
   if (invalid) return <InvalidSessionNotice variant="night" />
-  // Record games off: there is no match history or replay.
-  if (record.recordGames === false) return <NotRecordedNotice variant="night" />
 
   const openProfile = (sessionPlayerId: string) =>
     setProfileId(

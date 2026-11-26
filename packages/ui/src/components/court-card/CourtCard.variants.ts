@@ -1,3 +1,4 @@
+import { cn } from '@rotra/ui/cn'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 // The prototypes' .court, .court.oncourt and .court.busy; .court.merged spans two grid rows so a 5v5
@@ -23,3 +24,26 @@ export const courtCardVariants = cva(
 )
 
 export type CourtCardVariants = VariantProps<typeof courtCardVariants>
+
+/**
+ * A free open court as a drop target for a dragged match drawing (the mockup's
+ * body.court-dragging [data-free-court]): a dashed accent outline while any drawing is dragged,
+ * solid with a tint under the pointer. `dragging` and `dragOver` force the same looks from props.
+ */
+export function freeCourtDropClass({
+  dragging = false,
+  dragOver = false,
+}: {
+  dragging?: boolean
+  dragOver?: boolean
+}) {
+  return cn(
+    '[:is(body[data-court-dragging])_&]:outline-2 [:is(body[data-court-dragging])_&]:outline-accent [:is(body[data-court-dragging])_&]:outline-offset-2',
+    '[:is(body[data-court-dragging])_&:not([data-court-drop])]:outline-dashed',
+    'data-court-drop:bg-accent-subtle!',
+    // The dragged drawing's own busy court is no target (owner, November 25, 2026: trade courts)
+    'data-court-source:outline-none!',
+    dragging && !dragOver && 'outline-2 outline-dashed outline-accent outline-offset-2',
+    dragOver && 'outline-2 outline-accent outline-offset-2 bg-accent-subtle!',
+  )
+}

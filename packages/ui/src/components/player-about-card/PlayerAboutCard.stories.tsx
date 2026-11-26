@@ -16,6 +16,21 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Full: Story = {}
+/** Gender shows on others' profiles only when set; an own profile without one says Not added. */
+export const WithGender: Story = { args: { profile: { ...empty, gender: 'female' } } }
+export const WithGenderLight: Story = { ...WithGender, globals: { theme: 'light' } }
 export const EmptyPublic: Story = { args: { profile: empty } }
 export const EmptyOwn: Story = { args: { profile: empty, isOwn: true } }
 export const LinksOnly: Story = { args: { profile: linksOnly } }
+const answered = {
+  ...empty,
+  playStyle: 'back' as const,
+  shots: ['smash', 'drop', 'netkill'] as ('smash' | 'drop' | 'netkill')[],
+  shotsOther: ['Crosscourt drop'],
+  favoritePlayer: 'lindan' as const,
+}
+export const WithAnswers: Story = { args: { profile: answered } }
+export const WithAnswersLight: Story = { args: { profile: answered }, globals: { theme: 'light' } }
+export const FavoriteOthers: Story = {
+  args: { profile: { ...answered, favoritePlayer: 'other', favoritePlayerOther: 'Rinov Rivaldy' } },
+}

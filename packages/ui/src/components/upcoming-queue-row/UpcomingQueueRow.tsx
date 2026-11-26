@@ -23,6 +23,10 @@ export type UpcomingQueueRowProps = {
 // The prototype's queueCols(): queue tiles are at least 220 px wide with 10 px gaps (gap-2.5).
 const TILE_MIN = 220
 const GAP = 10
+/** Main Queue tiles (slide cards and grid mode): 450 px or more */
+export const QUEUE_TILE_MIN = 450
+/** The Courts tab's compact upcoming cards: 300 px or more */
+export const COMPACT_TILE_MIN = 300
 /** Auto Queue drafts carry chips under each name, so a doubles team needs a wider tile to stay on one row. */
 export const DRAFT_TILE_MIN = 230
 
@@ -60,7 +64,7 @@ export function UpcomingQueueRow({
   columns,
   className,
 }: UpcomingQueueRowProps) {
-  const [gridRef, measured] = useQueueColumns<HTMLDivElement>()
+  const [gridRef, measured] = useQueueColumns<HTMLDivElement>(COMPACT_TILE_MIN)
   const cols = Math.max(1, columns ?? measured)
   const shown = matches.slice(0, Math.max(1, cols - 1))
   const rest = matches.length - shown.length
@@ -91,7 +95,12 @@ export function UpcomingQueueRow({
       >
         {shown.length ? (
           shown.map((m, i) => (
-            <MatchCard key={m.matchNo} {...m} flow={i === matches.length - 1 ? null : 'right'} />
+            <MatchCard
+              key={m.matchNo}
+              {...m}
+              variant="compact"
+              flow={i === matches.length - 1 ? null : 'right'}
+            />
           ))
         ) : (
           <Card

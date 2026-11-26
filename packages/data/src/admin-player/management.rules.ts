@@ -43,10 +43,13 @@ export function adminPlayerStats(rows: readonly AdminPlayer[]): AdminPlayerStats
     noRank: 0,
     registered: 0,
     unclaimed: 0,
+    verified: 0,
+    unverified: 0,
   }
   for (const row of rows) {
     stats[row.levelBand ?? 'noRank']++
     stats[row.claimed ? 'registered' : 'unclaimed']++
+    if (row.claimed) stats[row.verification?.verified ? 'verified' : 'unverified']++
   }
   return stats
 }
@@ -56,10 +59,16 @@ export function selectAdminPlayers(all: AdminPlayer[], params: AdminPlayerListPa
   const matches = all
     .filter(
       (p) =>
-        matchesAccountFilter(p.claimed, params.account, p.detailsRequired) &&
+        matchesAccountFilter(
+          p.claimed,
+          params.account,
+          p.detailsRequired,
+          !!p.verification?.verified,
+        ) &&
         matchesAdminPlayerSearch(p, params.q) &&
         (!params.level ||
           (params.level === 'none' ? p.levelBand === null : p.levelBand === params.level)) &&
+        (!params.gender || (params.gender === 'none' ? !p.gender : p.gender === params.gender)) &&
         (!params.duplicates || duplicateIds.has(p.id)) &&
         (!params.addedFrom || p.addedOn >= params.addedFrom) &&
         (!params.addedTo || p.addedOn <= params.addedTo) &&

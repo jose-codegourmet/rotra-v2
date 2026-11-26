@@ -1,13 +1,18 @@
 'use client'
 import { MockError } from '@rotra/data/mock/errors'
+import type { OnboardingAnswers } from '@rotra/data/player/onboarding-answers'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
+import { useSaveMyOnboardingAnswers } from '@rotra/data/player/useSaveMyOnboardingAnswers'
+import { useSetMyGender } from '@rotra/data/player/useSetMyGender'
 import { useUpdateMyProfile } from '@rotra/data/player/useUpdateMyProfile'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
+import { isRealDataMode } from '@rotra/data/real/mode'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { EditProfileForm } from '@rotra/ui/edit-profile-form'
 import { ErrorState } from '@rotra/ui/error-state'
+import { gettingToKnowFromProfile } from '@rotra/ui/getting-to-know-fields/default-values'
 import { Notice } from '@rotra/ui/notice'
 import { PageHeader } from '@rotra/ui/page-header'
 import { personalDetailsFromProfile } from '@rotra/ui/personal-details-fields/default-values'
@@ -40,6 +45,8 @@ export function EditProfile() {
   const profile = usePlayerProfile(playerId)
   const myAccount = useMyAccount(account ? playerId : null)
   const update = useUpdateMyProfile()
+  const saveAnswers = useSaveMyOnboardingAnswers()
+  const saveGender = useSetMyGender()
   const pictureEditor = useProfilePictureSheet(profile.data)
   const bannerEditor = useBannerSheet(profile.data)
   // Opens over the edit page, so the profile draft stays.
@@ -51,7 +58,14 @@ export function EditProfile() {
   const [serverError, setServerError] = useState<string>()
   const profilePath = `/players/${playerId}`
   const defaultValues = useMemo(
-    () => (profile.data ? personalDetailsFromProfile(profile.data) : undefined),
+    () =>
+      profile.data
+        ? {
+            ...personalDetailsFromProfile(profile.data),
+            ...gettingToKnowFromProfile(profile.data),
+            gender: profile.data.gender ?? ('' as const),
+          }
+        : undefined,
     [profile.data],
   )
 
@@ -165,7 +179,7 @@ export function EditProfile() {
           email: myAccount.data.email,
           playerId: profile.data.rtrId,
         }}
-        isPending={update.isPending}
+        isPending={update.isPending || saveAnswers.isPending || saveGender.isPending}
         serverError={serverError}
         onDirtyChange={onDirtyChange}
         onCancel={() => leave(profilePath)}
@@ -173,19 +187,59 @@ export function EditProfile() {
         onOpenPhonePrivacy={() => leave('/profile/privacy-and-contact')}
         onSubmit={(values) => {
           setServerError(undefined)
-          update.mutate(values, {
+          // The pickers are saved beside the personal fields (D-2026-11-19-11); both must succeed.
+          const {
+            playStyle,
+            shots,
+            shotsOther,
+            favoritePlayer,
+            favoritePlayerOther,
+            gender,
+            ...personal
+          } = values
+          const answers: OnboardingAnswers = {
+            playStyle: playStyle === '' ? null : playStyle,
+            shots: shots as OnboardingAnswers['shots'],
+            shotsOther,
+            favoritePlayer:
+              favoritePlayer === ''
+                ? null
+                : (favoritePlayer as OnboardingAnswers['favoritePlayer']),
+            favoritePlayerOther,
+          }
+          // Gender (D-2026-11-19-01) saves last, only when it changed; setting it clears the reminder.
+          const nextGender = gender === '' ? null : gender
+          const saveGenderThen = (done: () => void) => {
+            if (nextGender === (profile.data?.gender ?? null)) return done()
+            saveGender.mutate(nextGender, { onSuccess: done, onError: failed })
+          }
+          const saved = () => {
+            setDirty(false)
+            dispatch(setUnsavedDraft(false))
+            toast('Profile saved')
+            go(profilePath)
+          }
+          const failed = (error: Error) => {
+            // A rejected answer (a repeated or too long shot) says what is wrong; the rest is generic.
+            const message =
+              error instanceof MockError && error.kind === 'offline'
+                ? SAVE_OFFLINE
+                : error instanceof MockError && error.kind === 'conflict'
+                  ? error.message
+                  : SAVE_FAILED
+            setServerError(message)
+            toast.error(message)
+          }
+          update.mutate(personal, {
             onSuccess: () => {
-              setDirty(false)
-              dispatch(setUnsavedDraft(false))
-              toast('Profile saved')
-              go(profilePath)
+              // Real mode has nowhere to store the answers yet (D-2026-11-19-11).
+              if (isRealDataMode()) return saveGenderThen(saved)
+              saveAnswers.mutate(answers, {
+                onSuccess: () => saveGenderThen(saved),
+                onError: failed,
+              })
             },
-            onError: (error) => {
-              const message =
-                error instanceof MockError && error.kind === 'offline' ? SAVE_OFFLINE : SAVE_FAILED
-              setServerError(message)
-              toast.error(message)
-            },
+            onError: failed,
           })
         }}
       />

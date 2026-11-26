@@ -4,15 +4,19 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   AUTO_QUEUE_MODES,
   autoQueueDraftConflict,
-  autoQueuePlayerCounts,
   toggleBaggingGame,
 } from '@rotra/data/match/auto-queue-rules'
-import { activeMatchFor, allPlayers, queueMasterName } from '@rotra/data/match/match.rules'
+import { gamesPlayedFor, queueMasterName } from '@rotra/data/match/match.rules'
+import { matchCategoryFor } from '@rotra/data/match/matchCategory.rules'
+import { autoQueueEmptyText, draftWaitStatus } from '@rotra/data/match/plan-ahead-rules'
 import { useAutoQueueDrafts } from '@rotra/data/match/useAutoQueueDrafts'
 import { useEditAutoQueueDrafts } from '@rotra/data/match/useEditAutoQueueDrafts'
+import { useExemptionList } from '@rotra/data/match/useExemptionList'
 import { useGenerateAutoQueueDrafts } from '@rotra/data/match/useGenerateAutoQueueDrafts'
+import { useSaveExemptionList } from '@rotra/data/match/useSaveExemptionList'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useTransferAutoQueueDrafts } from '@rotra/data/match/useTransferAutoQueueDrafts'
+import { sessionScoring } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { levelLabel } from '@rotra/data/session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
@@ -20,23 +24,25 @@ import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import {
   type AutoQueueBaggingProps,
   type AutoQueueCount,
+  type AutoQueueExemptionProps,
   type AutoQueueMode,
   AutoQueueWorkspace,
   type AutoQueueWorkspaceProps,
-  type QueueWorkspace,
 } from '@rotra/ui/auto-queue-workspace'
 import type { BaggingPlayer } from '@rotra/ui/bagging-pairs-card'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
-import { type ReactNode, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
+import { usePlayerGames } from '@/app/(operator)/sessions/[sessionId]/_components/player-games/PlayerGames'
 
 export type AutoQueueProps = {
   sessionId: string
-  workspace: QueueWorkspace
-  onWorkspaceChange: (workspace: QueueWorkspace) => void
-  mainQueue: ReactNode
+  /** The console clock: finish times and who is free are measured against it */
+  now: number
+  /** After reviewed drafts join the Main Queue: the console returns to the Main Queue tab */
+  onAddedToMainQueue: () => void
 }
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
@@ -50,7 +56,7 @@ const baggingPlayer = (p: SessionPlayer | undefined, id: string): BaggingPlayer 
 })
 
 /** In-memory draft wiring; accepted matches remain the sole source for dispatch and shared counts. */
-export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }: AutoQueueProps) {
+export function AutoQueue({ sessionId, now, onAddedToMainQueue }: AutoQueueProps) {
   const session = useQueueSession(sessionId),
     roster = useSessionRoster(sessionId),
     matches = useSessionMatches(sessionId)
@@ -71,6 +77,9 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
     photoUrl: photoOf(p),
   })
   const drafts = useAutoQueueDrafts(sessionId)
+  const exemptionList = useExemptionList(sessionId),
+    saveExemption = useSaveExemptionList()
+  const playerGames = usePlayerGames()
   const edit = useEditAutoQueueDrafts(),
     generate = useGenerateAutoQueueDrafts(),
     transfer = useTransferAutoQueueDrafts()
@@ -81,12 +90,14 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
   const [transferError, setTransferError] = useState<string>()
   const busy = useRef(false)
   const confirmation = useRef<{ key: string; id: string } | null>(null)
-  const failed = [session, roster, matches, drafts].find((query) => query.isError)
-  if (failed) return <QueryError query={failed} title="Couldn't load Generate matches." />
+  const failed = [session, roster, matches, drafts, exemptionList].find((query) => query.isError)
+  if (failed) return <QueryError query={failed} title="Couldn't load Generate Queue." />
   const s = session.data,
     state = drafts.data
-  if (!s || !state || !roster.data || !matches.data) return <Skeleton className="h-56 rounded-lg" />
-  const ctx = { roster: roster.data.roster, matches: matches.data, courts: s.courts }
+  if (!s || !state || !roster.data || !matches.data || !exemptionList.data)
+    return <Skeleton className="h-56 rounded-lg" />
+  const ctx = { roster: roster.data.roster, matches: matches.data, courts: s.courts, now }
+  const scoring = sessionScoring(s)
   const batches: AutoQueueWorkspaceProps['batches'] = {}
   for (const current of AUTO_QUEUE_MODES) {
     const batch = state.batches[current]
@@ -99,25 +110,27 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
         fullName: p?.nameSnapshot,
         level: p?.level ?? null,
         photoUrl: photoOf(p),
-        ...autoQueuePlayerCounts(id, ctx, lineups),
+        games: gamesPlayedFor(id, ctx),
       }
     }
     batches[current] = {
       stale: lineups.some((d) => d.fingerprint !== state.fingerprint),
       stopReason: batch?.stopReason,
       error: errors[current],
-      drafts: lineups.map((draft) => ({
-        id: draft.id,
-        format: draft.format,
-        reason: draft.reason,
-        teamA: draft.teamA.map(player),
-        teamB: draft.teamB.map(player),
-        attentionReason: autoQueueDraftConflict(draft, s, ctx) ?? undefined,
-        blockedReason:
-          draft.mode === 'ahead' && allPlayers(draft).some((id) => activeMatchFor(id, ctx.matches))
-            ? 'A player is playing now; this match waits until they are free.'
-            : undefined,
-      })),
+      drafts: lineups.map((draft) => {
+        // A draft with someone on a court waits for the match that finishes last (Plan Ahead).
+        const wait = draftWaitStatus(draft, ctx, scoring, now)
+        return {
+          id: draft.id,
+          format: draft.format,
+          categoryPrefix: matchCategoryFor(draft, ctx.roster),
+          reason: wait?.text ?? draft.reason,
+          statusTone: wait?.phase === 'long' ? ('warn' as const) : ('muted' as const),
+          teamA: draft.teamA.map(player),
+          teamB: draft.teamB.map(player),
+          attentionReason: autoQueueDraftConflict(draft, s, ctx) ?? undefined,
+        }
+      }),
     }
   }
   const onGenerate = async (
@@ -200,6 +213,28 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
         },
       }
     : undefined
+  const exemption: AutoQueueExemptionProps = {
+    players: ctx.roster.map((p) => ({
+      id: p.id,
+      name: p.nameSnapshot,
+      shortName: queueMasterName(p),
+      level: p.level ?? null,
+      photoUrl: photoOf(p),
+      games: gamesPlayedFor(p.id, ctx),
+      present: p.present,
+    })),
+    exemptIds: exemptionList.data,
+    onSave: (ids) => {
+      if (saveExemption.isPending) return
+      saveExemption.mutate(
+        { sessionId, ids },
+        {
+          onSuccess: (result) => toast(result.message),
+          onError: (error) => toast.error(errorMessage(error)),
+        },
+      )
+    },
+  }
   const onTransfer = async (draftIds: string[]) => {
     if (busy.current) return false
     busy.current = true
@@ -214,7 +249,7 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
       })
       confirmation.current = null
       toast(result.message)
-      onWorkspaceChange('main')
+      onAddedToMainQueue()
       return true
     } catch (error) {
       setTransferError(errorMessage(error))
@@ -225,22 +260,19 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
   }
   return (
     <AutoQueueWorkspace
-      workspace={workspace}
-      onWorkspaceChange={onWorkspaceChange}
-      mainQueue={mainQueue}
       mode={mode}
       onModeChange={setMode}
       count={count}
       onCountChange={setCount}
       minimumGames={s.minimumGames}
-      hasEligiblePlayers={ctx.roster.some(
-        (p) => p.present && (mode === 'ahead' || !activeMatchFor(p.id, ctx.matches)),
-      )}
+      noEligibleText={autoQueueEmptyText(mode, s, ctx, now)}
       catchUpTarget={target}
       onCatchUpTargetChange={setTarget}
       batches={batches}
       selectedIds={state.selectedIds}
-      isPending={edit.isPending || generate.isPending || transfer.isPending}
+      isPending={
+        edit.isPending || generate.isPending || transfer.isPending || saveExemption.isPending
+      }
       transferError={transferError}
       pendingMessage={
         generate.isPending
@@ -268,6 +300,8 @@ export function AutoQueue({ sessionId, workspace, onWorkspaceChange, mainQueue }
       }}
       onAddToMainQueue={onTransfer}
       bagging={bagging}
+      exemption={exemption}
+      onOpenGames={playerGames.open}
     />
   )
 }

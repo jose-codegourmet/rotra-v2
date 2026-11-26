@@ -1,6 +1,6 @@
 # Player app: optional gender on the profile, with a reminder until it is added
 
-Status: NEW
+Status: IN MOCK APP — #1081
 Date: 2026-11-19
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › Edit profile › Name, registration About you, profile About, notifications

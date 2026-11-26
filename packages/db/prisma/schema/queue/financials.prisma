@@ -17,7 +17,7 @@ model InventoryItem {
   name          String
   category      InventoryCategory
   unit          String            @default("piece")
-  /// ≥ 0. Not decremented by sessions in v1.
+  /// ≥ 0. Session done deducts the planned tubes, never below 0 (D-2026-11-26-01).
   stock         Int
   /// Centavos ≥ 0; 0 means no cost. Plan lines read the live price (snapshotting is open).
   unitCostMinor Int               @map("unit_cost_minor")

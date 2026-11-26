@@ -154,6 +154,13 @@ export function OperatorShell({ children }: { children: ReactNode }) {
           current: current('/saved-players'),
         },
         {
+          id: 'leaderboards',
+          label: 'Leaderboards',
+          icon: 'nav-trophy',
+          href: '/leaderboards',
+          current: current('/leaderboards'),
+        },
+        {
           id: 'venues',
           label: 'Venues',
           icon: 'nav-pin',

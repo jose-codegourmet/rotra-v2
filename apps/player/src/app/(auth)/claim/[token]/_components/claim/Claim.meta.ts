@@ -8,6 +8,7 @@ export const claimMeta = {
     'Only a club-issued link opens this route; public RTR IDs and profile pages never start a claim.',
     'An unknown token shows the expired state, so the page never reveals whether a profile exists.',
     'Flag player_google_sign_in on: after Is this you? the method step "Connect your Google account" (Google only), then the form in Google mode with "← Use another Google account"; completing says "Sign in from now on with Google (<email>)." A Google email already on another account returns to the method step with the error.',
+    'P-ONBOARD: the form is step 1 (Your details, fullscreen, no top bar or dock). Continue creates the account and saves the required gender; steps 2 to 4 (OnboardingFlow) follow, then the done page. Back on step 2 reopens Your details.',
     "'This isn't me' writes nothing; completing signs the player in.",
   ],
   prototype: {
@@ -24,6 +25,7 @@ export const claimMeta = {
     'wrong',
     'method',
     'form',
+    'onboarding',
     'claimed',
     'expired',
     'processing',

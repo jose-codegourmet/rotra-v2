@@ -122,7 +122,7 @@ func SessionOf(r sqlcgen.LockQueueSessionRow) Session {
 // CourtOf is courtDto for a session court row.
 func CourtOf(c sqlcgen.SessionCourt) Court {
 	return Court{
-		ID: c.ID.String(), SessionID: c.SessionID.String(), Label: c.Label, StartsAt: isoPtr(c.StartsAt), OpenedEarlyAt: isoPtr(c.OpenedEarlyAt),
+		ID: c.ID.String(), SessionID: c.SessionID.String(), Label: c.Label, Position: c.Position, StartsAt: isoPtr(c.StartsAt), OpenedEarlyAt: isoPtr(c.OpenedEarlyAt),
 		OpenUntil: isoPtr(c.OpenUntil), RemovedAt: isoPtr(c.RemovedAt),
 	}
 }

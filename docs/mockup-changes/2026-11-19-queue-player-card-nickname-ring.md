@@ -1,6 +1,6 @@
 # Queue app: the live Players card shows the level as a ring and one name (club nickname, nickname, full name)
 
-Status: NEW
+Status: IN MOCK APP — #1048
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console Players tab (`playersPane()`, `.pc3`)

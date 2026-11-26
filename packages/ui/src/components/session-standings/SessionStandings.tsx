@@ -9,8 +9,9 @@ import {
   formatStandingsGames,
   type StandingsGames,
   StandingsPlayerCell,
+  tiedNames,
 } from '@rotra/ui/standings-faces'
-import { useRef } from 'react'
+import { type ReactNode, useRef } from 'react'
 
 /** One player inside a standings position. */
 export type SessionStandingsPlayer = {
@@ -26,7 +27,7 @@ export type SessionStandingsPlayer = {
 
 /**
  * One standings row: a position and the players who hold it (same wins and losses share a position,
- * numbered 1, 1, 3). The caller computes the position and orders the players inside it.
+ * numbered 1, 1, 2). The caller computes the position and orders the players inside it.
  */
 export type SessionStandingsRow = {
   id: string
@@ -45,6 +46,8 @@ export type SessionStandingsProps = {
   /** Your position › Share: the system share sheet with “I finished #N of M …” */
   onShareFinish: () => void
   onShareLeaderboard: () => void
+  /** The session's TopThreePodium, between the players count and the table (D-2026-11-25-04) */
+  podium?: ReactNode
 }
 
 const flash = (row: HTMLElement) => {
@@ -72,6 +75,7 @@ export function SessionStandings({
   viewer,
   onShareFinish,
   onShareLeaderboard,
+  podium,
 }: SessionStandingsProps) {
   const mineRef = useRef<HTMLTableRowElement>(null)
   const mine = rows.find((row) => row.players.some((player) => player.isViewer))
@@ -164,6 +168,7 @@ export function SessionStandings({
           Share leaderboard
         </Button>
       </div>
+      {podium}
       <Card padding="none" className="overflow-x-auto px-2 py-1">
         <table className="w-full border-collapse text-sm">
           <thead>
@@ -199,9 +204,11 @@ export function SessionStandings({
                         pictureUrl: player.pictureUrl,
                         onOpen: player.onOpen,
                       }))}
-                      names={row.players
-                        .map((player) => (player.isViewer ? `${player.name} (you)` : player.name))
-                        .join(', ')}
+                      names={tiedNames(
+                        row.players.map((player) =>
+                          player.isViewer ? `${player.name} (you)` : player.name,
+                        ),
+                      )}
                     />
                   </td>
                   <td className={cn(cell, 'text-right tabular-nums')}>{row.wins}</td>

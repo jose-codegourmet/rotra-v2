@@ -1,6 +1,7 @@
 'use client'
 
 import type { ParticipantStats, ParticipantTonight } from '@rotra/data/public-session/types'
+import { queueTime } from '@rotra/schema/queue-time'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
@@ -84,7 +85,7 @@ export function tonightText(tonight: ParticipantTonight) {
     case 'free':
       return tonight.restMinutes === undefined
         ? 'Tonight · Free'
-        : `Tonight · Free · waiting ${tonight.restMinutes} min`
+        : `Tonight · Free · waiting ${queueTime(tonight.restMinutes)}`
     case 'away':
       return 'Tonight · Away'
   }
@@ -100,7 +101,7 @@ export function tonightPillLabel(tonight: ParticipantTonight) {
     case 'queued':
       return `Queued #${tonight.position}`
     case 'free':
-      return tonight.restMinutes === undefined ? 'Free' : `Free · ${tonight.restMinutes} min`
+      return tonight.restMinutes === undefined ? 'Free' : `Free · ${queueTime(tonight.restMinutes)}`
     case 'away':
       return 'Away'
   }

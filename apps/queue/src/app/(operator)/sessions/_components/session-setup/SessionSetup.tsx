@@ -19,6 +19,7 @@ import {
   type QueueSessionInput,
   type RequestFormats,
   recordsGames,
+  sessionLevelRestriction,
   sessionScoring,
 } from '@rotra/data/queue-session/types'
 import { useCreateQueueSession } from '@rotra/data/queue-session/useCreateQueueSession'
@@ -36,6 +37,7 @@ import { useSessionHosts } from '@rotra/data/session-host/useSessionHosts'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useAddTrustedHost } from '@rotra/data/trusted-host/useAddTrustedHost'
 import { useTrustedHosts } from '@rotra/data/trusted-host/useTrustedHosts'
+import { levelRestrictionOf } from '@rotra/schema/level-restriction'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { ChooseDateSheet } from '@rotra/ui/choose-date-sheet'
 import { toYmd } from '@rotra/ui/date-picker/date-calendar/helpers'
@@ -73,7 +75,14 @@ import { QueryError } from '../../../_components/query-error/QueryError'
 
 export type SessionSetupProps =
   | { mode: 'create'; date?: string; venueId?: string }
-  | { mode: 'edit'; sessionId: string }
+  | {
+      mode: 'edit'
+      sessionId: string
+      /** Open the editor on this page (0 date and venue and courts, 1 game rules, 2 costs and notes) */
+      initialStep?: number
+      /** Where Back, Cancel and a save return to: the preparation page's Settings tab instead of Overview */
+      returnToSettings?: boolean
+    }
 
 /** The Mode and Scoring card illustrations, served from apps/queue/public/art/session-setup. */
 const CARD_ART = {
@@ -169,7 +178,9 @@ export function SessionSetup(props: SessionSetupProps) {
   const roster = useSessionRoster(editing ?? '')
   const sessionHosts = useSessionHosts(editing ?? '')
   const isEdit = props.mode === 'edit'
-  const backHref = isEdit ? `/sessions/${editing}/preparation` : '/'
+  const returnToSettings = props.mode === 'edit' && props.returnToSettings
+  const preparationHref = `/sessions/${editing}/preparation${returnToSettings ? '?tab=settings' : ''}`
+  const backHref = isEdit ? preparationHref : '/'
   const backLabel = isEdit ? 'Back to preparation' : 'Home'
 
   if (isEdit) {
@@ -222,6 +233,7 @@ export function SessionSetup(props: SessionSetupProps) {
       scheduledEndAt: end,
       sessionMode: values.sessionMode,
       scoring: values.scoring,
+      levelRestriction: levelRestrictionOf(values.levelRestriction),
       allowSingles: values.allowSingles,
       allowDoubles: values.allowDoubles,
       requestFormats: Object.fromEntries(
@@ -296,7 +308,7 @@ export function SessionSetup(props: SessionSetupProps) {
           onSuccess: (result) => {
             toast(result.message)
             clearDraft()
-            router.push(`/sessions/${editing}/preparation`)
+            router.push(preparationHref)
           },
           onError: (error) => toast.error(errorMessage(error)),
         },
@@ -350,6 +362,7 @@ export function SessionSetup(props: SessionSetupProps) {
         requestFormats: allowedRequestFormats(s),
         sessionMode: s.sessionMode,
         scoring: sessionScoring(s),
+        levelRestriction: sessionLevelRestriction(s),
         recordGames: recordsGames(s),
         minimumIsCalculated: s.minimumIsCalculated,
         minimumGames: String(s.minimumGames),
@@ -424,7 +437,9 @@ export function SessionSetup(props: SessionSetupProps) {
         <SessionSetupForm
           ref={formRef}
           mode={props.mode}
-          initialPage={restored?.page}
+          initialPage={
+            props.mode === 'edit' ? (props.initialStep ?? restored?.page) : restored?.page
+          }
           financials={{
             shuttleItems: inventory.data?.items.filter((i) => i.category === 'shuttlecocks') ?? [],
             venueRates: venueList.map((v) => ({

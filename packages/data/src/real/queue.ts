@@ -23,15 +23,17 @@ import type { InventoryItem } from '../inventory/inventory.types'
 import type { ClubAccess } from '../license/license.types'
 import type { PlayingLevel } from '../player/player.types'
 import type { ParticipantStatsRead } from '../public-session/publicSession.types'
-import type {
-  DownloadState,
-  QueueSession,
-  QueueSessionInput,
-  QueueSessionSummary,
-  SessionCourt,
+import {
+  byCourtOrder,
+  type DownloadState,
+  type QueueSession,
+  type QueueSessionInput,
+  type QueueSessionSummary,
+  type SessionCourt,
 } from '../queue-session/queueSession.types'
 import { hostRegistrationText } from '../session-host/sessionHost.rules'
 import type { SessionHostRegistration } from '../session-host/sessionHost.types'
+import { handicapSpotsOf } from '../session-roster/handicap.rules'
 import { levelLabel, queueMasterName } from '../session-roster/sessionRoster.rules'
 import type {
   DirectoryPlayer,
@@ -175,6 +177,38 @@ export async function realUpdateSelfCheckIn(input: { enabled: boolean }) {
 export async function realRegenerateClubInvite() {
   const result = await realRequest<{ inviteCode: string }>('/api/club/invite', { method: 'POST' })
   return accepted({ inviteCode: result.inviteCode }, 'Club invite link regenerated')
+}
+
+/** Q-CLUB › Request name change: one pending request per club; the platform owner decides. */
+export async function realRequestClubNameChange(input: { requestedName: string }) {
+  await realRequest('/api/club/name-change', {
+    method: 'POST',
+    body: { commandId: crypto.randomUUID(), name: input.requestedName },
+  })
+  return accepted(null, 'Name change requested')
+}
+
+/** Q-CLUB › Cancel the pending name-change request. */
+export async function realCancelClubNameChange() {
+  await realRequest('/api/club/name-change', { method: 'DELETE' })
+  return accepted(null, 'Name-change request cancelled')
+}
+
+/** Q-CLUB › Session defaults: players per court and the usual entrance fee. */
+export async function realUpdateSessionDefaults(input: {
+  defaultPlayersPerCourt: number
+  defaultEntranceFeeMinor: number | null
+}) {
+  const { revision } = await realGetClub()
+  await realRequest('/api/club', {
+    method: 'PATCH',
+    body: {
+      defaultPlayersPerCourt: input.defaultPlayersPerCourt,
+      defaultEntranceFeeMinor: input.defaultEntranceFeeMinor,
+      expectedRevision: revision,
+    },
+  })
+  return accepted(null, 'Session defaults saved')
 }
 
 /** Q-CLUB Facebook post: saves the given fields; `template: null` restores the default template. */
@@ -354,10 +388,12 @@ export type WireSession = Omit<
   | 'finalizedAt'
   | 'playerRecordsUpdatedAt'
   | 'cancelledAt'
+  | 'plannedBeforeStart'
 > & {
   scheduledStartAt: string
   scheduledEndAt: string
   startedAt: string | null
+  plannedBeforeStart?: { startAt: string; endAt: string } | null
   finalizedAt: string | null
   cancelledAt?: string | null
 }
@@ -365,6 +401,8 @@ export type WireCourt = {
   id: string
   sessionId: string
   label: string
+  /** Court order from 1; missing in a copy downloaded before court order existed (read order then). */
+  position?: number
   /** Null for older courts: the session start applies. */
   startsAt?: string | null
   openedEarlyAt?: string | null
@@ -385,10 +423,12 @@ export type WireSessionSummary = {
   requestCount?: number
 }
 
-export const courtOf = (court: WireCourt): SessionCourt => ({
+/** `index` is the court's place in the list it came in, the order when `position` is missing. */
+export const courtOf = (court: WireCourt, index = 0): SessionCourt => ({
   id: court.id,
   sessionId: court.sessionId,
   label: court.label,
+  position: court.position ?? index + 1,
   startsAt: msOrNull(court.startsAt ?? null) ?? undefined,
   openedEarlyAt: msOrNull(court.openedEarlyAt ?? null),
   openUntil: msOrNull(court.openUntil),
@@ -403,6 +443,12 @@ export function summaryOf(wire: WireSessionSummary, downloadedHere: boolean): Qu
     scheduledStartAt: msOf(session.scheduledStartAt),
     scheduledEndAt: msOf(session.scheduledEndAt),
     startedAt: msOrNull(session.startedAt),
+    plannedBeforeStart: session.plannedBeforeStart
+      ? {
+          startAt: msOf(session.plannedBeforeStart.startAt),
+          endAt: msOf(session.plannedBeforeStart.endAt),
+        }
+      : null,
     finalizedAt: msOrNull(session.finalizedAt),
     cancelledAt: msOrNull(session.cancelledAt ?? null),
     playerRecordsUpdatedAt: null,
@@ -432,7 +478,7 @@ export async function realGetQueueSession(id: string) {
   return {
     ...summaryOf(wire, download !== null),
     ...(wire.requestCount === undefined ? {} : { requestCount: wire.requestCount }),
-    courts: wire.courts.map(courtOf),
+    courts: wire.courts.map(courtOf).sort(byCourtOrder),
     downloadState: (isDownloading(id)
       ? 'downloading'
       : download
@@ -499,6 +545,8 @@ export type WireRosterEntry = {
   clubNickname?: string | null
   /** Set games played adjustment (#717); missing on older servers means 0 */
   gamesAdjustment?: number
+  /** Handicap · tonight (D-2026-11-25-03); Queue Master reads only, missing on older servers */
+  handicapSpots?: string[]
   /** The Player's own I'm here / I'm leaving times (D-2026-11-09-03); missing on older servers */
   selfCheckedInAt?: string | null
   leftAt?: string | null
@@ -525,6 +573,7 @@ const rosterOf = (entry: WireRosterEntry): SessionPlayer => ({
   confirmedAt: msOf(entry.confirmedAt),
   selfCheckedInAt: msOrNull(entry.selfCheckedInAt ?? null),
   leftAt: msOrNull(entry.leftAt ?? null),
+  handicapSpots: handicapSpotsOf(entry.handicapSpots),
 })
 
 export type WireRosterRead = {
@@ -607,10 +656,14 @@ export async function realAddNewPlayerToSession(input: {
   email?: string
   /** #1019: a social link is an entry key too, and wins over the email */
   socialLink?: string
+  /** The new saved player's id chosen on the device */
+  clubPlayerId?: string
   level: PlayingLevel
   /** The outbox's on a replay (#722), else fresh */
   operationId?: string
 }) {
+  // Gender has no column in real mode yet (D-2026-11-19-01): never sent.
+  const { gender: _gender, ...fields } = input as typeof input & { gender?: unknown }
   const result = await realRequest<{
     rosterEntry: WireRosterEntry | null
     waitlist: WireWaitlistEntry | null
@@ -618,7 +671,7 @@ export async function realAddNewPlayerToSession(input: {
     emailWords?: string | null
   }>(`/api/sessions/${encodeURIComponent(input.sessionId)}/roster`, {
     method: 'POST',
-    body: { ...input, operationId: input.operationId ?? crypto.randomUUID() },
+    body: { ...fields, operationId: input.operationId ?? crypto.randomUUID() },
     fields: { player: 'name' },
   })
   const waitlistPosition = result.waitlist?.position ?? null
@@ -731,6 +784,8 @@ export function realUpdateClubPlayerDetails(id: string, values: ClubPlayerDetail
     body: {
       fullName: values.fullName,
       nickname: values.nickname,
+      // Gender has no column in real mode yet (D-2026-11-19-01): not sent.
+      level: values.level,
       phone: values.phone,
       email: values.email,
       playingStyle: values.playingStyle,
@@ -755,10 +810,13 @@ export async function realLookupPlayer(q: string): Promise<PlayerLookup> {
   const wire = await realRequest<{
     player: Omit<DirectoryPlayer, 'rankLabel'> | null
     savedName: string | null
+    matches?: Omit<DirectoryPlayer, 'rankLabel'>[]
   }>(`/api/players?q=${encodeURIComponent(q)}`)
   return {
     player: wire.player ? { ...wire.player, rankLabel: 'Not ranked' } : null,
     savedName: wire.savedName,
+    // D-2026-11-23-01: unclaimed players found by name
+    matches: (wire.matches ?? []).map((p) => ({ ...p, rankLabel: 'Not ranked' })),
   }
 }
 
@@ -858,14 +916,18 @@ export async function realAddNewSavedPlayer(input: {
   email?: string | null
   /** #1019: a social link is an entry key too, and wins over the email */
   socialLink?: string | null
+  /** The saved level, if one was chosen */
+  level?: string | null
 }) {
+  // Gender has no column in real mode yet (D-2026-11-19-01): never sent.
+  const { gender: _gender, ...fields } = input as typeof input & { gender?: unknown }
   const saved = await realRequest<{
     clubPlayerId: string
     name: string
     emailWords?: string | null
   }>('/api/club/players', {
     method: 'POST',
-    body: { ...input, operationId: crypto.randomUUID() },
+    body: { ...fields, operationId: crypto.randomUUID() },
   })
   return accepted(
     { clubPlayerId: saved.clubPlayerId },
@@ -880,6 +942,8 @@ export async function realAddDirectoryPlayerToClub(input: {
   playerId: string
   /** This club's own name for another club's unclaimed player (`ownNameRequired`) */
   name?: string | null
+  /** The saved level, if one was chosen */
+  level?: string | null
 }) {
   const saved = await realRequest<{ clubPlayerId: string; name: string }>('/api/club/players', {
     method: 'POST',

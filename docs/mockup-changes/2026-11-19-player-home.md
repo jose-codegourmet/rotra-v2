@@ -1,6 +1,6 @@
 # Player app: Home for signed-in players
 
-Status: NEW
+Status: IN MOCK APP — #1081
 Date: 2026-11-19
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `viewHome`, `currentSessionCard`, `mySessionsCard` (now Upcoming sessions), `clubsPanel`, `topBar`, `signIn`, route `home`

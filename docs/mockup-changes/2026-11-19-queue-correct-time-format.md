@@ -1,6 +1,6 @@
 # Queue app: Correct Queue Time Format: waiting times and the overdue line cap at hours, then “long time ago”
 
-Status: NEW
+Status: IN MOCK APP — #1056
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `queueTime()`, `endStatus()`, `queuePane()` faces, `playersPane()` cards

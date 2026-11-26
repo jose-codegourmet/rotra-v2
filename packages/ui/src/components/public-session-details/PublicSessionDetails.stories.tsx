@@ -7,7 +7,7 @@ const session = queueSessionFixtures.sessions[0]
 if (!session) throw new Error('Session fixture missing')
 const courts = queueSessionFixtures.courts.filter((c) => c.sessionId === session.id)
 
-// The prototype's fmtDate / fmtTime / fmtDur: "Sun, Oct 26, 6:00 PM–9:00 PM (3 h)".
+// The prototype's fmtDate / fmtRange / fmtDur: "Sun, Oct 26" over "6:00 PM–9:00 PM · 3 h".
 const fmtDate = (t: number) =>
   new Date(t).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
 const fmtTime = (t: number) =>
@@ -68,7 +68,8 @@ const meta = {
     ),
   ],
   args: {
-    when: `${fmtDate(session.scheduledStartAt)}, ${fmtTime(session.scheduledStartAt)}–${fmtTime(session.scheduledEndAt)} (${fmtDur(session.scheduledStartAt, session.scheduledEndAt)})`,
+    dateLabel: fmtDate(session.scheduledStartAt),
+    timeLabel: `${fmtTime(session.scheduledStartAt)}–${fmtTime(session.scheduledEndAt)} · ${fmtDur(session.scheduledStartAt, session.scheduledEndAt)}`,
     venueName: session.venueName,
     venueAddress: session.venueAddress,
     courtLabels: courts.map((c) => c.label),
@@ -86,6 +87,35 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+/** Everything on: address, notes, payment, a Levels tile and a Not ranked Rankings tile. */
+export const Full: Story = {
+  args: {
+    levelsLabel: 'Intermediate and up',
+    ranked: false,
+  },
+}
+export const FullLight: Story = { ...Full, globals: { theme: 'light' } }
+export const FullPhone: Story = { ...Full, globals: { viewport: { value: 'phone' } } }
+export const FullPhoneLight: Story = {
+  ...Full,
+  globals: { viewport: { value: 'phone' }, theme: 'light' },
+}
+/** A free session: Payment reads "Free" with no paid-at-the-venue line. */
+export const FreeSession: Story = { args: { amountDuePerPlayer: 0 } }
+export const FreeSessionLight: Story = { ...FreeSession, globals: { theme: 'light' } }
+/** No address, no notes, no payment estimate: the tiles and cards simply drop out. */
+export const NoAddressNotesOrPayment: Story = {
+  args: { venueAddress: null, notes: null, amountDuePerPlayer: null },
+}
+export const NoAddressNotesOrPaymentPhone: Story = {
+  ...NoAddressNotesOrPayment,
+  globals: { viewport: { value: 'phone' } },
+}
+/** The Levels tile, as the restrictions ticket fills it (D-2026-11-19-12). */
+export const WithLevelsTile: Story = {
+  args: { levelsLabel: 'All levels' },
+}
+
 export const WithNotes: Story = {}
 export const WithoutNotes: Story = { args: { notes: null } }
 
@@ -96,11 +126,11 @@ export const SinglesAndDoubles: Story = { args: { formats: { singles: true, doub
 export const NoStandardFormat: Story = { args: { formats: { singles: false, doubles: false } } }
 export const NoAddress: Story = { args: { venueAddress: null } }
 
-/** Record games off: a Results row reads "Not recorded" */
-export const NotRecorded: Story = { args: { recorded: false } }
-export const NotRecordedLight: Story = { ...NotRecorded, globals: { theme: 'light' } }
-export const NotRecordedPhone: Story = {
-  ...NotRecorded,
+/** Record games off: a Rankings tile reads "Not ranked" */
+export const NotRanked: Story = { args: { ranked: false } }
+export const NotRankedLight: Story = { ...NotRanked, globals: { theme: 'light' } }
+export const NotRankedPhone: Story = {
+  ...NotRanked,
   globals: { viewport: { value: 'phone' } },
 }
 
@@ -180,3 +210,14 @@ export const ScoringBestOfThree: Story = {
   },
 }
 export const ScoringBestOfThreeLight: Story = { ...ScoringBestOfThree, globals: { theme: 'light' } }
+/** Slots per level: the Levels tile shows each band's slots and the rule line (D-2026-11-19-12). */
+export const WithLevelsSlotsPerLevel: Story = {
+  args: {
+    levelsLabel: '6 beginner · 5 intermediate · 5 advanced',
+    levelsDescription: 'Set how many beginner, intermediate and advanced slots.',
+  },
+}
+export const WithLevelsSlotsPerLevelLight: Story = {
+  ...WithLevelsSlotsPerLevel,
+  globals: { theme: 'light' },
+}

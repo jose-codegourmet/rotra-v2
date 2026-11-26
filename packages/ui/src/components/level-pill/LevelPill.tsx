@@ -18,6 +18,17 @@ export function levelLabel(level: PlayingLevel | null): string {
     .join(' ')
 }
 
+/** Sets --ring to the level band's colour (grey with no level); pair with `outline-(--ring)` on a picture. */
+export function levelRingClass(level: PlayingLevel | null): string {
+  return (
+    {
+      beginner: '[--ring:var(--lv-beg)]',
+      intermediate: '[--ring:var(--lv-int)]',
+      advanced: '[--ring:var(--lv-adv)]',
+    }[level?.split('_')[0] ?? ''] ?? '[--ring:var(--lv-none)]'
+  )
+}
+
 /**
  * The prototype's .sp-level: three small bars for the band (one Beginner, two Intermediate, three
  * Advanced) beside the full level name.

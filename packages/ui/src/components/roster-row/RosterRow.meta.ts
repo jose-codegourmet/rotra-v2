@@ -5,6 +5,7 @@ export const rosterRowMeta = {
   description:
     'One confirmed slot on the preparation roster: picture, name, identity chip, the Player Information suggestion, the level select with its diff indicator, the Present switch and remove.',
   usage: [
+    'Pass name as the full name plus nickname and clubNickname when present: the PlayerNameBlock shows the first present of club nickname, nickname, full name in bold and the others in one muted line (2026-11-19-queue-roster-name-order).',
     'Pass onStepDown for the secondary Move to waitlist button next to remove (#735); it also shows in the read-only summary after Start.',
     'Pass selfCheckedInAt or leftAt timestamps for the muted presence caption; the caller owns clearing rules.',
     'presencePending shows Saving presence… without disabling the switch; the data batch owns optimistic values and rollback.',
@@ -26,6 +27,7 @@ export const rosterRowMeta = {
     'RosterPanel',
     'RosterCard',
     'LevelSelectMenu',
+    'PlayerNameBlock',
     'LevelDiffIndicator',
     'IdentityChip',
     'Switch',

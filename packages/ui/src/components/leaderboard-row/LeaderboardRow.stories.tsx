@@ -45,6 +45,17 @@ export const NewWithTooltip: Story = {
   },
 }
 export const Flash: Story = { args: { flash: true } }
+/** The Queue Leaderboards page's ROTRA board: club under the name, win rate under the wins */
+export const ClubAndWinRate: Story = {
+  args: {
+    period: 'month',
+    position: 5,
+    previousPosition: 7,
+    wins: 9,
+    winRate: 64,
+    club: 'Mandaue Shuttlers',
+  },
+}
 export const Me: Story = {
   args: {
     ...identity(jose),

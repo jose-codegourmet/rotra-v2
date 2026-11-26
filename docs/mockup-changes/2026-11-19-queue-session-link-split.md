@@ -1,6 +1,6 @@
 # Queue app: Session link and the join switches are separate boxes
 
-Status: NEW
+Status: IN MOCK APP — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `linkCard()`

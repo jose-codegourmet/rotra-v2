@@ -17,6 +17,7 @@ import { type MockState, mockStore, readMockState } from '../mock/store'
 import { requireClubAccess } from '../mock/transaction'
 import {
   realAddClub,
+  realChangeClubPrice,
   realGetAdminClub,
   realGetClubIdentityIndex,
   realListAdminClubs,
@@ -309,6 +310,10 @@ export function changeClubPrice(
   clubId: string,
   price: ClubPriceValues,
 ): Promise<{ changed: boolean; priceLine: string }> {
+  if (isRealDataMode()) {
+    throwFieldErrors('permission', priceErrors(price))
+    return realChangeClubPrice(clubId, price)
+  }
   return adminMutation(800, (draft) => {
     const club = adminClubIn(draft, clubId)
     throwFieldErrors('permission', priceErrors(price))

@@ -1,5 +1,6 @@
 'use client'
 
+import { queueTime } from '@rotra/schema/queue-time'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
@@ -60,7 +61,7 @@ function Face({ player, minimumGames }: { player: SwapMatchPlayer; minimumGames:
   return (
     <div
       role="img"
-      aria-label={`${player.name}, ${player.games} of ${minimumGames} games, waiting ${player.waitMinutes} min`}
+      aria-label={`${player.name}, ${player.games} of ${minimumGames} games, waiting ${queueTime(player.waitMinutes)}`}
       className="flex min-w-0 flex-col items-center gap-px"
     >
       <span className="relative block leading-none">
@@ -88,7 +89,7 @@ function Face({ player, minimumGames }: { player: SwapMatchPlayer; minimumGames:
           waitClassName({ kind: 'minutes', minutes: player.waitMinutes }),
         )}
       >
-        {player.waitMinutes} min
+        {queueTime(player.waitMinutes)}
       </span>
     </div>
   )

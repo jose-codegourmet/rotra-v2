@@ -40,7 +40,7 @@ export async function proxy(request: NextRequest) {
   const goMode = goApiEnabled()
   const protectedPath =
     /^\/players\/[^/]+\/compare\/?$/.test(path) ||
-    ['/me', '/profile', '/notifications'].some(
+    ['/home', '/me', '/profile', '/notifications'].some(
       (prefix) => path === prefix || path.startsWith(`${prefix}/`),
     )
   const toLogin = () => {
@@ -94,5 +94,5 @@ export async function proxy(request: NextRequest) {
   return NextResponse.next()
 }
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)'],
+  matcher: ['/((?!_next/static|_next/image|art/|favicon.ico|robots.txt|sitemap.xml).*)'],
 }

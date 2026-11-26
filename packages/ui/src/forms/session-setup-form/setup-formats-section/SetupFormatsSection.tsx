@@ -4,10 +4,10 @@ import type { MatchFormat } from '@rotra/data/match/types'
 import { SCORING, scoringOf } from '@rotra/schema/scoring'
 import { Chip } from '@rotra/ui/chip'
 import { ChoiceGroup } from '@rotra/ui/choice-group'
-import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { Notice } from '@rotra/ui/notice'
 import { Switch } from '@rotra/ui/switch'
+import { TickTile } from '@rotra/ui/tick-tile'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import {
   deuceHint,
@@ -21,6 +21,7 @@ import {
   scoringKeyFor,
 } from '../SessionSetupForm.helpers'
 import type { SessionSetupInput } from '../SessionSetupForm.schema'
+import { SetupRestrictionsField } from '../setup-restrictions-field/SetupRestrictionsField'
 
 const FORMATS = [
   ['allowSingles', 'Singles', 'Include standard singles when generating matches.'],
@@ -150,43 +151,43 @@ export function SetupFormatsSection({
       ) : null}
       {allowedRequestFormats ? (
         <div className="flex flex-col gap-1.5">
-          <span className="text-[13px] font-semibold text-fg2">Players can request</span>
-          {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}
+          <span className="text-[13px] font-semibold text-fg2">
+            Players can request{' '}
+            <span className="font-normal">
+              · {allowedRequestFormats.length} of {REQUEST_FORMATS.length} on
+            </span>
+          </span>
+          {/* biome-ignore lint/a11y/useSemanticElements: a group div; a fieldset would change the drawn layout */}
           <div
             role="group"
             aria-label="Formats players can request"
-            className="inline-flex flex-wrap gap-[3px] self-start rounded-lg border border-border-strong p-[3px]"
+            className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2"
           >
             {REQUEST_FORMATS.map(({ value, label }) => (
-              <button
+              <TickTile
                 key={value}
-                type="button"
-                aria-pressed={allowedRequestFormats.includes(value)}
-                onClick={() =>
+                label={label}
+                checked={allowedRequestFormats.includes(value)}
+                onChange={(on) =>
                   onRequestFormatsChange?.(
-                    allowedRequestFormats.includes(value)
-                      ? allowedRequestFormats.filter((format) => format !== value)
-                      : [...allowedRequestFormats, value],
+                    on
+                      ? [...allowedRequestFormats, value]
+                      : allowedRequestFormats.filter((format) => format !== value),
                   )
                 }
-                className={cn(
-                  'inline-flex min-h-9 items-center rounded-[7px] border-0 bg-transparent px-3.5 font-semibold text-fg2 touch:min-h-11 touch:px-4',
-                  'aria-pressed:bg-elev aria-pressed:text-fg',
-                )}
-              >
-                {label}
-              </button>
+              />
             ))}
           </div>
           <span className="text-xs text-fg2">
-            Which kinds of games a signed-in player can ask for with Request a match. Greyed pills
-            on their side are the ones you leave off here.
+            Tick each kind of game a signed-in player can ask for with Request a match. Unticked
+            ones show greyed out on their side.
             {allowedRequestFormats.length === 0
               ? " With none on, players can't send match requests."
               : ''}
           </span>
         </div>
       ) : null}
+      <SetupRestrictionsField />
       <div className="flex flex-col gap-1.5">
         <span className="text-[13px] font-semibold text-fg2">Mode</span>
         <Controller

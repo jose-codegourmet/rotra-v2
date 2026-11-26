@@ -12,6 +12,8 @@ export type RecentGamesCardProps = {
   onOpenPlayer?: (player: GameRowPlayer) => void
   /** Your own games: the share icon on each court (Share game) */
   onShareGame?: (sessionId: string, gameId: string) => void
+  /** Opens a game's match page: the whole court box (2026-11-25 match page log) */
+  onOpenGame?: (gameId: string) => void
 }
 
 /**
@@ -26,6 +28,7 @@ export function RecentGamesCard({
   me,
   onOpenPlayer,
   onShareGame,
+  onOpenGame,
 }: RecentGamesCardProps) {
   const ordered = sessions
     .slice()
@@ -60,6 +63,7 @@ export function RecentGamesCard({
                     ? () => onShareGame(session.id, game.id)
                     : undefined
                 }
+                onOpen={onOpenGame ? () => onOpenGame(game.id) : undefined}
                 dateLine={`${session.title} · ${formatSessionDay(Date.parse(session.finishedAt))} · ${session.clubName}`}
               />
             ))}

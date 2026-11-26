@@ -1,6 +1,6 @@
 # Cross-product states and permissions
 
-**Last verified:** 2026-11-07; the Match and participant counting table 2026-11-19 (Record games off).
+**Last verified:** 2026-11-07; the Match and participant counting table 2026-11-24 (Record games off, not ranked).
 
 **Status:** Screen behavior contract. A proposed screen cannot weaken these agreed access/result boundaries.
 
@@ -40,7 +40,7 @@
 | Payments on a cancelled session | Marks shown read-only; changes refused: “Payments are not available for this session.” | Same | — |
 | Public page of a cancelled session | **Cancelled** chip and “This session is cancelled. REASON.”; no Request to join | Last synced copy | — |
 | Short on players (live) | Banner “N players present: enough for … X sit out each game.”; a free court that can't get a match says “Not enough free players.” | Same (derived from local state) | Same |
-| Reduce or add courts / players per court in a prepared session | Saved with setup; roster over budget moves to the front of the waitlist, new slots fill from it | Save disabled | — |
+| Reduce or add courts / players per court in a prepared session | Saved with setup; roster over budget moves to the end of the waitlist, new slots fill from it | Save disabled | — |
 | Generate final result slides | After valid finalization | Unavailable for an unfinished session | Wait for valid finalization |
 | Publish/download new results | From available valid finalized output and allowed access | No offline finalization workaround | Do not publish unverified provisional results |
 | Claim player/login/reset | Requires server-backed flow. Real mode (#400): not connected yet. Account mapping and claim-link rules are decided (2026-11-07, #244); the routes and staged claim provisioning are not built | Not a Queue offline feature | Resume the same account flow safely |
@@ -92,7 +92,7 @@
 | Invalid match | On confirmed invalidation | None | No recorded game/win/loss | None |
 | Invalid session | Session-slot release policy unresolved | No official finalized credit | No official results/slides | None |
 | Cancelled session (never started) | No court was occupied | None | None; no games, standings or slides | None |
-| Match done in a session with Record games off ([D-2026-11-18-06](../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); mock app) | On confirmation, with no winner or score (“Finish match N?”) | Counts | No W/L, standings, slides or awards; the session shows **Not recorded** | None: nothing goes to player records or rankings |
+| Match done in a session with Record games off ([D-2026-11-20-02](../../mvp/decisions/2026-11-20.md#d-2026-11-20-02); mock app #1079, real mode #1080) | On confirmation, with the winner and score as usual | Counts | W/L, standings, slides and awards as usual; the session shows **Not ranked** | Goes to player records; its wins and losses stay out of the leaderboards, win rate, rank and game counts |
 
 ## Rank and award gates
 
@@ -122,9 +122,9 @@ A conflict is not permission to open a generic winner editor. Accepted unchanged
 | Generate matches draft stale | “The Main Queue changed since these were made. Check them before adding, or generate again.” Keep cards and selections visible | Review and revalidate on transfer; conflicts need attention |
 | Generate matches count missing | “Choose how many matches, then Generate.” Disabled actions explain “Choose how many matches first.” | Choose 2 / 3 / 4 / 6 explicitly |
 | Catch Up target missing / invalid | “Choose a game target, then Generate.”; “Enter a whole number of games, 1 or more.” for invalid input | Enter a target explicitly; the session minimum is only a placeholder and comparison |
-| Generate matches has no eligible players | “No one is free to play right now. Try Plan Ahead to include players who are mid-game.” Plan Ahead with nobody present: “No present players. Mark arrivals present in Players.” | Change player presence or strategy |
+| Generate matches has no eligible players | “No one is free to play right now. Try Plan Ahead to include players whose court is finishing soon.” Plan Ahead with nobody present: “No present players. Mark arrivals present in Players.” Plan Ahead with players present, none free and no court finishing soon: “No one is free and no court is finishing soon. Try again in a few minutes.” | Change player presence or strategy |
 | Generate matches full batch | “Made {n} of {n} matches.” Normal status text | Review before adding |
-| Generate matches short batch | “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “present” | Change eligible players or strategy |
+| Generate matches short batch | “Made {k} of {n}: not enough free players for another match.” Plan Ahead says “free or finishing-soon” | Change eligible players or strategy |
 | Catch Up target met in plan | “Everyone available reaches {target} games with these matches.” | Review any drafts; no automatic transfer |
 | Catch Up cannot progress | Keep drafts and show “Made {k} of {n}: no other match helps anyone reach {target} games.” Append “{s} more games are still needed to reach {target}.” when positive | Change target or eligible players, then Generate again |
 

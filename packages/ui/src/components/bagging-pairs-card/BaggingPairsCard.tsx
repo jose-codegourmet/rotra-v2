@@ -7,6 +7,7 @@ import { BaggingGamesRow } from '@rotra/ui/bagging-games-row'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
+import { levelLabel, levelRingClass } from '@rotra/ui/level-pill'
 
 /** A present roster player as the bagging surfaces draw them. */
 export type BaggingPlayer = {
@@ -72,36 +73,50 @@ export function BaggingPairsCard({
             {pairs.map((pair) => {
               const names = `${pair.a.shortName} and ${pair.b.shortName}`
               return (
-                <li
-                  key={pair.id}
-                  className="flex flex-wrap items-center gap-2.5 rounded-lg border border-border bg-bg px-3 py-2.5"
-                >
-                  <span className="flex flex-none">
-                    <Avatar name={pair.a.name} src={pair.a.photoUrl} size={28} />
-                    <Avatar
-                      name={pair.b.name}
-                      src={pair.b.photoUrl}
-                      size={28}
-                      className="-ml-1.5 shadow-[0_0_0_2px_var(--bg)]"
+                <li key={pair.id} className="@container rounded-lg border border-border bg-bg">
+                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2 px-3 py-2.5">
+                    <span className="flex flex-none">
+                      {[pair.a, pair.b].map((player, i) => (
+                        <span
+                          key={player.id}
+                          title={player.levelLabel ?? levelLabel(player.level)}
+                          className={cn(
+                            'inline-flex rounded-full',
+                            levelRingClass(player.level),
+                            i === 1 && '-ml-0.5',
+                          )}
+                        >
+                          <Avatar
+                            name={player.name}
+                            src={player.photoUrl}
+                            size={28}
+                            className="outline-2 outline-offset-1 outline-(--ring)"
+                          />
+                        </span>
+                      ))}
+                    </span>
+                    <b className="min-w-[8rem] flex-1 text-fg [overflow-wrap:break-word]">
+                      {names}
+                    </b>
+                    <BaggingGamesRow
+                      games={pair.games}
+                      minimumGames={minimumGames}
+                      disabled={disabled}
+                      className="order-3 basis-full @md:order-none @md:basis-auto"
+                      aria-label={`Games for ${names}`}
+                      onToggle={(value) => onToggleGame(pair.id, value)}
                     />
-                  </span>
-                  <b className="min-w-0 flex-1 text-fg [overflow-wrap:anywhere]">{names}</b>
-                  <BaggingGamesRow
-                    games={pair.games}
-                    minimumGames={minimumGames}
-                    disabled={disabled}
-                    aria-label={`Games for ${names}`}
-                    onToggle={(value) => onToggleGame(pair.id, value)}
-                  />
-                  <Button
-                    size="xs"
-                    variant="ghost"
-                    disabled={disabled}
-                    aria-label={`Remove pair ${names}`}
-                    onClick={() => onRemove(pair.id)}
-                  >
-                    Remove
-                  </Button>
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      className="order-2 @md:order-none"
+                      disabled={disabled}
+                      aria-label={`Remove pair ${names}`}
+                      onClick={() => onRemove(pair.id)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </li>
               )
             })}

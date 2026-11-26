@@ -23,8 +23,6 @@ export type RecordPlayerCardProps = RecordPlayerCardVariants & {
   minimum: number
   wins: number
   losses: number
-  /** False for an unrecorded session (Record games off): the W–L tile is not shown. Omitted reads as recorded. */
-  recorded?: boolean
   /** The picture opens the player's profile */
   onSelectPlayer: (playerId: string) => void
   className?: string
@@ -44,7 +42,6 @@ export function RecordPlayerCard({
   minimum,
   wins,
   losses,
-  recorded = true,
   onSelectPlayer,
   className,
 }: RecordPlayerCardProps) {
@@ -70,7 +67,7 @@ export function RecordPlayerCard({
         <p className="text-[13px] text-fg2">Not counted</p>
       ) : (
         <>
-          <div className={cn('grid gap-1.5', recorded ? 'grid-cols-2' : 'grid-cols-1')}>
+          <div className="grid grid-cols-2 gap-1.5">
             <div className="flex flex-col rounded-md bg-bg px-2 py-1.5">
               <b className="text-base font-bold tabular-nums">
                 {games}
@@ -78,14 +75,12 @@ export function RecordPlayerCard({
               </b>
               <span className="text-[11px] text-fg2">games</span>
             </div>
-            {recorded ? (
-              <div className="flex flex-col rounded-md bg-bg px-2 py-1.5">
-                <b className="text-base font-bold tabular-nums">
-                  {wins}–{losses}
-                </b>
-                <span className="text-[11px] text-fg2">W–L</span>
-              </div>
-            ) : null}
+            <div className="flex flex-col rounded-md bg-bg px-2 py-1.5">
+              <b className="text-base font-bold tabular-nums">
+                {wins}–{losses}
+              </b>
+              <span className="text-[11px] text-fg2">W–L</span>
+            </div>
           </div>
           <div className="mt-auto flex flex-wrap items-center gap-1.5">
             {games > minimum ? (

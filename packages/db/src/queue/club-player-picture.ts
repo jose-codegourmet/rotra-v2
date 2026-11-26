@@ -63,9 +63,35 @@ function clubPhotoPath(ref: string | null | undefined) {
   return path?.startsWith('clubs/') ? path : null
 }
 
-/** Best effort: a photo no longer current or previous is deleted; a failure leaves an orphan file. */
+/**
+ * Best effort: a photo no longer current or previous is deleted; a failure leaves an orphan file.
+ * A photo another record still uses is kept: a club that saved an unclaimed player from another
+ * club starts with that club's picture (D-2026-11-23-01), and registering copies it to the player.
+ */
 async function removePhotos(refs: (string | null | undefined)[]) {
-  const paths = refs.map(clubPhotoPath).filter((path): path is string => !!path)
+  const photos = refs.filter(isPhoto)
+  if (!photos.length) return
+  const [clubRows, playerRows] = await Promise.all([
+    prisma.clubPlayer.findMany({
+      where: {
+        OR: [{ avatarRef: { in: photos } }, { avatarPreviousRef: { in: photos } }],
+      },
+      select: { avatarRef: true, avatarPreviousRef: true },
+    }),
+    prisma.player.findMany({
+      where: {
+        OR: [{ avatarRef: { in: photos } }, { avatarPreviousRef: { in: photos } }],
+      },
+      select: { avatarRef: true, avatarPreviousRef: true },
+    }),
+  ])
+  const inUse = new Set(
+    [...clubRows, ...playerRows].flatMap((row) => [row.avatarRef, row.avatarPreviousRef]),
+  )
+  const paths = photos
+    .filter((ref) => !inUse.has(ref))
+    .map(clubPhotoPath)
+    .filter((path): path is string => !!path)
   if (paths.length)
     await bucket()
       .remove(paths)

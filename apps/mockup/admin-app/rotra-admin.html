@@ -892,7 +892,7 @@ function freshState() {
 function freshUi() {
   return {
     login: { email: '', pass: '', show: false, err: '', pending: false },
-    clubsQ: '', clubsF: 'all', playersQ: '', playersF: 'all', shown: 25, reqF: 'submitted',
+    clubsQ: '', clubsF: 'all', playersQ: '', playersF: 'all', playersG: 'all', shown: 25, reqF: 'submitted',
     cfg: null, cfgErr: '', cfgConflict: false, lic: null, sheet: null, nav: false, resetArmed: false, pendingGo: null,
   };
 }
@@ -1426,22 +1426,22 @@ function viewSales() {
 // The RTR ID carries the creation date as MMDDYY; show it the way people say it (“Jul 9, 2026”).
 const fmtAdded = (p) => { const d = p.rtr.split('-')[3] || ''; return /^\d{6}$/.test(d) ? fmtYmd(`20${d.slice(4)}-${d.slice(0, 2)}-${d.slice(2, 4)}`) : esc(d); };
 function playerMatches() {
-  const q = S.ui.playersQ.trim(), F = S.ui.playersF;
+  const q = S.ui.playersQ.trim(), F = S.ui.playersF, G = S.ui.playersG || 'all';
   const qp = plain(q), qd = q.replace(/\D/g, '');
-  return S.players.filter((p) => (F === 'all' || (F === 'registered' ? p.claimed : F === 'details' ? needsDetails(p) : !p.claimed))
+  return S.players.filter((p) => (G === 'all' || (G === 'none' ? !p.gender : p.gender === G)) && (F === 'all' || (F === 'registered' ? p.claimed : F === 'verified' ? isVerified(p) : F === 'unverified' ? p.claimed && !isVerified(p) : F === 'details' ? needsDetails(p) : !p.claimed))
     && (!q || plain(`${p.name} ${p.nick} ${p.rtr} ${p.email}`).includes(qp) || (qd.length >= 4 && (p.phone.replace(/\D/g, '').includes(qd) || p.phone.replace(/\D/g, '').includes(qd.replace(/^0/, '63'))))));
 }
 function viewPlayers() {
   const all = playerMatches(), size = S.ui.playerSize || 25, page = Math.min(S.ui.playerPage || 1, Math.max(1, Math.ceil(all.length / size)));
   const shown = all.slice((page-1)*size,page*size);
-  const labels = ['Advanced','Intermediate','Beginner','No rank','Registered','Unclaimed'];
-  const counts = [all.filter(p=>p.level>=6).length, all.filter(p=>p.level>=3&&p.level<6).length, all.filter(p=>p.level!==null&&p.level<3).length, all.filter(p=>p.level===null).length, all.filter(p=>p.claimed).length, all.filter(p=>!p.claimed).length];
+  const labels = ['Advanced','Intermediate','Beginner','No rank','Registered','Unclaimed','Verified','Not verified'];
+  const counts = [all.filter(p=>p.level>=6).length, all.filter(p=>p.level>=3&&p.level<6).length, all.filter(p=>p.level!==null&&p.level<3).length, all.filter(p=>p.level===null).length, all.filter(p=>p.claimed).length, all.filter(p=>!p.claimed).length, all.filter(isVerified).length, all.filter(p=>p.claimed&&!isVerified(p)).length];
   const adv = !!S.ui.playerAdv;
   const ic = (d) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-  const cell = (label, i) => `<button type="button" class="card pl-card ${i<4?'pl-level':'pl-account'}" data-act="playersF" data-v="${i===4?'registered':i===5?'unclaimed':'all'}" aria-label="${label}: ${counts[i]}. ${i>=4?'Show only these players':''}"><span>${label}</span><b class="tnum">${counts[i]}</b></button>`;
+  const cell = (label, i) => `<button type="button" class="card pl-card ${i<4?'pl-level':'pl-account'}" data-act="playersF" data-v="${['registered','unclaimed','verified','unverified'][i-4]||'all'}" aria-label="${label}: ${counts[i]}. ${i>=4?'Show only these players':''}"><span>${label}</span><b class="tnum">${counts[i]}</b></button>`;
   return shell(`<div class="page-head"><div class="row between"><div><h1>Players</h1><p class="muted">${all.length} player${all.length===1?'':'s'}</p></div><button class="btn primary pl-add" data-act="pmSheet" data-v="Add player"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add player</button></div></div>
-    <div class="pl-cards" role="group" aria-label="Player counts">${[0,1,2,3,4,5].map((i)=>cell(labels[i],i)).join('')}</div>
-    <div class="toolbar pl-tools"><div class="search"><input class="input" type="search" aria-label="Search players" placeholder="Search by name, RTR ID, phone or email" data-bind="ui.playersQ" data-live value="${esc(S.ui.playersQ)}"></div>${seg('playersF',S.ui.playersF,[['all','All'],['registered','Registered'],['unclaimed','Unclaimed'],['details','Details required']],'Filter by account')}
+    <div class="pl-cards" role="group" aria-label="Player counts">${labels.map((l,i)=>cell(l,i)).join('')}</div>
+    <div class="toolbar pl-tools"><div class="search"><input class="input" type="search" aria-label="Search players" placeholder="Search by name, RTR ID, phone or email" data-bind="ui.playersQ" data-live value="${esc(S.ui.playersQ)}"></div>${seg('playersF',S.ui.playersF,[['all','All'],['registered','Registered'],['verified','Verified'],['unverified','Not verified'],['unclaimed','Unclaimed'],['details','Details required']],'Filter by account')}
       <button class="btn" aria-expanded="${adv}" aria-controls="pl-adv" data-act="plAdv">${ic('<path d="M4 6h16M7 12h10M10 18h4"/>')} Filters</button>
       <div class="seg" role="group" aria-label="Layout"><button type="button" aria-pressed="${!S.ui.playerGrid}" aria-label="List view" title="List" data-act="plGrid" data-v="">${ic('<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>')}</button><button type="button" aria-pressed="${!!S.ui.playerGrid}" aria-label="Grid view" title="Grid" data-act="plGrid" data-v="1">${ic('<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>')}</button></div></div>
     ${adv ? `<section class="card stack pl-adv" id="pl-adv" aria-label="More filters">
@@ -1449,12 +1449,13 @@ function viewPlayers() {
         <label class="field"><span>Added from</span><input class="input" type="date"></label>
         <label class="field"><span>Added to</span><input class="input" type="date"></label>
         <label class="field"><span>Place registered</span><select class="input"><option>All places</option><option>Cebu City</option><option>Manila</option><option>Davao City</option></select></label>
+        <label class="field"><span>Gender</span><select class="input" data-change="plGender">${[['all','All'],['male','Male'],['female','Female'],['none','Not given']].map(([v,l])=>`<option value="${v}" ${(S.ui.playersG||'all')===v?'selected':''}>${l}</option>`).join('')}</select></label>
         <label class="field"><span>Archive status</span><select class="input"><option>Active</option><option>Archived</option><option>All</option></select></label>
       </div>
       <label class="pl-dup"><span class="stack tight"><b>Duplicates only</b><span class="small muted">Duplicate matches share a normalized name, phone or email. Flag only; never merge.</span></span><input type="checkbox" role="switch" class="pl-switch" aria-label="Duplicates only"></label>
       <div class="pl-adv-foot"><button class="btn" data-act="clearPlayers">Clear filters</button><button class="btn primary" data-act="plAdv">Done</button></div></section>` : ''}
     <div class="pl-bulk"><label class="pl-all"><input type="checkbox" data-change="plSelectAll"> Select all on this page</label><button class="btn xs" type="button">Select all ${all.length} matching</button></div>
-    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card player-row" data-act="pmSheet" data-v="Quick view" data-id="${p.id}"><label class="player-selection"><input class="player-select" type="checkbox" data-change="plCount" aria-label="Select ${esc(p.name)}"></label>${avatar(p)}<div class="main"><button class="link" data-act="pmSheet" data-v="Quick view" data-id="${p.id}">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${p.claimed?chip('Registered','ok'):chip('Unclaimed')}${needsDetails(p)?chip('Details required','warn'):''}${rankOf(p).chip}</div><p class="small muted">${esc(clubLine(p) || 'Created by Admin')} · Added ${fmtAdded(p)}</p></div><button class="btn" aria-label="Actions for ${esc(p.name)}" aria-haspopup="menu" data-act="pmMenu" data-id="${p.id}">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
+    <section class="${S.ui.playerGrid?'player-grid':'stack'}">${shown.map(p=>`<article class="card player-row" data-act="pmSheet" data-v="Quick view" data-id="${p.id}"><label class="player-selection"><input class="player-select" type="checkbox" data-id="${p.id}" data-change="plCount" aria-label="Select ${esc(p.name)}"></label>${avatar(p)}<div class="main"><button class="link" data-act="pmSheet" data-v="Quick view" data-id="${p.id}">${esc(p.name)}</button><p class="mono small">${esc(p.rtr)}</p><div class="row">${accountChips(p)}${needsDetails(p)?chip('Details required','warn'):''}${rankOf(p).chip}</div><p class="small muted">${esc(clubLine(p) || 'Created by Admin')} · Added ${fmtAdded(p)}</p></div><button class="btn" aria-label="Actions for ${esc(p.name)}" aria-haspopup="menu" data-act="pmMenu" data-id="${p.id}">⋯</button></article>`).join('') || '<div class="card empty">No players match. Clear filters.</div>'}</section>
     ${(() => {
       const pages = Math.max(1, Math.ceil(all.length / size));
       // 1 … 4 5 6 … 12: always the first and last page, and the pages next to the current one.
@@ -1466,7 +1467,7 @@ function viewPlayers() {
         <div class="pg-ctl"><button class="btn sm" data-act="plPage" data-v="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Previous page">‹<span class="pg-w"> Prev</span></button><span class="pg-nums">${items.map(btn).join('')}</span><button class="btn sm" data-act="plPage" data-v="${page + 1}" ${page >= pages ? 'disabled' : ''} aria-label="Next page"><span class="pg-w">Next </span>›</button></div>
         <label class="pg-size small muted">Rows <select class="input" aria-label="Rows per page" data-change="plSize">${[25, 50, 100].map((n) => `<option ${n === size ? 'selected' : ''}>${n}</option>`).join('')}</select></label></nav>`;
     })()}
-    <div class="pl-dock" role="region" aria-label="Actions for the selected players"><b class="pl-dock-n tnum">0 selected</b><div class="pl-dock-acts">${['Archive','Restore','Remove','Export CSV','Copy RTR IDs'].map(x=>`<button class="btn xs ${x==='Remove'?'danger':''}" data-act="pmSheet" data-v="${x}">${x}</button>`).join('')}</div><button class="btn xs ghost" data-act="plClear">Clear</button></div>`);
+    <div class="pl-dock" role="region" aria-label="Actions for the selected players"><b class="pl-dock-n tnum">0 selected</b><div class="pl-dock-acts">${['Archive','Restore','Set gender','Remove','Export CSV','Copy RTR IDs'].map(x=>`<button class="btn xs ${x==='Remove'?'danger':''}" data-act="${x==='Set gender'?'plSetGender':'pmSheet'}" ${x==='Set gender'?'':`data-v="${x}"`}>${x}</button>`).join('')}</div><button class="btn xs ghost" data-act="plClear">Clear</button></div>`);
 }
 function showPlayerActions(trigger,id) {
   document.querySelector('.player-actions-popover')?.remove();
@@ -1566,7 +1567,7 @@ function playerManagementSheet(action,id) {
   const qv = () => {
     const rk = rankOf(p), soc = socialsOf(p);
     return `<div class="stack qv">
-      <div class="qv-card"><div class="qv-banner" aria-hidden="true">${bannerArt(playerBanner(p))}</div><div class="qv-av">${avatar(p,'lg',true)}</div><div class="qv-id"><span class="pp-nm"><h2>${esc(p.nick || p.name)}</h2>${p.rtr ? `<a class="pp-ext" href="${esc(rotraProfileUrl(p))}" target="_blank" rel="noopener" aria-label="Open ${esc(p.nick || p.name)}'s ROTRA profile in a new tab" title="Open ROTRA profile in a new tab">${I.ext}</a>` : ''}</span>${p.nick ? `<span class="pp-full">${name}</span>` : ''}${p.rtr ? `<button type="button" class="btn xs pp-rtr" data-act="copyRtr" data-v="${esc(p.rtr)}" aria-label="Copy RTR ID ${esc(p.rtr)}" title="Copy RTR ID">${esc(p.rtr)}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>` : ''}<div class="row">${p.level == null ? chip('No rank yet') : chip(LEVELS[p.level], 'ok')}${p.claimed ? chip('Registered') : chip('Unclaimed')}${needsDetails(p) ? chip('Details required', 'warn') : ''}</div></div></div>
+      <div class="qv-card"><div class="qv-banner" aria-hidden="true">${bannerArt(playerBanner(p))}</div><div class="qv-av">${avatar(p,'lg',true)}</div><div class="qv-id"><span class="pp-nm"><h2>${esc(p.nick || p.name)}</h2>${p.rtr ? `<a class="pp-ext" href="${esc(rotraProfileUrl(p))}" target="_blank" rel="noopener" aria-label="Open ${esc(p.nick || p.name)}'s ROTRA profile in a new tab" title="Open ROTRA profile in a new tab">${I.ext}</a>` : ''}</span>${p.nick ? `<span class="pp-full">${name}</span>` : ''}${p.rtr ? `<button type="button" class="btn xs pp-rtr" data-act="copyRtr" data-v="${esc(p.rtr)}" aria-label="Copy RTR ID ${esc(p.rtr)}" title="Copy RTR ID">${esc(p.rtr)}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>` : ''}<div class="row">${p.level == null ? chip('No rank yet') : chip(LEVELS[p.level], 'ok')}${accountChips(p)}${needsDetails(p) ? chip('Details required', 'warn') : ''}</div></div></div>
       ${needsDetails(p) ? DETAILS_NOTE(p) : ''}
       ${p.claimed ? '' : `<div class="qv-invite"><div><b>Not registered yet</b><span class="small muted">Send an invite so this player claims the profile.</span></div><button class="btn sm primary" data-act="pmSheet" data-v="Invite to ROTRA" data-id="${id}">Invite to ROTRA</button></div>`}
       <dl class="kv qv-kv"><dt>Phone</dt><dd class="mono">${esc(showPhone(p.phone) || 'Not given')}</dd><dt>Email</dt><dd class="mono" style="overflow-wrap:anywhere">${esc(p.email || 'Not given')}</dd><dt>Socials</dt><dd class="qv-soc">${soc.length ? soc.map(([n, u]) => `<a class="chip" href="https://${esc(u)}" target="_blank" rel="noopener noreferrer" title="${esc(u)}">${n}</a>`).join('') : '<span class="muted">None added</span>'}</dd>${savedBy(p) ? `<dt>Created by</dt><dd>${savedByHtml(p)}<br><span class="small muted">${NO_BOARD}</span></dd>` : ''}</dl>
@@ -1643,6 +1644,11 @@ function playerVerification(p) {
 const verificationChip = (count, overridden) => overridden || count === 3
   ? chip(`${I.check} ${overridden ? 'Verified by Admin' : 'Verified'}`, 'ok')
   : chip(`Not verified · ${count} of 3`, 'warn');
+// Owner, November 23, 2026: Admin sees who is verified in the Players list, its filters and every player header.
+// A verified player shows Verified (or Verified by Admin) in place of Registered; a registered player who isn't shows both.
+const isVerified = (p) => { if (!p.claimed) return false; const v = playerVerification(p); return v.overridden || v.count === 3; };
+const accountChips = (p) => { if (!p.claimed) return chip('Unclaimed'); const { count, overridden } = playerVerification(p);
+  return overridden || count === 3 ? verificationChip(count, overridden) : chip('Registered', 'ok') + verificationChip(count, overridden); };
 const verificationAction = (clear) => clear ? 'Clear override' : 'Set Verified by Admin';
 function playerVerificationCard(p) {
   const { steps, count, overridden } = playerVerification(p);
@@ -1702,7 +1708,7 @@ function viewPlayer() {
       <section class="card stack"><h2>Record of actions</h2>${history.length ? `<ul class="log">${history.map((l) => `<li>${esc(l.text)}<span>${fmtAt(l.at)} · ${esc(l.actor)}</span></li>`).join('')}</ul>` : '<p class="small muted">No Admin actions recorded for this player.</p>'}</section>`,
   };
   return shell(`${backBtn('players', 'Players')}
-    <div class="hero">${avatar(p, 'lg', true)}<div class="main"><h1>${esc(p.name)}</h1><div class="row">${p.claimed ? chip('Registered', 'ok') : chip('Unclaimed')}${needsDetails(p) ? chip('Details required', 'warn') : ''}${rk.chip}<span class="mono small muted">${esc(p.rtr)}</span></div></div></div>
+    <div class="hero">${avatar(p, 'lg', true)}<div class="main"><h1>${esc(p.name)}</h1><div class="row">${accountChips(p)}${needsDetails(p) ? chip('Details required', 'warn') : ''}${rk.chip}<span class="mono small muted">${esc(p.rtr)}</span></div></div></div>
     ${twin.length ? notice('warn', `<b>Another player has the same name.</b> ${twin.map((x) => `<button class="link acc" data-act="openPlayer" data-id="${x.id}">${esc(x.name)}</button> (<span class="mono">${esc(x.rtr)}</span>)`).join(', ')} is a separate identity. Admin doesn't merge players.`) : ''}
     <div class="tabs" role="tablist" aria-label="Player sections">${PT.map(([k, l, badge]) => `<button role="tab" id="ptab-${k}" aria-selected="${k === ptab}" aria-controls="player-panel" data-act="playerTab" data-v="${k}">${l}${badge}</button>`).join('')}</div>
     <div id="player-panel" role="tabpanel" aria-labelledby="ptab-${ptab}" class="stack" style="gap:20px">${panels[ptab]}</div>`);
@@ -2355,8 +2361,30 @@ const ACT = {
   plAdv: () => { S.ui.playerAdv = !S.ui.playerAdv; render(); },
   plGrid: (el) => { S.ui.playerGrid = !!el.dataset.v; render(); },
   plPage: (el) => { S.ui.playerPage = +el.dataset.v; render(); },
+  // Set gender (owner, November 25, 2026): Admin sets Male, Female or Not given for every selected
+  // player, registered or unclaimed. The player can still change their own afterwards.
+  plSetGender: () => {
+    const ids = [...document.querySelectorAll('.player-select:checked')].map((x) => x.dataset.id);
+    if (!ids.length) return;
+    document.querySelectorAll('.scrim,.sheet').forEach((x) => x.remove());
+    const body = `<p>Set the gender for ${ids.length === 1 ? esc(playerOf(ids[0])?.name || 'this player') : `${ids.length} players`}. Players can still change their own in Edit profile.</p>
+      <fieldset class="stack"><legend class="small muted">Gender</legend>${[['male','Male'],['female','Female'],['none','Not given']].map(([v,l])=>`<label class="row"><input type="radio" name="pl-gender" value="${v}" data-change="plGenderPick"> ${l}</label>`).join('')}</fieldset>
+      <div id="pl-gender-results" role="status"></div>`;
+    document.body.insertAdjacentHTML('beforeend', sheetWrap(`Set gender`, body, `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" id="pl-gender-go" data-act="plGenderSave" data-ids="${ids.join(',')}" disabled>Set gender</button>`));
+    document.getElementById('sheet-title')?.focus();
+  },
+  plGenderSave: (el) => {
+    const picked = document.querySelector('input[name="pl-gender"]:checked')?.value;
+    if (!picked) return;
+    const value = picked === 'none' ? null : picked;
+    const ids = (el.dataset.ids || '').split(',').filter(Boolean);
+    ids.forEach((id) => { const p = playerOf(id); if (p) p.gender = value; });
+    document.querySelectorAll('.scrim,.sheet').forEach((x) => x.remove());
+    toast(`${ids.length} succeeded, 0 failed`);
+    render();
+  },
   playersF: (el) => { S.ui.playersF = el.dataset.v; S.ui.shown = 25; render(); },
-  clearPlayers: () => { S.ui.playersQ = ''; S.ui.playersF = 'all'; S.ui.shown = 25; render(); },
+  clearPlayers: () => { S.ui.playersQ = ''; S.ui.playersF = 'all'; S.ui.playersG = 'all'; S.ui.shown = 25; render(); },
   morePlayers: () => { S.ui.shown += 25; render(); },
   reqF: (el) => { S.ui.reqF = el.dataset.v; render(); },
   viewPhoto: (el) => {
@@ -2786,6 +2814,8 @@ const CHANGE = {
   },
   charFiles: (el) => { addCharFiles(el.files); el.value = ''; },
   bannerFiles: (el) => { addBannerFiles(el.files); el.value = ''; },
+  plGender: (el) => { S.ui.playersG = el.value; S.ui.playerPage = 1; S.ui.shown = 25; render(); },
+  plGenderPick: () => { const go = document.getElementById('pl-gender-go'); if (go) go.disabled = false; },
   plSize: (el) => { S.ui.playerSize = +el.value; S.ui.playerPage = 1; render(); },
   // Edit profile: the RTR ID preview follows the registration place and date.
   peRtr: (el) => { const p = playerOf(el.dataset.id), box = document.getElementById('pe-rtr'); if (p && box) box.textContent = rtrWith(p.rtr, pv('place'), pv('regDate')); },

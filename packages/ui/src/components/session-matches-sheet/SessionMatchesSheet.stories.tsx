@@ -1,4 +1,4 @@
-import { joseSession } from '@rotra/data/fixtures/player-games'
+import { JOSE_SESSIONS, joseSession } from '@rotra/data/fixtures/player-games'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { SessionMatchesSheet } from './SessionMatchesSheet'
@@ -36,3 +36,9 @@ export const SomeoneElse: Story = {
 /** The session page is gone: no Session page button */
 export const SessionPageGone: Story = { args: { session: { ...session, sessionPageUrl: null } } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
+/** A not ranked session: the Not ranked chip after the club; its games count in the record. */
+export const NotRanked: Story = {
+  args: { session: JOSE_SESSIONS.find((s) => s.ranked === false) ?? null },
+  globals: { theme: 'dark' },
+}
+export const NotRankedLight: Story = { ...NotRanked, globals: { theme: 'light' } }

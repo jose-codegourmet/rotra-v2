@@ -1,6 +1,12 @@
+import { SHOT_LABELS } from '@rotra/data/player/onboarding-answers'
 import type { PlayerProfile } from '@rotra/data/player/types'
 import { Card } from '@rotra/ui/card'
+import { Chip } from '@rotra/ui/chip'
+import { COURT_POSITIONS } from '@rotra/ui/court-position-card'
+import { FAVORITE_PLAYERS } from '@rotra/ui/favorite-player-chips'
 import { Icon } from '@rotra/ui/icon'
+
+const GENDER_LABEL = { male: 'Male', female: 'Female' } as const
 export type PlayerAboutCardProps = { profile: PlayerProfile; isOwn?: boolean }
 const PROVIDERS = {
   facebook: 'Facebook',
@@ -17,20 +23,57 @@ export function PlayerAboutCard({ profile, isOwn = false }: PlayerAboutCardProps
   ]
     .filter(Boolean)
     .join(', ')
+  const court = COURT_POSITIONS.find((p) => p.value === profile.playStyle)?.title
+  // The listed shots first, in the list's order, then the player's own.
+  const shots = [
+    ...(profile.shots ?? []).map((id) => SHOT_LABELS[id] ?? id),
+    ...(profile.shotsOther ?? []),
+  ]
+  const favorite =
+    profile.favoritePlayer === 'other'
+      ? profile.favoritePlayerOther
+      : FAVORITE_PLAYERS.find((p) => p.value === profile.favoritePlayer)?.label
   const links = Object.entries(profile.socialLinks).filter(([, url]) => Boolean(url))
   return (
     <Card asChild>
       <section className="flex flex-col gap-3">
         <h2>About</h2>
+        {profile.gender || isOwn ? (
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
+              Gender
+            </span>
+            <p className={profile.gender ? undefined : 'text-fg2'}>
+              {profile.gender ? GENDER_LABEL[profile.gender] : 'Not added'}
+            </p>
+          </div>
+        ) : null}
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
-            Playing style
+            Where they play
           </span>
-          <p className={profile.playingStyle ? undefined : 'text-fg2'}>
-            {profile.playingStyle ||
-              `${isOwn ? "You haven't" : "This player hasn't"} added a playing style yet.`}
+          <p className={court ? undefined : 'text-fg2'}>
+            {court ?? `${isOwn ? "You haven't" : "This player hasn't"} added this yet.`}
           </p>
         </div>
+        {shots.length ? (
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">Shots</span>
+            <div className="flex flex-wrap gap-1.5">
+              {shots.map((shot) => (
+                <Chip key={shot}>{shot}</Chip>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {favorite ? (
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
+              Favorite player
+            </span>
+            <p>{favorite}</p>
+          </div>
+        ) : null}
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold tracking-[0.6px] text-fg2 uppercase">
             Experience

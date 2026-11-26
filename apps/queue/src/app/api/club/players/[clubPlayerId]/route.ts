@@ -35,6 +35,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
         clubPlayerId,
         fullName: text(body.fullName),
         nickname: text(body.nickname) || null,
+        level: text(body.level) || null,
         phoneE164: phone?.data ?? null,
         email: text(body.email) || null,
         playingStyle: text(body.playingStyle),

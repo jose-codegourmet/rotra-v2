@@ -76,6 +76,8 @@ type WireStatus = {
   stage: FinalizationStage
   accepted: boolean
   failedStage: FinalizationStage | null
+  /** Record games: false = not ranked. Missing reads as true (older wire shapes). */
+  recordGames?: boolean
   jobs: { kind: string; status: 'pending' | 'running' | 'done' | 'failed' }[]
 }
 
@@ -86,9 +88,8 @@ type WireStatus = {
  */
 function finalizationOf(wire: WireStatus): SessionFinalization {
   const base = { sessionId: wire.sessionId, commandId: wire.commandId }
-  // An unrecorded session (D-2026-11-18-06) is done at `finishing`: no player records, no slides.
-  if (wire.state === 'done')
-    return { ...base, state: 'done', stage: wire.stage === 'finishing' ? 'finishing' : 'slides' }
+  // Every session runs all four stages, Record games off too (D-2026-11-20-02).
+  if (wire.state === 'done') return { ...base, state: 'done', stage: 'slides' }
   if (!wire.accepted)
     return wire.state === 'failed'
       ? { ...base, state: 'failed', stage: wire.stage, failedStage: wire.failedStage ?? wire.stage }
@@ -103,7 +104,7 @@ function finalizationOf(wire: WireStatus): SessionFinalization {
 }
 
 const DONE_TOAST = 'Session finished · player records updated'
-const UNRECORDED_TOAST = 'Session finished · games not recorded'
+const NOT_RANKED_TOAST = 'Session finished · player records updated, not ranked'
 const PREPARING = 'Session finished; results are being prepared'
 
 export async function realFinalizeSession(input: { sessionId: string; commandId: string }) {
@@ -112,7 +113,7 @@ export async function realFinalizeSession(input: { sessionId: string; commandId:
     { method: 'POST', body: { commandId: input.commandId } },
   )
   const data = finalizationOf(status)
-  const done = data.stage === 'finishing' ? UNRECORDED_TOAST : DONE_TOAST
+  const done = status.recordGames === false ? NOT_RANKED_TOAST : DONE_TOAST
   return accepted(data, data.state === 'done' ? done : PREPARING)
 }
 

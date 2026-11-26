@@ -10,7 +10,8 @@ export const onCourtSheetMeta = {
     'Pass swapTarget with the next waiting match that is ready for this court (same number of courts, counting this match’s players as free) and its queue position; null disables Swap with the queue and the line says no other match is ready. onSwapWithQueue opens SwapMatchSheet with fromMatch.',
     'Pass canMoveCourt false when no free open court is left (two for 5v5). onMoveCourt opens the Move match sheet; onReplacePlayer opens the Replace player sheet. Both are plain lineup changes: never a substitution, never the credit question.',
     'Start match is one tap: the owner rechecks presence and busy players. Set pendingAction while Start match or Send back runs so neither fires twice and the sheet cannot be dismissed; on a failed recheck keep the sheet open and pass message "Something changed. Review the match again." The timer starts only at Start match.',
-    'Do not use for a Playing match; use ActiveMatchSheet (no switching sides there).',
+    "onSelectPlayer opens the profile from a player's picture; onReplace opens Replace player for the tapped card.",
+    'Do not use for a Playing match; use ActiveMatchSheet.',
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',

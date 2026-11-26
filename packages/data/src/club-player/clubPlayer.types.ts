@@ -1,6 +1,9 @@
 import type { PlayerCharacterId } from '../player/picture'
 import type { PlayingLevel } from '../player/player.types'
 
+/** Optional gender (D-2026-11-19-01); decides the match category. Not given reads as null. */
+export type Gender = 'male' | 'female'
+
 /**
  * How a saved player joined the club (D-2026-11-09-06). Missing on older or story rows reads as
  * `added`; use `joinedViaOf` rather than reading the field directly.
@@ -58,6 +61,11 @@ export type ClubPlayer = {
   clubNickname?: string | null
   identity: 'registered' | 'unclaimed' | 'guest' | 'pending'
   playingLevel: PlayingLevel | null
+  /**
+   * Optional gender the club gave for this player (D-2026-11-19-01). Missing or null = not given,
+   * which makes any match with them Genderless. Real mode has no column yet: always missing.
+   */
+  gender?: Gender | null
   /** The club deleted this saved player; history still points at it (mock store only) */
   removedAt?: number
   joinedVia?: JoinedVia
@@ -91,6 +99,10 @@ export type ClubPlayerDetails = {
   nickname: string | null
   /** The club's own phone for an unclaimed player is on file; a guest never has one */
   phoneOnFile: boolean
+  /** Gender the club gave (D-2026-11-19-01); null or missing = not given */
+  gender?: Gender | null
+  /** Level for this club (the saved level, or the latest session one); null for none yet */
+  level: PlayingLevel | null
   /**
    * Edit details › Profile picture: what shows now and the previous photo, if any
    * (D-2026-11-09-12; stored on `club_players.avatar_ref` in real mode).
@@ -110,6 +122,10 @@ export type ClubPlayerDetails = {
 export type ClubPlayerDetailsInput = {
   fullName: string
   nickname: string
+  /** Optional gender: 'male', 'female' or '' for not given */
+  gender?: Gender | ''
+  /** Level for this club: a playing level code, or '' for none */
+  level: string
   phone: string
   email: string
   playingStyle: string

@@ -16,12 +16,21 @@ type CaseFile = {
   version: number
   cases: { name: string; now?: number; input: unknown; expected: unknown }[]
 }
+// Rules written in TypeScript first, whose Go copy (and so the .wasm export) follows before the next
+// Go merge. Their cases run in @rotra/data; remove a key here in the PR that adds its Go rule.
+// The Go tests skip the same keys: apps/api/internal/rulecases (GoCopyPending).
+const GO_COPY_PENDING: ReadonlySet<string> = new Set([
+  'courts/expectedFinish',
+  'roster/levelRestrictionBlock',
+])
 const files: { key: string; file: CaseFile }[] = []
 for (const v of readdirSync(CASES)) {
   for (const area of readdirSync(join(CASES, v))) {
     for (const f of readdirSync(join(CASES, v, area))) {
+      const key = `${area}/${f.replace(/\.json$/, '')}`
+      if (GO_COPY_PENDING.has(key)) continue
       const file = JSON.parse(readFileSync(join(CASES, v, area, f), 'utf8')) as CaseFile
-      files.push({ key: `${area}/${f.replace(/\.json$/, '')}`, file })
+      files.push({ key, file })
     }
   }
 }

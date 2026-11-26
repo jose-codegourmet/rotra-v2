@@ -4,12 +4,14 @@ import type { SelfCheckInMark } from '../match-request/matchRequest.types'
 import type { MockState } from '../mock/store'
 import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import type { QueueSession, SessionCourt } from '../queue-session/queueSession.types'
+import { levelRestrictionBlockFor } from '../session-roster/levelRestriction.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import { closePendingSlotTransfers } from '../slot-transfer/closeSlotTransfers'
 import type {
   ParticipantStats,
   ParticipantStatsRead,
   ParticipantTonight,
+  PlayerLevelBlock,
   PublicSessionParticipant,
   PublicSkillMix,
 } from './publicSession.types'
@@ -125,6 +127,28 @@ export function memberClubPlayer(state: MockState, clubId: string, playerId: str
       (p) => p.clubId === clubId && p.playerId === playerId && !p.removedAt && !!p.playingLevel,
     ) ?? null
   )
+}
+
+/**
+ * Not open to your level (D-2026-11-19-12): the signed-in Player's level at the session's club (their
+ * current saved record's) against the session's restriction and the roster's bands. Null when they
+ * may request; a Player with no level at the club always may.
+ */
+export function playerLevelBlock(
+  state: MockState,
+  session: Pick<QueueSession, 'id' | 'clubId' | 'levelRestriction'>,
+  playerId: string,
+): PlayerLevelBlock | null {
+  const level = state.clubPlayers.find(
+    (p) => p.clubId === session.clubId && p.playerId === playerId && !p.removedAt,
+  )?.playingLevel
+  if (!level) return null
+  const reason = levelRestrictionBlockFor(
+    session.levelRestriction,
+    level,
+    state.roster.filter((r) => r.sessionId === session.id).map((r) => r.level),
+  )
+  return reason ? { reason, level } : null
 }
 
 /**

@@ -1,4 +1,5 @@
 import 'server-only'
+import { canMovePlaying } from '@rotra/data/match/liveMatch.rules'
 import {
   autoFillPlacements,
   canMoveCourt,
@@ -428,10 +429,15 @@ export async function moveCourt(
     const match = await activeMatch(tx, session.id, input.matchId)
     if (match.courtUsage.some((u) => u.acquireOperationId === input.operationId))
       return matchDto(match)
-    requireOnCourt(match)
+    // A Playing match moves too (owner, November 19, 2026; real mode November 25, 2026): it keeps
+    // playing on the new court(s) with the same start time; only the court usage changes.
+    const playing = match.state === 'active'
+    if (playing) requireLineupEditable(match)
+    else requireOnCourt(match)
     const { ctx } = await matchContext(tx, session)
     const view = ctx.matches.find((m) => m.id === match.id)
-    if (!view || !canMoveCourt(view, input.courtIds, ctx)) throw conflict()
+    const allowed = playing ? canMovePlaying : canMoveCourt
+    if (!view || !allowed(view, input.courtIds, ctx)) throw conflict()
     const now = new Date()
     await releaseCourts(tx, match, input.operationId, now)
     await acquireCourts(tx, session, match, input.courtIds, input.operationId, now)
@@ -441,6 +447,43 @@ export async function moveCourt(
     return result
   })
   return withAutoPlaced(done, autoPlaced)
+}
+
+/**
+ * Q-CONSOLE court drag · Trade courts (owner, November 25, 2026, for a match put on the wrong
+ * court): two one-court matches on courts (Getting ready or Playing) swap courts in one transaction.
+ * Each keeps its state, players and start time; only the court holds and usage change. No court
+ * frees, so Auto Queue does nothing. Keyed on this match's court usage (a retry returns both).
+ */
+export async function tradeCourts(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string; withMatchId: string },
+) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const match = await activeMatch(tx, session.id, input.matchId)
+    const reply = async () => ({
+      match: matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow),
+      other: matchDto((await loadMatch(tx, session.id, input.withMatchId)) as MatchRow),
+    })
+    if (match.courtUsage.some((u) => u.acquireOperationId === input.operationId)) return reply()
+    const other = await activeMatch(tx, session.id, input.withMatchId)
+    const one = (x: MatchRow) =>
+      (x.state === 'on_court' || x.state === 'active') && !x.decision && x.courtHolds.length === 1
+    if (match.id === other.id || !one(match) || !one(other)) throw conflict()
+    const mine = match.courtHolds[0]?.courtId as string,
+      theirs = other.courtHolds[0]?.courtId as string
+    const now = new Date()
+    await releaseCourts(tx, match, input.operationId, now)
+    await releaseCourts(tx, other, input.operationId, now)
+    await acquireCourts(tx, session, match, [theirs], input.operationId, now)
+    await acquireCourts(tx, session, other, [mine], input.operationId, now)
+    await tx.match.updateMany({
+      where: { id: { in: [match.id, other.id] } },
+      data: { revision: { increment: 1 } },
+    })
+    return reply()
+  })
 }
 
 /**
@@ -521,6 +564,98 @@ export async function replacePlayer(
     const changed = (await loadMatch(tx, session.id, match.id)) as MatchRow
     await holdPlayers(tx, session, changed, roster, now)
     return matchDto(changed)
+  })
+}
+
+/**
+ * Q-CONSOLE court card / Q-MATCH · Pause match (real mode November 25, 2026): a Playing match started
+ * by mistake goes back to Getting ready on the same court(s). The start time clears, so Start match
+ * gives it a fresh one; players, sides and substitutions stay and nothing is recorded. The court and
+ * player holds stay, so Auto Queue does nothing. A retry finds it on court already and returns it.
+ */
+export async function pauseMatch(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string },
+) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const match = await activeMatch(tx, session.id, input.matchId)
+    if (match.state === 'on_court' && !match.decision) return matchDto(match)
+    if (match.state !== 'active' || match.decision) throw conflict()
+    await tx.match.update({
+      where: { id: match.id },
+      data: {
+        state: 'on_court',
+        startedAt: null,
+        placedAt: match.placedAt ?? new Date(),
+        revision: { increment: 1 },
+      },
+    })
+    return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+  })
+}
+
+/**
+ * Q-ON-COURT / Q-MATCH · Switch sides on a court (drag a player onto someone in the other pair):
+ * one player from each team trade teams; nobody new joins and no substitution is recorded (real
+ * mode November 25, 2026). Getting ready: the match becomes manual and protected, like any lineup
+ * edit. Playing (owner, November 19, 2026): "swapped partners"; the result follows the pairs as
+ * they are at Match done. The open participations change `team` in place (a started match's rows
+ * are never deleted). `aTeam` is the team the client saw `aId` on: a retry that finds the two
+ * already switched returns the match unchanged instead of switching them back.
+ */
+export function switchSides(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string; aId: string; bId: string; aTeam: 'A' | 'B' },
+) {
+  return tradeTeams(context, sessionId, input, false)
+}
+
+/**
+ * Q-ON-COURT / Q-MATCH · Swap from match (Replace player sheet): the player coming out (`aId`) and
+ * an opponent in this same match (`bId`) trade places; nobody new joins and no substitution is
+ * recorded. Like Replace player, the match becomes manual and protected whether Getting ready or
+ * Playing (real mode November 25, 2026). Same keying as Switch sides.
+ */
+export function swapFromMatch(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string; aId: string; bId: string; aTeam: 'A' | 'B' },
+) {
+  return tradeTeams(context, sessionId, input, true)
+}
+
+/** One player from each team trade teams in place; `protectAlways` also protects a Playing match. */
+function tradeTeams(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string; aId: string; bId: string; aTeam: 'A' | 'B' },
+  protectAlways: boolean,
+) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const match = await activeMatch(tx, session.id, input.matchId)
+    requireLineupEditable(match)
+    const seat = (id: string) =>
+      match.participations.find((p) => p.sessionPlayerId === id && !p.leftAt)
+    const a = seat(input.aId),
+      b = seat(input.bId)
+    if (!a || !b || input.aId === input.bId) throw conflict()
+    const other = input.aTeam === 'A' ? 'B' : 'A'
+    if (a.team === other && b.team === input.aTeam) return matchDto(match)
+    if (a.team !== input.aTeam || b.team !== other) throw conflict()
+    await tx.matchParticipation.update({ where: { id: a.id }, data: { team: other } })
+    await tx.matchParticipation.update({ where: { id: b.id }, data: { team: input.aTeam } })
+    await tx.match.update({
+      where: { id: match.id },
+      data: {
+        ...(protectAlways || match.state === 'on_court'
+          ? { origin: 'manual', manualProtected: true }
+          : {}),
+        revision: { increment: 1 },
+      },
+    })
+    return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
   })
 }
 
@@ -793,10 +928,8 @@ async function decide(
 /**
  * Winner-only results keep both scores null; scores must agree with the winner.
  *
- * A session with Record games off (D-2026-11-18-06): the match ends with no winner and no score,
- * whatever the call carries; nothing is validated or kept. It still counts toward each player's
- * games and the minimum, like any completed match. A no-result completion is accepted only there:
- * a recorded session still needs a winner (the database refuses the other shape either way).
+ * A session with Record games off stores the winner and score like any other (D-2026-11-20-02):
+ * every completed match needs a winner (the database refuses a completion without one).
  */
 export async function completeMatch(
   context: ClubContext,

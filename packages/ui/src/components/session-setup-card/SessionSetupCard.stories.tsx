@@ -45,7 +45,7 @@ export const WithCosts: Story = {
     extraRows: [{ label: 'Costs', value: '₱3,060 estimated · ₱219 a player to break even' }],
   },
 }
-/** Record games off: "Off · no results kept" */
+/** Record games off: "Off · not ranked" */
 export const RecordGamesOff: Story = { args: { recordGames: false } }
 export const RecordGamesOffLight: Story = { ...RecordGamesOff, globals: { theme: 'light' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
@@ -87,4 +87,13 @@ export const ScoringBestOfThree: Story = {
 export const ScoringBestOfThreeLight: Story = { ...ScoringBestOfThree, globals: { theme: 'light' } }
 export const ScoringFixedAfterStart: Story = {
   args: { scoringLabel: '16/31, no deuce', fixedAfterStart: true },
+}
+/** The Levels row (D-2026-11-19-12): a restriction label, or the slots per level. */
+export const LevelsBeginnersOnly: Story = { args: { levelsLabel: 'Beginners only' } }
+export const LevelsSlotsPerLevel: Story = {
+  args: { levelsLabel: '6 beginner · 5 intermediate · 5 advanced' },
+}
+export const LevelsSlotsPerLevelLight: Story = {
+  ...LevelsSlotsPerLevel,
+  globals: { theme: 'light' },
 }

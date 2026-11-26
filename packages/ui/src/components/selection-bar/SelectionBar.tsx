@@ -28,6 +28,8 @@ export type SelectionBarProps = {
   primaryLabel?: string
   /** Extra buttons before Clear, e.g. Auto Queue's secondary "Add all N" */
   actions?: ReactNode
+  /** Extra buttons between Clear and the primary, e.g. the Players view's Set present / Set away */
+  trailingActions?: ReactNode
   /** The region's name: "Selected players", or "Selected drafts" in Auto Queue */
   ariaLabel?: string
   className?: string
@@ -46,6 +48,7 @@ export function SelectionBar({
   onMakeMatch,
   primaryLabel = 'Make match',
   actions,
+  trailingActions,
   ariaLabel = 'Selected players',
   className,
 }: SelectionBarProps) {
@@ -79,6 +82,7 @@ export function SelectionBar({
         <Button size="sm" variant="ghost" onClick={onClear}>
           Clear
         </Button>
+        {trailingActions}
         {onMakeMatch ? (
           <Button size="sm" variant="primary" onClick={onMakeMatch} disabled={!valid}>
             {primaryLabel}

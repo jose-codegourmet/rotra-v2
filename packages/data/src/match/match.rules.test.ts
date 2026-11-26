@@ -69,23 +69,23 @@ describe('Standings grouped by position', () => {
   const rows = [
     row('Amy', 1, 4, 2, 6),
     row('Ben', 1, 4, 2, 6),
-    row('Cat', 3, 2, 1, 3),
-    row('Dan', 3, 2, 1, 5),
-    row('Eve', 3, 2, 1, 4),
-    row('Fay', 6, 0, 3, 3),
+    row('Cat', 2, 2, 1, 3),
+    row('Dan', 2, 2, 1, 5),
+    row('Eve', 2, 2, 1, 4),
+    row('Fay', 3, 0, 3, 3),
   ]
 
-  it('makes one row per position, players in standings order (1, 1, 3 → 1, 3, 6)', () => {
+  it('makes one row per position, players in standings order (1, 1, 2, 2, 2, 3 → 1, 2, 3)', () => {
     expect(groupStandings(rows, (r) => r.name)).toEqual([
       { position: 1, players: ['Amy', 'Ben'], wins: 4, losses: 2, games: 6 },
       {
-        position: 3,
+        position: 2,
         players: ['Cat', 'Dan', 'Eve'],
         wins: 2,
         losses: 1,
         games: { min: 3, max: 5 },
       },
-      { position: 6, players: ['Fay'], wins: 0, losses: 3, games: 3 },
+      { position: 3, players: ['Fay'], wins: 0, losses: 3, games: 3 },
     ])
   })
 

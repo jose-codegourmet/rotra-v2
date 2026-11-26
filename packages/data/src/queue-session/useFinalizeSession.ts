@@ -2,6 +2,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { clubKeys } from '../club/queryKeys'
 import { deviceKeys } from '../device/queryKeys'
+import { inventoryKeys } from '../inventory/queryKeys'
 import { matchKeys } from '../match/queryKeys'
 import { publicSessionKeys } from '../public-session/queryKeys'
 import { sessionResultKeys } from '../session-result/queryKeys'
@@ -32,6 +33,8 @@ export function useFinalizeSession(sessionId: string) {
         client.invalidateQueries({ queryKey: clubKeys.all }),
         client.invalidateQueries({ queryKey: deviceKeys.all }),
         client.invalidateQueries({ queryKey: publicSessionKeys.all }),
+        // Session done deducts the planned tubes (D-2026-11-26-01).
+        client.invalidateQueries({ queryKey: inventoryKeys.all }),
       ])
     },
   })

@@ -7,7 +7,6 @@ export const publicMatchHistoryMeta = {
     'Replaces the read-only Queue on the Details tab of a finished session.',
     'Pass the open tab’s matches as they show now: on All the container keeps only those started by the replay’s time and sets `now` on the ones on court.',
     'Before the club shares the results, All shows the not-shared line and Yours lists only the viewer’s matches.',
-    'Pass recorded={false} for an unrecorded session (Record games off): only the heading and "This session\'s games were not recorded." show, for a visitor and a signed-in player alike.',
     'Best of 3 (Q22): an item carries `score` “2–1” and `gameScores` (every game, read from the left side); the container flips both when the viewer played on Team B, as it flips `score`.',
     'Visitors (`signedIn` false) see the Log in line only.',
   ],

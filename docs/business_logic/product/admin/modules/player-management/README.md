@@ -28,7 +28,7 @@ Archive requires a reason, is reversible and hides identities from default direc
 
 Registration links open `/claim/{token}`, expire after seven days, and are issued as ROTRA Admin. Issuing replaces the earlier active link. Never put the token in the audit. ROTRA sends no email or SMS. A player who registers from an Admin link is not assigned to a club (owner decision, November 8, 2026).
 
-Bulk actions: Archive, Restore, Remove (only when all selected records qualify), Export CSV and Copy RTR IDs. CSV includes name, nickname, RTR ID, account, rank, clubs, added and place, never contacts. Selection survives pages and view changes; filters clear it. Mutations report each record and retry only failures.
+Bulk actions: Archive, Restore, **Set gender** (owner, November 25, 2026, [D-2026-11-19-01](../../../../../mvp/decisions/2026-11-19.md#d-2026-11-19-01): Male, Female or Not given for any selected player, registered or unclaimed; no reason is asked; one Record of actions entry per player; a player can still change their own afterwards; the Players list also has a **Gender** filter: All, Male, Female, Not given), Remove (only when all selected records qualify), Export CSV and Copy RTR IDs. In real mode Set gender saves for registered and allocated players (`players.gender`); a club-only or shared-entry unclaimed record has no stored gender yet and reports a failure for that player. CSV includes name, nickname, RTR ID, account, rank, clubs, added and place, never contacts. Selection survives pages and view changes; filters clear it. Mutations report each record and retry only failures.
 
 Management mutations remain an in-memory mock. In real mode, the directory, identity detail, selected-ID reads and read-only history load persisted players through Admin-only endpoints (2026-11-01). Contact-request reads, Decline and the Record of actions also load saved data (#401). Approve, Retry application and Check status for a contact change run on saved data too (#575, November 8, 2026): approval reviews then applies, an unclaimed player (no login) changes only the contact, and any failure shows Application failed. Edit profile saves name and nickname for real (`PATCH /api/players/[playerId]`, revision-checked, audit `player.profile_updated` with before/after and reason, shown as the record line). A registered player sees "Changed by ROTRA Admin: <reason>" from the latest such event since the claim. The unclaimed photo link stays mock-only, and club-owned names are not rewritten in real mode. Create, archive, restore, remove, claim-link transport and ranking-settings reads remain F07 work.
 
@@ -38,6 +38,11 @@ Admin can set **Verified by Admin** for a registered player or clear the overrid
 [automatic checks](../../../player-information/modules/identity/README.md#account-verification).
 The Verification card on Player detail shows the status and all three checks. Each successful set or
 clear adds one entry with the required reason to the player's **Record of actions**.
+
+**Owner, November 23, 2026 ([D-2026-11-23-07](../../../../../mvp/decisions/2026-11-23.md#d-2026-11-23-07)):** Admin can
+tell who is verified without opening each player. The Players list, its Quick view and the player
+header show the verification status, and the list filters and counts **Verified** and **Not verified**
+(registered players only). The status is the same derived one: the three checks or Verified by Admin.
 
 ## Reviewed password recovery (#491, owner request November 8, 2026)
 

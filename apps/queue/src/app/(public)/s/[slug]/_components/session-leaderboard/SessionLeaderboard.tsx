@@ -7,6 +7,7 @@ import { SessionStandings } from '@rotra/ui/session-standings'
 import { ShareDialog } from '@rotra/ui/share-dialog'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
+import { SessionPodium } from '@/app/(operator)/sessions/[sessionId]/_components/session-podium/SessionPodium'
 
 export type SessionLeaderboardProps = {
   rows: PublicStandingRow[]
@@ -43,9 +44,12 @@ async function shareText(text: string, link: string) {
 /**
  * Finished session page › Leaderboard tab (2026-11-13 finished session and share leaderboard
  * logs): SessionStandings from the published standings grouped into positions (players with the same
- * wins and losses share one row, 1, 1, 3), Your position › Share (the system share
+ * wins and losses share one row, 1, 1, 2), Your position › Share (the system share
  * sheet with “I finished #N of M at SESSION · CLUB (NW NL). Played on ROTRA.”, or copied), and
- * Share leaderboard (ShareDialog with LeaderboardShareCard, the viewer's row highlighted).
+ * Share leaderboard (ShareDialog with LeaderboardShareCard, the viewer's row highlighted). The
+ * session's podium sits between the players count and the table (D-2026-11-25-04), unmasked like the
+ * table: a shared place opens Podium place for anyone; a face (podium or dialog row) opens the
+ * profile card for a signed-in viewer only.
  */
 export function SessionLeaderboard({
   rows,
@@ -93,6 +97,28 @@ export function SessionLeaderboard({
           )
         }}
         onShareLeaderboard={() => setSharing(true)}
+        podium={
+          <SessionPodium
+            rows={rows.map((row, i) => ({
+              id: String(i),
+              name: row.name,
+              pictureUrl: row.pictureUrl,
+              position: row.position,
+              wins: row.wins,
+              losses: row.losses,
+              games: row.games,
+              canOpen: row.participant !== undefined,
+            }))}
+            onOpenPlayer={
+              onOpenParticipant
+                ? (id) => {
+                    const participant = rows[Number(id)]?.participant
+                    if (participant !== undefined) onOpenParticipant(participant)
+                  }
+                : undefined
+            }
+          />
+        }
       />
       <ShareDialog open={sharing} onOpenChange={setSharing} title="Share leaderboard">
         <LeaderboardShareCard

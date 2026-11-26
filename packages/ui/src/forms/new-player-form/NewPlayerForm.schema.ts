@@ -1,5 +1,6 @@
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { emailField } from '@rotra/schema/email'
+import { genderField } from '@rotra/schema/gender'
 import { nameField } from '@rotra/schema/name'
 import { phoneField } from '@rotra/schema/phone'
 import { normalizeSocialLink, SOCIAL_LINK_ERROR } from '@rotra/schema/social-link'
@@ -95,6 +96,8 @@ const newPlayerFields = {
     .trim()
     .max(NICKNAME_MAX)
     .transform((value) => value || null),
+  /** Optional: '' while not given, saved as null */
+  gender: genderField,
   email: optionalEmail,
   socialLink: optionalSocialLink,
   phone: optionalPhone,

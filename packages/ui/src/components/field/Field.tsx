@@ -34,6 +34,8 @@ export type FieldProps = {
   error?: ReactNode
   /** Adds "(optional)" to the label, as the prototypes write it */
   optional?: boolean
+  /** Adds the green "Required" pill after the label (P-CLAIM, P-ONBOARD); replaces any red star. Opt-in. */
+  required?: boolean
   /** A control beside the label at the far end, e.g. P-LOGIN's "Forgot password?" button. Opt-in. */
   labelAction?: ReactNode
   /** Control id; generated when omitted */
@@ -42,12 +44,22 @@ export type FieldProps = {
   children: ReactNode
 }
 
+/** The prototypes' .req-pill: a small green "Required" pill after a label. */
+export function RequiredPill() {
+  return (
+    <span className="ml-1.5 inline-block rounded-full border border-accent/40 bg-accent-subtle px-[7px] py-px align-[1px] text-[11px] font-bold tracking-[0.2px] text-accent">
+      Required
+    </span>
+  )
+}
+
 /** The prototypes' .field: label, control, hint and inline error, stacked. */
 export function Field({
   label,
   hint,
   error,
   optional,
+  required,
   labelAction,
   id,
   className,
@@ -79,6 +91,7 @@ export function Field({
               >
                 {label}
                 {optional ? ' (optional)' : null}
+                {required ? <RequiredPill /> : null}
               </label>
               {labelAction}
             </div>
@@ -86,6 +99,7 @@ export function Field({
             <label id={labelId} htmlFor={controlId} className="text-[13px] font-semibold text-fg2">
               {label}
               {optional ? ' (optional)' : null}
+              {required ? <RequiredPill /> : null}
             </label>
           )}
           {children}

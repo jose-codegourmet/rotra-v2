@@ -20,12 +20,12 @@ FROM queue_sessions s
 WHERE s.club_id = @club_id AND (sqlc.narg('session_id')::uuid IS NULL OR s.id = sqlc.narg('session_id')::uuid)
 ORDER BY s.scheduled_start_at ASC, s.id ASC;
 
--- The live courts of every session of the club, in creation order (liveCourts).
+-- The live courts of every session of the club, in court order (liveCourts).
 -- name: ListQueueLiveCourts :many
-SELECT id, session_id, label, starts_at, opened_early_at, open_until, removed_at
+SELECT id, session_id, label, position, starts_at, opened_early_at, open_until, removed_at
 FROM session_courts
 WHERE club_id = @club_id AND removed_at IS NULL
-ORDER BY created_at ASC, id ASC;
+ORDER BY position ASC, created_at ASC, id ASC;
 
 -- Join requests still pending plus open drop-out notices of live roster entries: Requests · N on a prepared session.
 -- name: CountQueuePendingJoinRequests :one

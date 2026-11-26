@@ -1,6 +1,6 @@
 # Queue app: “Players can request” formats become tick boxes
 
-Status: NEW
+Status: IN MOCK APP — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `viewSetup()` step 2, `.fmt-ticks` / `.fmt-tick`

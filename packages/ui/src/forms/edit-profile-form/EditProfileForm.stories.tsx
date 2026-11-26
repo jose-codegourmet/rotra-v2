@@ -1,5 +1,6 @@
 import { playerAccounts } from '@rotra/data/fixtures/player-accounts'
 import { playerProfiles } from '@rotra/data/fixtures/player-profiles'
+import { gettingToKnowFromProfile } from '@rotra/ui/getting-to-know-fields/default-values'
 import { personalDetailsFromProfile } from '@rotra/ui/personal-details-fields/default-values'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn, within } from 'storybook/test'
@@ -12,7 +13,11 @@ const meta = {
   title: 'Player/EditProfileForm',
   component: EditProfileForm,
   args: {
-    defaultValues: personalDetailsFromProfile(jose),
+    defaultValues: {
+      ...personalDetailsFromProfile(jose),
+      ...gettingToKnowFromProfile(jose),
+      gender: jose.gender ?? '',
+    },
     account: { phone: account.phone, email: account.email, playerId: jose.rtrId },
     onSubmit: fn(),
     onCancel: fn(),
@@ -34,6 +39,16 @@ const openSection =
     await userEvent.click(await within(canvasElement).findByRole('tab', { name: new RegExp(name) }))
   }
 export const NameSection: Story = {}
+/** A gender already added */
+export const WithGender: Story = {
+  args: {
+    defaultValues: {
+      ...personalDetailsFromProfile(jose),
+      ...gettingToKnowFromProfile(jose),
+      gender: 'male',
+    },
+  },
+}
 export const NameSectionLight: Story = { globals: { theme: 'light' } }
 /** The Name preview with the Night banner and initials (no picture) */
 export const NightBannerInitials: Story = { args: { bannerKey: 'night', picture: null } }
@@ -51,6 +66,10 @@ export const EmberBannerLight: Story = { args: { bannerKey: 'ember' }, globals: 
 /** Without onChangeBanner the banner pencil is left out */
 export const WithoutBannerPencil: Story = { args: { onChangeBanner: undefined } }
 export const PlayingStyleSection: Story = { play: openSection('Playing style') }
+export const PlayingStyleSectionLight: Story = {
+  play: openSection('Playing style'),
+  globals: { theme: 'light' },
+}
 export const LinksSection: Story = { play: openSection('Links') }
 export const LinksSectionLight: Story = {
   play: openSection('Links'),

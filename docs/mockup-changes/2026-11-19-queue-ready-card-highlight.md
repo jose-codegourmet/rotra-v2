@@ -1,6 +1,6 @@
 # Queue app: a queued match that can go on a court now stands out
 
-Status: NEW
+Status: TICKETED — #1062
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `queueCard()` (`.qtile.ready`, `.qt-ready`)

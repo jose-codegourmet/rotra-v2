@@ -10,7 +10,7 @@
 |---|---|
 | `id` | UUID PK, independent of authentication subject |
 | `full_name`, `nickname`, `avatar_ref` | Public/permitted display data; nickname/avatar optional |
-| `gender` | **Proposed** ([D-2026-11-19-01](../../../../mvp/decisions/2026-11-19.md#d-2026-11-19-01)). Nullable enum `player_gender`: `male` · `female`; null = not given (every existing row). Public. Set by the player; additive migration, no backfill |
+| `gender` | **Implemented** (migration `20261124000200_player_gender`, #1089; applied by the owner). ([D-2026-11-19-01](../../../../mvp/decisions/2026-11-19.md#d-2026-11-19-01)). Nullable enum `player_gender`: `male` · `female`; null = not given (every existing row). Public. Set by the player; additive migration, no backfill |
 | `avatar_previous_ref` | Nullable; stores the previous picture reference for an Admin edit, including a character. The previous initials remain unrepresented (the known Admin mockup gap); superseded uploaded photos are removed after a successful save ([D-2026-11-09-14](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-14)). The Player picker retains its separate current-and-previous-photo rule |
 | `profile_state` | Unclaimed/claimed; no login is required for unclaimed identity |
 | `hide_phone_from_clubs` | Privacy preference |

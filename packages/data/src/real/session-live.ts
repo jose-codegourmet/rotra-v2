@@ -1,6 +1,14 @@
 import type { PlayingLevel } from '../player/player.types'
-import { atWhenLabel, joinRequestsClosedNote } from '../queue-session/queueSession.rules'
-import type { QueueSessionInput, SessionCourt } from '../queue-session/queueSession.types'
+import {
+  atWhenLabel,
+  backToPreparationToast,
+  joinRequestsClosedNote,
+} from '../queue-session/queueSession.rules'
+import {
+  courtMovedText,
+  type QueueSessionInput,
+  type SessionCourt,
+} from '../queue-session/queueSession.types'
 import { hostRegistrationText } from '../session-host/sessionHost.rules'
 import type { SessionHostRegistration } from '../session-host/sessionHost.types'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
@@ -49,6 +57,19 @@ export async function realStartSession(input: { sessionId: string; newEndAt?: nu
   return accepted(
     await realGetQueueSession(sessionId),
     `Session started · levels locked${ends}${closed}`,
+  )
+}
+
+/** Back to preparation (D-BACK-TO-PREP): undoes Start while no game has started. */
+export async function realBackToPreparation(sessionId: string) {
+  const { revision } = await readSession(sessionId)
+  const session = await realRequest<WireSession & { matchesRemoved?: number }>(
+    `${sessionPath(sessionId)}/back-to-preparation`,
+    { method: 'POST', body: { expectedRevision: revision }, fields: { session: 'session' } },
+  )
+  return accepted(
+    await realGetQueueSession(sessionId),
+    backToPreparationToast(session.matchesRemoved ?? 0),
   )
 }
 
@@ -126,6 +147,7 @@ type WireCourt = {
   id: string
   sessionId: string
   label: string
+  position: number
   /** Null for older courts: the session start applies. */
   startsAt: string | null
   openedEarlyAt: string | null
@@ -140,6 +162,7 @@ const courtOf = (court: WireCourt): SessionCourt => ({
   id: court.id,
   sessionId: court.sessionId,
   label: court.label,
+  position: court.position,
   startsAt: court.startsAt ? Date.parse(court.startsAt) : undefined,
   openedEarlyAt: court.openedEarlyAt ? Date.parse(court.openedEarlyAt) : null,
   openUntil: court.openUntil ? Date.parse(court.openUntil) : null,
@@ -230,6 +253,19 @@ export async function realUndoCourtEarlyOpen(input: { sessionId: string; courtId
 export async function realRemoveCourt(input: { sessionId: string; courtId: string }) {
   await realRequest(courtPath(input.sessionId, input.courtId), { method: 'DELETE' })
   return accepted(null, 'Court removed')
+}
+
+/** Reorder courts (owner decision, 2026-11-25): the full new order of the live courts. Online only. */
+export async function realReorderCourts(input: { sessionId: string; courtIds: string[] }) {
+  const { courts, moved } = await realRequest<{
+    courts: WireCourt[]
+    moved: { courtId: string; position: number } | null
+  }>(`${sessionPath(input.sessionId)}/courts/order`, {
+    method: 'PATCH',
+    body: { courtIds: input.courtIds },
+  })
+  const label = moved && courts.find((c) => c.id === moved.courtId)?.label
+  return accepted(courts.map(courtOf), label && moved ? courtMovedText(label, moved.position) : '')
 }
 
 const endToast = (session: WireSession) =>
@@ -336,6 +372,30 @@ export async function realSetGamesPlayed(input: {
   )
 }
 
+/** Handicap · tonight (D-2026-11-25-03): `PATCH …/roster/handicap` with the whole set of spots. */
+export async function realSetHandicap(input: {
+  sessionId: string
+  rosterId: string
+  spots: string[]
+  operationId?: string
+}) {
+  const result = await realRequest<{ rosterId: string; name: string; spots: string[] }>(
+    `${sessionPath(input.sessionId)}/roster/handicap`,
+    {
+      method: 'PATCH',
+      body: {
+        operationId: input.operationId ?? crypto.randomUUID(),
+        rosterId: input.rosterId,
+        spots: input.spots,
+      },
+    },
+  )
+  return accepted(
+    { rosterId: result.rosterId, spots: result.spots },
+    `Handicap saved · ${result.name}`,
+  )
+}
+
 export async function realSetAllPresence(input: { sessionId: string; present: boolean }) {
   await realRequest(`${sessionPath(input.sessionId)}/presence`, {
     method: 'POST',
@@ -392,7 +452,17 @@ export async function realApplyRosterBatch(input: {
 }) {
   const reply = await realRequest<{ results: WireBatchResult[]; roster: WireRosterRead }>(
     `${sessionPath(input.sessionId)}/roster/batch`,
-    { method: 'POST', body: { operations: input.operations } },
+    {
+      method: 'POST',
+      // Gender has no column in real mode yet (D-2026-11-19-01): never sent.
+      body: {
+        operations: input.operations.map((operation) => {
+          if (operation.op !== 'add' || operation.source !== 'new') return operation
+          const { gender: _gender, ...rest } = operation
+          return rest
+        }),
+      },
+    },
   )
   const results: RosterBatchResult[] = reply.results.map((result) => ({
     operationId: result.operationId,
@@ -415,10 +485,22 @@ type WirePlaced = {
   waitlist: { clubPlayerId: string; position: number } | null
 }
 
-export async function realConfirmJoinRequest(input: { requestId: string; level: PlayingLevel }) {
+export async function realConfirmJoinRequest(input: {
+  requestId: string
+  level: PlayingLevel
+  /** Confirm again after the level restriction warning (D-2026-11-19-12) */
+  allowOutsideLevels?: boolean
+}) {
   const placed = await realRequest<WirePlaced>(
     `/api/join-requests/${encodeURIComponent(input.requestId)}/confirm`,
-    { method: 'POST', body: { operationId: crypto.randomUUID(), level: input.level } },
+    {
+      method: 'POST',
+      body: {
+        operationId: crypto.randomUUID(),
+        level: input.level,
+        ...(input.allowOutsideLevels ? { allowOutsideLevels: true } : {}),
+      },
+    },
   )
   const waitlistPosition = placed.waitlist?.position ?? 0
   const data = {

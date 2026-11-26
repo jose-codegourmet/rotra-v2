@@ -2,7 +2,7 @@
 
 **Last verified:** 2026-11-13 · **Decision:** [D-2026-11-13-01](../../mvp/decisions/2026-11-13.md#d-2026-11-13-01) (B-04, B-11)
 
-**Status:** Proposed design. Migration SQL written (`20261114000400_sign_in_tables`), verified only on a disposable local database, not applied to any shared one; Go code not built. Credentials stay in Supabase Auth until
+**Status:** Proposed design. Migration SQL written (`20261114000400_sign_in_tables`), verified on a disposable local database and **applied to the shared Supabase database on 2026-11-23** (owner sign-off; run in the SQL Editor, recorded in `_prisma_migrations` with its checksum). The four tables are empty: row level security is on and `anon`/`authenticated` have no grants. Go code not built. Credentials stay in Supabase Auth until
 the Go API's sign-in area moves ([backend proposal](../../backend/decisions/2026-11-13-go-railway-backend/01-proposal.md)).
 Business rules win: [architecture §8](../../architecture.md#8-auth-real-for-queue-admin-and-player),
 [identity](player-information/modules/identity.md), [D-2026-11-07-01](../../mvp/decisions/2026-11-07.md#d-2026-11-07-01).

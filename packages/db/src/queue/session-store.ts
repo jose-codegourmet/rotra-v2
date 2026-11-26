@@ -82,11 +82,31 @@ export function levelCodeFor(id: number | null): PlayingLevel | null {
   return id == null ? null : (PLAYING_LEVELS[id] ?? null)
 }
 
+/**
+ * Court order (owner decision, 2026-11-25): position, then created_at and id. Every read of a
+ * session's courts uses it, so court lists and Auto Queue's fill follow the Queue Master's order.
+ */
+export const COURT_ORDER = [
+  { position: 'asc' },
+  { createdAt: 'asc' },
+  { id: 'asc' },
+] satisfies Prisma.SessionCourtOrderByWithRelationInput[]
+
+/** The session's live (not removed) courts in court order. */
 export function liveCourts(tx: Tx, sessionId: string) {
   return tx.sessionCourt.findMany({
     where: { sessionId, removedAt: null },
-    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+    orderBy: COURT_ORDER,
   })
+}
+
+/** The position a new court of the session takes: after every court, removed ones included. */
+export async function nextCourtPosition(tx: Tx, sessionId: string) {
+  const { _max } = await tx.sessionCourt.aggregate({
+    where: { sessionId },
+    _max: { position: true },
+  })
+  return (_max.position ?? 0) + 1
 }
 
 /**
@@ -143,20 +163,25 @@ export function liveRoster(tx: Tx, sessionId: string) {
 }
 
 /**
- * Waitlist order (physical-schema.md, proposal pending #245): demoted entries first, latest demotion
- * batch at the front, each batch in original slot order; then everyone else by arrival; id last.
+ * When the entry joined the waitlist: the demotion time for a player moved off the roster, otherwise
+ * `added_at` (a confirmed join request keeps its requested_at).
+ */
+export function waitlistJoinedAt(entry: { addedAt: Date; demotedAt: Date | null }) {
+  return entry.demotedAt ?? entry.addedAt
+}
+
+/**
+ * Waitlist order (D-2026-11-23-06, replacing proposal #245): strictly first come, first served by
+ * the time each entry joined the waitlist; a demotion batch keeps its original slot order; id last.
  */
 export async function orderedWaitlist(tx: Tx, sessionId: string) {
   const rows = await tx.sessionWaitlistEntry.findMany({ where: { sessionId } })
-  return rows.sort((a, b) => {
-    if (a.demotedAt && b.demotedAt) {
-      const batch = b.demotedAt.getTime() - a.demotedAt.getTime()
-      if (batch) return batch
-      const slot = (a.demotedConfirmedAt?.getTime() ?? 0) - (b.demotedConfirmedAt?.getTime() ?? 0)
-      if (slot) return slot
-    } else if (a.demotedAt || b.demotedAt) return a.demotedAt ? -1 : 1
-    return a.addedAt.getTime() - b.addedAt.getTime() || a.id.localeCompare(b.id)
-  })
+  return rows.sort(
+    (a, b) =>
+      waitlistJoinedAt(a).getTime() - waitlistJoinedAt(b).getTime() ||
+      (a.demotedConfirmedAt?.getTime() ?? 0) - (b.demotedConfirmedAt?.getTime() ?? 0) ||
+      a.id.localeCompare(b.id),
+  )
 }
 
 export async function capacityOf(tx: Tx, session: QueueSession) {

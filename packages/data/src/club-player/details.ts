@@ -3,6 +3,7 @@ import { checkMockSave } from '../mock/bridge'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { mockStore, readMockState } from '../mock/store'
+import { PLAYING_LEVELS, type PlayingLevel } from '../player/player.types'
 import {
   isCurrentRecord,
   savedDisplayName,
@@ -53,6 +54,8 @@ export async function getClubPlayerDetails(id: string): Promise<ClubPlayerDetail
     fullName: row.fullName,
     nickname: row.nickname,
     phoneOnFile: Boolean(state.privatePhones[row.id]),
+    gender: row.gender ?? null,
+    level: row.playingLevel ?? null,
     picture: clubPictureState(row, null),
     profile:
       row.identity === 'unclaimed' || email
@@ -103,6 +106,10 @@ export async function updateClubPlayerDetails({
     }
     row.fullName = values.fullName.trim()
     row.nickname = values.nickname.trim() || null
+    if (values.gender !== undefined) row.gender = values.gender || null
+    row.playingLevel = PLAYING_LEVELS.includes(values.level as PlayingLevel)
+      ? (values.level as PlayingLevel)
+      : null
     if (phone) draft.privatePhones[row.id] = phone
     if (row.identity === 'unclaimed')
       row.details = {

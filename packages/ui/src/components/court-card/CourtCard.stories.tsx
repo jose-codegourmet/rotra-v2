@@ -112,6 +112,9 @@ function nextFor(court: SessionCourt, list: Match[]) {
         formatLabel: FORMAT_LABELS[match.format],
         teamA: match.teamA.map((id) => playerOf(id).shortName),
         teamB: match.teamB.map((id) => playerOf(id).shortName),
+        // Owner, November 25, 2026: each pair's pictures before its names
+        facesA: match.teamA.map(playerOf),
+        facesB: match.teamB.map(playerOf),
       }
     : null
   return {
@@ -167,6 +170,31 @@ export const OneVersusTwoInGame: Story = {
   }),
 }
 export const MergedFiveVersusFive: Story = { args: inGame(merged) }
+/** Q27.5: the expected finish line under the match line, one story per phase */
+export const PlayingEndsInAboutMinutes: Story = {
+  args: inGame(playing, { expectedFinish: { text: 'Ends in about 6 min', tone: 'muted' } }),
+}
+export const PlayingFinishingSoon: Story = {
+  args: inGame(playing, { expectedFinish: { text: 'Finishing soon', tone: 'accent' } }),
+}
+export const PlayingCouldEndAnyTime: Story = {
+  args: inGame(playing, { expectedFinish: { text: 'Could end any time', tone: 'muted' } }),
+}
+export const PlayingCouldEndAnyTimeDeuce: Story = {
+  args: inGame(playing, {
+    expectedFinish: { text: 'Could end any time · may be in deuce', tone: 'muted' },
+  }),
+}
+export const PlayingRunningLong: Story = {
+  args: inGame(playing, { expectedFinish: { text: 'Running long', tone: 'warn' } }),
+}
+export const PlayingRunningLongLight: Story = {
+  ...PlayingRunningLong,
+  globals: { theme: 'light' },
+}
+export const Merged5v5: Story = {
+  args: inGame(merged, { expectedFinish: { text: 'Ends in about 8 min', tone: 'muted' } }),
+}
 export const WithSubstitutions: Story = {
   args: inGame({ ...playing, substitutions: withSubs.substitutions }),
 }
@@ -181,6 +209,18 @@ export const FreeTenMinutes: Story = {
 export const FreeSixteenMinutes: Story = {
   args: free(courtAt(1), [playing, ready], { freeMinutes: 18 }),
 }
+/** Free · 45 min, Free · 2 h, Free · long time ago (from 24 h) */
+export const Free45Minutes: Story = {
+  args: free(courtAt(1), [playing, ready], { freeMinutes: 45 }),
+}
+export const Free2Hours: Story = { args: free(courtAt(1), [playing, ready], { freeMinutes: 120 }) }
+export const Free30Hours: Story = {
+  args: free(courtAt(1), [playing, ready], { freeMinutes: 30 * 60 }),
+}
+/** Match line: "Match N · 45 min", "· 2 h", "· started long time ago" (from 24 h) */
+export const Playing45Minutes: Story = { args: inGame(playing, { minutes: 45 }) }
+export const Playing2Hours: Story = { args: inGame(playing, { minutes: 120 }) }
+export const Playing30Hours: Story = { args: inGame(playing, { minutes: 30 * 60 }) }
 export const FreeSixteenMinutesLight: Story = {
   ...FreeSixteenMinutes,
   globals: { theme: 'light' },
@@ -412,4 +452,93 @@ export const ReadOnlyMerged: Story = {
     teamA: merged.teamA.map(playerOf),
     teamB: merged.teamB.map(playerOf),
   },
+}
+
+/** Q25.1: Playing with Pause match (pause icon) beside Open match, and Move to a free court in the menu */
+export const PlayingWithPause: Story = {
+  args: inGame(playing, { onPause: fn(), onMoveToFree: fn(), onDragMove: fn() }),
+}
+export const PlayingWithPauseLight: Story = { ...PlayingWithPause, globals: { theme: 'light' } }
+export const PlayingWithPauseMerged: Story = {
+  args: inGame(merged, { onPause: fn(), onMoveToFree: fn(), onDragMove: fn() }),
+}
+export const PlayingMoveToFreeMenu: Story = {
+  args: inGame(playing, { onPause: fn(), onMoveToFree: fn() }),
+  play: openBusyMenu,
+}
+/** No court is free: Move to a free court is disabled with "No court is free" */
+export const PlayingNoFreeCourt: Story = {
+  args: inGame(playing, { onPause: fn(), onMoveToFree: fn(), noFreeCourt: true }),
+  play: openBusyMenu,
+}
+export const PlayingNoFreeCourtLight: Story = { ...PlayingNoFreeCourt, globals: { theme: 'light' } }
+/** The drawing is a button on Getting ready too (tooltip "Open match"), draggable */
+export const GettingReadyDraggable: Story = { args: onCourt(ready, { onDragMove: fn() }) }
+export const GettingReadyMergedDraggable: Story = {
+  args: onCourt(merged, { onDragMove: fn() }),
+}
+const dropGrid: Decorator = (Story) => (
+  <div className="w-full max-w-3xl">
+    <Story />
+  </div>
+)
+/** Dragging: every free open court shows a dashed accent outline (forced here with `dragging`) */
+export const DraggingFreeCourtsOutlined: Story = {
+  decorators: [dropGrid],
+  render: () => (
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
+      <CourtCard {...inGame(playing, { onDragMove: fn(), onPause: fn(), onMoveToFree: fn() })} />
+      <CourtCard
+        {...free(courtAt(1), [playing, ready], { dropCourtId: courtAt(1).id, dragging: true })}
+      />
+      <CourtCard
+        {...free(courtAt(2), [playing, ready], { dropCourtId: courtAt(2).id, dragging: true })}
+      />
+    </div>
+  ),
+}
+/** Drag hover: the court under the pointer is solid with a tint; the other free court stays dashed */
+export const DragHoverOnFreeCourt: Story = {
+  decorators: [dropGrid],
+  render: () => (
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
+      <CourtCard {...inGame(playing, { onDragMove: fn(), onPause: fn(), onMoveToFree: fn() })} />
+      <CourtCard
+        {...free(courtAt(1), [playing, ready], {
+          dropCourtId: courtAt(1).id,
+          dragging: true,
+          dragOver: true,
+        })}
+      />
+      <CourtCard
+        {...free(courtAt(2), [playing, ready], { dropCourtId: courtAt(2).id, dragging: true })}
+      />
+    </div>
+  ),
+}
+export const DragHoverOnFreeCourtLight: Story = {
+  ...DragHoverOnFreeCourt,
+  globals: { theme: 'light' },
+}
+
+const withGames = (ids: string[], games: number[]): CourtPlayer[] =>
+  ids.map((id, i) => ({ ...playerOf(id), games: games[i] ?? 0 }))
+
+/** onOpenGames: each face's games badge is its own button, “NAME's games this session, N”; the face still opens the profile. */
+export const GamesBadgeButton: Story = {
+  args: inGame(playing, {
+    teamA: withGames(playing.teamA, [3, 2]),
+    teamB: withGames(playing.teamB, [4, 1]),
+    onOpenProfile: fn(),
+    onOpenGames: fn(),
+  }),
+}
+
+/** Without onOpenGames the badge is display only. */
+export const GamesBadgeDisplayOnly: Story = {
+  args: inGame(playing, {
+    teamA: withGames(playing.teamA, [3, 2]),
+    teamB: withGames(playing.teamB, [4, 1]),
+    onOpenProfile: fn(),
+  }),
 }

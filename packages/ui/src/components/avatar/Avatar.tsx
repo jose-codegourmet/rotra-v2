@@ -31,6 +31,8 @@ export type AvatarProps = AvatarVariants & {
    * (the profile cards' picture, 2026-11-13-profile-card-name-layout sixth pass).
    */
   viewEye?: boolean
+  /** Hover text of the profile button (with onClick); defaults to the name */
+  title?: string
   className?: string
 }
 
@@ -140,15 +142,15 @@ function AvatarFace({
  */
 export function Avatar({ onClick, onView, ...props }: AvatarProps) {
   if (!onClick) {
-    return <AvatarFace key={JSON.stringify([props.src, props.name])} {...props} onView={onView} />
+    return <AvatarFace key={props.src ?? ''} {...props} onView={onView} />
   }
-  const face = <AvatarFace key={JSON.stringify([props.src, props.name])} {...props} />
+  const face = <AvatarFace key={props.src ?? ''} {...props} />
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={`View ${props.name}'s profile`}
-      title={props.name}
+      title={props.title ?? props.name}
       className={cn(
         'group/avatar m-0 flex-none rounded-full border-0 bg-transparent p-0 leading-none',
         '[&>span]:hover:shadow-[0_0_0_2px_var(--accent)]',

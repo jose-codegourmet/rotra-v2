@@ -5,7 +5,7 @@ export type AdminPlayerBulkBarProps = {
   players: AdminPlayer[]
   offline?: boolean
   onClear: () => void
-  onAction: (action: 'archive' | 'restore' | 'remove' | 'export' | 'copy') => void
+  onAction: (action: 'archive' | 'restore' | 'gender' | 'remove' | 'export' | 'copy') => void
 }
 export function AdminPlayerBulkBar({
   players,
@@ -32,6 +32,9 @@ export function AdminPlayerBulkBar({
         </Button>
         <Button size="xs" disabled={offline} onClick={() => onAction('restore')}>
           Restore
+        </Button>
+        <Button size="xs" disabled={offline} onClick={() => onAction('gender')}>
+          Set gender
         </Button>
         <Button
           size="xs"

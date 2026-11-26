@@ -25,6 +25,9 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useGooglePicker } from '@/app/_components/google-sign-in/useGooglePicker'
 import { useNoGoogleSheet } from '@/app/_components/google-sign-in/useNoGoogleSheet'
+import { OnboardingChrome } from '@/app/_components/onboarding/OnboardingChrome'
+import { OnboardingFlow } from '@/app/_components/onboarding/OnboardingFlow'
+import { useSaveRegistrationGender } from '@/app/_components/onboarding/useSaveRegistrationGender'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useAppDispatch } from '@/store/hooks'
 import { setAccount } from '@/store/slices/authSlice'
@@ -128,6 +131,9 @@ export function GoogleInvite({
     unclaimed: UnclaimedIdentities
   } | null>(null)
   const [pickedId, setPickedId] = useState<string | null>(null)
+  // P-ONBOARD: after registering, steps 2 to 4 come before the Registration complete page.
+  const [onboarding, setOnboarding] = useState(false)
+  const saveGender = useSaveRegistrationGender()
   const records = unclaimed?.records ?? []
   const pickedRecord = records.length > 1 ? records.find((r) => r.id === pickedId) : undefined
   const matchedRecord = records.length === 1 ? records[0] : undefined
@@ -175,12 +181,27 @@ export function GoogleInvite({
     )
   // Real mode comes back here from Google; the same handler then reads what the server decided.
   const picker = useGooglePicker({ key: 'invite', intent: 'register' }, chooseGoogle)
-  const adminSignedIn = !clubId && playerId !== null
+  // A visitor who has just registered through the Admin link stays for the onboarding and the done page.
+  const adminSignedIn = !clubId && playerId !== null && registration.data?.outcome !== 'registered'
   useEffect(() => {
     if (adminSignedIn) router.replace(`/players/${playerId}`)
   }, [adminSignedIn, playerId, router])
 
   const result = registration.data
+  if (result?.outcome === 'registered' && google && onboarding)
+    return (
+      <OnboardingFlow
+        playerId={result.playerId}
+        firstName={result.firstName}
+        googleEmail={google.email}
+        onFinish={() => {
+          setOnboarding(false)
+          consumeSessionReturn(returnTo)
+          window.scrollTo(0, 0)
+          toast('Registration complete')
+        }}
+      />
+    )
   if (result?.outcome === 'registered' && google)
     return (
       <AccountLinkStatus
@@ -300,92 +321,96 @@ export function GoogleInvite({
     const error = registration.error
     const clubName = card.kind === 'admin' ? '' : card.club.name
     return (
-      <ClaimForm
-        key={`${google?.email ?? ''}:${pickedId ?? ''}`}
-        standalone
-        google={{
-          name: google?.name ?? '',
-          email: google?.email ?? '',
-          onChange: () => {
-            setGoogle(null)
-            forgetIdentity()
-            registration.reset()
-          },
-        }}
-        pickedIdentity={
-          pickedRecord && unclaimed
-            ? { clubName: pickedRecord.clubName, rtrId: unclaimed.rtrId }
-            : undefined
-        }
-        emailMatch={
-          matchedRecord && unclaimed
-            ? { clubName: matchedRecord.clubName, rtrId: unclaimed.rtrId }
-            : undefined
-        }
-        clubName={clubName}
-        contextLabel={
-          card.kind === 'admin'
-            ? 'ROTRA registration'
-            : card.kind === 'session'
-              ? `Session link from ${clubName} · ${card.session.title}`
-              : `Registration link from ${clubName}`
-        }
-        cities={
-          card.kind === 'admin' && !unclaimed
-            ? foundingCities.map((city) => ({ value: city.code, label: city.name }))
-            : undefined
-        }
-        maskedPhone=""
-        defaultValues={{
-          fullName: startingRecord?.name ?? google?.name ?? '',
-          nickname: startingRecord?.nickname ?? '',
-        }}
-        isPending={registration.isPending}
-        accountMatch={result?.outcome === 'account-match'}
-        onDismissMatch={() => registration.reset()}
-        serverError={
-          error
-            ? {
-                message: error.message,
-                field:
-                  error instanceof MockError && error.fieldErrors?.phone
-                    ? 'phone'
-                    : error instanceof MockError && error.fieldErrors?.cityCode
-                      ? 'cityCode'
-                      : undefined,
-              }
-            : undefined
-        }
-        onSubmit={({
-          confirmPassword: _confirm,
-          email: _email,
-          password: _password,
-          ...values
-        }) => {
-          if (!google) return
-          registration.mutate(
-            {
-              google,
-              clubId: clubId || null,
-              sessionSlug: sessionSlug ?? null,
-              clubInviteCode: clubInviteCode ?? null,
-              identityRecordId: pickedRecord?.id ?? null,
-              values,
+      <>
+        <OnboardingChrome />
+        <ClaimForm
+          key={`${google?.email ?? ''}:${pickedId ?? ''}`}
+          standalone
+          google={{
+            name: google?.name ?? '',
+            email: google?.email ?? '',
+            onChange: () => {
+              setGoogle(null)
+              forgetIdentity()
+              registration.reset()
             },
-            {
-              onSuccess: (response) => {
-                if (response.outcome === 'registered') {
-                  dispatch(setAccount(response.session.account))
-                  toast('Registration complete')
-                  consumeSessionReturn(returnTo)
+          }}
+          pickedIdentity={
+            pickedRecord && unclaimed
+              ? { clubName: pickedRecord.clubName, rtrId: unclaimed.rtrId }
+              : undefined
+          }
+          emailMatch={
+            matchedRecord && unclaimed
+              ? { clubName: matchedRecord.clubName, rtrId: unclaimed.rtrId }
+              : undefined
+          }
+          clubName={clubName}
+          contextLabel={
+            card.kind === 'admin'
+              ? 'ROTRA registration'
+              : card.kind === 'session'
+                ? `Session link from ${clubName} · ${card.session.title}`
+                : `Registration link from ${clubName}`
+          }
+          cities={
+            card.kind === 'admin' && !unclaimed
+              ? foundingCities.map((city) => ({ value: city.code, label: city.name }))
+              : undefined
+          }
+          maskedPhone=""
+          defaultValues={{
+            fullName: startingRecord?.name ?? google?.name ?? '',
+            nickname: startingRecord?.nickname ?? '',
+          }}
+          isPending={registration.isPending}
+          accountMatch={result?.outcome === 'account-match'}
+          onDismissMatch={() => registration.reset()}
+          serverError={
+            error
+              ? {
+                  message: error.message,
+                  field:
+                    error instanceof MockError && error.fieldErrors?.phone
+                      ? 'phone'
+                      : error instanceof MockError && error.fieldErrors?.cityCode
+                        ? 'cityCode'
+                        : undefined,
                 }
-                window.scrollTo(0, 0)
+              : undefined
+          }
+          onSubmit={({
+            confirmPassword: _confirm,
+            email: _email,
+            password: _password,
+            gender,
+            ...values
+          }) => {
+            if (!google) return
+            registration.mutate(
+              {
+                google,
+                clubId: clubId || null,
+                sessionSlug: sessionSlug ?? null,
+                clubInviteCode: clubInviteCode ?? null,
+                identityRecordId: pickedRecord?.id ?? null,
+                values,
               },
-              onError: (failure) => toast.error(failure.message),
-            },
-          )
-        }}
-      />
+              {
+                onSuccess: (response) => {
+                  if (response.outcome === 'registered') {
+                    dispatch(setAccount(response.session.account))
+                    setOnboarding(true)
+                    saveGender(gender)
+                  }
+                  window.scrollTo(0, 0)
+                },
+                onError: (failure) => toast.error(failure.message),
+              },
+            )
+          }}
+        />
+      </>
     )
   }
   if (google) return inviteRegistration()

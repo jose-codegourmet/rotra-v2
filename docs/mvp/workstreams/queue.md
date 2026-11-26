@@ -122,7 +122,7 @@ Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisio
 
 ## Remaining work
 
-- [ ] Club settings in real mode: name-change request, session defaults, password change. Ticket: needed (MVP scope: open question 3).
+- [ ] Club settings in real mode: password change is NOT done (mock-only; MVP scope: open question 3). Name-change request (`POST` and `DELETE /api/club/name-change`; cancel stores the request as `cancelled`) and session defaults (`PATCH /api/club`) are connected, built but not yet run against a database.
 - [ ] Downloads / This device page. #477 (blocked on #246).
 - [x] Attach a signed-in player to a join request (real mode, #687: one-tap join and Cancel request through the Player app). Player sign-up (D-07): guest registration through club invitations (#490).
 - [ ] Decide whether published results and profile pictures on the public page are masked too (D-06 "not covered yet"). Owner decision.
@@ -143,6 +143,13 @@ Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisio
 - [D-2026-11-19-12](../decisions/2026-11-19.md#d-2026-11-19-12) — session level restrictions (all levels, beginners only, beginners to intermediate, slots per level).
 - [D-2026-11-19-14](../decisions/2026-11-19.md#d-2026-11-19-14) — Higgsfield art inside the apps (Mode and Scoring cards, sign-in).
 - [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) — trusted club hosts and session host display (epic #1002; #1003 Club settings › Trusted hosts, #1004 session setup › Hosts and #1005 change hosts during a session, #1006 public Hosts section and #1008 finished sessions keep their hosts built).
+- [D-2026-11-23-08](../decisions/2026-11-23.md#d-2026-11-23-08) — expected match length per scoring mode and the Playing court card's expected finish (mockup only; Epic Q27).
+- [D-2026-11-23-09](../decisions/2026-11-23.md#d-2026-11-23-09) — Plan Ahead uses free and finishing-soon players, ranked together (mockup only; Epic Q27).
+- [D-2026-11-23-10](../decisions/2026-11-23.md#d-2026-11-23-10) — the games badge opens a compact games dialog with Matches and Planned queue (mockup only; Epic Q27).
+- [D-2026-11-25-01](../decisions/2026-11-25.md#d-2026-11-25-01) — match making factors for Generate matches: Whose turn (with the exhaustion rule), Fresh faces, Even game by tonight's results (mockup only).
+- [D-2026-11-25-02](../decisions/2026-11-25.md#d-2026-11-25-02) — the Almost done switch on a Playing court card; Plan Ahead treats those players as free soon (mockup only).
+- [D-2026-11-25-03](../decisions/2026-11-25.md#d-2026-11-25-03) — Handicap · tonight in the live Edit player sheet; a handicapped player rests after 1 game in a row (mockup only).
+- [D-2026-11-25-04](../decisions/2026-11-25.md#d-2026-11-25-04) — the session console's Leaderboard is one podium and list for the current session; a new Leaderboards page in the left nav with Club and ROTRA tabs, four periods each; full names on leaderboards (mockup only).
 
 ## Blocking open decisions
 

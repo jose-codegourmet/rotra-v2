@@ -220,3 +220,15 @@ const transfers = [
 ]
 export const WithSlotTransfers: Story = { args: { dropOuts, transfers } }
 export const WithSlotTransfersLight: Story = { ...WithSlotTransfers, globals: { theme: 'light' } }
+
+/**
+ * D-2026-11-19-12: a confirm outside the session's restriction shows the reason with "Press Confirm
+ * again to add NAME anyway."; the second press confirms with allowOutsideLevels.
+ */
+export const LevelRestrictionWarning: Story = {
+  args: { levelBlock: () => 'This session is for beginners only.' },
+}
+export const LevelRestrictionWarningLight: Story = {
+  ...LevelRestrictionWarning,
+  globals: { theme: 'light' },
+}

@@ -10,7 +10,6 @@ import { isStatsHidden, selfCheckInMark, visibleStats } from '@rotra/data/public
 import { expectedGames, slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
-import { queueMasterName } from '@rotra/data/session-roster/sessionRoster.rules'
 import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
 import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
@@ -36,6 +35,7 @@ import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel
 import { useEffect, useRef, useState } from 'react'
 import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
 import { OverfillConfirm } from '@/app/(operator)/_components/overfill-confirm/OverfillConfirm'
+import { usePlayerProfileActions } from '@/app/(operator)/_components/player-profile-actions/PlayerProfileActions'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { longDateLabel } from '@/lib/dates'
 
@@ -147,7 +147,9 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
     const mark = setPresence.pending.has(r.id) ? null : selfCheckInMark(r)
     return {
       id: r.id,
-      name: queueMasterName(r),
+      name: r.nameSnapshot,
+      nickname: r.nicknameSnapshot,
+      clubNickname: p?.identity === 'registered' ? r.clubNickname : undefined,
       photoUrl: p
         ? profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName)
         : undefined,
@@ -179,6 +181,11 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   const photo = usePhotoViewer()
   const profile = profileId ? byClubPlayer(profileId) : undefined
   const profileStats = useClubPlayerYearStats(profileId)
+  const actions = usePlayerProfileActions(profile, {
+    hideProfile: () => setProfileId(null),
+    showProfile: setProfileId,
+    closeProfile: () => setProfileId(null),
+  })
   const profilePhotoUrl = profile
     ? profilePictureSrc(
         profile.picture,
@@ -323,8 +330,10 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
           emailOnFile={profile.emailOnFile}
           detailsRequired={profile.detailsRequired}
           getInviteLink={profile.identity === 'guest' ? inviteLinkFor(profile.id) : undefined}
+          {...actions.profileProps(profile)}
         />
       ) : null}
+      {actions.sheets}
       {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
     </>
   )

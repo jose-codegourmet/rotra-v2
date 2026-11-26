@@ -4,6 +4,7 @@ import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { KeyValueList } from '@rotra/ui/key-value-list'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 export type ClaimIdentityCheckProps = {
   clubName: string
   /** The club-created identity (name, nickname, picture, RTR ID) */
@@ -39,6 +40,12 @@ export function ClaimIdentityCheck({
         ]
       : []),
   ]
+  // A photo URL as is; a `character:` picture drawn from the same seed as the club's card.
+  const pictureSrc = profilePictureSrc(
+    preview.picture,
+    preview.pictureSeedId ?? preview.playerId ?? '',
+    preview.fullName,
+  )
   return (
     <LinkPage
       label={`Registration link from ${clubName}`}
@@ -50,9 +57,9 @@ export function ClaimIdentityCheck({
           <div className="flex min-w-0 items-center gap-3.5">
             <Avatar
               name={preview.fullName}
-              src={preview.picture ?? undefined}
+              src={pictureSrc}
               size={64}
-              tone={preview.picture ? 'neutral' : 'accent'}
+              tone={pictureSrc ? 'neutral' : 'accent'}
             />
             <div className="flex min-w-0 flex-col gap-1.5">
               <h2 className="[overflow-wrap:anywhere]">{preview.fullName}</h2>

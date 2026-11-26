@@ -11,10 +11,12 @@ import { promoteWaiter, recomputeMinimum } from '../queue-session/mutations'
 import { realKeepDropOut, realRemoveDropOut } from '../real/match-request'
 import { isRealDataMode } from '../real/mode'
 import {
+  type ConfirmRequestInput,
   capacity,
   confirmJoinRequest,
   confirmJoinRequestChange,
   place,
+  requireLevelAllowed,
   slotsFull,
 } from './mutations'
 import { levelLabel } from './sessionRoster.rules'
@@ -105,7 +107,7 @@ function accountPlayer(s: MockState, clubId: string, r: SessionJoinRequest): Clu
  * request goes through `confirmJoinRequest` (a new guest record); a signed-in Player's request uses
  * their saved player, saving a player new to the club as registered and “Joined via session link”.
  */
-export function confirmRequest(input: { requestId: string; level: PlayingLevel }) {
+export function confirmRequest(input: ConfirmRequestInput) {
   const r = isRealDataMode() ? null : pendingRequest(readMockState(), input.requestId)
   if (!r?.playerId) return confirmJoinRequest(input)
   return requestMutation(r.sessionId, (s) => confirmRequestChange(s, input))
@@ -116,15 +118,17 @@ export function confirmRequest(input: { requestId: string; level: PlayingLevel }
  * now: a guest's, a signed-in Player's, or a Join from waitlist. The roster batch (#718) applies
  * it in click order with the other roster changes of one burst.
  */
-export function confirmRequestChange(
-  s: MockState,
-  input: { requestId: string; level: PlayingLevel },
-) {
+export function confirmRequestChange(s: MockState, input: ConfirmRequestInput) {
   const r = pendingRequest(s, input.requestId)
   if (!r.playerId) return confirmJoinRequestChange(s, input)
   if (r.placement === 'from_waitlist') return giveSlotFromRequestChange(s, input)
   const request = pendingRequest(s, input.requestId)
   const clubId = sessionIn(s, request.sessionId).clubId
+  // D-2026-11-19-12: outside the level restriction is refused until the QM confirms again.
+  requireLevelAllowed(s, request.sessionId, input.level, {
+    toWaitlist: request.placement === 'waitlist',
+    allowOutsideLevels: input.allowOutsideLevels,
+  })
   const p = accountPlayer(s, clubId, request)
   const data = place(
     s,

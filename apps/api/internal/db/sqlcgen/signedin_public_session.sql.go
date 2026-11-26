@@ -395,22 +395,23 @@ func (q *Queries) ListSessionCourtHoldRows(ctx context.Context, sessionID pgtype
 }
 
 const listSessionCourtRows = `-- name: ListSessionCourtRows :many
-SELECT id, label, starts_at, opened_early_at, open_until, removed_at
+SELECT id, label, position, starts_at, opened_early_at, open_until, removed_at
 FROM session_courts
 WHERE session_id = $1
-ORDER BY created_at ASC, id ASC
+ORDER BY position ASC, created_at ASC, id ASC
 `
 
 type ListSessionCourtRowsRow struct {
 	ID            pgtype.UUID
 	Label         string
+	Position      int32
 	StartsAt      pgtype.Timestamptz
 	OpenedEarlyAt pgtype.Timestamptz
 	OpenUntil     pgtype.Timestamptz
 	RemovedAt     pgtype.Timestamptz
 }
 
-// All courts of a session in creation order, removed ones too (liveCourts is the ones with no removed_at).
+// All courts of a session in court order, removed ones too (liveCourts is the ones with no removed_at).
 func (q *Queries) ListSessionCourtRows(ctx context.Context, sessionID pgtype.UUID) ([]ListSessionCourtRowsRow, error) {
 	rows, err := q.db.Query(ctx, listSessionCourtRows, sessionID)
 	if err != nil {
@@ -423,6 +424,7 @@ func (q *Queries) ListSessionCourtRows(ctx context.Context, sessionID pgtype.UUI
 		if err := rows.Scan(
 			&i.ID,
 			&i.Label,
+			&i.Position,
 			&i.StartsAt,
 			&i.OpenedEarlyAt,
 			&i.OpenUntil,

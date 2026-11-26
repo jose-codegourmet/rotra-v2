@@ -64,6 +64,7 @@ export function createQueueFixtures(now = Date.now()) {
     alwaysRequireRequest: false,
     // The live example plays the default 16/31 (Q22).
     scoring: '31',
+    levelRestriction: { kind: 'all' },
   }
   const history = createSessionHistoryFixtures(now)
   const sessions: QueueSession[] = [tonight, ...history.sessions]
@@ -72,6 +73,7 @@ export function createQueueFixtures(now = Date.now()) {
       id: `${tonight.id}-court-${n}`,
       sessionId: tonight.id,
       label: `Court ${n}`,
+      position: n,
       startsAt: tonight.scheduledStartAt,
       openUntil: null,
       removedAt: null,
@@ -92,6 +94,7 @@ export function createQueueFixtures(now = Date.now()) {
       clubPlayerId: p.id,
       nameSnapshot: p.fullName,
       nicknameSnapshot: p.nickname,
+      gender: p.gender ?? null,
       present: i < 10,
       presentChangedAt: i < 10 ? now : null,
       level:
@@ -111,6 +114,7 @@ export function createQueueFixtures(now = Date.now()) {
       clubPlayerId: p.id,
       nameSnapshot: p.fullName,
       nicknameSnapshot: p.nickname,
+      gender: p.gender ?? null,
       present: true,
       presentChangedAt: now,
       level: p.playingLevel,

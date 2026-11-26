@@ -1,7 +1,5 @@
 'use client'
-import { PLAYER_FIXTURE_NOW } from '@rotra/data/fixtures/player-games'
 import { leaderboardKeys } from '@rotra/data/leaderboard/query-keys'
-import { leaderboardPeriodStart } from '@rotra/data/leaderboard/rules'
 import {
   LEADERBOARD_LIMIT,
   LEADERBOARD_PERIODS,
@@ -33,43 +31,20 @@ import { Notice } from '@rotra/ui/notice'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
 import { PullToRefresh } from '@rotra/ui/pull-to-refresh'
-import { type PodiumEntry, TopThreePodium } from '@rotra/ui/top-three-podium'
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import {
+  LeaderboardPodium,
+  leaderboardDateLabel,
+  leaderboardRowOpens,
+  placeCounts,
+} from '@/app/_components/leaderboard-podium/LeaderboardPodium'
 import { ProfileCard, type ProfileCardPerson } from '@/app/_components/profile-card/ProfileCard'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { useAppSelector } from '@/store/hooks'
 import { selectAccount } from '@/store/slices/authSlice'
 import { selectDev } from '@/store/slices/devSlice'
-
-const periodFormatters = {
-  year: new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', year: 'numeric' }),
-  month: new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Asia/Manila',
-    month: 'long',
-    year: 'numeric',
-  }),
-  week: new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Asia/Manila',
-    month: 'short',
-    day: 'numeric',
-  }),
-}
-
-function periodDateLabel(period: LeaderboardPeriod, periodStart?: string) {
-  const timestamp = periodStart
-    ? Date.parse(periodStart)
-    : leaderboardPeriodStart(period, isRealDataMode() ? Date.now() : PLAYER_FIXTURE_NOW.getTime())
-  const formatter = periodFormatters[period]
-  if (period !== 'week') return formatter.format(timestamp)
-  return `${formatter.format(timestamp)} to ${formatter.format(timestamp + 6 * 86_400_000)}`
-}
-
-function profileCardAvailable(entry: LeaderboardRowData) {
-  // Private rows for visitors are inert. Always private rows can open the masked dialog.
-  return !entry.masked || entry.levelHidden
-}
 
 export function LeaderboardPage({
   focusPlayerId,
@@ -98,7 +73,7 @@ export function LeaderboardPage({
   const photo = usePhotoViewer()
   const entries = board.data?.pages.flatMap((page) => page.entries) ?? []
   const total = board.data?.pages[0]?.total ?? 0
-  const dateLabel = periodDateLabel(period, board.data?.pages[0]?.periodStart)
+  const dateLabel = leaderboardDateLabel(period, board.data?.pages[0]?.periodStart)
   const when = LEADERBOARD_PERIOD_COPY[period].current
   const nameSearch = Boolean(query.trim()) && !/^RTR-/i.test(query.trim())
   const active = nameSearch ? search : board
@@ -114,11 +89,20 @@ export function LeaderboardPage({
   const failed =
     mockScenario === 'error' || (active.isError && (!active.data || (dev.offline && offlineRetry)))
   const empty = !loading && !failed && board.data && total === 0
-  const podium = !loading && !failed && !nameSearch && entries.length >= 3
-  const shownEntries = nameSearch ? (search.data?.hits ?? []) : entries.slice(podium ? 3 : 0)
+  // Owner, November 25, 2026: the podium always shows once the list has loaded, also while
+  // searching and with an empty list. It holds places 1 to 3, so the list starts at place 4.
+  const boardLoading = mockScenario === 'loading' || (board.isPending && !board.data)
+  const boardFailed =
+    mockScenario === 'error' || (board.isError && (!board.data || (dev.offline && offlineRetry)))
+  const podium = !boardLoading && !boardFailed && Boolean(board.data)
+  const afterPodium = entries.filter((entry) => entry.position > 3)
+  const shownEntries = nameSearch ? (search.data?.hits ?? []) : afterPodium
+  const counts = placeCounts(nameSearch ? [...entries, ...(search.data?.hits ?? [])] : entries)
+  const shared = (entry: LeaderboardRowData) => (counts.get(entry.position) ?? 0) > 1
   const standing = position.data
   const ownPosition = standing?.position ?? null
   const ownName = ownProfile.data?.fullName ?? account?.name
+  const ownRow = viewerId ? entries.find((entry) => entry.id === viewerId) : undefined
   const ownPicture =
     viewerId && ownProfile.data
       ? pictureSrc(ownProfile.data.picture, viewerId, ownName ?? '')
@@ -132,7 +116,7 @@ export function LeaderboardPage({
       picture: entry.pictureUrl,
       level: entry.levelHidden ? null : entry.playingLevel,
       isYou: entry.id === viewerId,
-      masked: !!entry.masked,
+      masked: false,
       bannerKey: entry.bannerKey,
       bannerImageUrl: entry.bannerImageUrl,
     })
@@ -163,14 +147,32 @@ export function LeaderboardPage({
     setOfflineRetry(false)
     resetPages(period)
   }
+  // The podium needs everyone in places 1 to 3, and the list at least one row after it.
+  const lastPosition = entries[entries.length - 1]?.position ?? 0
+  useEffect(() => {
+    if (
+      lastPosition &&
+      lastPosition <= 3 &&
+      board.hasNextPage &&
+      !board.isFetching &&
+      !board.isError
+    )
+      void board.fetchNextPage()
+  }, [lastPosition, board.hasNextPage, board.isFetching, board.isError, board.fetchNextPage])
   useEffect(() => {
     if (!flashId) return
     const timer = setTimeout(() => setFlashId(null), 1600)
     return () => clearTimeout(timer)
   }, [flashId])
+  // A player in places 1 to 3 has no row: the jump goes to the podium instead.
+  const jumpOnPodium = Boolean(
+    jumpTo && entries.some((entry) => entry.id === jumpTo && entry.position <= 3),
+  )
   useEffect(() => {
     if (!jumpTo || nameSearch || loading || board.isFetching) return
-    const row = document.getElementById(`leaderboard-${jumpTo}`)
+    const row = document.getElementById(
+      jumpOnPodium ? 'leaderboard-podium' : `leaderboard-${jumpTo}`,
+    )
     if (row) {
       row.scrollIntoView({
         block: 'center',
@@ -184,6 +186,7 @@ export function LeaderboardPage({
     else setJumpTo(null)
   }, [
     jumpTo,
+    jumpOnPodium,
     viewerId,
     focusPlayerId,
     nameSearch,
@@ -204,17 +207,6 @@ export function LeaderboardPage({
     setOfflineRetry(dev.offline)
     void refresh()
   }
-  const podiumEntries = entries.slice(0, 3).map((entry) => ({
-    id: `leaderboard-${entry.id}`,
-    fullName: entry.fullName,
-    nickname: entry.nickname,
-    wins: entry.wins,
-    picture: { src: pictureSrc(entry.pictureUrl, entry.id, entry.fullName) },
-    isMe: entry.id === viewerId,
-    masked: entry.masked,
-    disabled: !profileCardAvailable(entry),
-  }))
-
   return (
     <PullToRefresh
       onRefresh={refreshing.refresh}
@@ -234,15 +226,16 @@ export function LeaderboardPage({
           <LeaderboardPeriodSwitch period={period} dateLabel={dateLabel} onChange={changePeriod} />
         </header>
         {podium ? (
-          <TopThreePodium
-            entries={podiumEntries as [PodiumEntry, PodiumEntry, PodiumEntry]}
-            period={period}
-            dateLabel={dateLabel}
-            onSelect={(index) => {
-              const entry = entries[index]
-              if (entry && profileCardAvailable(entry)) openCard(entry)
-            }}
-          />
+          <div id="leaderboard-podium" className="scroll-mt-5">
+            <LeaderboardPodium
+              rows={entries}
+              period={period}
+              dateLabel={dateLabel}
+              scope="ROTRA"
+              viewerId={viewerId}
+              onOpenPlayer={openCard}
+            />
+          </div>
         ) : null}
         {viewerId && ownName && standing && !loading && !failed ? (
           <MyPositionCard
@@ -254,6 +247,7 @@ export function LeaderboardPage({
             }
             wins={standing.wins}
             previousPosition={standing.previousPosition}
+            shared={ownRow ? shared(ownRow) : false}
             cutoffWins={ownPosition !== null ? standing.cutoffWins : undefined}
             cutoffHasBetterWinRate={standing.cutoffHasBetterWinRate}
             onViewPicture={
@@ -290,7 +284,7 @@ export function LeaderboardPage({
           ) : empty ? (
             <div role="status">
               <EmptyState>
-                No one on the leaderboard has played a standard match {when} yet.
+                No one has won a standard match {when} yet. The list fills as clubs finish sessions.
               </EmptyState>
             </div>
           ) : nameSearch && search.data?.total === 0 ? (
@@ -304,6 +298,11 @@ export function LeaderboardPage({
               search={
                 nameSearch && search.data
                   ? { query: query.trim(), total: search.data.total }
+                  : undefined
+              }
+              note={
+                !nameSearch && !shownEntries.length
+                  ? 'Everyone on this list so far is on the podium.'
                   : undefined
               }
               shown={nameSearch ? undefined : entries.length}
@@ -324,15 +323,15 @@ export function LeaderboardPage({
                   period={period}
                   wins={entry.wins}
                   previousPosition={entry.previousPosition}
-                  masked={entry.masked}
                   unclaimed={entry.unclaimed}
                   fullName={entry.fullName}
                   nickname={entry.nickname}
                   picture={{ src: pictureSrc(entry.pictureUrl, entry.id, entry.fullName) }}
                   isMe={entry.id === viewerId}
+                  shared={shared(entry)}
                   flash={entry.id === flashId}
                   variant={entry.position <= 3 ? `medal-${entry.position as 1 | 2 | 3}` : undefined}
-                  onSelect={profileCardAvailable(entry) ? () => openCard(entry) : undefined}
+                  onSelect={leaderboardRowOpens(entry) ? () => openCard(entry) : undefined}
                 />
               ))}
             </LeaderboardList>

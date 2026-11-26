@@ -1,3 +1,4 @@
+import { accountVerificationIn } from '../account-verification/mockVerification'
 import { getAdminSession } from '../admin-account/fetchers'
 import type { ClubPlayer } from '../club-player/clubPlayer.types'
 import { clubPictureState } from '../club-player/clubPlayerPicture.rules'
@@ -24,6 +25,7 @@ import type {
   AdminPlayerEdit,
   AdminPlayerList,
   AdminPlayerListParams,
+  AdminPlayerVerification,
 } from './adminPlayer.types'
 import { levelBandOf, selectAdminPlayers } from './management.rules'
 
@@ -44,6 +46,7 @@ export function adminPlayerOf(state: MockState, player: Player): AdminPlayer {
     id: player.id,
     name: player.fullName,
     nickname: player.nickname ?? clubRecords.find((entry) => entry.nickname)?.nickname ?? null,
+    gender: state.playerProfiles.find((p) => p.playerId === player.id)?.gender ?? null,
     rtrId: player.rtrId,
     createdByClubId: state.adminPlayerRecords[player.id]?.adminCreated
       ? (state.adminPlayerRecords[player.id]?.createdByClubId ?? null)
@@ -93,7 +96,15 @@ export function adminPlayerOf(state: MockState, player: Player): AdminPlayer {
       effectiveRankingVersion(state.rankingPolicyVersions).recentStandardMatchThreshold,
       manyClubs,
     ),
+    verification: adminVerificationOf(state, player.id),
   }
+}
+
+function adminVerificationOf(state: MockState, playerId: string): AdminPlayerVerification | null {
+  const v = accountVerificationIn(state, playerId)
+  return v
+    ? { verified: v.verified, verifiedByAdmin: v.verifiedByAdmin, completedSteps: v.completedSteps }
+    : null
 }
 
 /**
@@ -122,6 +133,7 @@ export function clubOnlyAdminPlayerOf(state: MockState, record: ClubPlayer): Adm
     id: record.id,
     name: record.fullName,
     nickname: record.nickname,
+    gender: record.gender ?? null,
     rtrId: null,
     createdByClubId: record.clubId,
     createdOn: addedOn,
@@ -159,6 +171,7 @@ export function clubOnlyAdminPlayerOf(state: MockState, record: ClubPlayer): Adm
       0,
       effectiveRankingVersion(state.rankingPolicyVersions).recentStandardMatchThreshold,
     ),
+    verification: null,
   }
 }
 

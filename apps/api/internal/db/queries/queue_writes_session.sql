@@ -43,16 +43,20 @@ SET title = @title, notes = @notes, venue_id = @venue_id, venue_name = @venue_na
 WHERE id = @id;
 
 -- name: ListQueueSessionCourts :many
--- liveCourts: the session's courts that were not removed, oldest first.
-SELECT * FROM session_courts WHERE session_id = @session_id AND removed_at IS NULL ORDER BY created_at ASC, id ASC;
+-- liveCourts: the session's courts that were not removed, in court order (position, then creation time and id).
+SELECT * FROM session_courts WHERE session_id = @session_id AND removed_at IS NULL ORDER BY position ASC, created_at ASC, id ASC;
 
 -- name: GetSessionCourt :one
 SELECT * FROM session_courts WHERE id = @id;
 
 -- name: InsertSessionCourt :one
-INSERT INTO session_courts (id, club_id, session_id, label, starts_at, open_until, created_at, updated_at)
-VALUES (@id, @club_id, @session_id, @label, @starts_at, @open_until, @now, @now)
+INSERT INTO session_courts (id, club_id, session_id, label, position, starts_at, open_until, created_at, updated_at)
+VALUES (@id, @club_id, @session_id, @label, @position, @starts_at, @open_until, @now, @now)
 RETURNING *;
+
+-- name: NextSessionCourtPosition :one
+-- nextCourtPosition: a new court goes after every court of the session, removed ones included.
+SELECT (COALESCE(max(position), 0) + 1)::int4 FROM session_courts WHERE session_id = @session_id;
 
 -- name: DropSessionCourt :exec
 -- Edit preparation drops the courts left out of the form: removed_at only (no revision bump).
@@ -60,7 +64,7 @@ UPDATE session_courts SET removed_at = @now, updated_at = @now WHERE id = @id;
 
 -- name: EditSessionCourt :one
 -- A court's label, planned start and advisory end, with a revision bump. No row (another club's, or gone) is not found.
-UPDATE session_courts SET label = @label, starts_at = @starts_at, open_until = @open_until, revision = revision + 1, updated_at = @now
+UPDATE session_courts SET label = @label, position = COALESCE(sqlc.narg('position')::int4, position), starts_at = @starts_at, open_until = @open_until, revision = revision + 1, updated_at = @now
 WHERE club_id = @club_id AND session_id = @session_id AND id = @id
 RETURNING *;
 

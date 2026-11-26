@@ -10,7 +10,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/rulestest"
 )
 
-// Every committed v1 case file runs through rules.For(1): 40 files, 308 cases (plan, "Case counts", plus the two shared-position cases of Q23.4 and the scoring-mode cases of Q22.3).
+// Every committed v1 case file runs through rules.For(1): 40 files, 309 cases (plan, "Case counts", plus the two shared-position cases of Q23.4, the scoring-mode cases of Q22.3 and the no-ties standings case of Q26.5).
 func TestEveryV1CaseFilePassesThroughForOne(t *testing.T) {
 	root, err := rulecases.RepoRoot()
 	if err != nil {
@@ -26,11 +26,12 @@ func TestEveryV1CaseFilePassesThroughForOne(t *testing.T) {
 		total.Files += got.Files
 		total.Cases += got.Cases
 	}
-	if total.Files != len(onDisk) {
-		t.Errorf("ran %d case files, %d are on disk: an area has no test", total.Files, len(onDisk))
+	// Files whose Go copy follows (rulecases.GoCopyPending) are on disk but not run here.
+	if want := len(onDisk) - len(rulecases.GoCopyPending); total.Files != want {
+		t.Errorf("ran %d case files, %d are on disk: an area has no test", total.Files, want)
 	}
-	if total.Files != 40 || total.Cases != 308 {
-		t.Errorf("ran %d files and %d cases, want 40 and 308", total.Files, total.Cases)
+	if total.Files != 40 || total.Cases != 309 {
+		t.Errorf("ran %d files and %d cases, want 40 and 309", total.Files, total.Cases)
 	}
 }
 

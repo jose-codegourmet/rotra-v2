@@ -29,6 +29,10 @@ model ClubPlayer {
   /// one previous photo kept. Ignored once the player is registered: their own picture shows.
   avatarRef            String?   @map("avatar_ref")
   avatarPreviousRef    String?   @map("avatar_previous_ref")
+  /// The level the club gave this saved player outside a session (Saved players › Add player or
+  /// Edit details), and when. Saved players show it, or the latest session assessment when newer.
+  savedSkillLevelId    Int?      @map("saved_skill_level_id") @db.SmallInt
+  savedLevelAt         DateTime? @map("saved_level_at") @db.Timestamptz(6)
   createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision             BigInt    @default(1)
@@ -45,6 +49,7 @@ model ClubPlayer {
   slotTransfersSent     SessionSlotTransfer[]   @relation("SlotTransferSender")
   slotTransfersReceived SessionSlotTransfer[]   @relation("SlotTransferRecipient")
   assessments           ClubAssessment[]
+  savedSkillLevel       SkillLevel?             @relation("ClubPlayerSavedLevel", fields: [savedSkillLevelId], references: [id], onDelete: Restrict)
   claimLinks            ClubPlayerClaimLink[]
   trustedHosts          ClubTrustedHost[]
   sessionHosts          SessionHost[]

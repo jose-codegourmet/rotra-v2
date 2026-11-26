@@ -1,6 +1,6 @@
 # Queue app: Set games played shows Now and To side by side
 
-Status: NEW
+Status: IN MOCK APP — #1047
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › sheet `setGames` (D-SET-GAMES), `.gcmp`

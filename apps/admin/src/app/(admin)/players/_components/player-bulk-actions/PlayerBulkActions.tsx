@@ -6,6 +6,7 @@ import { useAdminPlayerMutations } from '@rotra/data/admin-player/useAdminPlayer
 import { useAdminPlayerSelection } from '@rotra/data/admin-player/useAdminPlayerSelection'
 import { AdminPlayerBulkBar } from '@rotra/ui/admin-player-bulk-bar'
 import { AdminPlayerChangeForm } from '@rotra/ui/admin-player-change-form'
+import { AdminPlayerGenderForm } from '@rotra/ui/admin-player-gender-form'
 import { CopyPlayerValue } from '@rotra/ui/copy-player-value'
 import { ErrorState } from '@rotra/ui/error-state'
 import { Skeleton } from '@rotra/ui/skeleton'
@@ -19,6 +20,7 @@ export function PlayerBulkActions({ ids, onClear }: { ids: string[]; onClear: ()
       action: 'archive' | 'restore' | 'remove'
       players: AdminPlayer[]
     } | null>(null),
+    [genderDialog, setGenderDialog] = useState<AdminPlayer[] | null>(null),
     [results, setResults] = useState<AdminPlayerBulkResult[] | undefined>(),
     [copyValue, setCopyValue] = useState('')
   const players = selection.data ?? []
@@ -55,6 +57,10 @@ export function PlayerBulkActions({ ids, onClear }: { ids: string[]; onClear: ()
                   () => toast.success('RTR IDs copied'),
                   () => setCopyValue(value),
                 )
+            } else if (action === 'gender') {
+              mutations.setGender.reset()
+              setResults(undefined)
+              setGenderDialog(players)
             } else {
               mutations.change.reset()
               setResults(undefined)
@@ -64,6 +70,34 @@ export function PlayerBulkActions({ ids, onClear }: { ids: string[]; onClear: ()
         />
       ) : null}
       <CopyPlayerValue value={copyValue} onClose={() => setCopyValue('')} />
+      {genderDialog ? (
+        <AdminPlayerGenderForm
+          players={genderDialog}
+          open
+          offline={offline}
+          pending={mutations.setGender.isPending}
+          error={mutations.setGender.error?.message}
+          results={results}
+          onClose={() => setGenderDialog(null)}
+          onSubmit={(gender, ids) =>
+            mutations.setGender.mutate(
+              { ids, gender },
+              {
+                onSuccess: (next) => {
+                  setResults((previous) => [
+                    ...(previous ?? []).filter((r) => !ids.includes(r.id)),
+                    ...next,
+                  ])
+                  toast.success(
+                    `${next.filter((r) => r.success).length} succeeded, ${next.filter((r) => !r.success).length} failed`,
+                  )
+                },
+                onError: (error) => toast.error(error.message),
+              },
+            )
+          }
+        />
+      ) : null}
       {dialog ? (
         <AdminPlayerChangeForm
           players={dialog.players}

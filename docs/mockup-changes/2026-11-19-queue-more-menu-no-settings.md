@@ -1,6 +1,6 @@
 # Queue app: the live console's ⋯ menu drops Session settings
 
-Status: NEW
+Status: IN MOCK APP — #1058
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `viewConsole()` More menu

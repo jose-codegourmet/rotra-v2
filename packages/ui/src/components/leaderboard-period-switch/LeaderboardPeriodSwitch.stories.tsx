@@ -4,6 +4,7 @@ import { type LeaderboardPeriod, LeaderboardPeriodSwitch } from './LeaderboardPe
 
 const dateLabels = {
   year: '2026',
+  quarter: 'Oct to Dec 2026',
   month: 'November 2026',
   week: 'Nov 16 to Nov 22',
 } satisfies Record<LeaderboardPeriod, string>
@@ -28,5 +29,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Annual: Story = {}
+export const Quarterly: Story = { args: { period: 'quarter' } }
 export const Monthly: Story = { args: { period: 'month' } }
 export const Weekly: Story = { args: { period: 'week' } }

@@ -128,8 +128,12 @@ func (s *server) addCourt(r *http.Request, club pgtype.UUID) (writes.Result, err
 		if msg, bad := courtWindowError(from, until, base, t.sess.ScheduledEndAt.Time.UnixMilli()); bad {
 			return nil, writes.Fail(httpapi.ErrInvalid, msg)
 		}
+		position, err := t.q.NextSessionCourtPosition(t.ctx, t.sess.ID) // a new court goes last in court order
+		if err != nil {
+			return nil, err
+		}
 		court, err := t.q.InsertSessionCourt(t.ctx, sqlcgen.InsertSessionCourtParams{
-			ID: courtID, ClubID: t.club, SessionID: t.sess.ID, Label: trimmed, StartsAt: nullableTimestamp(planned), OpenUntil: nullableTimestamp(until), Now: t.stamp(),
+			ID: courtID, ClubID: t.club, SessionID: t.sess.ID, Label: trimmed, Position: position, StartsAt: nullableTimestamp(planned), OpenUntil: nullableTimestamp(until), Now: t.stamp(),
 		})
 		if err != nil {
 			return nil, mapDatabaseError(err)

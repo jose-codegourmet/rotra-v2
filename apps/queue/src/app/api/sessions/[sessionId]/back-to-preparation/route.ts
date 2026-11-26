@@ -5,7 +5,7 @@ import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { cookies } from 'next/headers'
 
 /**
- * Q-CONSOLE › ⋯ › Back to preparation (D-BACK-TO-PREP): active → prepared while no game has
+ * Q-CONSOLE Settings tab › Setup › Back to preparation… (D-BACK-TO-PREP): active → prepared while no game has
  * started. `expectedRevision` is the displayed session.
  */
 export async function POST(

@@ -187,7 +187,7 @@ export const END_WITHIN_DAY_ERROR = 'Choose an end at most 24 hours after play b
 export const START_NEEDS_NEW_END = 'Set a new end time after now to start.'
 
 /**
- * Back to preparation (owner, November 25, 2026): why the ⋯ menu item is disabled, or null. Only
+ * Back to preparation (owner, November 25, 2026): why the Settings tab's Back to preparation… button is disabled, or null. Only
  * before any game starts (no match Playing, done or invalid) and only online.
  */
 export function backToPreparationBlocker(

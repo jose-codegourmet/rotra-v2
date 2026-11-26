@@ -19,7 +19,7 @@ export type BackToPreparationProps = {
 }
 
 /**
- * D-BACK-TO-PREP: the console ⋯ menu's Back to preparation… confirmation (owner, November 25, 2026).
+ * D-BACK-TO-PREP: the Settings tab's Back to preparation… confirmation (owner, November 25, 2026).
  * Lists what undoing Start does, with the planned time it goes back to (the window kept at Start, or
  * the current one for sessions started before that was kept), then opens the preparation page.
  */

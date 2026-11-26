@@ -176,7 +176,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 44 · IN PROGRESS: 1 · IN MOCK APP: 275 · CANCELLED: 4 · MOCKUP ONLY: 4
+TICKETED: 41 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 3 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -497,10 +497,10 @@ TICKETED: 44 · IN PROGRESS: 1 · IN MOCK APP: 275 · CANCELLED: 4 · MOCKUP ONL
 | [2026-11-25-queue-standings-image-shared-rows](2026-11-25-queue-standings-image-shared-rows.md) | Standings images: one row per position, and previews that are the images | result-slide-frame, export-images-sheet (export-frame-preview) | TICKETED — #1127 |
 | [2026-11-25-queue-status-pills](2026-11-25-queue-status-pills.md) | Players cards and Main Queue: one status pill per player | player-pool-card, match-card (queue tile faces), a new status pill | TICKETED — #1127 |
 | [2026-11-25-queue-upcoming-side-by-side](2026-11-25-queue-upcoming-side-by-side.md) | Courts tab: pairs side by side on upcoming cards, faces on Next eligible | match-card (compact), court card (free state) | IN REAL MODE — #1121 |
-| [2026-11-26-player-dock-settings-session](2026-11-26-player-dock-settings-session.md) | Player app: Settings page and a session slot in the main navigation | top bar, mobile dock, settings list (new) | TICKETED — #1142 |
+| [2026-11-26-player-dock-settings-session](2026-11-26-player-dock-settings-session.md) | Player app: Settings page and a session slot in the main navigation | top bar, mobile dock, settings list (new) | IN REAL MODE — #1149 |
 | [2026-11-26-player-match-court-vs-card](2026-11-26-player-match-court-vs-card.md) | Player app: Game page is the court beside a VS card; stats only for a tapped player | match court (unchanged), VS card (new), player stats card (new) | TICKETED — #1142 |
-| [2026-11-26-player-session-button-options](2026-11-26-player-session-button-options.md) | Player app: four style options for the dock's session button | mobile dock | TICKETED — #1142 |
-| [2026-11-26-player-weekly-summary-box](2026-11-26-player-weekly-summary-box.md) | Player app: Weekly Performance summary in one box | weekly performance summary | TICKETED — #1142 |
+| [2026-11-26-player-session-button-options](2026-11-26-player-session-button-options.md) | Player app: four style options for the dock's session button | mobile dock | IN REAL MODE — #1149 |
+| [2026-11-26-player-weekly-summary-box](2026-11-26-player-weekly-summary-box.md) | Player app: Weekly Performance summary in one box | weekly performance summary | IN REAL MODE — #1146 |
 | [2026-11-26-queue-console-no-courts-and-time](2026-11-26-queue-console-no-courts-and-time.md) | Queue app: live session header trimmed; Payments becomes a console tab | live session header actions | TICKETED — #1136 |
 | [2026-11-26-queue-court-match-line](2026-11-26-queue-court-match-line.md) | Queue app: court card match line as #N header and pills | court card | IN REAL MODE — #1124 |
 | [2026-11-26-queue-edit-player-name](2026-11-26-queue-edit-player-name.md) | Queue app: Edit player has Full name and Club nickname for every player | EditLivePlayerSheet | TICKETED — #1127 |

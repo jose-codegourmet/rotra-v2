@@ -1,4 +1,6 @@
 'use client'
+import { playerSessionSlot } from '@rotra/data/player/rules'
+import { useMySessions } from '@rotra/data/player/useMySessions'
 import { useConfirmMockEmail } from '@rotra/data/player-account/useConfirmMockEmail'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
 import { useResendConfirmationEmail } from '@rotra/data/player-account/useResendConfirmationEmail'
@@ -8,7 +10,12 @@ import { TopBar } from '@rotra/ui/app-shell/top-bar'
 import { EmailConfirmBanner } from '@rotra/ui/email-confirm-banner'
 import { NotificationBell } from '@rotra/ui/notification-bell'
 import { OfflineBand } from '@rotra/ui/offline-band'
-import { PlayerNav, type PlayerNavCurrent, PlayerNavDock } from '@rotra/ui/player-nav'
+import {
+  PlayerNav,
+  type PlayerNavCurrent,
+  PlayerNavDock,
+  type PlayerNavProps,
+} from '@rotra/ui/player-nav'
 import { ThemeToggle } from '@rotra/ui/theme-toggle'
 import { toast } from '@rotra/ui/toaster'
 import Link from 'next/link'
@@ -27,8 +34,14 @@ import {
 import { GoogleAnnouncementBand } from '../google-sign-in/GoogleAnnouncementBand'
 import { GoogleRequiredGate } from '../google-sign-in/GoogleRequiredGate'
 
+const SESSION_SLOT_LABELS = { play: 'Play', ready: 'Ready', 'next-up': 'Next up' } as const
+
 export function PlayerShell({ children }: { children: ReactNode }) {
   const account = useAppSelector(selectAccount)
+  const realMode = isRealDataMode()
+  const mySessions = useMySessions(realMode ? (account?.id ?? null) : null, {
+    refreshSessionSlot: true,
+  })
   const unreadNotifications = usePlayerNotificationUnreadCount(account?.id ?? null)
   const myAccount = useMyAccount(account?.id ?? null)
   const resend = useResendConfirmationEmail()
@@ -44,20 +57,43 @@ export function PlayerShell({ children }: { children: ReactNode }) {
   const target = (href: string) =>
     unsavedDraft ? { onNavigate: () => dispatch(requestLeave(href)) } : { href }
   const ownPath = account ? `/players/${account.id}` : null
-  const current: PlayerNavCurrent =
-    pathname === '/'
-      ? 'leaderboard'
-      : (ownPath && (pathname === ownPath || pathname.startsWith(`${ownPath}/`))) ||
-          pathname === '/me' ||
-          pathname.startsWith('/me/') ||
-          pathname.startsWith('/profile/')
-        ? 'profile'
-        : ['/login', '/forgot-password'].includes(pathname) ||
-            pathname.startsWith('/reset-password/')
-          ? 'sign-in'
-          : null
+  let current: PlayerNavCurrent = null
+  if (pathname === '/') current = 'leaderboard'
+  else if (pathname === '/settings') current = 'settings'
+  else if (
+    (ownPath && (pathname === ownPath || pathname.startsWith(`${ownPath}/`))) ||
+    pathname === '/me' ||
+    pathname.startsWith('/me/') ||
+    pathname.startsWith('/profile/')
+  ) {
+    current = 'profile'
+  } else if (
+    ['/login', '/forgot-password'].includes(pathname) ||
+    pathname.startsWith('/reset-password/')
+  ) {
+    current = 'sign-in'
+  }
   // /card/<RTR ID> is framed by rotra.club: the card alone, no top bar or bands.
   if (pathname.startsWith('/card/')) return <>{children}</>
+  const slot =
+    realMode && mySessions.data ? playerSessionSlot(mySessions.data.sessions, Date.now()) : null
+  const nav: PlayerNavProps = {
+    signedIn: Boolean(account),
+    current,
+    leaderboard: target('/'),
+    profile: target(ownPath ?? '/'),
+    signIn: target('/login'),
+    session: slot
+      ? {
+          label: SESSION_SLOT_LABELS[slot.kind],
+          live: slot.kind === 'play',
+          href: slot.session.href,
+          accessibleName: `${slot.kind === 'play' ? 'Back to session' : 'Incoming session'}: ${slot.session.title}`,
+        }
+      : undefined,
+    settings: (slot?.showSettings ?? true) ? target('/settings') : undefined,
+    linkAs: Link,
+  }
   // P-ONBOARD is fullscreen: the frame draws its own header and footer, so no top bar, band or dock.
   // The children keep their place in the tree, so the onboarding's state survives the switch.
   const chrome = !onboardingFullscreen
@@ -73,14 +109,7 @@ export function PlayerShell({ children }: { children: ReactNode }) {
             else router.push(home)
           }}
         >
-          <PlayerNav
-            signedIn={Boolean(account)}
-            current={current}
-            leaderboard={target('/')}
-            profile={target(ownPath ?? '/')}
-            signIn={target('/login')}
-            linkAs={Link}
-          />
+          <PlayerNav {...nav} />
           {account ? (
             <NotificationBell
               unreadCount={unreadNotifications.isSuccess ? unreadNotifications.data : 0}
@@ -106,7 +135,7 @@ export function PlayerShell({ children }: { children: ReactNode }) {
             })
           }
           onConfirm={
-            !isRealDataMode()
+            !realMode
               ? () =>
                   confirm.mutate(undefined, {
                     onSuccess: () => toast('Email confirmed'),
@@ -127,16 +156,7 @@ export function PlayerShell({ children }: { children: ReactNode }) {
       ) : (
         children
       )}
-      {chrome ? (
-        <PlayerNavDock
-          signedIn={Boolean(account)}
-          current={current}
-          leaderboard={target('/')}
-          profile={target(ownPath ?? '/')}
-          signIn={target('/login')}
-          linkAs={Link}
-        />
-      ) : null}
+      {chrome ? <PlayerNavDock {...nav} /> : null}
     </>
   )
 }

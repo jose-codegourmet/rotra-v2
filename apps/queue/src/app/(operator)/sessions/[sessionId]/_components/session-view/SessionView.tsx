@@ -52,8 +52,8 @@ import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { courtNextDay } from '@rotra/schema/court-window'
 import { AddCourtTile } from '@rotra/ui/add-court-tile'
 import { Button } from '@rotra/ui/button'
+import { CardCarousel, COURT_SLIDE_CLASS } from '@rotra/ui/card-carousel'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
-import { COURT_SLIDE_CLASS, CardCarousel } from '@rotra/ui/card-carousel'
 import { CourtCard, type CourtCardProps } from '@rotra/ui/court-card'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { CourtFillInfoSheet } from '@rotra/ui/court-fill-info-sheet'
@@ -572,7 +572,9 @@ export function SessionView({
       notOpen: !courtOpen(c, now),
       dropCourtId: grid && free.some((f) => f.id === c.id) ? c.id : undefined,
       onFill:
-        live && onFillCourt && free.some((f) => f.id === c.id) ? () => onFillCourt(c.id) : undefined,
+        live && onFillCourt && free.some((f) => f.id === c.id)
+          ? () => onFillCourt(c.id)
+          : undefined,
       // "Free · N min": since the last match on it ended, or from the planned start, even when opened early (plain "Free" until then), or the session start.
       freeMinutes: live
         ? freeCourtMinutes(

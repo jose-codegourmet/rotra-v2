@@ -147,6 +147,7 @@ export function CardCarousel({
         >
           <Icon name="back" />
         </IconButton>
+        {/* biome-ignore lint/a11y/useSemanticElements: a row of dot buttons; a fieldset would change the drawn layout */}
         <div role="group" aria-label={`${label} slides`} className="flex gap-1.5">
           {Array.from({ length: state.snaps }, (_, k) => k).map((k) => (
             <button

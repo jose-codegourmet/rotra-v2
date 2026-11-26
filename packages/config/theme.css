@@ -159,6 +159,13 @@
 }
 
 :root {
+  /* Pixel session button keeps the same brand-sprite palette in both themes. */
+  --px-ink: #0b0b0c;
+  --px-top: #8dffc6;
+  --px-fill: #00ff88;
+  --px-low: #00cc6a;
+  --px-drop: #00804a;
+  --px-hi: #ffffff;
   /* Fixed share-card colors from the Session QR prototype; never overridden by light mode. */
   --share-bg: #0b0b0c;
   --share-fg: #f0f0f2;

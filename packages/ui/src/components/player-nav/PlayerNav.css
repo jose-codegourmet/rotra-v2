@@ -1,0 +1,144 @@
+.player-nav-session {
+  display: flex;
+  flex: none;
+  min-width: 96px;
+  min-height: 44px;
+  margin: 0 4px;
+  padding: 3px 3px 8px;
+  color: var(--px-ink);
+  text-decoration: none;
+  background: linear-gradient(var(--px-ink) 0 calc(100% - 5px), var(--px-drop) calc(100% - 5px));
+  clip-path: polygon(
+    0 6px,
+    3px 6px,
+    3px 3px,
+    6px 3px,
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 3px,
+    calc(100% - 3px) 3px,
+    calc(100% - 3px) 6px,
+    100% 6px,
+    100% calc(100% - 9px),
+    calc(100% - 3px) calc(100% - 9px),
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 6px) calc(100% - 3px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 3px),
+    3px calc(100% - 3px),
+    3px calc(100% - 9px),
+    0 calc(100% - 9px)
+  );
+}
+
+.player-nav-session-face {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 12px 4px;
+  overflow: hidden;
+  font-family: var(--pixel, var(--mono, ui-monospace)), monospace;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1.5px;
+  text-shadow: 0 1px 0 var(--px-top);
+  text-transform: uppercase;
+  background: linear-gradient(
+    var(--px-top) 0 4px,
+    var(--px-fill) 4px calc(100% - 5px),
+    var(--px-low) calc(100% - 5px)
+  );
+  clip-path: polygon(
+    0 3px,
+    3px 3px,
+    3px 0,
+    calc(100% - 3px) 0,
+    calc(100% - 3px) 3px,
+    100% 3px,
+    100% calc(100% - 3px),
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 3px) 100%,
+    3px 100%,
+    3px calc(100% - 3px),
+    0 calc(100% - 3px)
+  );
+}
+
+.player-nav-session-face::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(
+    115deg,
+    transparent 0 10%,
+    color-mix(in srgb, var(--px-hi) 55%, transparent) 10% 15%,
+    transparent 15% 19%,
+    color-mix(in srgb, var(--px-hi) 55%, transparent) 19% 21%,
+    transparent 21%
+  );
+}
+
+.player-nav-session-face > span {
+  position: relative;
+}
+
+.player-nav-session:focus-visible .player-nav-session-face {
+  outline: 2px solid var(--px-ink);
+  outline-offset: -4px;
+}
+
+@media (max-width: 640px) {
+  .player-nav-session {
+    flex: 1.25;
+    min-width: auto;
+    max-width: 150px;
+    min-height: 60px;
+    margin: -10px 0 0;
+  }
+
+  .player-nav-session-face {
+    padding: 4px 6px 6px;
+    font-size: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .player-nav-session:active {
+    padding-top: 6px;
+    padding-bottom: 5px;
+  }
+
+  .player-nav-session-live .player-nav-session-face::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -40%;
+    width: 30%;
+    pointer-events: none;
+    content: "";
+    background: linear-gradient(
+      115deg,
+      transparent 0 30%,
+      color-mix(in srgb, var(--px-hi) 50%, transparent) 30% 55%,
+      transparent 55%
+    );
+    animation: player-nav-session-shine 2.4s steps(12) infinite;
+  }
+}
+
+@keyframes player-nav-session-shine {
+  0%,
+  40% {
+    left: -40%;
+  }
+
+  100% {
+    left: 120%;
+  }
+}

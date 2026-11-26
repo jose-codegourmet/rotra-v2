@@ -12,8 +12,16 @@ export const shareSessionDialogMeta = {
   ],
   prototype: {
     file: 'apps/mockup/queue-app/rotra-queue.html',
-    screen: 'Q-PREPARE › header Share › SHEETS.share, ACT.openShare; live variant: SHEETS.share › share-live',
+    screen:
+      'Q-PREPARE › header Share › SHEETS.share, ACT.openShare; live variant: SHEETS.share › share-live',
   },
   docs: ['docs/screens/product/modules/queue/session-setup.md'],
-  related: ['Sheet', 'SessionJoinQr', 'SessionLinkCard', 'ShareDialog', 'ShareCard', 'FacebookPostSheet'],
+  related: [
+    'Sheet',
+    'SessionJoinQr',
+    'SessionLinkCard',
+    'ShareDialog',
+    'ShareCard',
+    'FacebookPostSheet',
+  ],
 } satisfies ComponentMeta

@@ -366,13 +366,13 @@ export function ShareCard({
         )}
       </section>
       {hideNote ? null : (
-      <p className="m-0 text-fg2 text-sm">
-        {noteStart ? `${noteStart} ` : ''}
-        {format === 'story'
-          ? 'Story size (9:16) for Facebook and Instagram stories.'
-          : 'Post size (4:5) for Facebook and Instagram feeds.'}
-        {noteEnd ? ` ${noteEnd}` : ''}
-      </p>
+        <p className="m-0 text-fg2 text-sm">
+          {noteStart ? `${noteStart} ` : ''}
+          {format === 'story'
+            ? 'Story size (9:16) for Facebook and Instagram stories.'
+            : 'Post size (4:5) for Facebook and Instagram feeds.'}
+          {noteEnd ? ` ${noteEnd}` : ''}
+        </p>
       )}
       {primaryRowAbove ? <div className="flex flex-col">{primaryRowAbove}</div> : null}
       <div className="flex flex-wrap justify-center gap-2">

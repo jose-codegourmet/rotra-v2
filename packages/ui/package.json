@@ -247,6 +247,7 @@
     "./session-games": "./src/components/session-games/SessionGames.tsx",
     "./session-link-card": "./src/components/session-link-card/SessionLinkCard.tsx",
     "./settings-card": "./src/components/settings-card/SettingsCard.tsx",
+    "./settings-list": "./src/components/settings-list/SettingsList.tsx",
     "./share-session-dialog": "./src/components/share-session-dialog/ShareSessionDialog.tsx",
     "./who-can-join-card": "./src/components/who-can-join-card/WhoCanJoinCard.tsx",
     "./session-hosts-card": "./src/components/session-hosts-card/SessionHostsCard.tsx",

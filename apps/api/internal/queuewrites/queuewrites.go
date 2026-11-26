@@ -115,6 +115,7 @@ func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerPayments(rt)
 	s.registerFinalization(rt)
 	s.registerVisitor(rt)
+	s.registerHosts(rt)
 }
 
 // at is `new Date()`: the clock in milliseconds.

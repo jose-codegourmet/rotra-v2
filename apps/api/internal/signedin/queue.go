@@ -78,6 +78,7 @@ func (s *server) registerQueue(rt *Router) {
 	rt.Handle("GET /api/club/players/{clubPlayerId}/year-stats", club, s.club(s.queueYearStats))
 	rt.Handle("GET /api/players", club, s.club(s.queuePlayerLookup))
 	s.registerQueueSessions(rt)
+	s.registerQueueHosts(rt)
 	s.registerQueueSync(rt)
 	s.registerQueueFinalization(rt)
 }

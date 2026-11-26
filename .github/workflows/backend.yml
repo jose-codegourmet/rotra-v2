@@ -98,6 +98,19 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      # The live-update tests need a cluster of their own: the publisher releases an event only below pg_snapshot_xmin, which is
+      # cluster-wide, so a transaction open in another package's test database holds its events back.
+      postgres-live:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     env:
       DATABASE_URL_TEST: postgres://postgres:test@localhost:5432/postgres?sslmode=disable
     defaults:
@@ -121,7 +134,11 @@ jobs:
         run: go vet ./...
       - name: Test (race, coverage)
         if: steps.present.outputs.yes == 'true'
-        run: go test ./... -race -cover
+        run: |
+          status=0
+          go test $(go list ./... | grep -v '/internal/liveupdates$') -race -cover || status=1
+          DATABASE_URL_TEST='postgres://postgres:test@localhost:5433/postgres?sslmode=disable' go test ./internal/liveupdates -race -cover || status=1
+          exit $status
       - name: Build
         if: steps.present.outputs.yes == 'true'
         run: go build ./...

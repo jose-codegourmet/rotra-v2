@@ -69,7 +69,7 @@ export async function seed(): Promise<SeededAccounts> {
     const visitor = await anonymous('player')
     const values = {
       fullName: playerName(n),
-      nickname: '',
+      nickname: playerName(n),
       playingStyle: '',
       experienceYears: '',
       experienceMonths: '',

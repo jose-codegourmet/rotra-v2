@@ -2,7 +2,6 @@ import type { Page } from '@playwright/test'
 import { readAccounts } from '../../src/accounts.ts'
 import { resetClock } from '../../src/clock.ts'
 import { expect, test } from '../../src/fixtures.ts'
-import { skipUntilInGo } from '../../src/known-defect.ts'
 import { appUrl } from '../../src/stack.ts'
 import {
   abandonCreatedSessions,
@@ -23,7 +22,6 @@ import {
 import { rolePage, signInAdmin, signInPlayer, signInQueueMaster } from '../../src/ui/sign-in.ts'
 import { advance, jumpTo, MINUTE } from '../../src/ui/time.ts'
 
-skipUntilInGo('BL-22', 'trusted hosts are not in Go, so the Queue session form does not load')
 test.use({ actionTimeout: 15_000 })
 // Clean up on the journey's own virtual time first (court actions follow the server clock).
 test.afterEach(async () => {
@@ -116,7 +114,7 @@ test('UI-01 a club night from Admin to Session done to the Player history', asyn
 async function countedGames(page: Page, playerId: string) {
   await page.goto(`${appUrl('player')}/players/${playerId}`)
   const all = page.getByRole('button', { name: /^All games \(\d+\)$/ })
-  const none = page.getByText('No recorded games yet.', { exact: true })
+  const none = page.getByText('No games recorded yet.', { exact: true })
   await expect(all.or(none)).toBeVisible({ timeout: 30_000 })
   if (await none.isVisible()) return 0
   return Number(/\((\d+)\)/.exec((await all.textContent()) ?? '')?.[1])

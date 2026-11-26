@@ -23,7 +23,7 @@ These records support an estimate and a manual paid / not-paid checklist. There 
 
 Unique `(club_id, id)` for scoped FKs. Index `(club_id, category, name)` for the inventory screen; active items are those with `removed_at IS NULL`.
 
-Removing an item is a soft remove because past session estimates may reference it. Stock changes are direct updates guarded by `revision`; stock is **not** decremented by session activity in v1. If stock history is wanted later, add an append-only adjustment table rather than overloading this row.
+Removing an item is a soft remove because past session estimates may reference it. Stock changes are direct updates guarded by `revision`; Session done decrements stock by each shuttle plan line's tubes inside the finalization transaction, clamped at zero, skipping removed items ([D-2026-11-26-01](../../../../mvp/decisions/2026-11-26.md#d-2026-11-26-01)); the one `session_finalizations` row per session keeps it to once. If stock history is wanted later, add an append-only adjustment table rather than overloading this row.
 
 "Running low" (stock ≤ 2) and total stock value (Σ stock × unit cost) are derived at read time, not stored.
 

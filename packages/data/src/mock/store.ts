@@ -51,9 +51,9 @@ import type { PlayerNotification } from '../player-notifications/playerNotificat
 import type { ProfileBanner } from '../profile-banner/profileBanner.types'
 import type { ProfileCharacter } from '../profile-character/profileCharacter.types'
 import {
+  byCourtOrder,
   type DownloadState,
   type QueueSession,
-  recordsGames,
   type SessionCourt,
   type SessionFinalization,
 } from '../queue-session/queueSession.types'
@@ -97,6 +97,8 @@ export type MockState = {
   playerAccounts: typeof playerAccounts
   playerNotifications: Record<string, PlayerNotification[]>
   verificationReminderReads: Record<string, string>
+  /** When each player read the derived Add your gender reminder (D-2026-11-19-01). */
+  genderReminderReads: Record<string, string>
   resetLinks: Record<string, 'valid' | 'used'>
   claimLinks: Record<string, ClaimLinkRecord>
   /** Player requests and their Admin review/application, in every state */
@@ -138,6 +140,11 @@ export type MockState = {
    */
   sessionHosts?: SessionHostRecord[]
   sessions: QueueSession[]
+  /**
+   * Every session's courts, removed ones included. Each session's courts are kept in court order
+   * (`position`, owner decision 2026-11-25) by every write (`keepCourtOrder`), so a filter by
+   * session reads them in that order.
+   */
   courts: SessionCourt[]
   roster: SessionPlayer[]
   waitlist: SessionWaitlistEntry[]
@@ -161,6 +168,11 @@ export type MockState = {
   sync: SyncState
   sessionIntegrity: Record<string, SessionIntegrity>
   autoQueueDrafts: Record<string, AutoQueueDraftState>
+  /**
+   * Session exemption lists (D-2026-11-19-07): the roster ids Generate Queue leaves out, by session.
+   * Mock store only (real mode has no column yet). Missing in older saved states.
+   */
+  sessionExemptions?: Record<string, string[]>
   matches: Match[]
   matchSequences: Record<string, number>
   finalizations: Record<string, SessionFinalization>
@@ -206,16 +218,35 @@ function freeze<T>(value: T): DeepReadonly<T> {
   }
   return value as DeepReadonly<T>
 }
+/**
+ * Puts each session's courts in court order in place: a session's courts keep the array slots they
+ * had and only swap among them (a stable sort by position), so other sessions are not moved.
+ */
+function keepCourtOrder(state: MockState) {
+  const slots = new Map<string, number[]>()
+  state.courts.forEach((court, index) => {
+    const indexes = slots.get(court.sessionId)
+    if (indexes) indexes.push(index)
+    else slots.set(court.sessionId, [index])
+  })
+  const courts = [...state.courts]
+  for (const indexes of slots.values()) {
+    const sorted = indexes.map((i) => courts[i] as SessionCourt).sort(byCourtOrder)
+    indexes.forEach((slot, n) => {
+      state.courts[slot] = sorted[n] as SessionCourt
+    })
+  }
+}
 function seedState(): MockState {
   const now = Date.now(),
     { sessions, courts, roster, history, requests } = createQueueFixtures(now),
     publicationFixtures = createSessionPublicationFixtures(now),
     financials = createFinancialFixtures([...roster, ...history.roster], now)
   // The seeded completed history sessions carry the snapshot their finalization `slides` stage
-  // produced; an unrecorded one never reached that stage and has none.
+  // produced, a session with Record games off (not ranked) included.
   const resultSnapshots = Object.fromEntries(
     sessions
-      .filter((s) => s.state === 'completed' && recordsGames(s))
+      .filter((s) => s.state === 'completed')
       .map((s) => [
         s.id,
         createResultSnapshot({
@@ -257,6 +288,7 @@ function seedState(): MockState {
     playerAccounts,
     playerNotifications: { [JOSE_PLAYER_ID]: createPlayerNotificationFixtures(now) },
     verificationReminderReads: {},
+    genderReminderReads: {},
     resetLinks: { 'reset-valid': 'valid' },
     claimLinks,
     contactChangeRequests: createContactChangeRequestFixtures(now),
@@ -289,6 +321,7 @@ function seedState(): MockState {
     downloadInfo: {},
     sessionIntegrity: {},
     autoQueueDrafts: {},
+    sessionExemptions: {},
     matches: history.matches,
     matchSequences: history.matchSequences,
     finalizations: history.finalizations,
@@ -313,6 +346,7 @@ function seedState(): MockState {
   seedAdminPlayerManagement(state)
   seedLeaderboardHistory(state)
   seedUnclaimedPlayers(state, now)
+  keepCourtOrder(state)
   return state
 }
 /**
@@ -359,12 +393,14 @@ export function createMockStore() {
         // The working state is private to one offline apply: no freeze, no listeners.
         const draft = structuredClone(working.snapshot) as MockState
         change(draft)
+        keepCourtOrder(draft)
         working.snapshot = draft
         return
       }
       if (isRealDataMode()) throw new NotConnectedError()
       const draft = structuredClone(snapshot) as MockState
       change(draft)
+      keepCourtOrder(draft)
       snapshot = freeze(structuredClone(draft))
       notify()
     },

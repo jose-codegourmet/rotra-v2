@@ -21,6 +21,7 @@ import type {
   AddDirectoryPlayerInput,
   AddNewPlayerInput,
   AddSavedPlayerInput,
+  ConfirmRequestInput,
   RosterAddPlacement,
 } from './mutations'
 import { sessionRosterKeys } from './queryKeys'
@@ -74,9 +75,11 @@ function placement(
 }
 
 /** Only the flags that are set, so an ordinary add sends exactly what it did before #735. */
-const placementFlags = ({ allowOverfill, toWaitlist }: RosterAddPlacement) => ({
+const placementFlags = ({ allowOverfill, toWaitlist, allowOutsideLevels }: RosterAddPlacement) => ({
   ...(allowOverfill ? { allowOverfill: true } : {}),
   ...(toWaitlist ? { toWaitlist: true } : {}),
+  // D-2026-11-19-12: the second press after the level restriction warning.
+  ...(allowOutsideLevels ? { allowOutsideLevels: true } : {}),
 })
 
 function savedPlayer(client: QueryClient, clubPlayerId: string) {
@@ -299,9 +302,11 @@ export function enqueueAddNewPlayer(
       ...placementFlags(input),
       name,
       nickname: input.nickname?.trim() || undefined,
+      ...(input.gender ? { gender: input.gender } : {}),
       ...(email ? { email } : {}),
       ...(socialLink ? { socialLink } : {}),
       ...(phone ? { phone } : {}),
+      clubPlayerId,
       level: input.level,
     },
     preview: preview(
@@ -359,7 +364,7 @@ function pendingRequest(client: QueryClient, requestId: string): SessionJoinRequ
 
 export function enqueueAcceptRequest(
   client: QueryClient,
-  input: { requestId: string; level: PlayingLevel },
+  input: ConfirmRequestInput,
 ): Enqueued<Placed> {
   const request = pendingRequest(client, input.requestId)
   const fromWaitlist = request.placement === 'from_waitlist'
@@ -373,6 +378,7 @@ export function enqueueAcceptRequest(
       operationId: crypto.randomUUID(),
       requestId: request.id,
       level: input.level,
+      ...(input.allowOutsideLevels ? { allowOutsideLevels: true } : {}),
     },
     preview: preview(
       {

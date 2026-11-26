@@ -159,6 +159,7 @@ export async function matchContext(tx: Tx, session: QueueSession) {
         id: c.id,
         sessionId: c.sessionId,
         label: c.label,
+        position: c.position,
         startsAt: c.startsAt?.getTime(),
         openedEarlyAt: c.openedEarlyAt?.getTime() ?? null,
         openUntil: c.openUntil?.getTime() ?? null,

@@ -8,7 +8,7 @@ import {
   startNeedsNewEnd,
   startNewEndError,
 } from '@rotra/data/queue-session/queueSession.rules'
-import type { QueueSession as SessionView } from '@rotra/data/queue-session/types'
+import { movedCourt, type QueueSession as SessionView } from '@rotra/data/queue-session/types'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { QueueSession, SessionCourt, SessionMode } from '../generated/prisma/client'
@@ -16,9 +16,10 @@ import { appendLiveUpdateEvent } from '../live/append-event'
 import { notifyWaitlistPlace } from '../player/notification-events'
 import { requireClubEntitlement, requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
-import { courtDto, requestFormatsInput, sessionDto } from './dto'
+import { courtDto, levelRestrictionInput, requestFormatsInput, sessionDto } from './dto'
+import { dropUnstarted } from './finalization'
 import { autoFillCourts } from './match-control'
-import { liveOpenRequests } from './match-request-store'
+import { closeSessionMatchRequests, liveOpenRequests } from './match-request-store'
 import { assignSessionHostsIn, type HostRegistration, hostIdsInput } from './session-hosts'
 import {
   derivedId,
@@ -27,6 +28,7 @@ import {
   liveRoster,
   lockSession,
   mapDatabaseError,
+  nextCourtPosition,
   orderedWaitlist,
   promoteWaiter,
   recomputeMinimum,
@@ -62,8 +64,15 @@ export type QueueSessionInput = {
    */
   recordGames?: boolean
   /**
+   * Restrictions (D-2026-11-19-12): `{ kind, slots? }` as `@rotra/schema/level-restriction` shapes
+   * it. Left out on create, All levels; on edit, unchanged. Slots per level must add up to the
+   * session's slots (courts × players per court) or the save is refused.
+   */
+  levelRestriction?: unknown
+  /**
    * `id` keeps an existing court on edit; courts left out are removed. `startsAt` is the planned
-   * start (null or the session start = follows the session start).
+   * start (null or the session start = follows the session start). The list order is the court
+   * order: the courts saved take positions 1..n in it. Labels may repeat (owner decision, 2026-11-25).
    */
   courts: { id?: string; label: string; startsAt?: string | null; openUntil?: string | null }[]
   repeat?: 'none' | 'weekly' | 'biweekly' | 'monthly'
@@ -172,7 +181,13 @@ async function validate(tx: Tx, context: ClubContext, input: QueueSessionInput) 
     )
     if (error) throw new ServiceError('invalid', { courts: Object.values(error)[0] as string })
   }
-  return { venue, start, end, playersPerCourt }
+  // Restrictions (D-2026-11-19-12): refused unless slots per level add up to the session's slots.
+  const levelRestriction = levelRestrictionInput(
+    input.levelRestriction,
+    input.courts.length,
+    playersPerCourt,
+  )
+  return { venue, start, end, playersPerCourt, levelRestriction }
 }
 
 /** The club's sessions that can clash (not invalid, not cancelled), in the shared rule's shape. */
@@ -227,7 +242,11 @@ export async function createQueueSession(
           : 1
         return { firstSessionId: existing.id, created, skipped: null, hosts: null }
       }
-      const { venue, start, end, playersPerCourt } = await validate(tx, context, input)
+      const { venue, start, end, playersPerCourt, levelRestriction } = await validate(
+        tx,
+        context,
+        input,
+      )
       const occurrences = sessionOccurrences(
         {
           scheduledStartAt: start,
@@ -276,6 +295,8 @@ export async function createQueueSession(
               (input.allowSingles ? ['doubles', 'singles'] : ['doubles']),
             // Every date of a series gets the same choice; anything but an explicit false records.
             recordGames: input.recordGames !== false,
+            // Every date of a series gets the same restriction; left out is All levels.
+            ...(levelRestriction ?? {}),
             seriesId,
             publicSlug: `${publicSlugFor(id)}${id.slice(0, 4)}`,
             sourceCommandId: await derivedId(commandId, `session:${index}`),
@@ -290,6 +311,7 @@ export async function createQueueSession(
               clubId: context.clubId,
               sessionId: id,
               label: court.label.trim(),
+              position: n + 1,
               startsAt: startsAt === null ? null : new Date(date.start + (startsAt - start)),
               openUntil: court.openUntil
                 ? new Date(date.start + (ms(court.openUntil) - start))
@@ -345,7 +367,11 @@ export async function updateQueueSession(
       let session = await lockSession(tx, context, sessionId)
       requireState(session, ['prepared'], 'Only prepared sessions can be edited.')
       requireRevision(session.revision, expectedRevision)
-      const { venue, start, end, playersPerCourt } = await validate(tx, context, input)
+      const { venue, start, end, playersPerCourt, levelRestriction } = await validate(
+        tx,
+        context,
+        input,
+      )
       const [date] = sessionOccurrences(
         {
           id: sessionId,
@@ -381,6 +407,7 @@ export async function updateQueueSession(
             ? { requestFormats: requestFormatsInput(input.requestFormats) }
             : {}),
           ...(typeof input.recordGames === 'boolean' ? { recordGames: input.recordGames } : {}),
+          ...(levelRestriction ?? {}),
           revision: { increment: 1 },
         },
       })
@@ -394,6 +421,8 @@ export async function updateQueueSession(
         const startsAt = plannedStart(court.startsAt, start)
         const data = {
           label: court.label.trim(),
+          // The form's list order is the court order; removed courts keep their old position.
+          position: n + 1,
           startsAt: startsAt === null ? null : new Date(startsAt),
           openUntil: court.openUntil ? new Date(court.openUntil) : null,
         }
@@ -562,7 +591,15 @@ export async function startSession(
         data: {
           state: 'active',
           startedAt: now,
+          // Back to preparation puts these back (owner, November 25, 2026).
+          plannedStartBeforeStartAt: session.scheduledStartAt,
+          plannedEndBeforeStartAt: session.scheduledEndAt,
           ...(late && newEnd != null ? { scheduledEndAt: new Date(newEnd) } : {}),
+          // Started on an earlier day than planned (owner, November 25, 2026): the planned start
+          // moves to now, so the window is now → the new end. Courts that follow it open now.
+          ...(late && newEnd != null && plannedStartAt > now.getTime()
+            ? { scheduledStartAt: now }
+            : {}),
           startLicenseTermId: entitlement.effectiveTermId,
           revision: { increment: 1 },
         },
@@ -575,6 +612,75 @@ export async function startSession(
       // #1011: pending slot transfers expire at Start; every slot stays with its holder.
       await closePendingSlotTransfers(tx, sessionId, 'expired', now)
       return { ...sessionDto(session), joinRequestsClosed: closed.count }
+    })
+  } catch (error) {
+    mapDatabaseError(error)
+  }
+}
+
+/**
+ * Back to preparation (owner, November 25, 2026): undoes Start while no game has started. Refuses
+ * once any match is Playing, done or invalid. Removes every waiting and On court match (holds
+ * released), closes open match requests and drop-out notices, sets the session prepared with no start
+ * time or license term, puts the planned window back to what it was at Start (sessions started
+ * before that was kept keep their current times), clears early-opened courts and unlocks every
+ * level. Join requests closed at Start stay closed. Returns how many matches were removed as
+ * `matchesRemoved`. A retry after a lost response returns the prepared session (0 removed).
+ */
+export async function backToPreparation(
+  context: ClubContext,
+  sessionId: string,
+  expectedRevision: string,
+) {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      let session = await lockSession(tx, context, sessionId)
+      await requireSessionAccess(context, session, tx)
+      if (session.state === 'prepared' && session.startedAt === null)
+        return { ...sessionDto(session), matchesRemoved: 0 }
+      requireState(session, ['active'], 'Only a live session can go back to preparation.')
+      requireRevision(session.revision, expectedRevision)
+      const played = await tx.match.count({
+        where: { sessionId, state: { in: ['active', 'completed', 'invalid'] } },
+      })
+      if (played)
+        throw new ServiceError('conflict', {
+          session: 'Not available once a game has started.',
+        })
+      const now = new Date()
+      const matchesRemoved = await tx.match.count({
+        where: { sessionId, state: { in: ['waiting', 'on_court'] }, removedAt: null },
+      })
+      await dropUnstarted(tx, sessionId, now)
+      await closeSessionMatchRequests(tx, sessionId, now)
+      // The session is prepared first: the level-lock trigger allows an unlock only then.
+      session = await tx.queueSession.update({
+        where: { id: sessionId },
+        data: {
+          state: 'prepared',
+          startedAt: null,
+          startLicenseTermId: null,
+          ...(session.plannedStartBeforeStartAt && session.plannedEndBeforeStartAt
+            ? {
+                scheduledStartAt: session.plannedStartBeforeStartAt,
+                scheduledEndAt: session.plannedEndBeforeStartAt,
+              }
+            : {}),
+          plannedStartBeforeStartAt: null,
+          plannedEndBeforeStartAt: null,
+          revision: { increment: 1 },
+        },
+      })
+      await tx.sessionCourt.updateMany({
+        where: { sessionId, openedEarlyAt: { not: null } },
+        data: { openedEarlyAt: null, revision: { increment: 1 } },
+      })
+      await tx.sessionPlayer.updateMany({
+        where: { sessionId, levelLockedAt: { not: null } },
+        data: { levelLockedAt: null, revision: { increment: 1 } },
+      })
+      session = await recomputeMinimum(tx, session)
+      return { ...sessionDto(session), matchesRemoved }
     })
   } catch (error) {
     mapDatabaseError(error)
@@ -620,6 +726,8 @@ export async function addCourt(
           clubId: context.clubId,
           sessionId,
           label,
+          // A new court goes last in court order.
+          position: await nextCourtPosition(tx, sessionId),
           startsAt: startsAt === null ? null : new Date(startsAt),
           openUntil: openUntil === null ? null : new Date(openUntil),
         },
@@ -797,6 +905,63 @@ export async function removeCourt(context: ClubContext, sessionId: string, court
     session = await touchSession(tx, session)
     await recomputeMinimum(tx, session)
     return null
+  })
+}
+
+/**
+ * Reorder courts (owner decision, 2026-11-25), dragged in Settings: `courtIds` is the full new order
+ * of the session's live courts, each exactly once; they take positions 1..n. Removed courts keep
+ * theirs. Allowed while prepared or active, as the other court changes are; a list that no longer
+ * matches the live courts is a conflict. Returns the live courts in their new order and the court
+ * the toast names (`movedCourt`).
+ */
+export async function reorderSessionCourts(
+  context: ClubContext,
+  sessionId: string,
+  courtIds: string[],
+) {
+  return prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, context, sessionId)
+    await requireSessionAccess(context, session, tx)
+    requireState(
+      session,
+      ['prepared', 'active'],
+      'Courts can change only before or during the session.',
+    )
+    const courts = await liveCourts(tx, sessionId)
+    const byId = new Map(courts.map((c) => [c.id, c]))
+    if (
+      courtIds.length !== courts.length ||
+      new Set(courtIds).size !== courtIds.length ||
+      courtIds.some((id) => !byId.has(id))
+    )
+      throw new ServiceError('conflict', COURTS_CHANGED)
+    const ordered: SessionCourt[] = []
+    let changed = false
+    for (const [n, id] of courtIds.entries()) {
+      const court = byId.get(id) as SessionCourt
+      if (court.position === n + 1) {
+        ordered.push(court)
+        continue
+      }
+      changed = true
+      ordered.push(
+        await tx.sessionCourt.update({
+          where: { id },
+          data: { position: n + 1, revision: { increment: 1 } },
+        }),
+      )
+    }
+    // The same order again (a retry) writes nothing.
+    if (changed) await touchSession(tx, session)
+    return {
+      courts: ordered.map(courtDto),
+      /** The court the toast names, or null when the order did not change. */
+      moved: movedCourt(
+        courts.map((c) => c.id),
+        courtIds,
+      ),
+    }
   })
 }
 

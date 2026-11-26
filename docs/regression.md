@@ -4,7 +4,7 @@ A Playwright suite that runs whole club nights through the three apps in **real 
 `/api` call forwarded to the **Go API**, on a throwaway **local Postgres**. It checks that every player
 gets their fair share of games when real-life disruptions happen. Decisions:
 [D-2026-11-12-05](mvp/decisions/2026-11-12.md#d-2026-11-12-05) (the suite),
-[D-2026-11-25-01](mvp/decisions/2026-11-25.md#d-2026-11-25-01) (Go and plain Postgres instead of Supabase).
+[D-2026-11-25-06](mvp/decisions/2026-11-25.md#d-2026-11-25-06) (Go and plain Postgres instead of Supabase).
 
 - Servers: Queue 9100, Player 9101, Admin 9102 and the Go API 9103. The Go API counts as ready when
   `/readyz` answers (checked in `global-setup.ts` with the proxy secret).

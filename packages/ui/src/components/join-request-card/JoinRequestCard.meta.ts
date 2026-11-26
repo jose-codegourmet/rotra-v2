@@ -14,6 +14,7 @@ export const joinRequestCardMeta = {
     'Guest (not signed in): pass registerNudge on "sent", "confirmed-slot", "confirmed-waitlist" and "declined" to add "Register to check in and see your matches." under the status notice; a guest has no My night card (D-2026-11-09-03). Leave it off for a signed-in ROTRA Player.',
     'D-2026-11-11-02: on the signed-in "open", "full" or "active" variants pass placement and onPlacementChange for the "How do you want to join?" choice (Join a slot / Be waitlisted) above the one tap; Join a slot is disabled on "full" (before start, every slot taken); during play the Queue Master can admit additional players, so "active" never disables it. Pass placement on "sent" so a waitlist request reads "You asked to be waitlisted." On "confirmed-waitlist" with signedIn pass openSlots and onJoinFromWaitlist for the primary Join from waitlist button (shown while a slot is open), or slotRequestPending with onCancelRequest while that request waits. A guest picks on JoinRequestForm instead and never joins from the waitlist here.',
     'D-2026-11-12-02 (#764): a signed-in club member on a prepared session with Accept join requests on and Always require a request off passes member and clubName on "open" or "full": the line reads "You\'re a member of CLUB, so you get your place right away." and the button "Join as NAME" (Join a slot) or "Join the waitlist as NAME" (Be waitlisted, or every slot taken); onRequestToJoin joins directly (toast "You\'re in" / "You\'re on the waitlist"). Non-members, members with the setting on, and everyone once the session started keep the request flow and copy.',
+    'D-2026-11-19-12: variant="not-open-to-level" (reason, levelLabel) for a signed-in Player whose level here is outside the session\'s restriction, or whose band\'s slots are full: "Not open to your level", the reason, "Your level here is LEVEL." and "You can\'t send a join request for this session. Ask the Queue Master if you think this is wrong." No request button. A Player with no level at the club is never blocked and keeps the open / full card.',
     "A request is never a booking (a member's direct join is a place, not a request): never show a held slot. The Queue Master's review of requests is JoinRequestsPanel.",
   ],
   prototype: {
@@ -34,6 +35,7 @@ export const joinRequestCardMeta = {
     'confirmed-slot',
     'confirmed-waitlist',
     'declined',
+    'not-open-to-level',
   ],
   related: ['JoinRequestForm', 'JoinRequestsPanel', 'SkillDistributionBar', 'Notice', 'Card'],
 } satisfies ComponentMeta

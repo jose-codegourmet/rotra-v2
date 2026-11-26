@@ -25,8 +25,14 @@ export type TeamLineupProps = {
   teamB: TeamLineupPlayer[]
   /** The session's minimum games */
   minimumGames: number
-  /** Opens the player's profile */
+  /** Opens the player's profile; with onOpenProfile it is the card's own tap instead (see below) */
   onSelectPlayer: (playerId: string, team: MatchLineupTeam) => void
+  /**
+   * Open match dialogs (Playing, Getting ready): each card splits into a picture button that opens
+   * the profile (this callback) and a card button with a swap icon that fires onSelectPlayer
+   * (Change NAME? or Replace player). Omit it and the whole card is one button.
+   */
+  onOpenProfile?: (playerId: string, team: MatchLineupTeam) => void
   /**
    * Swap mode: the cards sit in a SwapSidesArea, so a player can be dragged onto someone on the
    * other team or moved across with ← / →. Reports the two slots; the owner changes the lineup.
@@ -42,6 +48,7 @@ function Team({
   players,
   minimumGames,
   onSelectPlayer,
+  onOpenProfile,
   swappable,
   actionLabel,
 }: {
@@ -49,6 +56,7 @@ function Team({
   players: TeamLineupPlayer[]
   minimumGames: number
   onSelectPlayer: TeamLineupProps['onSelectPlayer']
+  onOpenProfile?: TeamLineupProps['onOpenProfile']
   swappable: boolean
   actionLabel?: string
 }) {
@@ -68,6 +76,8 @@ function Team({
             minimumGames={minimumGames}
             team={team}
             onClick={() => onSelectPlayer(p.id, team)}
+            variant={onOpenProfile ? 'swappable' : 'default'}
+            onOpenProfile={onOpenProfile ? () => onOpenProfile(p.id, team) : undefined}
             swappable={swappable}
             actionLabel={actionLabel}
           />
@@ -96,6 +106,7 @@ export function TeamLineup({
   teamB,
   minimumGames,
   onSelectPlayer,
+  onOpenProfile,
   onSwap,
   playerActionLabel,
   className,
@@ -113,6 +124,7 @@ export function TeamLineup({
         players={teamA}
         minimumGames={minimumGames}
         onSelectPlayer={onSelectPlayer}
+        onOpenProfile={onOpenProfile}
         swappable={swappable}
         actionLabel={playerActionLabel}
       />
@@ -122,6 +134,7 @@ export function TeamLineup({
         players={teamB}
         minimumGames={minimumGames}
         onSelectPlayer={onSelectPlayer}
+        onOpenProfile={onOpenProfile}
         swappable={swappable}
         actionLabel={playerActionLabel}
       />

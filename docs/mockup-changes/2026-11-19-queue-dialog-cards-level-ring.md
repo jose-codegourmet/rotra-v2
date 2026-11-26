@@ -1,6 +1,6 @@
 # Queue app: match dialog player cards show the level as the picture's ring, not as text
 
-Status: NEW
+Status: IN MOCK APP — #1045
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `faceTeam()` (`.sg-p`)

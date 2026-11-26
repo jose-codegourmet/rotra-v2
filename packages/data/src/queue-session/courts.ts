@@ -2,12 +2,15 @@ import { courtWindowError } from '@rotra/schema/court-window'
 import { courtOpen, holdsCourt, openedEarly } from '../match/match.rules'
 import { requireLive } from '../match/queue.mutations'
 import { MockError } from '../mock/errors'
-import type { MockState } from '../mock/store'
+import { type MockState, readMockState } from '../mock/store'
 import { queueMutation, sessionIn } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
+import { isRealDataMode } from '../real/mode'
+import { realReorderCourts } from '../real/session-live'
 import { autoFillCourts, autoFillNote } from './courtFill'
 import { recomputeMinimum } from './mutations'
 import { atWhenLabel, sessionEndError } from './queueSession.rules'
+import { courtMovedText, movedCourt, type SessionCourt } from './queueSession.types'
 
 const hhmm = (n: number) =>
   new Date(n).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
@@ -33,6 +36,12 @@ export function addCourt(input: {
         id: crypto.randomUUID(),
         sessionId: session.id,
         label: input.label.trim(),
+        // A new court goes last in court order, after removed courts too.
+        position:
+          Math.max(
+            0,
+            ...s.courts.filter((c) => c.sessionId === session.id).map((c) => c.position),
+          ) + 1,
         startsAt,
         openUntil: input.openUntil,
         removedAt: null,
@@ -164,6 +173,44 @@ export function removeCourt(input: { sessionId: string; courtId: string }) {
       court.removedAt = Date.now()
       return { data: null, text: `${court.label} removed` }
     }),
+  )
+}
+/**
+ * Reorder courts (owner decision, 2026-11-25), dragged in Settings: `courtIds` is the full new order
+ * of the session's live courts, each once; they take positions 1..n (removed courts keep theirs).
+ * Prepared or running sessions only. Needs internet, as Manual | Auto Queue does: refused offline,
+ * never queued for sync. The same order again writes nothing. `data` is the live courts in order.
+ */
+export function reorderCourts(input: { sessionId: string; courtIds: string[] }) {
+  if (isRealDataMode()) return realReorderCourts(input)
+  const liveIds = (s: MockState) =>
+    s.courts.filter((c) => c.sessionId === input.sessionId && !c.removedAt).map((c) => c.id)
+  const current = readMockState()
+  if (!movedCourt(liveIds(current), input.courtIds))
+    return Promise.resolve({
+      savedOffline: false,
+      message: '',
+      data: current.courts.filter((c) => c.sessionId === input.sessionId && !c.removedAt),
+    })
+  return queueMutation(
+    { area: 'Courts and time', onlineOnly: true, sessionId: input.sessionId },
+    (s) => {
+      const before = liveIds(s)
+      if (
+        input.courtIds.length !== before.length ||
+        new Set(input.courtIds).size !== before.length ||
+        input.courtIds.some((id) => !before.includes(id))
+      )
+        throw new MockError('conflict', 'Something changed. Review the courts again.')
+      const courts = input.courtIds.map((id, n) => {
+        const court = s.courts.find((c) => c.id === id) as SessionCourt
+        court.position = n + 1
+        return court
+      })
+      const moved = movedCourt(before, input.courtIds)
+      const label = courts.find((c) => c.id === moved?.courtId)?.label ?? ''
+      return { data: courts, text: courtMovedText(label, moved?.position ?? 1) }
+    },
   )
 }
 /**

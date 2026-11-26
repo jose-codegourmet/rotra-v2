@@ -1,6 +1,6 @@
 # Player app: fullscreen onboarding after an invite link, with play style, shots and favorite player
 
-Status: NEW
+Status: IN MOCK APP — #1081
 Date: 2026-11-19
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `viewOnboard`, `startOnboard`, `finishOnboard`, `obTop`, `viewClaim` (step 1),

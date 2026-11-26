@@ -3,12 +3,14 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const swapPickerSheetMeta = {
   name: 'SwapPickerSheet',
   description:
-    'The player picker for Replace (before and during play) and Substitute. Opens compact (about 620 px, one column): the title, Who\'s coming out/off (the match\'s players, 4 per row), Suggested (seven free players with the fewest games, longest rest first, plus a dashed "+ Other · All players" tile), the extra choice and the one primary action. Other shows All players — a full-width search, a skill-level filter, a sort that reverses on a second tap (Longest/Shortest wait, Fewest/Most games, Name A–Z/Z–A) and pages of 24, free players first and the rest greyed out with Away / Playing / On court.',
+    'The player picker for Replace (before and during play) and Substitute. Opens compact (about 620 px, one column): the title, Who\'s coming out/off (the match\'s players, 4 per row), Suggestion (seven free players with the fewest games, longest rest first, plus a dashed "+ Other · All players" tile), the extra choice and the one primary action. Other shows All players — a full-width search, a skill-level filter, a sort that reverses on a second tap (Longest/Shortest wait, Fewest/Most games, Name A–Z/Z–A) and pages of 24, free players first and the rest greyed out with Away / Playing / On court.',
   usage: [
+    'Each tile (owner, November 25, 2026): the picture has the level ring and the games badge, like the Main Queue faces, and the line under the name is the status alone (no "N/M ·"); a free player\'s "rest Nm" is warning from 10 min and error from 16 (StatusPill\'s thresholds).',
     '900 px and wider: Other widens the dialog to about 75% of the screen with All players as an edge-to-edge panel on the right; the tile becomes "− Hide".',
     'Under 900 px: Other opens All players as a second dialog stacked over the picker; tapping a player picks them and closes it; × or the backdrop closes it without picking.',
-    'A player picked from All players takes the first Suggested slot so the compact view always shows the choice.',
+    'A player picked from All players takes the first Suggestion slot so the compact view always shows the choice.',
     'There is no header bar and no Back button: the title is the left column\'s first line (the heading stays for screen readers) and the floating × ("Back to match N") and the backdrop return to the match.',
+    'Replace only: pass swapFrom for the "Swap from match" row between Who\'s coming out? and Suggestion (the opponents of the player coming out, each marked "Team B · opponent"; opponents null shows "Choose who\'s coming out to see who they can swap with.").',
     'Pass the Replace notice ("Replace fixes a mistake…" during play, the lineup-change line before Start) or the substitution\'s "Who gets this game?" as extra, and Replace player / Review substitution as action.',
   ],
   prototype: {
@@ -16,6 +18,7 @@ export const swapPickerSheetMeta = {
     screen: 'swapPicker(), SHEETS.replace, SHEETS.sub, ACT.spOther / ACT.spSort, .sp-* styles',
   },
   docs: [
+    'docs/mockup-changes/2026-11-25-queue-picker-level-games-rest.md',
     'docs/screens/product/modules/queue/match-control.md',
     'docs/mockup-changes/2026-11-13-queue-replace-during-play.md',
   ],

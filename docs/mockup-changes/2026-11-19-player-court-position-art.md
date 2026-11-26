@@ -1,6 +1,6 @@
 # Player app: Higgsfield art on the Where you play cards
 
-Status: NEW
+Status: IN MOCK APP — #1081
 Date: 2026-11-19
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `COURT_POS_ART`, `pickCourt`, `.ob-opt.has-art` styles

@@ -12,7 +12,11 @@ export function seedLeaderboardHistory(state: MockState) {
     leaderboardPlayers,
     leaderboardHistoryFacts(state.playerGames),
   )
-  const [leader, runnerUp] = current
+  const [leader] = current
+  // Last year's winner is this year's sole 3rd place (else the runner-up). Places 1 to 3 then hold
+  // the same players both years, so from 4th place on everyone holds their place.
+  const third = current.filter((row) => row.position === 3)
+  const climber = third.length === 1 ? third[0] : current[1]
   for (const player of leaderboardPlayers) {
     const history = state.playerGames[player.id]
     // The fifth player is New on the annual board.
@@ -27,12 +31,11 @@ export function seedLeaderboardHistory(state: MockState) {
         games: session.games.map((game) => ({ ...game, id: `previous-year-${game.id}` })),
       }
     })
-    // Last year's winner is this year's runner-up. Third and fourth held their places.
-    if (leader && runnerUp && player.id === runnerUp.id) {
+    if (leader && climber && player.id === climber.id) {
       const session = previousYear[0]
       const game = session?.games.find((entry) => entry.counting === 'counted')
       if (session && game) {
-        const extraWins = leader.wins - runnerUp.wins + 1
+        const extraWins = leader.wins - climber.wins + 1
         for (let i = 0; i < extraWins; i++)
           session.games.push({ ...game, id: `previous-win-${i}`, result: 'won', score: null })
       }
@@ -73,22 +76,30 @@ export function seedLeaderboardHistory(state: MockState) {
   state.playerGames['admin-demo-0'] = genSessions('admin-demo-0', 16)
 }
 
-/** Prototype controls change games, so the normal ordering and cutoff rules still decide the place. */
+/**
+ * Prototype controls change games, so the normal ordering, shared places and cutoff rules still
+ * decide the place. Inside: sixteen people hold sixteen different records above the demo player,
+ * who wins their sole match (place 17); everyone else shares the next place, so the list also shows
+ * the tie at the cut. Outside: fifty people hold fifty different places, the rest share the next
+ * one with one win and one loss, and the demo player has one win and two losses.
+ */
 export function myPlaceFixture(playerIds: readonly string[], below: boolean): LeaderboardFact[] {
   const others = playerIds.filter((id) => id !== JOSE_PLAYER_ID)
+  const distinct = below ? 49 : 16
+  const record = (index: number) => {
+    if (index === 0) return { wins: 1, losses: below ? 2 : 0 }
+    if (index <= distinct) return { wins: 2 + Math.floor((index - 1) / 4), losses: (index - 1) % 4 }
+    return { wins: 1, losses: below && index === distinct + 1 ? 0 : 1 }
+  }
   return [JOSE_PLAYER_ID, ...others].flatMap((id, index) => {
-    // Sixteen people have two wins in the inside fixture. The demo player wins their sole match.
-    // In the outside fixture everyone has one win, and the demo player has one more loss.
-    const won = [true]
-    if (below || id !== JOSE_PLAYER_ID) won.push(!below && index <= 16)
-    if (below && id === JOSE_PLAYER_ID) won.push(false)
-    return won.map((result) => ({
+    const { wins, losses } = record(index)
+    return Array.from({ length: wins + losses }, (_, game) => ({
       playerId: id,
       playedAt: PLAYER_FIXTURE_NOW.getTime(),
       standardMatch: true,
       fullParticipation: true,
       valid: true,
-      won: result,
+      won: game < wins,
     }))
   })
 }

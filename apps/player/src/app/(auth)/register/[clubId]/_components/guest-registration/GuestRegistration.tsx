@@ -22,7 +22,10 @@ import { JoinClubCard } from '@rotra/ui/join-club-card'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { OnboardingChrome } from '@/app/_components/onboarding/OnboardingChrome'
+import { OnboardingFlow } from '@/app/_components/onboarding/OnboardingFlow'
+import { useSaveRegistrationGender } from '@/app/_components/onboarding/useSaveRegistrationGender'
 import { usePlayerGoogleSignInEnabled } from '@/providers/PlayerFlagsProvider'
 import { useAppDispatch } from '@/store/hooks'
 import { setAccount } from '@/store/slices/authSlice'
@@ -68,6 +71,22 @@ function EmailRegistration({ clubId, returnTo, sessionSlug, inviteCode }: GuestR
   const dispatch = useAppDispatch()
   const router = useRouter()
   const result = registration.data
+  // P-ONBOARD: after registering, steps 2 to 4 come before the Registration complete page.
+  const [onboarding, setOnboarding] = useState(false)
+  const saveGender = useSaveRegistrationGender()
+  if (result?.status === 'registered' && onboarding)
+    return (
+      <OnboardingFlow
+        playerId={result.playerId}
+        firstName={result.firstName}
+        onFinish={() => {
+          setOnboarding(false)
+          consumeSessionReturn(returnTo)
+          window.scrollTo(0, 0)
+          toast('Registration complete')
+        }}
+      />
+    )
   if (result?.status === 'registered')
     return (
       <AccountLinkStatus
@@ -151,51 +170,56 @@ function EmailRegistration({ clubId, returnTo, sessionSlug, inviteCode }: GuestR
     )
   const error = registration.error
   return (
-    <ClaimForm
-      standalone
-      clubName={club.data.clubName ?? ''}
-      contextLabel={
-        !clubId
-          ? 'ROTRA registration'
-          : sessionSlug
-            ? `Session link from ${club.data.clubName} · ${club.data.sessionTitle}`
-            : `Registration link from ${club.data.clubName}`
-      }
-      cities={
-        !clubId ? foundingCities.map((city) => ({ value: city.code, label: city.name })) : undefined
-      }
-      maskedPhone=""
-      isPending={registration.isPending}
-      accountMatch={result?.status === 'account-match'}
-      onDismissMatch={() => registration.reset()}
-      serverError={
-        error
-          ? {
-              message: error.message,
-              field:
-                error instanceof MockError && error.fieldErrors?.email
-                  ? 'email'
-                  : error instanceof MockError && error.fieldErrors?.phone
-                    ? 'phone'
-                    : error instanceof MockError && error.fieldErrors?.cityCode
-                      ? 'cityCode'
-                      : undefined,
-            }
-          : undefined
-      }
-      onSubmit={({ confirmPassword: _confirm, ...values }) =>
-        registration.mutate(values, {
-          onSuccess: (response) => {
-            if (response.status === 'registered') {
-              dispatch(setAccount(response.session.account))
-              toast('Registration complete')
-              consumeSessionReturn(returnTo)
-            }
-            window.scrollTo(0, 0)
-          },
-          onError: (failure) => toast.error(failure.message),
-        })
-      }
-    />
+    <>
+      <OnboardingChrome />
+      <ClaimForm
+        standalone
+        clubName={club.data.clubName ?? ''}
+        contextLabel={
+          !clubId
+            ? 'ROTRA registration'
+            : sessionSlug
+              ? `Session link from ${club.data.clubName} · ${club.data.sessionTitle}`
+              : `Registration link from ${club.data.clubName}`
+        }
+        cities={
+          !clubId
+            ? foundingCities.map((city) => ({ value: city.code, label: city.name }))
+            : undefined
+        }
+        maskedPhone=""
+        isPending={registration.isPending}
+        accountMatch={result?.status === 'account-match'}
+        onDismissMatch={() => registration.reset()}
+        serverError={
+          error
+            ? {
+                message: error.message,
+                field:
+                  error instanceof MockError && error.fieldErrors?.email
+                    ? 'email'
+                    : error instanceof MockError && error.fieldErrors?.phone
+                      ? 'phone'
+                      : error instanceof MockError && error.fieldErrors?.cityCode
+                        ? 'cityCode'
+                        : undefined,
+              }
+            : undefined
+        }
+        onSubmit={({ confirmPassword: _confirm, gender, ...values }) =>
+          registration.mutate(values, {
+            onSuccess: (response) => {
+              if (response.status === 'registered') {
+                dispatch(setAccount(response.session.account))
+                setOnboarding(true)
+                saveGender(gender)
+              }
+              window.scrollTo(0, 0)
+            },
+            onError: (failure) => toast.error(failure.message),
+          })
+        }
+      />
+    </>
   )
 }

@@ -645,3 +645,18 @@ export async function removeWaitingMatch(
     },
   )
 }
+
+/**
+ * Q-QUEUE › Clear queue (real mode November 25, 2026): every waiting match in one write, each kept
+ * as a removed draft like Remove waiting match. Court and finished matches stay. A retry finds
+ * nothing waiting and returns 0.
+ */
+export async function clearQueue(context: ClubContext, sessionId: string) {
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const { count } = await tx.match.updateMany({
+      where: { sessionId: session.id, state: 'waiting', removedAt: null },
+      data: { removedAt: new Date(), queuePosition: null, revision: { increment: 1 } },
+    })
+    return { removed: count }
+  })
+}

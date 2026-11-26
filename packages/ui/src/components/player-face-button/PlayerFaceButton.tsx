@@ -2,8 +2,9 @@ import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { StatusPill } from '@rotra/ui/status-pill'
 import type { KeyboardEvent } from 'react'
-import { labelWithWait, type PlayerWait, waitClassName, waitCopy } from './PlayerFaceButton.helpers'
+import { labelWithWait, type PlayerWait, waitPill } from './PlayerFaceButton.helpers'
 
 export type { PlayerWait }
 
@@ -24,7 +25,8 @@ export type PlayerFaceButtonProps = {
   /** Narrower name pill for 4v4 and 5v5 sides (.side.n4 .pf-n) */
   compact?: boolean
   /**
-   * Queue cards in a live session: "M min" under the name, or On court / Playing / Not here.
+   * Queue cards in a live session: a StatusPill under the name, In queue Nm, Playing Nm, Getting
+   * ready or Away.
    * The accessible name adds "waiting M min" when the timer is shown.
    */
   wait?: PlayerWait
@@ -107,16 +109,7 @@ export function PlayerFaceButton({
       >
         {shortName}
       </span>
-      {wait ? (
-        <span
-          className={cn(
-            'text-xs font-semibold leading-[1.2] whitespace-nowrap tabular-nums',
-            waitClassName(wait),
-          )}
-        >
-          {waitCopy(wait)}
-        </span>
-      ) : null}
+      {wait ? <StatusPill status={waitPill(wait)} size="sm" /> : null}
     </button>
   )
 }

@@ -7,9 +7,11 @@ import { useDeclineMatchRequest } from '@rotra/data/match/useDeclineMatchRequest
 import type { MatchRequestSpot as RequestSpot } from '@rotra/data/match-request/types'
 import { useSessionRequests } from '@rotra/data/match-request/useSessionRequests'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
+import { sessionLevelRestriction } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import { firstEligibleWaiter } from '@rotra/data/session-payment/refund-rules'
+import { levelRestrictionBlockFor } from '@rotra/data/session-roster/levelRestriction.rules'
 import { useConfirmRequest } from '@rotra/data/session-roster/useConfirmRequest'
 import { useDeclineJoinRequest } from '@rotra/data/session-roster/useDeclineJoinRequest'
 import { useJoinRequestHints } from '@rotra/data/session-roster/useJoinRequestHints'
@@ -304,7 +306,25 @@ export function JoinRequests({ sessionId, variant = 'card', className }: JoinReq
         slotsFull={slotsFull}
         variant={variant}
         className={className}
-        onConfirm={(requestId, level) => run(confirm.mutate, { requestId, level })}
+        levelBlock={(request, level) =>
+          // D-2026-11-19-12: the waitlist (and a slot given from it) isn't checked.
+          request.placement === 'waitlist' ||
+          request.placement === 'from_waitlist' ||
+          (slotsFull && !live)
+            ? null
+            : levelRestrictionBlockFor(
+                sessionLevelRestriction(s),
+                level,
+                (roster.data?.roster ?? []).map((r) => r.level),
+              )
+        }
+        onConfirm={(requestId, level, allowOutsideLevels) =>
+          run(confirm.mutate, {
+            requestId,
+            level,
+            ...(allowOutsideLevels ? { allowOutsideLevels: true } : {}),
+          })
+        }
         onDecline={(requestId) => run(decline.mutate, requestId)}
       />
     </>

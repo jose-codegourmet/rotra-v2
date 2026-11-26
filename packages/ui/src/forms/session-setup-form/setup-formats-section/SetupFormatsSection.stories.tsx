@@ -54,9 +54,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const All: Story = { render: () => <Demo initial={all} /> }
+/** Defaults: only 2 v 2 ticked */
+export const Defaults: Story = { render: () => <Demo initial={['doubles']} /> }
 export const Some: Story = { render: () => <Demo initial={['doubles', 'singles']} /> }
 export const None: Story = { render: () => <Demo initial={[]} /> }
-/** Record games switch off: the hint says no results are kept */
+/** Record games switch off: the hint says wins don't count toward the ROTRA leaderboards or win rate */
 export const RecordGamesOff: Story = { render: () => <Demo initial={all} recordGames={false} /> }
 /** After Start: a read-only On chip and "Record games can't change after Start." */
 export const RecordGamesLockedOn: Story = { render: () => <Demo initial={all} locked /> }
@@ -68,6 +70,7 @@ export const RecordGamesLockedOnLight: Story = {
   ...RecordGamesLockedOn,
   globals: { theme: 'light' },
 }
+export const DefaultsLight: Story = { ...Defaults, globals: { theme: 'light' } }
 export const AllLight: Story = { ...All, globals: { theme: 'light' } }
 export const SomeLight: Story = { ...Some, globals: { theme: 'light' } }
 export const NoneLight: Story = { ...None, globals: { theme: 'light' } }

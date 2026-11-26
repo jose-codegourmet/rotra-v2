@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_SCORING,
+  ENDING_SOON_PHASES,
+  expectedFinish,
   gameScoreError,
   gameScoreValid,
   gamesWon,
@@ -9,6 +11,7 @@ import {
   SCORING_KEYS,
   scoringMode,
   scoringOf,
+  typedScoreError,
   validateResult,
 } from './scoring'
 
@@ -95,6 +98,26 @@ describe('gameScoreError with the dialog entry', () => {
   })
 })
 
+describe('typedScoreError (two boxes, no deuce switch)', () => {
+  it('takes the higher score as the winner and checks the mode', () => {
+    expect(typedScoreError(SCORING['31'], 30, 32)).toBeNull()
+    expect(typedScoreError(SCORING['31'], 31, 21)).toBeNull()
+    expect(typedScoreError(SCORING['31'], 31, 30)).toBe(
+      'At 30–30 the game goes to deuce: the winner needs a 2-point lead, like 32–30.',
+    )
+    expect(typedScoreError(SCORING['31'], 33, 30)).toBe(
+      'Enter a finished game: 31 against 0 to 29, or past 30–30 a 2-point lead, like 32–30.',
+    )
+    expect(typedScoreError(SCORING['31nd'], 31, 30)).toBeNull()
+    expect(typedScoreError(SCORING['31nd'], 32, 30)).toBe(
+      'The winner has 31 and the other pair 0 to 30.',
+    )
+    expect(typedScoreError(SCORING['21x3'], 21, 21, { game: 2 })).toBe(
+      "Game 3: A game can't end level. One pair needs 21.",
+    )
+  })
+})
+
 describe('validateResult', () => {
   it('keeps a winner-only result valid in every mode', () => {
     for (const scoring of SCORING_KEYS)
@@ -121,5 +144,51 @@ describe('validateResult', () => {
       wins: { A: 2, B: 1 },
       decided: 'A',
     })
+  })
+})
+
+describe('expectedFinish', () => {
+  it('carries the typical and long minutes of every mode', () => {
+    expect(SCORING_KEYS.map((k) => [SCORING[k].typical, SCORING[k].long])).toEqual([
+      [15, 25],
+      [15, 18],
+      [10, 15],
+      [25, 35],
+      [25, 30],
+    ])
+  })
+
+  it('changes phase at typical − 3, typical and long in every mode', () => {
+    for (const key of SCORING_KEYS) {
+      const { typical, long } = SCORING[key]
+      const phases = [typical - 4, typical - 3, typical - 1, typical, long - 1, long].map(
+        (p) => expectedFinish(key, p).phase,
+      )
+      expect(phases, key).toEqual(['mid', 'soon', 'soon', 'any', 'any', 'long'])
+    }
+  })
+
+  it('words each phase like the Playing court card', () => {
+    expect(expectedFinish('31', 4)).toEqual({
+      phase: 'mid',
+      minutesLeft: 11,
+      text: 'Ends in about 11 min',
+      tag: 'ends in about 11 min',
+    })
+    expect(expectedFinish('31', 13)).toMatchObject({ minutesLeft: 2, text: 'Finishing soon' })
+    expect(expectedFinish('31', 20).text).toBe('Could end any time · may be in deuce')
+    expect(expectedFinish('31nd', 16).text).toBe('Could end any time')
+    expect(expectedFinish('21x3nd', 30)).toMatchObject({ minutesLeft: 0, text: 'Running long' })
+  })
+
+  it('counts the full typical length for a match that has not started', () => {
+    expect(expectedFinish('21x3', null)).toEqual({
+      phase: 'notStarted',
+      minutesLeft: 25,
+      text: 'Not started yet',
+      tag: 'not started yet',
+    })
+    expect(expectedFinish(undefined, null).minutesLeft).toBe(15)
+    expect(ENDING_SOON_PHASES).toEqual(['soon', 'any', 'long'])
   })
 })

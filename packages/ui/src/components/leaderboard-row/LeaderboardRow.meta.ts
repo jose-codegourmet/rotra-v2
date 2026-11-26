@@ -8,6 +8,7 @@ export const leaderboardRowMeta = {
     'Use inside LeaderboardList for Top annual, Top monthly and Top weekly.',
     'Pass isMe for the signed-in player.',
     'unclaimed adds the warn chip “Not registered yet” after the name (also in name search results) and “not registered yet” to the row’s accessible name.',
+    'Queue Leaderboards page (Q-LEADERBOARDS): club adds the club line under the name (ROTRA board) and winRate adds “P% win rate” under the wins; both join the accessible name.',
     'flash: the row a profile’s leaderboard box jumped to gets an accent wash that fades out in about 1.6 s.',
   ],
   prototype: {

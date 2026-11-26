@@ -1,4 +1,5 @@
 import 'server-only'
+import { deriveAccountVerification } from '@rotra/data/account-verification/rules'
 import { PROFILE_BANNER_NOT_PICKABLE } from '@rotra/data/profile-banner/rules'
 import { maskPublicName } from '@rotra/data/public-session/rules'
 import { isProfileBannerPickable, resolvePlayerBanner } from '../admin/profile-banners'
@@ -6,6 +7,7 @@ import type { ClubContext, PlayerContext } from '../auth/account-context'
 import { loginHasPassword } from '../auth/supabase-provider-admin'
 import { prisma } from '../client/prisma'
 import type { Prisma, ProfileVisibility, SocialProvider } from '../generated/prisma/client'
+import { readOwnDetails } from '../queue/club-player-own-details'
 import { requireRevision } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { toDecimalString } from '../service/serialize'
@@ -18,12 +20,14 @@ const SOCIAL: SocialProvider[] = ['facebook', 'instagram', 'youtube', 'linkedin'
 
 /**
  * Public profile allowlist (`PlayerProfile`). No contacts, account or claim fields; the visibility
- * level is read so the projection can mask an always-private player (D-2026-11-12-01).
+ * level is read so the projection can mask an always-private player (D-2026-11-12-01). The
+ * verification facts are read only to derive `verified` (D-2026-11-23-07) and never leave here.
  */
 const PUBLIC_PLAYER_SELECT = {
   id: true,
   fullName: true,
   nickname: true,
+  gender: true,
   avatarRef: true,
   bannerId: true,
   banner: { select: { id: true, image: true } },
@@ -40,6 +44,9 @@ const PUBLIC_PLAYER_SELECT = {
   personalDetails: true,
   idAllocation: { select: { rtrId: true } },
   socialLinks: { select: { provider: true, url: true } },
+  verificationOverride: true,
+  account: { select: { googleEmail: true } },
+  privateContact: { select: { email: true, phoneE164: true } },
 } satisfies Prisma.PlayerSelect
 
 type PublicPlayerRow = Prisma.PlayerGetPayload<{ select: typeof PUBLIC_PLAYER_SELECT }>
@@ -83,6 +90,21 @@ export function experienceUpdate(next: number | null, shown: number | null, now:
     : { experienceMonths: next, experienceRecordedAt: now }
 }
 
+/** D-2026-11-23-07: the result only; undefined for an unclaimed player, who has no account. */
+function verifiedOf(row: PublicPlayerRow): boolean | undefined {
+  if (row.profileState !== 'claimed' || !row.account) return undefined
+  return deriveAccountVerification(
+    {
+      playerId: row.id,
+      googleEmail: row.account.googleEmail,
+      email: row.privateContact?.email ?? '',
+      phone: row.privateContact?.phoneE164 ?? '',
+    },
+    [],
+    row.verificationOverride === 'verified',
+  ).verified
+}
+
 /**
  * Shapes `PlayerProfile`. Only profiles with a permanent RTR ID are public. A masked profile (the
  * one rule of `./masking`, B-54) leaves here with the name masked, no nickname, no details and no
@@ -101,10 +123,12 @@ function publicProfileDto(row: PublicPlayerRow, viewerId: string | null = null) 
     ...(masked ? {} : { rtrId: row.idAllocation.rtrId }),
     fullName: masked ? maskPublicName(row.fullName) : (savingClub?.displayName ?? row.fullName),
     nickname: masked ? null : savingClub ? savingClub.nickname : row.nickname,
+    // Public (D-2026-11-19-01); an always-private profile hides it with the name. Null = not added.
+    gender: masked ? null : row.gender,
     picture: row.avatarRef,
     bannerId: row.bannerId,
     profileVisibility: visibility,
-    ...(masked ? {} : { unclaimedSavedBy: savingClub?.club.name }),
+    ...(masked ? {} : { unclaimedSavedBy: savingClub?.club.name, verified: verifiedOf(row) }),
     // Stats on your profile: the flags only. The Player app hides Latest stats and the Weekly
     // performance chart from everyone but the player, like mock mode.
     showProfileStats: row.showProfileStats,
@@ -145,7 +169,10 @@ async function loadProfile(
     where: { id: playerId },
     select: PUBLIC_PLAYER_SELECT,
   })
-  if (!row?.idAllocation) throw new ServiceError('not_found')
+  // An unclaimed player a club saved with an email or a social link is a shared entry, not a
+  // `players` row: its id is the entry's (D-2026-11-16-04, D-2026-11-23-01).
+  if (!row) return readEntryProfile(playerId, viewerId)
+  if (!row.idAllocation) throw new ServiceError('not_found')
   const own = viewerId === playerId
   const singleClub = row.profileState === 'unclaimed' && row.clubPlayers.length === 1
   if (!own && !singleClub) {
@@ -181,22 +208,83 @@ export async function readPublicProfile(playerId: string, viewerId: string | nul
 
 /** Find a player by RTR ID (public). Identifies a profile; never authorizes claiming. */
 export async function findPublicProfileByRtrId(rtrId: string, viewerId: string | null) {
+  const id = rtrId.trim().toUpperCase()
   const allocation = await prisma.playerIdAllocation.findUnique({
-    where: { rtrId: rtrId.trim().toUpperCase() },
+    where: { rtrId: id },
     select: { playerId: true, player: { select: { hiddenFromDirectory: true } } },
   })
-  // B-53: Hide me from Player Information also hides the RTR ID lookup, for every caller.
-  if (!allocation || allocation.player?.hiddenFromDirectory) throw new ServiceError('not_found')
-  try {
-    return await readVisibleProfile(allocation.playerId, viewerId)
-  } catch (error) {
-    // B-63: an RTR ID whose profile this viewer may not open answers like an unknown one.
-    if (
-      error instanceof ServiceError &&
-      (error.code === 'forbidden' || error.code === 'unauthenticated')
-    )
-      throw new ServiceError('not_found')
-    throw error
+  if (allocation) {
+    // B-53: Hide me from Player Information also hides the RTR ID lookup, for every caller.
+    if (allocation.player?.hiddenFromDirectory) throw new ServiceError('not_found')
+    try {
+      return await readVisibleProfile(allocation.playerId, viewerId)
+    } catch (error) {
+      // B-63: an RTR ID whose profile this viewer may not open answers like an unknown one.
+      if (
+        error instanceof ServiceError &&
+        (error.code === 'forbidden' || error.code === 'unauthenticated')
+      )
+        throw new ServiceError('not_found')
+      throw error
+    }
+  }
+  // An unclaimed player saved by a club (shared entry): found by their RTR ID too.
+  const entry = await prisma.sharedPlayerEntry.findFirst({
+    where: { rtrId: id, claimedPlayerId: null, retiredAt: null },
+    select: { id: true },
+  })
+  if (!entry) throw new ServiceError('not_found')
+  return readEntryProfile(entry.id, viewerId)
+}
+
+/**
+ * The public profile of an unclaimed player a club saved (a shared entry, D-2026-11-16-04): the
+ * name, nickname, picture and profile details of the club that saved them first, their RTR ID and
+ * "saved by" that club. Public while exactly one club has them; with more, signed-in players only,
+ * as for older unclaimed profiles. No rank, banner choice or leaderboard place.
+ */
+async function readEntryProfile(entryId: string, viewerId: string | null) {
+  const entry = await prisma.sharedPlayerEntry.findFirst({
+    where: { id: entryId, claimedPlayerId: null, retiredAt: null },
+    select: {
+      id: true,
+      rtrId: true,
+      clubPlayers: {
+        where: { removedAt: null, linkedToClubPlayerId: null, playerId: null },
+        orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
+        select: {
+          displayName: true,
+          nickname: true,
+          avatarRef: true,
+          club: { select: { name: true } },
+          privateInput: { select: { presetFields: true } },
+        },
+      },
+    },
+  })
+  const first = entry?.clubPlayers[0]
+  if (!entry || !first) throw new ServiceError('not_found')
+  if (entry.clubPlayers.length > 1 && !viewerId) throw new ServiceError('unauthenticated')
+  const own = readOwnDetails(first.privateInput?.presetFields)
+  const months = currentExperienceMonths(own.experienceMonths, own.experienceRecordedAt)
+  return {
+    playerId: entry.id,
+    rtrId: entry.rtrId,
+    fullName: first.displayName,
+    nickname: first.nickname,
+    gender: null,
+    picture: first.avatarRef,
+    bannerId: null,
+    profileVisibility: 'public' as ProfileVisibility,
+    unclaimedSavedBy: entry.clubPlayers.length === 1 ? first.club.name : undefined,
+    verified: undefined,
+    showProfileStats: true,
+    showWeeklyPerformance: true,
+    playingStyle: own.playingStyle,
+    experienceYears: months == null ? null : Math.floor(months / 12),
+    experienceMonths: months == null ? null : months % 12,
+    socialLinks: own.socialLinks,
+    ...(await resolvePlayerBanner(null)),
   }
 }
 
@@ -459,6 +547,32 @@ export async function setStatsVisibility(
       select: PUBLIC_PLAYER_SELECT,
     })
     return ownProfile(tx, await profileWithBanner(tx, row, row.id))
+  })
+}
+
+/**
+ * Edit profile › Name › Gender (D-2026-11-19-01): the player sets or clears (null) their own gender
+ * under the loaded account revision. Setting the same value again is not a write. Returns the saved
+ * own profile.
+ */
+export async function setMyGender(
+  context: PlayerContext,
+  input: { gender: 'male' | 'female' | null; expectedRevision: string },
+) {
+  return prisma.$transaction(async (tx) => {
+    const player = await tx.player.findUniqueOrThrow({ where: { id: context.playerId } })
+    if (input.gender !== player.gender) {
+      requireRevision(player.revision, input.expectedRevision)
+      await tx.player.update({
+        where: { id: player.id },
+        data: { gender: input.gender, revision: { increment: 1 } },
+      })
+    }
+    const row = await tx.player.findUniqueOrThrow({
+      where: { id: player.id },
+      select: PUBLIC_PLAYER_SELECT,
+    })
+    return ownProfile(tx, await profileWithBanner(tx, row, true))
   })
 }
 

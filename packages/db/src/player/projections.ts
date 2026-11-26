@@ -61,6 +61,30 @@ async function playerFacts(tx: Tx, playerId: string) {
 const counts = (f: PlayerMatchFact) => f.fullParticipation && f.standardMatch
 
 /**
+ * The not ranked sessions among `sessionIds`: run with Record games off (D-2026-11-20-02). Their
+ * facts are kept like any other, but they never count toward the skill rank, the Provisional or
+ * leaderboard game counts, or a win rate (like fun games).
+ */
+async function notRankedSessions(tx: Tx, sessionIds: readonly string[]) {
+  const ids = [...new Set(sessionIds)]
+  if (!ids.length) return new Set<string>()
+  const rows = await tx.queueSession.findMany({
+    where: { id: { in: ids }, recordGames: false },
+    select: { id: true },
+  })
+  return new Set(rows.map((r) => r.id))
+}
+
+/** The facts that count toward rank: `counts`, from a ranked session. */
+async function rankedFacts(tx: Tx, facts: PlayerMatchFact[]) {
+  const notRanked = await notRankedSessions(
+    tx,
+    facts.map((f) => f.sessionId),
+  )
+  return facts.filter((f) => counts(f) && !notRanked.has(f.sessionId))
+}
+
+/**
  * Recomputes one player's `player_rank_current` from evidence at `now`. The original played date
  * decides the window, so ageing changes eligibility without new games. A stale run (lower input
  * watermark than stored) never overwrites a newer projection.
@@ -73,8 +97,10 @@ export async function recomputeRank(tx: Tx, playerId: string, now: Date, jobId: 
   if (!policy) throw new ServiceError('unavailable')
   const facts = await playerFacts(tx, playerId)
   const windowStart = new Date(now.getTime() - WINDOW_DAYS * DAY)
-  const inWindow = facts.filter((f) => counts(f) && f.playedAt >= windowStart && f.playedAt <= now)
-  const lastValid = facts.find(counts)?.playedAt ?? null
+  // Newest first, like `facts`. Games of a not ranked session are evidence kept, never counted.
+  const ranked = await rankedFacts(tx, facts)
+  const inWindow = ranked.filter((f) => f.playedAt >= windowStart && f.playedAt <= now)
+  const lastValid = ranked[0]?.playedAt ?? null
   const assessments = await tx.clubAssessment.count({
     where: { playerIdAtAssessment: playerId, assessedAt: { gte: windowStart, lte: now } },
   })
@@ -135,9 +161,8 @@ async function writeResultSnapshot(tx: Tx, sessionId: string) {
     where: { sessionId_version: { sessionId, version: 1 } },
   })
   if (existing) return existing
+  // Record games off (D-2026-11-20-02) gets its snapshot like any session: standings and awards.
   const session = await tx.queueSession.findUniqueOrThrow({ where: { id: sessionId } })
-  // Record games off (D-2026-11-18-06): Session done enqueues no snapshot job; never write one.
-  if (!session.recordGames) return null
   const { ctx } = await matchContext(tx, session)
   const clubPlayers = await tx.clubPlayer.findMany({
     where: { clubId: session.clubId, id: { in: ctx.roster.map((r) => r.clubPlayerId) } },
@@ -490,12 +515,14 @@ export async function confirmHistoryAttribution(
 /**
  * One person on a game court (`PlayerGamePlayer`): the entry's name snapshot, the ROTRA player's
  * picture reference (a photo URL or `character:<id>`; the client resolves it) and player ID. A
- * guest or unclaimed record (no profile with an RTR ID) has no picture and no player ID; their name
- * shows as it always has on game rows. With `maskAlwaysPrivate`, an always-private player
+ * guest or unclaimed record (no profile with an RTR ID) has no player ID and shows the picture the
+ * club set for it (D-2026-11-09-12), else initials, as on the session page; their name shows as it
+ * always has on game rows. With `maskAlwaysPrivate`, an always-private player
  * (D-2026-11-12-01) shows a masked name; their picture and player ID stay, as on the leaderboard.
  */
 type CourtEntry = {
   nameSnapshot: string
+  clubPlayer: { avatarRef: string | null }
   playerAtEntry: {
     id: string
     avatarRef: string | null
@@ -510,7 +537,8 @@ function courtPlayer(
 ): { name: string; picture: string | null; playerId: string | null } {
   if (!entry) return { name: '', picture: null, playerId: null }
   const player = entry.playerAtEntry
-  if (!player?.idAllocation) return { name: entry.nameSnapshot, picture: null, playerId: null }
+  if (!player?.idAllocation)
+    return { name: entry.nameSnapshot, picture: entry.clubPlayer.avatarRef ?? null, playerId: null }
   // The one masking rule (B-54): a masked player has no player ID that opens the profile.
   if (maskAlwaysPrivate && isMasked(player.profileVisibility, viewerId, player.id))
     return {
@@ -542,6 +570,7 @@ async function historyFromFacts(
         title: true,
         finalizedAt: true,
         publicSlug: true,
+        recordGames: true,
         club: { select: { name: true } },
         publication: { select: { publishedAt: true } },
       },
@@ -551,6 +580,7 @@ async function historyFromFacts(
       select: {
         id: true,
         nameSnapshot: true,
+        clubPlayer: { select: { avatarRef: true } },
         playerAtEntry: {
           select: {
             id: true,
@@ -592,6 +622,8 @@ async function historyFromFacts(
       clubName: s.club.name,
       finishedAt: toIsoOrNull(s.finalizedAt),
       sessionPageUrl: s.publication?.publishedAt ? `/s/${s.publicSlug}` : null,
+      /** False for a session run with Record games off: its games read `not_ranked`. */
+      ranked: s.recordGames,
       games: facts
         .filter((f) => f.sessionId === s.id)
         .map((f) => {
@@ -605,7 +637,15 @@ async function historyFromFacts(
             opponents: opponentPlayers.map((p) => p.name),
             partnerPlayers,
             opponentPlayers,
-            counting: !f.fullParticipation ? 'partial' : f.standardMatch ? 'counted' : 'fun',
+            // A full standard game of a not ranked session (D-2026-11-20-02) is `not_ranked`: it
+            // shows with its win or loss but stays out of every count that reads `counted`.
+            counting: !f.fullParticipation
+              ? 'partial'
+              : !f.standardMatch
+                ? 'fun'
+                : s.recordGames
+                  ? 'counted'
+                  : 'not_ranked',
             result: f.team === f.winningTeam ? 'won' : 'lost',
             score:
               f.teamAScore == null || f.teamBScore == null
@@ -625,6 +665,17 @@ export async function readPlayerMatchHistory(
   { maskAlwaysPrivate = true, viewerId = null as string | null } = {},
 ) {
   if (!UUID.test(playerId)) return []
+  // An unclaimed player saved by clubs (a shared entry, no `players` row): every club record's games.
+  const entry = await prisma.sharedPlayerEntry.findFirst({
+    where: { id: playerId, claimedPlayerId: null, retiredAt: null },
+    select: { clubPlayers: { where: { removedAt: null }, select: { id: true, clubId: true } } },
+  })
+  if (entry) {
+    const sessions: Awaited<ReturnType<typeof readClubPlayerMatchHistory>> = []
+    for (const record of entry.clubPlayers)
+      sessions.push(...(await readClubPlayerMatchHistory(record.clubId, record.id)))
+    return sessions
+  }
   return prisma.$transaction(async (tx) =>
     historyFromFacts(tx, await playerFacts(tx, playerId), maskAlwaysPrivate, viewerId),
   )
@@ -766,7 +817,10 @@ export async function readPlayerRank(playerId: string, viewerId: string | null =
         : null,
       position: null,
       recentCount: rank.recentStandardMatchCount,
-      olderCount: Math.max(0, facts.filter(counts).length - rank.recentStandardMatchCount),
+      olderCount: Math.max(
+        0,
+        (await rankedFacts(tx, facts)).length - rank.recentStandardMatchCount,
+      ),
     }
   })
 }

@@ -7,7 +7,7 @@ export const sessionRecordHeaderMeta = {
   usage: [
     'Use once at the top of a completed, invalid or cancelled session record, under the Breadcrumb.',
     'A completed session shows Completed plus Results published / Results private; an invalid session shows only Invalid session and "—" for Games; a cancelled session shows Cancelled and the reason notice, with no tabs following it.',
-    'A session with Record games off passes recorded={false}: a Not recorded chip replaces Results published / private. Omitted reads as recorded.',
+    'A session with Record games off passes ranked={false}: a Not ranked chip sits next to Results published / private. Omitted reads as ranked.',
     'Pass when, length and cancelledWhen already formatted; the component never formats dates itself.',
     'Do not use for the live console or the private results page (Session results · private).',
   ],
@@ -21,5 +21,5 @@ export const sessionRecordHeaderMeta = {
     'docs/business_logic/product/queue/modules/results/README.md#session-record',
   ],
   variants: ['completed', 'invalid', 'cancelled'],
-  related: ['Chip', 'NotRecordedChip', 'Card', 'Notice', 'Breadcrumb', 'Tabs', 'PageHeader'],
+  related: ['Chip', 'NotRankedChip', 'Card', 'Notice', 'Breadcrumb', 'Tabs', 'PageHeader'],
 } satisfies ComponentMeta

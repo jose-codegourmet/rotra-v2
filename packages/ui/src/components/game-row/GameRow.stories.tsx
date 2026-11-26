@@ -35,7 +35,17 @@ export const OwnGameShareable: Story = { args: { onShare: () => {} }, globals: {
 export const LostWithoutScore: Story = { args: { game: withFaces(0, 1) } }
 export const Singles: Story = { args: { game: withFaces(0, 2) } }
 export const Fun: Story = { args: { game: withFaces(0, 3) } }
-export const PartialWithNote: Story = { args: { game: withFaces(2, 2) } }
+export const PartialWithNote: Story = { args: { game: withFaces(3, 2) } }
+/** A game of a not ranked session: Won / Lost as usual, the note without “· not counted”. */
+export const NotRanked: Story = {
+  args: { game: withFaces(2, 0), onShare: () => {} },
+  globals: { theme: 'dark' },
+}
+export const NotRankedLight: Story = { ...NotRanked, globals: { theme: 'light' } }
+export const NotRankedPhone: Story = {
+  ...NotRanked,
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}
 export const SomeoneElse: Story = {
   args: { me: { name: 'Mikee Abellana', label: 'Mikee', playerId: 'mikee' } },
 }
@@ -58,3 +68,19 @@ export const BestOfThreeGames: Story = {
   args: { game: { ...withFaces(0, 0), score: '2–1', gameScores: ['21–18', '15–21', '21–19'] } },
 }
 export const BestOfThreeGamesLight: Story = { ...BestOfThreeGames, globals: { theme: 'light' } }
+
+/** Court tap (2026-11-25 match page log): the court box opens the game's match page. */
+export const OpensMatchPage: Story = {
+  args: { onShare: () => {}, onOpen: () => {} },
+  globals: { theme: 'dark' },
+}
+export const OpensMatchPageLight: Story = { ...OpensMatchPage, globals: { theme: 'light' } }
+/** The match page court: skill-group rings on every face, no court tap. */
+export const SkillRings: Story = {
+  args: {
+    skillRings: (player) =>
+      player.playerId === 'jose' ? 'intermediate' : player.playerId ? 'advanced' : null,
+  },
+  globals: { theme: 'dark' },
+}
+export const SkillRingsLight: Story = { ...SkillRings, globals: { theme: 'light' } }

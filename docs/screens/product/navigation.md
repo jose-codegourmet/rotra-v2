@@ -39,7 +39,7 @@ flowchart TD
 
 ## Product navigation
 
-- **Queue:** top bar with sync status and a light/dark mode switch on every operator screen. A collapsible left nav on every operator screen (burger in the top bar on wide screens, icon rail when collapsed; on phones a bottom dock with Menu, a highlighted Create/Continue session, and Settings): Live session (while live), Dashboard, Saved players, Venues, Inventory, Club settings, License, This device. Sign out is in Club settings. Home dashboard: club header with Create session, now card, calendar. Club settings has its own left-hand menu (on phones a button that opens it as a left drawer, closing the main menu first) and is unavailable offline. Each session's public page is also its session link; guests reach it from wherever the club shares it, never from the operator app's navigation. The live console has Session / Queue / Players / Leaderboard views and a footer with Session done. License gates remain global. Public session pages are a separate audience.
+- **Queue:** top bar with sync status and a light/dark mode switch on every operator screen. A collapsible left nav on every operator screen (burger in the top bar on wide screens, icon rail when collapsed; on phones a bottom dock with Menu, a highlighted Create/Continue session, and Settings): Live session (while live), Dashboard, Saved players, Leaderboards (`/leaderboards`, `?tab=rotra` for the ROTRA board; [D-2026-11-25-04](../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)), Venues, Inventory, Club settings, License, This device. Sign out is in Club settings. Home dashboard: club header with Create session, now card, calendar. Club settings has its own left-hand menu (on phones a button that opens it as a left drawer, closing the main menu first) and is unavailable offline. Each session's public page is also its session link; guests reach it from wherever the club shares it, never from the operator app's navigation. The live console has Session / Queue / Players / Leaderboard views and a footer with Session done. License gates remain global. Public session pages are a separate audience.
 - **Player Information:** overall leaderboard and public profile reading; sign-in adds Home (`/home`: current session, upcoming sessions, clubs and stats), own profile, ID/QR, privacy, and contact requests. No World discovery entry.
 - **Admin:** clubs/licenses, players/contact requests, ranking configuration, feature flags. No speculative analytics dashboard is required.
 
@@ -58,6 +58,7 @@ flowchart TD
 | [Public session page](modules/queue/public-session.md) | `Q-PUBLIC-DETAILS`, `Q-PUBLIC-PARTICIPANTS`, `Q-PUBLIC-RESULTS`, `Q-PUBLIC-STALE` |
 | [Private session results, publishing, exports, and history](modules/queue/results-sharing.md) | `Q-RESULTS`, `Q-STANDINGS-SLIDE`, `Q-AWARDS-SLIDE`, `Q-OFF-DAY-SLIDE`, `Q-PUBLISH`, `Q-EXPORT`, `Q-HISTORY` |
 | [Active session console](modules/queue/session-console.md) | `Q-CONSOLE`, `Q-COURTS`, `Q-POOL`, `Q-LEADERBOARD`, `Q-SESSION-ADJUST`, `Q-ADD-COURT` |
+| [Leaderboards](modules/queue/leaderboards.md) | `Q-LEADERBOARDS`, `Q-PODIUM-PLACE` |
 | [Whole-session finalization](modules/queue/session-finalization.md) | `Q-SESSION-DONE`, `Q-FINALIZE-PROGRESS`, `Q-INVALID-SESSION` |
 | [Session setup, preparation, download, and start](modules/queue/session-setup.md) | `Q-SETUP`, `Q-PREPARE`, `Q-DOWNLOAD`, `Q-START` |
 
@@ -70,6 +71,7 @@ flowchart TD
 | [Public and own player profile](modules/player-information/profile.md) | `P-PUBLIC-PROFILE`, `P-OWN-PROFILE`, `P-EDIT-PROFILE` |
 | [Public club page and club members](modules/player-information/club-page.md) | `P-CLUB-PAGE`, `P-CLUB-MEMBERS` |
 | [Global leaderboard, rank explanation, and game history](modules/player-information/ranking-history.md) | `P-LEADERBOARD`, `P-RANK-DETAIL`, `P-ELIGIBILITY`, `P-MATCH-HISTORY` |
+| [Public match page](modules/player-information/match-page.md) | `P-MATCH-PAGE` |
 | [Legal pages](modules/player-information/legal.md) | `P-PRIVACY`, `P-TERMS` |
 
 ### Admin
@@ -112,7 +114,11 @@ While the `player_google_sign_in` flag is on (#919), the same routes show the in
 
 ### Player club routes (epic P07)
 
-Proposed November 11, 2026 ([D-2026-11-11-11](../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)): `/clubs/[clubId]` (`P-CLUB-PAGE`) and `/clubs/[clubId]/members` (`P-CLUB-MEMBERS`) in Player Information. Both are public (no sign-in), served per request, never indexed and never static; signed-out visitors see masked member names. Linked from the clubs card on every readable profile ([D-2026-11-12-04](../../mvp/decisions/2026-11-12.md#d-2026-11-12-04)). The Members page's back link returns to the club page. Member taps open the profile dialog and don't navigate. Unknown club ids are not found. The prototype serves them under `/player/clubs/c1`.
+Proposed November 11, 2026 ([D-2026-11-11-11](../../mvp/decisions/2026-11-11.md#d-2026-11-11-11)): `/clubs/[clubId]` (`P-CLUB-PAGE`) and `/clubs/[clubId]/members` (`P-CLUB-MEMBERS`) in Player Information. Both are public (no sign-in), served per request, never indexed and never static; signed-out visitors see masked member names. Linked from the clubs card on every readable profile ([D-2026-11-12-04](../../mvp/decisions/2026-11-12.md#d-2026-11-12-04)). The Members page's back link returns to the club page. Member taps open the profile dialog and don't navigate. Unknown club ids are not found. The prototype serves them under `/player/clubs/c1`. Proposed November 25, 2026 ([D-2026-11-25-04](../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)): `/clubs/[clubId]/leaderboard` (`P-CLUB-LEADERBOARD`), opened from **See all** on the club page's Leaderboard card; public, with a back link to the club page.
+
+### Player match route
+
+Owner decision, November 25, 2026 ([log](../../mockup-changes/2026-11-25-player-match-page.md)): `/matches/[matchId]` (`P-MATCH-PAGE`) in Player Information, one public page per match, the same for every player in it. Public (no sign-in); names follow the profile privacy rules. Opened by tapping any game court and from the **Link** field of **Share game**. Its back link returns to the page the court was tapped on, else the leaderboard. Unknown match ids show the page's not-found state. The prototype serves it under `/player/matches/m1-2`.
 
 ### Player legal routes
 

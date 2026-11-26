@@ -10,7 +10,7 @@
  *   @import "@rotra/config/theme.css";
  *
  * Fonts are not defined here. Each app loads them with next/font and sets --font, --mono
- * (and --pixel in apps/player) on <html>; the @theme fonts below fall back to system fonts.
+ * (and --pixel in apps/player and apps/queue) on <html>; the @theme fonts below fall back to system fonts.
  */
 
 /* Touch screens and windows up to 1024 px get bigger targets (experience contract › touch sizing). */

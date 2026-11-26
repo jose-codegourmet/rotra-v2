@@ -3,6 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { maskPhone } from '@rotra/schema/phone'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { Field } from '@rotra/ui/field'
+import { GettingToKnowFields } from '@rotra/ui/getting-to-know-fields'
 import { useSubmitOnce } from '@rotra/ui/hooks/use-submit-once'
 import { KeyValueList } from '@rotra/ui/key-value-list'
 import { Notice } from '@rotra/ui/notice'
@@ -11,11 +13,20 @@ import {
   type PersonalDetailsSection,
 } from '@rotra/ui/personal-details-fields'
 import { ProfileHero } from '@rotra/ui/profile-hero'
+import { Select } from '@rotra/ui/select'
 import { useEffect, useId, useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { editProfileDefaultValues } from './EditProfileForm.defaultValues'
 import { type EditProfileValues, editProfileSchema } from './EditProfileForm.schema'
 import { SectionNav } from './section-nav/SectionNav'
+
+const GENDER_OPTIONS = [
+  { value: 'none', label: 'Not added yet' },
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+]
+const GENDER_HINT =
+  "Optional for now. Clubs use it to name your matches: Men's, Women's or Mixed Doubles. Until you add it, your matches count as Genderless."
 
 type SectionId = PersonalDetailsSection | 'account'
 type Section = { id: SectionId; label: string; intro: string; keys: (keyof EditProfileValues)[] }
@@ -24,13 +35,21 @@ const SECTIONS: [Section, ...Section[]] = [
     id: 'name',
     label: 'Name',
     intro: 'How you appear on the leaderboard and your profile.',
-    keys: ['fullName', 'nickname'],
+    keys: ['fullName', 'nickname', 'gender'],
   },
   {
     id: 'playing-style',
     label: 'Playing style',
     intro: 'Help clubs and other players know your game.',
-    keys: ['playingStyle', 'experienceYears', 'experienceMonths'],
+    keys: [
+      'playStyle',
+      'shots',
+      'shotsOther',
+      'favoritePlayer',
+      'favoritePlayerOther',
+      'experienceYears',
+      'experienceMonths',
+    ],
   },
   {
     id: 'links',
@@ -181,6 +200,33 @@ export function EditProfileForm({
                 </ProfileHero>
               </>
             ) : null}
+            {section.id === 'name' ? (
+              <Field
+                label={
+                  <>
+                    Gender · <span className="text-xs font-normal">public</span>
+                  </>
+                }
+                hint={errors.gender ? undefined : GENDER_HINT}
+                error={errors.gender?.message}
+              >
+                <Controller
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <Select
+                      options={GENDER_OPTIONS}
+                      value={field.value === '' ? 'none' : field.value}
+                      onChange={(next) => field.onChange(next === 'none' ? '' : next)}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                      disabled={isPending}
+                    />
+                  )}
+                />
+              </Field>
+            ) : null}
             {section.id === 'account' ? (
               <>
                 <KeyValueList
@@ -217,7 +263,16 @@ export function EditProfileForm({
                 </p>
               </>
             ) : (
-              <PersonalDetailsFields sections={[section.id]} disabled={isPending} />
+              <>
+                {section.id === 'playing-style' ? (
+                  <GettingToKnowFields
+                    sections={['court', 'shots', 'favorite']}
+                    labelled
+                    disabled={isPending}
+                  />
+                ) : null}
+                <PersonalDetailsFields sections={[section.id]} disabled={isPending} />
+              </>
             )}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3.5 max-[720px]:sticky max-[720px]:bottom-0 max-[720px]:-mx-4 max-[720px]:-mb-4 max-[720px]:rounded-b-lg max-[720px]:bg-surface max-[720px]:px-4 max-[720px]:pt-3 max-[720px]:pb-[calc(12px+env(safe-area-inset-bottom,0px))]">
               <span className="text-sm text-fg2" aria-live="polite">

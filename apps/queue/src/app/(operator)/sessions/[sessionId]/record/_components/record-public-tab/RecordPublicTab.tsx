@@ -48,7 +48,6 @@ export function RecordPublicTab({ sessionId, record }: RecordPublicTabProps) {
     <>
       <PublicPageSummary
         invalid={invalid}
-        recorded={record.recordGames !== false}
         details={{
           when: `${date(p.start)}, ${time(p.start)}–${time(p.end)}`,
           venue: p.venue.name,
@@ -93,7 +92,7 @@ export function RecordPublicTab({ sessionId, record }: RecordPublicTabProps) {
           />
         ))}
       </PublicPageSummary>
-      {invalid || record.recordGames === false ? null : (
+      {invalid ? null : (
         <PublishResultsSheet
           sessionId={sessionId}
           open={publishOpen}

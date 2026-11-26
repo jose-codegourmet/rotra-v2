@@ -1,6 +1,6 @@
 import type { PlayerProfile } from '../player/player.types'
 import portraits from './playerPortraits.json'
-import { leaderboardPlayers, players } from './players'
+import { genderSeeds, leaderboardPlayers, players } from './players'
 
 // Vector artwork copied from rotra-player.html faceSVG(), with its original bN/u1 seeds.
 // These are image asset colours, not interface theme colours.
@@ -27,6 +27,48 @@ const HIDDEN_FROM_DIRECTORY_IDS = [
   leaderboardPlayers[20]?.id,
   leaderboardPlayers[41]?.id,
 ]
+/**
+ * Sample getting-to-know answers (D-2026-11-19-11), by full name. Jose (the prototype's Migs) has
+ * the prototype's answers; Aaron shows own shots and a typed favourite; Raymark answered only some;
+ * everyone else has not answered.
+ */
+const answerSeeds: Record<
+  string,
+  Pick<
+    PlayerProfile,
+    'playStyle' | 'shots' | 'shotsOther' | 'favoritePlayer' | 'favoritePlayerOther'
+  >
+> = {
+  Jose: {
+    playStyle: 'front',
+    shots: ['netting', 'drop', 'drive', 'netkill'],
+    shotsOther: [],
+    favoritePlayer: 'lcw',
+    favoritePlayerOther: '',
+  },
+  Aaron: {
+    playStyle: 'back',
+    shots: ['smash', 'jump', 'clear'],
+    shotsOther: ['Tweener', 'Reverse slice'],
+    favoritePlayer: 'other',
+    favoritePlayerOther: 'Rexy Mainaky',
+  },
+  Raymark: {
+    playStyle: 'all',
+    shots: [],
+    shotsOther: [],
+    favoritePlayer: 'axelsen',
+    favoritePlayerOther: '',
+  },
+}
+const noAnswers = {
+  playStyle: null,
+  shots: [],
+  shotsOther: [],
+  favoritePlayer: null,
+  favoritePlayerOther: '',
+} satisfies (typeof answerSeeds)[string]
+
 export const playerProfiles: PlayerProfile[] = players.map((player) => {
   const jose = player.fullName === 'Jose'
   const raymark = player.rtrId === 'RTR-PH-CEB-040226-0007'
@@ -44,6 +86,10 @@ export const playerProfiles: PlayerProfile[] = players.map((player) => {
     fullName: player.fullName,
     nickname: player.nickname,
     picture: pictures[player.id] ?? null,
+    // D-2026-11-19-01: named sample players have a gender; Jose (the prototype's Migs) has not
+    // added one yet, so the Add your gender reminder shows for him.
+    gender: jose ? null : (genderSeeds[player.fullName] ?? null),
+    ...(answerSeeds[player.fullName] ?? noAnswers),
     playingStyle: jose
       ? 'Doubles, mostly at the front. I like fast drives and net kills, and I am working on my clears.'
       : '',

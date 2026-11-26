@@ -4,6 +4,7 @@ import { fn, within } from 'storybook/test'
 import { ClaimForm } from './ClaimForm'
 
 const meta = {
+  parameters: { layout: 'fullscreen' },
   title: 'Player/ClaimForm',
   component: ClaimForm,
   args: {
@@ -22,7 +23,7 @@ export const AllErrors: Story = {
     const canvas = within(canvasElement)
     await userEvent.type(await canvas.findByLabelText(/^Password/), 'one')
     await userEvent.type(canvas.getByLabelText(/Confirm password/), 'two')
-    await userEvent.click(canvas.getByRole('button', { name: 'Complete registration' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
   },
 }
 export const EmailConflict: Story = {
@@ -37,6 +38,26 @@ export const Pending: Story = { args: { isPending: true } }
 export const OfflineServerError: Story = {
   args: { serverError: { message: claimLinkScenarios.offline } },
 }
+export const NoGenderChosen: Story = {
+  args: { standalone: true, maskedPhone: '', defaultValues: {} },
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+  },
+}
+export const OptionalFieldError: Story = {
+  args: {
+    defaultValues: {
+      ...claimLinkScenarios.preset,
+      nickname: 'A nickname that is far too long to keep',
+    },
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+  },
+}
+export const Light: Story = { globals: { theme: 'light' } }
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }
 
 /** Guest registration shares the same form, with no profile prefill or guest linkage. */

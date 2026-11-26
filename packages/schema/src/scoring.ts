@@ -5,6 +5,10 @@
  *
  * The result check here is the shared queue rule `validateResult` (Go copy:
  * apps/api/internal/rules/match/match.go, cases: packages/rule-cases/cases/v1/match/validateResult.json).
+ *
+ * `expectedFinish` (Q27.6, D-2026-11-23-08) is a time rule the device and the server both use. It is
+ * written here first, with cases in packages/rule-cases/cases/v1/courts/expectedFinish.json; the Go
+ * copy in apps/api/internal/rules/courts and the .wasm rebuild follow before the next Go merge.
  */
 
 export type ScoringKey = '31' | '31nd' | '21' | '21x3' | '21x3nd'
@@ -23,6 +27,10 @@ export type ScoringMode = {
   games: 1 | 3
   /** true: at target − 1 all, the first pair to lead by 2 wins (no cap) */
   deuce: boolean
+  /** Expected match length in minutes (D-2026-11-23-08): how long a match usually takes */
+  typical: number
+  /** Expected match length in minutes: past this a match is Running long */
+  long: number
 }
 
 export const SCORING: Record<ScoringKey, ScoringMode> = {
@@ -32,6 +40,8 @@ export const SCORING: Record<ScoringKey, ScoringMode> = {
     target: 31,
     games: 1,
     deuce: true,
+    typical: 15,
+    long: 25,
   },
   '31nd': {
     label: '16/31, no deuce',
@@ -39,6 +49,8 @@ export const SCORING: Record<ScoringKey, ScoringMode> = {
     target: 31,
     games: 1,
     deuce: false,
+    typical: 15,
+    long: 18,
   },
   '21': {
     label: '11/21',
@@ -46,6 +58,8 @@ export const SCORING: Record<ScoringKey, ScoringMode> = {
     target: 21,
     games: 1,
     deuce: true,
+    typical: 10,
+    long: 15,
   },
   '21x3': {
     label: '11/21 × 3',
@@ -53,6 +67,8 @@ export const SCORING: Record<ScoringKey, ScoringMode> = {
     target: 21,
     games: 3,
     deuce: true,
+    typical: 25,
+    long: 35,
   },
   '21x3nd': {
     label: '21 × 3',
@@ -60,6 +76,8 @@ export const SCORING: Record<ScoringKey, ScoringMode> = {
     target: 21,
     games: 3,
     deuce: false,
+    typical: 25,
+    long: 30,
   },
 }
 /** The order the setup choices list in (integer-like object keys would otherwise sort first). */
@@ -98,9 +116,15 @@ export function gameScoreValid(mode: ScoringMode, winnerScore: number, loserScor
 export const PICK_WINNER_ERROR = 'Pick the winner.'
 export const losingScoreRangeError = (mode: ScoringMode) =>
   `Enter the losing score as a whole number from 0 to ${losingScoreMax(mode)}.`
-/** `row`: a best-of-3 game row, whose switch is Deuce for this game, not Went to deuce. */
+/**
+ * `row`: a best-of-3 game row. Shared rule copy (the Go rule and @rotra/rule-cases match it); the
+ * result dialog no longer has these switches and says `deuceNeedsLeadError` instead.
+ */
 export const goesToDeuceError = (mode: ScoringMode, row = false) =>
   `At ${mode.target - 1}–${mode.target - 1} the game goes to deuce. Turn on ${row ? 'Deuce for this game' : 'Went to deuce'} and type both scores.`
+/** The result dialog's 31–30 message (owner, November 25, 2026: no deuce switch; raise the winner's box). */
+export const deuceNeedsLeadError = (mode: ScoringMode) =>
+  `At ${mode.target - 1}–${mode.target - 1} the game goes to deuce: the winner needs a 2-point lead, like ${mode.target + 1}–${mode.target - 1}.`
 export const deuceLeadError = (mode: ScoringMode) =>
   `A deuce game ends when one pair leads by 2, like ${mode.target + 1}–${mode.target - 1}.`
 export const scoreDisagreesError = (byScore: Team, picked: Team) =>
@@ -158,6 +182,30 @@ export function gameScoreError(
     return mode.deuce && lost === T - 1 ? `${pre}${goesToDeuceError(mode, row)}` : range()
   return null
 }
+
+/**
+ * The result dialog's check of two typed boxes (owner, November 25, 2026: both boxes always typed,
+ * no deuce switch). An error message, or null when the score is one the mode can produce. The
+ * winner is whoever has more; `game` is the 0-based best-of-3 row ("Game 2: " prefix).
+ */
+export function typedScoreError(
+  mode: ScoringMode,
+  a: number,
+  b: number,
+  options: { game?: number } = {},
+): string | null {
+  const T = mode.target,
+    pre = options.game === undefined ? '' : gamePrefix(options.game)
+  if (!isWhole(a) || !isWhole(b)) return `${pre}Scores are whole numbers.`
+  if (a === b) return `${pre}A game can't end level. One pair needs ${T}.`
+  const w = Math.max(a, b),
+    l = Math.min(a, b)
+  if (gameScoreValid(mode, w, l)) return null
+  if (!mode.deuce) return `${pre}The winner has ${T} and the other pair 0 to ${T - 1}.`
+  if (w === T && l === T - 1) return `${pre}${deuceNeedsLeadError(mode)}`
+  return `${pre}Enter a finished game: ${T} against 0 to ${T - 2}, or past ${T - 1}–${T - 1} a 2-point lead, like ${T + 1}–${T - 1}.`
+}
+export const BOTH_SCORES_ERROR = 'Enter both scores, or clear them.'
 
 /** A result as stored on a completed match (and as `completeMatch` takes it). */
 export type ResultValues = {
@@ -231,4 +279,65 @@ export function validateResult(input: ResultValues): ResultCheck {
     if (error) return fail(error)
   }
   return won(decided)
+}
+
+// ---- Expected finish (Q27.6, D-2026-11-23-08; mockup log 2026-11-23-queue-plan-ahead-court-finish) ----
+
+/**
+ * Where a match stands against its mode's expected length: `notStarted` (Getting ready), `mid`
+ * (Ends in about N min), `soon` (Finishing soon), `any` (Could end any time), `long` (Running long).
+ */
+export type ExpectedFinishPhase = 'notStarted' | 'mid' | 'soon' | 'any' | 'long'
+export type ExpectedFinish = {
+  phase: ExpectedFinishPhase
+  /** Expected minutes left: the full typical length when not started, 0 from the typical length on */
+  minutesLeft: number
+  /** The Playing court card's line: "Ends in about 4 min", "Finishing soon", … */
+  text: string
+  /** The same wording in lowercase, for a draft's "Waits for Court 2 · …" line */
+  tag: string
+}
+/** The phases Plan Ahead counts as finishing soon: Finishing soon, Could end any time, Running long. */
+export const ENDING_SOON_PHASES: readonly ExpectedFinishPhase[] = ['soon', 'any', 'long']
+/** Finishing soon starts this many minutes before the typical length. */
+export const FINISHING_SOON_MINUTES = 3
+
+/**
+ * The expected finish of a match, an estimate from time only (ROTRA has no live score). `scoring`
+ * is the session's stored mode (missing or unknown reads as 16/31); `minutesPlayed` is whole
+ * minutes since Start match, or null for a Getting ready match (not started), which counts the
+ * full typical length. With `p` minutes played: `p < typical − 3` Ends in about N min (N at least
+ * 1); `typical − 3 ≤ p < typical` Finishing soon; `typical ≤ p < long` Could end any time (deuce
+ * modes add " · may be in deuce"); `p ≥ long` Running long.
+ */
+export function expectedFinish(scoring: unknown, minutesPlayed: number | null): ExpectedFinish {
+  const mode = scoringMode(scoring)
+  if (minutesPlayed == null)
+    return {
+      phase: 'notStarted',
+      minutesLeft: mode.typical,
+      text: 'Not started yet',
+      tag: 'not started yet',
+    }
+  const played = Math.max(0, minutesPlayed),
+    minutesLeft = Math.max(0, mode.typical - played)
+  if (played < mode.typical - FINISHING_SOON_MINUTES) {
+    const n = Math.max(1, minutesLeft)
+    return {
+      phase: 'mid',
+      minutesLeft,
+      text: `Ends in about ${n} min`,
+      tag: `ends in about ${n} min`,
+    }
+  }
+  if (played < mode.typical)
+    return { phase: 'soon', minutesLeft, text: 'Finishing soon', tag: 'finishing soon' }
+  if (played < mode.long)
+    return {
+      phase: 'any',
+      minutesLeft: 0,
+      text: `Could end any time${mode.deuce ? ' · may be in deuce' : ''}`,
+      tag: 'could end any time',
+    }
+  return { phase: 'long', minutesLeft: 0, text: 'Running long', tag: 'running long' }
 }

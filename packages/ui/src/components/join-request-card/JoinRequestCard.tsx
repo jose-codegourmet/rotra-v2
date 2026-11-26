@@ -22,6 +22,7 @@ export type JoinRequestCardVariant =
   | 'confirmed-slot'
   | 'confirmed-waitlist'
   | 'declined'
+  | 'not-open-to-level'
 
 type CommonProps = {
   className?: string
@@ -128,6 +129,17 @@ export type JoinRequestCardProps = CommonProps &
         disabled?: boolean
       }
     | { variant: 'declined' }
+    | {
+        /**
+         * Not open to your level (D-2026-11-19-12): a signed-in Player whose level here is outside
+         * the session's restriction, or whose band's slots are full. No request button.
+         */
+        variant: 'not-open-to-level'
+        /** Why: "This session is for beginners only." / "All 6 beginner slots are taken." */
+        reason: string
+        /** The Player's level at this club, as its label ("Advanced Mid") */
+        levelLabel: string
+      }
   )
 
 type StatusProps = Extract<
@@ -287,6 +299,24 @@ export function JoinRequestCard(props: JoinRequestCardProps) {
                 ? `Request to join as ${props.signedInName}`
                 : 'Request to join'}
           </Button>
+        </section>
+      </Card>
+    )
+  }
+
+  if (props.variant === 'not-open-to-level') {
+    return (
+      <Card asChild className={cardClass}>
+        <section aria-label="Not open to your level">
+          <Notice tone="warn" title="Not open to your level">
+            <span className="block">
+              {props.reason} Your level here is {props.levelLabel}.
+            </span>
+          </Notice>
+          <p className="m-0 text-[13px] text-fg2">
+            You can't send a join request for this session. Ask the Queue Master if you think this
+            is wrong.
+          </p>
         </section>
       </Card>
     )

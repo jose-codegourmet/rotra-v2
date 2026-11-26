@@ -6,7 +6,7 @@ export const leaderboardShareCardMeta = {
   usage: [
     'Put it inside ShareDialog titled “Share leaderboard”.',
     'Session record › Results › Standings (Queue Master): no viewer row. Finished session page › Leaderboard: flag the signed-in viewer’s row with `isViewer` to highlight it and open the carousel on their image.',
-    'One row per player, in standings order. The number on each row is its `position`, not its index: players sharing a position show the same number (1, 1, 3), and the top-three accent follows it. Stacking faces on the images is an open decision, so none is drawn here. The “#a–b of N” caption still counts rows.',
+    'One row per player, in standings order. The number on each row is its `position`, not its index: players sharing a position show the same number (1, 1, 2), and the top-three accent follows it. Stacking faces on the images is an open decision, so none is drawn here. The “#a–b of N” caption still counts rows.',
     'Names follow the page’s rule; long names end in an ellipsis. Wins green, losses red, games in the text colour.',
   ],
   prototype: {

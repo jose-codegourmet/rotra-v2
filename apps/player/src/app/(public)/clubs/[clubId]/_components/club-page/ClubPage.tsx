@@ -7,6 +7,7 @@ import {
   upcomingSessions,
 } from '@rotra/data/club-page/rules'
 import { useClubPage } from '@rotra/data/club-page/useClubPage'
+import type { LeaderboardPeriod } from '@rotra/data/leaderboard/types'
 import { useLeaveClub } from '@rotra/data/player-club/useLeaveClub'
 import { useThrottledRefresh } from '@rotra/data/refresh/useThrottledRefresh'
 import { Button } from '@rotra/ui/button'
@@ -24,7 +25,9 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
 import { notFound, useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { ProfileCard, type ProfileCardPerson } from '@/app/_components/profile-card/ProfileCard'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
+import { ClubLeaderboardCard } from '../club-leaderboard-card/ClubLeaderboardCard'
 import { MemberProfile } from '../member-profile/MemberProfile'
 
 /** The page link visitors share; separate from the club's invite link (D-2026-11-11-11). */
@@ -78,6 +81,9 @@ export function ClubPage({ clubId }: { clubId: string }) {
   const [openKey, setOpenKey] = useState<string | null>(null)
   const leaveClub = useLeaveClub()
   const [leaving, setLeaving] = useState(false)
+  // The Leaderboard card's period is its own, separate from the ROTRA leaderboard's.
+  const [boardPeriod, setBoardPeriod] = useState<LeaderboardPeriod>('year')
+  const [card, setCard] = useState<ProfileCardPerson | null>(null)
   if (page.data === null) notFound()
   if (!page.data)
     return page.isError ? (
@@ -126,7 +132,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
       throttled={!refreshing.canRefresh}
       refreshing={refreshing.isRefreshing}
       updatedLabel={updatedLabel}
-      disabled={openKey !== null || leaving}
+      disabled={openKey !== null || leaving || card !== null}
     >
       <main className="mx-auto flex w-full max-w-[1180px] flex-col gap-5 px-4 pt-5 pb-[120px]">
         <div className="flex flex-col gap-1.5">
@@ -179,6 +185,13 @@ export function ClubPage({ clubId }: { clubId: string }) {
           <div className="flex min-w-0 flex-col gap-5">
             {next ? <ClubNextUpCard {...row(next)} /> : null}
             <ClubSessionList upcomingCount={upcoming.length} rest={upcoming.slice(1).map(row)} />
+            <ClubLeaderboardCard
+              clubId={club.id}
+              clubName={club.name}
+              period={boardPeriod}
+              onPeriodChange={setBoardPeriod}
+              onOpenPlayer={setCard}
+            />
             <ClubCalendar
               sessions={sessions}
               referenceDate={referenceDate}
@@ -218,6 +231,7 @@ export function ClubPage({ clubId }: { clubId: string }) {
           member={members.find((m) => m.key === openKey) ?? null}
           onClose={() => setOpenKey(null)}
         />
+        <ProfileCard person={card} onClose={() => setCard(null)} />
       </main>
     </PullToRefresh>
   )

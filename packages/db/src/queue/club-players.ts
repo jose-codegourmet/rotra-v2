@@ -6,6 +6,7 @@ import { normalizeSocialLink } from '@rotra/schema/social-link'
 import { readShownProfileBanners } from '../admin/profile-banners'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
+import type { Prisma } from '../generated/prisma/client'
 import { readPlayerMatchHistory } from '../player/projections'
 import {
   normalizeEmail,
@@ -18,7 +19,7 @@ import {
 import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { clubPlayerForProfile, createClubPlayer } from './session-roster'
-import { levelCodeFor, mapDatabaseError } from './session-store'
+import { levelCodeFor, levelIdFor, mapDatabaseError } from './session-store'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -73,6 +74,8 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       nickname: true,
       addedAt: true,
       avatarRef: true,
+      savedSkillLevelId: true,
+      savedLevelAt: true,
       privateInput: { select: { phoneE164: true } },
       sharedEntry: { select: { id: true, rtrId: true, claimedPlayerId: true, email: true } },
       player: {
@@ -90,7 +93,7 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       assessments: {
         orderBy: { assessedAt: 'desc' },
         take: 1,
-        select: { skillLevelId: true },
+        select: { skillLevelId: true, assessedAt: true },
       },
       rosterEntries: { select: { sessionId: true } },
     },
@@ -127,7 +130,7 @@ export async function listClubPlayers(context: ClubContext): Promise<ClubPlayerD
       bannerImageUrl: banner.bannerImageUrl,
       identity: registered ? 'registered' : entry || p.player || phone ? 'unclaimed' : 'guest',
       rtrId: registered ? (p.player?.idAllocation?.rtrId ?? null) : (entry?.rtrId ?? null),
-      playingLevel: levelCodeFor(p.assessments[0]?.skillLevelId ?? null),
+      playingLevel: levelCodeFor(savedLevelOf(p)),
       phoneHidden: registered ? (p.player?.hidePhoneFromClubs ?? false) : false,
       hasPhone: Boolean((registered && p.player?.privateContact?.phoneE164) || phone),
       // #1019: an entry saved with a social link only has no email.
@@ -160,9 +163,80 @@ export type DirectoryPlayerDto = {
   ownNameRequired?: boolean
 }
 
-export type PlayerLookupDto = { player: DirectoryPlayerDto | null; savedName: string | null }
+export type PlayerLookupDto = {
+  player: DirectoryPlayerDto | null
+  savedName: string | null
+  /** D-2026-11-23-01: unclaimed players whose name contains the query, when there is no exact match */
+  matches?: DirectoryPlayerDto[]
+}
 
 const NO_MATCH: PlayerLookupDto = { player: null, savedName: null }
+
+/** The club record that saved an unclaimed person first (its name and picture are the ones shown). */
+const firstRecordOf = (entryId: string) =>
+  prisma.clubPlayer.findFirst({
+    where: { sharedEntryId: entryId, removedAt: null, linkedToClubPlayerId: null, playerId: null },
+    orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
+    select: { displayName: true, avatarRef: true },
+  })
+
+/**
+ * An unclaimed person as Player lookup shows them (D-2026-11-23-01): the name and picture of the
+ * club that saved them first. The adding club still enters its own name (`ownNameRequired`).
+ */
+async function unclaimedResult(entry: { id: string; rtrId: string }) {
+  const first = await firstRecordOf(entry.id)
+  return {
+    id: entry.id,
+    fullName: first?.displayName ?? '',
+    nickname: null,
+    rtrId: entry.rtrId,
+    identity: 'unclaimed' as const,
+    picture: first?.avatarRef ?? null,
+    suggestion: null,
+    phoneHidden: false,
+    ownNameRequired: true,
+  }
+}
+
+/**
+ * D-2026-11-23-01: open unclaimed people whose name at any club contains the query (two letters or
+ * more), leaving out anyone this club already saved. Registered players are never found by name.
+ */
+async function unclaimedByName(context: ClubContext, query: string) {
+  const q = query.trim()
+  if (q.length < 2) return []
+  const rows = await prisma.clubPlayer.findMany({
+    where: {
+      displayName: { contains: q, mode: 'insensitive' },
+      removedAt: null,
+      linkedToClubPlayerId: null,
+      playerId: null,
+      sharedEntry: { claimedPlayerId: null, retiredAt: null },
+    },
+    select: { sharedEntryId: true, sharedEntry: { select: { id: true, rtrId: true } } },
+    take: 100,
+  })
+  const mine = new Set(
+    (
+      await prisma.clubPlayer.findMany({
+        where: {
+          clubId: context.clubId,
+          removedAt: null,
+          sharedEntryId: {
+            in: rows.map((r) => r.sharedEntryId).filter((id): id is string => !!id),
+          },
+        },
+        select: { sharedEntryId: true },
+      })
+    ).map((r) => r.sharedEntryId),
+  )
+  const entries = new Map<string, { id: string; rtrId: string }>()
+  for (const row of rows)
+    if (row.sharedEntry && !mine.has(row.sharedEntry.id))
+      entries.set(row.sharedEntry.id, row.sharedEntry)
+  return Promise.all([...entries.values()].slice(0, 20).map(unclaimedResult))
+}
 
 /**
  * Player lookup (D-2026-11-16-04): the one ROTRA person whose RTR ID or email is exactly `query`
@@ -178,7 +252,7 @@ export async function lookupPlayer(context: ClubContext, query: string): Promise
   const email = rtrId ? null : normalizeEmail(q)
   // #1019: an exact social link finds an unclaimed player only, never a registered one.
   const link = rtrId || email ? null : normalizeSocialLink(q)
-  if (!rtrId && !email && !link) return NO_MATCH
+  if (!rtrId && !email && !link) return { ...NO_MATCH, matches: await unclaimedByName(context, q) }
   const entry = rtrId
     ? await openEntryByRtrId(prisma, rtrId)
     : email
@@ -198,7 +272,7 @@ export async function lookupPlayer(context: ClubContext, query: string): Promise
       : email
         ? await registeredPlayerByEmail(prisma, email)
         : null
-  if (!entry && !playerId) return NO_MATCH
+  if (!entry && !playerId) return { ...NO_MATCH, matches: await unclaimedByName(context, q) }
   const saved = await prisma.clubPlayer.findFirst({
     where: {
       clubId: context.clubId,
@@ -213,21 +287,7 @@ export async function lookupPlayer(context: ClubContext, query: string): Promise
       savedName:
         (saved.player?.profileState === 'claimed' && saved.player.fullName) || saved.displayName,
     }
-  if (entry)
-    return {
-      player: {
-        id: entry.id,
-        fullName: '',
-        nickname: null,
-        rtrId: entry.rtrId,
-        identity: 'unclaimed',
-        picture: null,
-        suggestion: null,
-        phoneHidden: false,
-        ownNameRequired: true,
-      },
-      savedName: null,
-    }
+  if (entry) return { player: await unclaimedResult(entry), savedName: null }
   const p = await prisma.player.findFirst({
     where: {
       id: playerId ?? undefined,
@@ -261,6 +321,38 @@ export async function lookupPlayer(context: ClubContext, query: string): Promise
   }
 }
 
+/**
+ * The level Saved players show: the one the club gave outside a session (Add player, Edit
+ * details) or the latest session assessment, whichever is newer.
+ */
+export function savedLevelOf(p: {
+  savedSkillLevelId: number | null
+  savedLevelAt: Date | null
+  assessments: { skillLevelId: number; assessedAt: Date }[]
+}) {
+  const assessed = p.assessments[0]
+  if (p.savedSkillLevelId == null || !p.savedLevelAt) return assessed?.skillLevelId ?? null
+  return assessed && assessed.assessedAt > p.savedLevelAt
+    ? assessed.skillLevelId
+    : p.savedSkillLevelId
+}
+
+/** Sets (or, with null, clears) the level the club gives a saved player outside a session. */
+export async function setSavedLevel(
+  tx: Prisma.TransactionClient,
+  clubId: string,
+  clubPlayerId: string,
+  level: string | null,
+  now: Date,
+) {
+  await tx.clubPlayer.update({
+    where: { clubId_id: { clubId, id: clubPlayerId } },
+    data: level
+      ? { savedSkillLevelId: levelIdFor(level), savedLevelAt: now, revision: { increment: 1 } }
+      : { savedSkillLevelId: null, savedLevelAt: null, revision: { increment: 1 } },
+  })
+}
+
 const alreadySaved = (name: string) =>
   new ServiceError('conflict', { player: `${name} is already in your saved players.` })
 
@@ -268,11 +360,11 @@ const alreadySaved = (name: string) =>
  * Saved players › Add player › Player Information: saves a lookup match to the club only, never to
  * a session. `playerId` is a registered player's id or an unclaimed person's shared entry id; for
  * the latter `name` is this club's own name for them (required). A person already saved is
- * refused. A level needs a session to be recorded (`club_assessments`), so none is stored here.
+ * refused. The level chosen, if any, is the saved level (`club_players.saved_skill_level_id`).
  */
 export async function addDirectoryPlayerToClub(
   context: ClubContext,
-  input: { operationId: string; playerId: string; name?: string | null },
+  input: { operationId: string; playerId: string; name?: string | null; level?: string | null },
 ) {
   await requireClubEntitlement(context)
   try {
@@ -286,6 +378,8 @@ export async function addDirectoryPlayerToClub(
         input.name,
       )
       if (!created) throw alreadySaved(clubPlayer.displayName)
+      if (input.level)
+        await setSavedLevel(tx, context.clubId, clubPlayer.id, input.level, new Date())
       return { clubPlayerId: clubPlayer.id, name: clubPlayer.displayName }
     })
   } catch (error) {
@@ -310,6 +404,8 @@ export async function addNewSavedPlayer(
     email?: string | null
     /** #1019: a social link is an entry key too, and wins over the email */
     socialLink?: string | null
+    /** The saved level, if one was chosen */
+    level?: string | null
   },
 ) {
   await requireClubEntitlement(context)
@@ -339,6 +435,8 @@ export async function addNewSavedPlayer(
         input,
         new Date(),
       )
+      if (input.level)
+        await setSavedLevel(tx, context.clubId, clubPlayer.id, input.level, new Date())
       return { clubPlayerId: clubPlayer.id, name: clubPlayer.displayName, emailWords: words }
     })
   } catch (error) {

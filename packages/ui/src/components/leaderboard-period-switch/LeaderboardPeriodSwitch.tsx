@@ -1,10 +1,16 @@
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 
-export const LEADERBOARD_PERIODS = ['year', 'month', 'week'] as const
+export const LEADERBOARD_PERIODS = ['year', 'quarter', 'month', 'week'] as const
 export type LeaderboardPeriod = (typeof LEADERBOARD_PERIODS)[number]
 
 export const LEADERBOARD_PERIOD_COPY = {
   year: { label: 'Top annual', current: 'this year', previous: 'last year', list: 'annual' },
+  quarter: {
+    label: 'Top quarterly',
+    current: 'this quarter',
+    previous: 'last quarter',
+    list: 'quarterly',
+  },
   month: { label: 'Top monthly', current: 'this month', previous: 'last month', list: 'monthly' },
   week: { label: 'Top weekly', current: 'this week', previous: 'last week', list: 'weekly' },
 } as const

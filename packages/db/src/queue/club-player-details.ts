@@ -18,6 +18,8 @@ import { requireClubEntitlement } from '../service/authorize'
 import { ServiceError } from '../service/errors'
 import { ownDetailsJson, readOwnDetails } from './club-player-own-details'
 import { type ClubPictureStateDto, clubPictureStateOf } from './club-player-picture'
+import { savedLevelOf, setSavedLevel } from './club-players'
+import { levelCodeFor } from './session-store'
 
 const E164 = /^\+639\d{9}$/
 const NOT_EDITABLE = 'This player registered, so they keep their own details.'
@@ -36,6 +38,8 @@ export type ClubPlayerDetailsDto = {
   fullName: string
   nickname: string | null
   phoneOnFile: boolean
+  /** Level for this club: the saved level or the latest session assessment, whichever is newer */
+  level: string | null
   /** The club-set picture and the previous photo kept (D-2026-11-09-12) */
   picture: ClubPictureStateDto
   /** Unclaimed records only (email '' for an older record with none: Details required); null for guests */
@@ -63,6 +67,13 @@ async function loadEditable(context: ClubContext, clubPlayerId: string) {
       player: { select: { profileState: true } },
       avatarRef: true,
       avatarPreviousRef: true,
+      savedSkillLevelId: true,
+      savedLevelAt: true,
+      assessments: {
+        orderBy: { assessedAt: 'desc' },
+        take: 1,
+        select: { skillLevelId: true, assessedAt: true },
+      },
     },
   })
   if (!row || row.removedAt) throw new ServiceError('not_found')
@@ -90,6 +101,7 @@ export async function readClubPlayerDetails(
     fullName: row.displayName,
     nickname: row.nickname,
     phoneOnFile: Boolean(row.privateInput?.phoneE164),
+    level: levelCodeFor(savedLevelOf(row)),
     picture: clubPictureStateOf(row),
     profile: unclaimed
       ? {
@@ -116,6 +128,8 @@ export async function updateClubPlayerDetails(
     clubPlayerId: string
     fullName: string
     nickname: string | null
+    /** Level for this club; null clears it. Saved only when it differs from what shows now */
+    level: string | null
     /** E.164 from the Route Handler; only used when no phone is on file */
     phoneE164: string | null
     email: string | null
@@ -168,6 +182,8 @@ export async function updateClubPlayerDetails(
         revision: { increment: 1 },
       },
     })
+    if ((input.level || null) !== levelCodeFor(savedLevelOf(row)))
+      await setSavedLevel(tx, context.clubId, row.id, input.level || null, now)
     // A phone is taken only for an unclaimed player with none on file; a guest has none.
     const newPhone = unclaimed && phone && !onFile ? phone : null
     if (newPhone) {

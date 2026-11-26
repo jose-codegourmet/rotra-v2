@@ -2,6 +2,7 @@ import type { PlayerSessionRecord } from '@rotra/data/player/types'
 import { Button } from '@rotra/ui/button'
 import { GameRow, type GameRowPlayer, type GameRowProps } from '@rotra/ui/game-row'
 import { Icon } from '@rotra/ui/icon'
+import { NotRankedChip } from '@rotra/ui/not-ranked-chip'
 import type { ReactNode } from 'react'
 export type SessionGamesProps = {
   session: PlayerSessionRecord
@@ -11,6 +12,8 @@ export type SessionGamesProps = {
   onOpenPlayer?: (player: GameRowPlayer) => void
   /** Your own games: the share icon on each court (Share game) */
   onShareGame?: (gameId: string) => void
+  /** Opens a game's match page: the whole court box (2026-11-25 match page log) */
+  onOpenGame?: (gameId: string) => void
   /** Between the session head and the games: the Share performance / result / games row */
   actions?: ReactNode
 }
@@ -19,6 +22,7 @@ export function SessionGames({
   me,
   onOpenPlayer,
   onShareGame,
+  onOpenGame,
   actions,
 }: SessionGamesProps) {
   return (
@@ -34,6 +38,8 @@ export function SessionGames({
               timeZone: 'Asia/Manila',
             })}{' '}
             · {session.clubName}
+            {session.ranked === false ? ' · ' : null}
+            {session.ranked === false ? <NotRankedChip /> : null}
           </p>
         </div>
         {session.sessionPageUrl ? (
@@ -55,6 +61,7 @@ export function SessionGames({
             me={me}
             onOpenPlayer={onOpenPlayer}
             onShare={onShareGame ? () => onShareGame(game.id) : undefined}
+            onOpen={onOpenGame ? () => onOpenGame(game.id) : undefined}
           />
         ))}
       </div>

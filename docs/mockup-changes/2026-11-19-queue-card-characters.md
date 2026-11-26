@@ -1,6 +1,6 @@
 # Queue app: Rion and Tara drawn into the Mode and Scoring card art
 
-Status: NEW
+Status: IN MOCK APP — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `CARD_ART`, `artCard(k, …)`

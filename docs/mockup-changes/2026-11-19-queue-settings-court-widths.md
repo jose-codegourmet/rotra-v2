@@ -1,6 +1,6 @@
 # Queue app: Settings court cards fill the width, 350 px minimum on wide boxes, two a row on small ones
 
-Status: NEW
+Status: IN MOCK APP — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `liveSettings()` courts; CSS `.ls-courts`, container `lscourts`

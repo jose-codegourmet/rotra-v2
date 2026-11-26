@@ -213,3 +213,40 @@ export const DeclinedGuestNudgeLight: Story = {
   args: { variant: 'declined', registerNudge: true },
   globals: { theme: 'light' },
 }
+
+/** D-2026-11-19-12: a signed-in Player outside the session's restriction: the reason, their level, no request button. */
+export const NotOpenToYourLevel: Story = {
+  args: {
+    variant: 'not-open-to-level',
+    reason: 'This session is for beginners only.',
+    levelLabel: 'Advanced Mid',
+  },
+}
+export const NotOpenToYourLevelLight: Story = {
+  args: NotOpenToYourLevel.args,
+  globals: { theme: 'light' },
+}
+export const NotOpenToYourLevelPhone: Story = {
+  args: NotOpenToYourLevel.args,
+  globals: { viewport: { value: 'phone' } },
+}
+/** Slots per level: the Player's band is full. */
+export const NotOpenBandFull: Story = {
+  args: {
+    variant: 'not-open-to-level',
+    reason: 'All 6 intermediate slots are taken.',
+    levelLabel: 'Intermediate Low',
+  },
+}
+export const NotOpenBandFullLight: Story = {
+  args: NotOpenBandFull.args,
+  globals: { theme: 'light' },
+}
+/** Slots per level with none set for the band. */
+export const NotOpenNoSlotsForBand: Story = {
+  args: {
+    variant: 'not-open-to-level',
+    reason: 'This session has no advanced slots.',
+    levelLabel: 'Advanced Low',
+  },
+}

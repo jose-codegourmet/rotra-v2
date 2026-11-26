@@ -1,11 +1,13 @@
+import { elapsedTime, queueTime } from '@rotra/schema/queue-time'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { CourtDrawing, type CourtPlayer } from '@rotra/ui/court-drawing'
 import { Icon } from '@rotra/ui/icon'
 import { OverflowMenu, type OverflowMenuItem } from '@rotra/ui/overflow-menu'
+import { PairFaces, type PairFacesPlayer } from '@rotra/ui/pair-faces'
 import type { ReactNode } from 'react'
-import { courtCardVariants } from './CourtCard.variants'
+import { courtCardVariants, freeCourtDropClass } from './CourtCard.variants'
 
 type CourtCardBase = {
   /** "Court 1", or "Court 1 + Court 2" for a merged 5v5 */
@@ -36,13 +38,37 @@ type CourtCardMatchBase = CourtCardBase & {
   teamA: CourtPlayer[]
   teamB: CourtPlayer[]
   onOpenProfile?: (playerId: string) => void
+  /**
+   * Opens the player's games this session (D-SESSION-GAMES). Makes the games badge on each face its own
+   * button next to the face button, named “NAME's games this session, N”; display only without it.
+   */
+  onOpenGames?: (playerId: string) => void
   /** "Doubles", "5v5 fun" */
   formatLabel: string
   matchNo: number
-  /** Renders "Open match" when given (primary on Playing, secondary on Getting ready) */
+  /**
+   * Renders "Open match" when given (primary on Playing, secondary on Getting ready). It also makes
+   * the court drawing a button (tooltip "Open match"); faces still open the profile.
+   */
   onOpenMatch?: () => void
+  /**
+   * Makes the drawing draggable (mouse after 6 px, touch after press and hold). Dropping it on a free
+   * court that carries `dropCourtId` reports that court's id; anywhere else does nothing.
+   */
+  onDragMove?: (courtId: string) => void
+  /**
+   * Owner, November 25, 2026: a busy one-court court a dragged drawing can land on; the two matches
+   * trade courts. Its own drawing never targets it. Leave out for a merged 5v5 court.
+   */
+  dropCourtId?: string
   /** ⋯ menu: Remove, disabled here with "Only a free court can be removed" */
   onRemove?: () => void
+}
+
+export type CourtCardExpectedFinish = {
+  text: string
+  /** Finishing soon is accent, Running long is warn, the rest are muted */
+  tone: 'muted' | 'accent' | 'warn'
 }
 
 /** Playing: a started match. Steady accent glow, chip "Playing", the minutes in the match line. */
@@ -51,6 +77,18 @@ export type CourtCardInGameProps = CourtCardMatchBase & {
   /** Minutes since Start match */
   minutes: number
   substitutions?: number
+  /** Renders the secondary "Pause match" button (pause icon) beside Open match: back to Getting ready */
+  onPause?: () => void
+  /** ⋯ menu: "Move to a free court"; the item shows only when this is given */
+  onMoveToFree?: () => void
+  /** No free court can take the match (a two-court match needs two): the item is disabled with "No court is free" */
+  noFreeCourt?: boolean
+  /**
+   * One small line under "FORMAT · Match N · M min" (Playing and merged 5v5), plain text from the caller:
+   * "Ends in about 6 min", "Finishing soon", "Could end any time", "Running long".
+   * Words always carry the meaning; the tone only colours them.
+   */
+  expectedFinish?: CourtCardExpectedFinish
 }
 
 /** The next ready waiting match the ⋯ menu's Swap would put on this court */
@@ -83,17 +121,34 @@ export type CourtCardNextMatch = {
   /** Short names per team */
   teamA: string[]
   teamB: string[]
+  /**
+   * Owner, November 25, 2026: each pair's pictures before its names ("(faces) Danna & Darryn vs
+   * (faces) Derr & Dexter"). Without them the line is the names only.
+   */
+  facesA?: PairFacesPlayer[]
+  facesB?: PairFacesPlayer[]
 }
 
 export type CourtCardFreeProps = CourtCardBase & {
   variant: 'free'
   /**
    * Whole minutes since the court became free (the last match on it ended, or it opened): the chip
-   * reads "Free · N min", amber from 10, red from 16. Omit or null for a plain "Free".
+   * reads "Free · N min" ("N h", "long time ago" from 24 h), amber from 10, red from 16. Omit or null for a plain "Free".
    */
   freeMinutes?: number | null
   notOpen?: boolean
   removed?: boolean
+  /**
+   * A free open court that a dragged match can land on: the court's id, set as `data-free-court` and
+   * handed back to the dragged card's onDragMove. Leave out for Not open yet, removed and busy courts.
+   * While any drawing is being dragged the card shows a dashed accent outline, solid with a tint while
+   * the pointer is over it.
+   */
+  dropCourtId?: string
+  /** Forces the dashed outline (a drag is in progress); the drag itself shows it without this */
+  dragging?: boolean
+  /** Forces the solid outline and tint (the dragged drawing is over this court) */
+  dragOver?: boolean
   /** The session's last court: Remove is disabled with "A session needs at least one court" */
   isLastCourt?: boolean
   /** ⋯ menu: Remove */
@@ -158,13 +213,15 @@ function TimeLine({
   )
 }
 
-/** Swap (Getting ready only), Edit / Change time, Undo early open and Remove; the card keeps only the actions for its state. */
+/** Swap (Getting ready only), Move to a free court (Playing only), Edit / Change time, Undo early open and Remove; the card keeps only the actions for its state. */
 function CourtMenu({
   label,
   busy,
   isLastCourt = false,
   onSwap,
   swapWith,
+  onMoveToFree,
+  noFreeCourt = false,
   onChangeLabel,
   onEdit,
   onUndoEarlyOpen,
@@ -175,6 +232,8 @@ function CourtMenu({
   isLastCourt?: boolean
   onSwap?: () => void
   swapWith?: CourtCardSwapMatch | null
+  onMoveToFree?: () => void
+  noFreeCourt?: boolean
   onChangeLabel?: () => void
   onEdit?: () => void
   onUndoEarlyOpen?: () => void
@@ -191,6 +250,12 @@ function CourtMenu({
             disabledReason: 'No other waiting match is ready',
           },
     )
+  if (onMoveToFree)
+    items.push({
+      label: 'Move to a free court',
+      onSelect: onMoveToFree,
+      disabledReason: noFreeCourt ? 'No court is free' : undefined,
+    })
   if (onChangeLabel) items.push({ label: 'Change court label', onSelect: onChangeLabel })
   if (onEdit) items.push({ label: busy ? 'Change time' : 'Edit', onSelect: onEdit })
   if (onUndoEarlyOpen)
@@ -221,7 +286,7 @@ export function FreeCourtChip({ minutes }: { minutes?: number | null }) {
   if (minutes == null) return <Chip>Free</Chip>
   return (
     <Chip tone={minutes >= 16 ? 'error' : minutes >= 10 ? 'warn' : 'neutral'}>
-      Free · {minutes} min
+      Free · {queueTime(minutes)}
     </Chip>
   )
 }
@@ -304,6 +369,9 @@ function MatchCourtHead({
   teamA,
   teamB,
   onOpenProfile,
+  onOpenGames,
+  onOpenMatch,
+  onDragMove,
   chip,
   menu,
 }: Pick<
@@ -317,6 +385,9 @@ function MatchCourtHead({
   | 'teamA'
   | 'teamB'
   | 'onOpenProfile'
+  | 'onOpenGames'
+  | 'onOpenMatch'
+  | 'onDragMove'
 > & { chip: ReactNode; menu: ReactNode }) {
   return (
     <>
@@ -335,6 +406,9 @@ function MatchCourtHead({
         teamA={teamA}
         teamB={teamB}
         onOpenProfile={onOpenProfile}
+        onOpenGames={onOpenGames}
+        onOpenMatch={onOpenMatch}
+        onDragMove={onDragMove}
       />
     </>
   )
@@ -349,12 +423,19 @@ function PlayingCourtCard({
   teamA,
   teamB,
   onOpenProfile,
+  onOpenGames,
   formatLabel,
   matchNo,
   minutes,
   substitutions = 0,
   onOpenMatch,
+  onDragMove,
+  dropCourtId,
+  onPause,
+  onMoveToFree,
+  noFreeCourt = false,
   openedEarly = false,
+  expectedFinish,
   onChangeLabel,
   onEdit,
   onUndoEarlyOpen,
@@ -364,25 +445,69 @@ function PlayingCourtCard({
   return (
     <article
       aria-label={label}
-      className={cn(courtCardVariants({ variant: 'in-game', merged }), className)}
+      data-free-court={merged ? undefined : dropCourtId}
+      className={cn(
+        courtCardVariants({ variant: 'in-game', merged }),
+        !merged && dropCourtId && freeCourtDropClass({}),
+        className,
+      )}
     >
       <MatchCourtHead
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
-        {...{ teamA, teamB, onOpenProfile }}
+        {...{ teamA, teamB, onOpenProfile, onOpenGames, onOpenMatch, onDragMove }}
         chip={<Chip tone="accent">{merged ? 'Merged · Playing' : 'Playing'}</Chip>}
-        menu={<CourtMenu busy {...{ label, onChangeLabel, onEdit, onUndoEarlyOpen, onRemove }} />}
+        menu={
+          <CourtMenu
+            busy
+            {...{
+              label,
+              onMoveToFree,
+              noFreeCourt,
+              onChangeLabel,
+              onEdit,
+              onUndoEarlyOpen,
+              onRemove,
+            }}
+          />
+        }
       />
       <p className="text-[13px] text-fg2">
-        {formatLabel} · Match {matchNo} · {minutes} min
+        {formatLabel} · Match {matchNo} · {elapsedTime(minutes)}
         {substitutions > 0
           ? ` · ${substitutions} substitution${substitutions > 1 ? 's' : ''}`
           : null}
       </p>
-      {onOpenMatch ? (
+      {expectedFinish ? (
+        <p
+          className={cn(
+            'text-xs',
+            expectedFinish.tone === 'accent'
+              ? 'text-accent'
+              : expectedFinish.tone === 'warn'
+                ? 'text-warn'
+                : 'text-fg2',
+          )}
+        >
+          {expectedFinish.text}
+        </p>
+      ) : null}
+      {onOpenMatch || onPause ? (
         <div className="mt-auto flex flex-wrap items-center gap-2">
-          <Button size="sm" variant="primary" onClick={onOpenMatch}>
-            Open match
-          </Button>
+          {onOpenMatch ? (
+            <Button size="sm" variant="primary" onClick={onOpenMatch}>
+              Open match
+            </Button>
+          ) : null}
+          {onPause ? (
+            <Button
+              size="sm"
+              onClick={onPause}
+              title="Back to Getting ready, for a match started by mistake"
+            >
+              <Icon name="pause" size={14} />
+              Pause match
+            </Button>
+          ) : null}
         </div>
       ) : null}
     </article>
@@ -398,11 +523,14 @@ function GettingReadyCourtCard({
   teamA,
   teamB,
   onOpenProfile,
+  onOpenGames,
   formatLabel,
   matchNo,
   blockedReason,
   onStartMatch,
   onOpenMatch,
+  onDragMove,
+  dropCourtId,
   onSwap,
   swapWith,
   openedEarly = false,
@@ -415,11 +543,16 @@ function GettingReadyCourtCard({
   return (
     <article
       aria-label={label}
-      className={cn(courtCardVariants({ variant: 'on-court', merged }), className)}
+      data-free-court={merged ? undefined : dropCourtId}
+      className={cn(
+        courtCardVariants({ variant: 'on-court', merged }),
+        !merged && dropCourtId && freeCourtDropClass({}),
+        className,
+      )}
     >
       <MatchCourtHead
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
-        {...{ teamA, teamB, onOpenProfile }}
+        {...{ teamA, teamB, onOpenProfile, onOpenGames, onOpenMatch, onDragMove }}
         chip={<Chip>{merged ? 'Merged · Getting ready' : 'Getting ready'}</Chip>}
         menu={
           <CourtMenu
@@ -472,6 +605,9 @@ function FreeCourtCard({
   isLastCourt = false,
   onRemove,
   onStartAnyway,
+  dropCourtId,
+  dragging = false,
+  dragOver = false,
   openedEarly = false,
   onChangeLabel,
   onEdit,
@@ -487,7 +623,15 @@ function FreeCourtCard({
 }: CourtCardFreeProps) {
   const onPlace = onPutOnCourt ?? onReviewAndStart
   return (
-    <article aria-label={label} className={cn(courtCardVariants({ variant: 'free' }), className)}>
+    <article
+      aria-label={label}
+      data-free-court={!removed && !notOpen ? dropCourtId : undefined}
+      className={cn(
+        courtCardVariants({ variant: 'free' }),
+        !removed && !notOpen && dropCourtId && freeCourtDropClass({ dragging, dragOver }),
+        className,
+      )}
+    >
       <div className="flex items-center justify-between gap-2">
         <div>
           <h3 className="text-base">{label}</h3>
@@ -532,7 +676,17 @@ function FreeCourtCard({
             <span className="text-fg2">Next eligible:</span> #{next.position} · {next.formatLabel}
           </p>
           <p className="text-[13px]">
-            {listNames(next.teamA)} <span className="text-fg2">vs</span> {listNames(next.teamB)}
+            {next.facesA && next.facesB ? (
+              <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+                <PairFaces players={next.facesA} />
+                <span className="text-fg2">vs</span>
+                <PairFaces players={next.facesB} />
+              </span>
+            ) : (
+              <>
+                {listNames(next.teamA)} <span className="text-fg2">vs</span> {listNames(next.teamB)}
+              </>
+            )}
           </p>
           {onPlace || onPickAnother ? (
             <div className="mt-auto flex flex-wrap items-center gap-2">

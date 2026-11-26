@@ -1,6 +1,6 @@
 # Queue app: Pause match takes a playing match back to Getting ready
 
-Status: NEW
+Status: IN MOCK APP — #1042
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `courtsPane()` Playing card, sheet `match` (Q-ACTIVE-MATCH), action `pauseMatch`

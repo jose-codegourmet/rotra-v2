@@ -62,6 +62,7 @@ beforeEach(async () => {
         id: `court-${i}`,
         sessionId,
         label: `Court ${i + 10}`,
+        position: i + 10,
         openUntil: null,
         removedAt: null,
       })

@@ -1,6 +1,6 @@
 # Player app: a faster, mobile-first Your details step with clear Required fields
 
-Status: NEW
+Status: IN MOCK APP — #1081
 Date: 2026-11-19
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `viewClaim` (the details step), `field()` (Required pill), `.req-pill`,

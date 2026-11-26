@@ -188,48 +188,60 @@ export function createResultSnapshot(input: {
   }
 }
 
-export const ROWS_PER_FRAME: Record<ExportFormat, number> = { story: 14, feed: 10 }
+/** Rows per standings image: 14 on a Story image, 9 on a Feed image (owner, November 25, 2026). */
+export const ROWS_PER_FRAME: Record<ExportFormat, number> = { story: 14, feed: 9 }
+/** A shared position lists its names on one row, three to a line; more names take more rows. */
+export const NAMES_PER_ROW = 3
+
 /**
- * Long standings continue onto extra images so every name stays readable: 14 rows per Story image,
- * 10 per Feed image. Frames are titled "Standings 1", "Standings 2" … only when there is more than one;
- * an empty standings list still yields one "Standings" frame, as the prototype's export sheet does.
+ * Long standings continue onto extra images so every name stays readable (owner, November 25,
+ * 2026): one row per position, 14 rows per Story image and 9 per Feed image. A position with more
+ * than three names counts one row per three names, and a position never splits across images.
+ * Titles read "Standings · 1 of 3" only when there is more than one image; empty standings still
+ * yield one "Standings" image.
  */
-export function paginateStandings<T>(
+export function paginateStandings<T extends { position: number }>(
   rows: readonly T[],
   format: ExportFormat,
-): { title: string; rows: T[] }[] {
-  const per = ROWS_PER_FRAME[format],
-    count = Math.max(1, Math.ceil(rows.length / per))
-  return Array.from({ length: count }, (_, i) => ({
-    title: count > 1 ? `Standings ${i + 1}` : 'Standings',
-    rows: rows.slice(i * per, i * per + per),
+): { title: string; rows: T[]; page: number; pages: number }[] {
+  const per = ROWS_PER_FRAME[format]
+  const groups: T[][] = []
+  for (const row of rows) {
+    const last = groups.at(-1)
+    if (last && last[0]?.position === row.position) last.push(row)
+    else groups.push([row])
+  }
+  const pages: T[][] = [[]]
+  let used = 0
+  for (const group of groups) {
+    const lines = Math.ceil(group.length / NAMES_PER_ROW)
+    const current = pages[pages.length - 1] as T[]
+    if (used + lines > per && current.length) {
+      pages.push([...group])
+      used = lines
+    } else {
+      current.push(...group)
+      used += lines
+    }
+  }
+  return pages.map((page, i) => ({
+    title: pages.length > 1 ? `Standings · ${i + 1} of ${pages.length}` : 'Standings',
+    rows: page,
+    page: i + 1,
+    pages: pages.length,
   }))
 }
 /** Download images frames in order: standings pages, Awards, then Off Day only when explicitly included. */
 export function buildExportFrames(
-  snapshot: Pick<SessionResultSnapshot, 'standings' | 'awards'>,
+  snapshot: Pick<SessionResultSnapshot, 'standings'>,
   selection: ExportSelection,
   format: ExportFormat,
 ): ExportFrame[] {
   const frames: ExportFrame[] = []
   if (selection.slides.includes('standings'))
-    frames.push(
-      ...paginateStandings(
-        snapshot.standings.map((r) => r.name),
-        format,
-      ),
-    )
-  if (selection.slides.includes('awards'))
-    frames.push({
-      title: 'Awards',
-      rows: [
-        snapshot.awards.mvp ? `MVP · ${snapshot.awards.mvp.name}` : 'MVP · none',
-        ...(snapshot.awards.mostImproved
-          ? [`Most Improved · ${snapshot.awards.mostImproved.name}`]
-          : []),
-      ],
-    })
-  if (selection.includeOffDay)
-    frames.push({ title: 'Off Day', rows: snapshot.awards.offDay.map((x) => x.name) })
+    for (const page of paginateStandings(snapshot.standings, format))
+      frames.push({ kind: 'standings', ...page })
+  if (selection.slides.includes('awards')) frames.push({ kind: 'awards', title: 'Awards' })
+  if (selection.includeOffDay) frames.push({ kind: 'offDay', title: 'Off Day' })
   return frames
 }

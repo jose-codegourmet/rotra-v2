@@ -1,3 +1,4 @@
+import { type LevelRestriction, levelRestrictionOf } from '@rotra/schema/level-restriction'
 import { type ScoringKey, scoringOf } from '@rotra/schema/scoring'
 export type SessionMode = 'chill' | 'fair' | 'hard'
 /** The Manual Queue | Auto Queue switch. Auto places the next ready match On court; it never starts one. */
@@ -27,6 +28,11 @@ export type QueueSession = {
   playersPerCourt: number
   expectedPlayers: number | null
   startedAt: number | null
+  /**
+   * The planned window as it was at Start, before a late or other-day start moved it. **Back to
+   * preparation** puts it back (owner, November 25, 2026). Null or missing: keep the current times.
+   */
+  plannedBeforeStart?: { startAt: number; endAt: number } | null
   finalizedAt: number | null
   playerRecordsUpdatedAt: number | null
   seriesId: string | null
@@ -46,8 +52,9 @@ export type QueueSession = {
    */
   requestFormats?: RequestFormats
   /**
-   * **Record games** (D-2026-11-18-06): false runs the night and keeps no results. Missing means
-   * true (sessions saved before the switch). Read it through `recordsGames`. Fixed once started.
+   * **Record games** (D-2026-11-20-02): false records the games as usual but keeps the session's
+   * wins out of the ROTRA leaderboards and win rate ("Not ranked"). Missing means true (sessions
+   * saved before the switch). Read it through `recordsGames`. Fixed once started.
    */
   recordGames?: boolean
   /**
@@ -56,14 +63,24 @@ export type QueueSession = {
    * Fixed once started.
    */
   scoring?: ScoringKey
+  /**
+   * **Restrictions** (D-2026-11-19-12): which levels may take a slot. Missing means All levels
+   * (sessions saved before the setting). Read it through `sessionLevelRestriction`; the allowed /
+   * full check is `levelRestrictionBlock` in `session-roster/levelRestriction.rules`.
+   */
+  levelRestriction?: LevelRestriction
 }
+/** The session's level restriction: the stored pick, or All levels when missing or unknown. */
+export const sessionLevelRestriction = (
+  session: Pick<QueueSession, 'levelRestriction'> | null | undefined,
+) => levelRestrictionOf(session?.levelRestriction)
 /** The session's scoring mode: the stored value, or 16/31 when missing or unknown. */
 export const sessionScoring = (session: Pick<QueueSession, 'scoring'> | null | undefined) =>
   scoringOf(session?.scoring)
 /**
- * Whether the session keeps results: the one place the Record games default lives (missing reads
- * as on). An unrecorded session has no winner, score, standings, awards, result slides or
- * publication, and nothing of it goes to player records or ranking.
+ * Whether the session's wins count toward the ROTRA leaderboards and win rate: the one place the
+ * Record games default lives (missing reads as on). With it off the session is "Not ranked", but
+ * its games, results, standings, awards and result slides are kept as usual.
  */
 export const recordsGames = (session: Pick<QueueSession, 'recordGames'>) =>
   session.recordGames !== false
@@ -88,7 +105,13 @@ export const prototypeDefaultRequestFormats = (
 export type SessionCourt = {
   id: string
   sessionId: string
+  /** May repeat within a session (owner decision, 2026-11-25). */
   label: string
+  /**
+   * Court order in the session, from 1 (owner decision, 2026-11-25), set by Reorder courts in
+   * Settings. Every court list and Auto Queue's fill follow it; see `byCourtOrder`.
+   */
+  position: number
   /** Older fixtures without a start are already open. New bookings always set it. */
   startsAt?: number
   /** When the Queue Master opened the court before its planned start (Start anyway); missing or null when not. `startsAt` keeps the booking. */
@@ -96,6 +119,35 @@ export type SessionCourt = {
   openUntil: number | null
   removedAt: number | null
 }
+/**
+ * Court order (owner decision, 2026-11-25): position, then the given order (a stable sort keeps
+ * the order the courts were read in on a tie). Sort a session's courts with it wherever they are read.
+ */
+export const byCourtOrder = (
+  a: Pick<SessionCourt, 'position'>,
+  b: Pick<SessionCourt, 'position'>,
+) => a.position - b.position
+/**
+ * Which court a reorder moved, for the toast "COURT moved to position N" (2026-11-25 mockup log):
+ * the court whose move alone turns `beforeIds` into `afterIds`; when two could (two neighbours
+ * swapped), the one now earlier. A reorder that is not one move names the first court whose place
+ * changed. Null when the order is the same.
+ */
+export function movedCourt(
+  beforeIds: readonly string[],
+  afterIds: readonly string[],
+): { courtId: string; position: number } | null {
+  const same = (a: readonly string[], b: readonly string[]) =>
+    a.length === b.length && a.every((id, i) => b[i] === id)
+  if (same(beforeIds, afterIds)) return null
+  const without = (ids: readonly string[], id: string) => ids.filter((x) => x !== id)
+  const id =
+    afterIds.find((id) => same(without(beforeIds, id), without(afterIds, id))) ??
+    afterIds.find((id, i) => beforeIds[i] !== id)
+  return id ? { courtId: id, position: afterIds.indexOf(id) + 1 } : null
+}
+export const courtMovedText = (label: string, position: number) =>
+  `${label} moved to position ${position}`
 export type DownloadState = 'none' | 'downloading' | 'ready'
 export type QueueSessionSummary = QueueSession & {
   courtsInUse: number
@@ -130,6 +182,7 @@ export type QueueSessionInput = Pick<
   | 'requestFormats'
   | 'recordGames'
   | 'scoring'
+  | 'levelRestriction'
 > & {
   costEstimate?: import('../session-cost/sessionCost.types').SessionCostInput | null
   playersPerCourt?: number
@@ -182,17 +235,8 @@ export const FINALIZATION_STAGES: readonly FinalizationStage[] = [
   'player_records',
   'slides',
 ]
-/** An unrecorded session finishes in two steps: no player records to update, no slides to make. */
-export const UNRECORDED_FINALIZATION_STAGES: readonly FinalizationStage[] = [
-  'checking',
-  'finishing',
-]
-/** The steps Session done runs for this session, in order. */
-export const finalizationStagesFor = (session: Pick<QueueSession, 'recordGames'>) =>
-  recordsGames(session) ? FINALIZATION_STAGES : UNRECORDED_FINALIZATION_STAGES
 /**
  * One finalization per session; `committed` means the session is complete but later work failed.
- * An unrecorded session ends `done` at stage `finishing`.
  */
 export type SessionFinalization = {
   sessionId: string
@@ -220,7 +264,7 @@ export type SessionRecordSummary = {
   playerRecordsUpdatedAt: number | null
   venueName: string
   venueAddress: string
-  /** False when unrecorded ("Not recorded"): games count, wins and losses stay 0. Missing: true. */
+  /** False when not ranked: games and results are recorded as usual. Missing: true. */
   recordGames?: boolean
   games: number
   invalidGames: number

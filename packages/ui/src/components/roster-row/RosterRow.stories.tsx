@@ -107,3 +107,15 @@ export const WithMoveToWaitlistPhone: Story = {
   ...WithMoveToWaitlist,
   globals: { viewport: { value: 'phone' } },
 }
+
+/** Club nickname bold, then "Migs · Miguel Santos" (2026-11-19-queue-roster-name-order) */
+export const NameBlockClubNickname: Story = {
+  args: { ...rowAt(0), name: 'Miguel Santos', nickname: 'Migs', clubNickname: 'Migo' },
+}
+export const NameBlockNicknameOnly: Story = {
+  args: { ...rowAt(0), name: 'Miguel Santos', nickname: 'Migs' },
+}
+export const NameBlockClubNicknameLight: Story = {
+  ...NameBlockClubNickname,
+  globals: { theme: 'light' },
+}

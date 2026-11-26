@@ -28,8 +28,8 @@ link ([D-2026-11-07-01](../decisions/2026-11-07.md#d-2026-11-07-01)).
 | Add club | implemented | `club/fetchers.ts:234` → `api/clubs/route.ts:25` → `stageClub` (`clubs.ts:108`) | — |
 | License activate / terms / operation status | implemented | `license/fetchers.ts:110,140,205` → `real/admin.ts:175-198` → `db/src/admin/licenses.ts:110,188,199` | #377 open (decision) |
 | Scheduled license-lapse refresh, retention sweep | not implemented | `refreshLapsedEntitlements` (`licenses.ts:221`), `runRetentionSweep` (`retention.ts:97`) have no caller | Ticket: needed (MVP scope: open question 13) |
-| Change club price | not implemented | `club/fetchers.ts:306` mock only; `setClubPricing` (`clubs.ts:211`) has no route | Ticket: needed |
-| Club-name requests (list/approve/reject) | not implemented | `club/fetchers.ts:350,376,400` mock only; `reviewClubNameChange` (`clubs.ts:502`) has no route | Ticket: needed |
+| Change club price | implemented | `club/fetchers.ts` `changeClubPrice` → `real/admin.ts` `realChangeClubPrice` → `api/clubs/[clubId]/price` (PATCH) → `setClubPricing` (`clubs.ts`), audited as `club.price_changed`; recorded license terms keep their amounts | — |
+| Club-name requests (list/approve/reject) | implemented | `club/fetchers.ts` → `real/admin.ts` `realReviewClubNameChange` / `realListClubNameRequests` → `api/clubs/[clubId]` (PATCH) → `reviewClubNameChange` | — |
 | Player directory / detail / games | implemented | `admin-player/fetchers.ts:89,103,136,147` → `real/admin-players.ts` → `db/src/admin/players.ts:13,106` | #25 open (epic) |
 | Player verification and audited Admin override | mock implementation in source, pending batch verification | Overview shows the status and three checks below Account for registered players. Set and Clear require a reason and refresh the record of actions. | #912 mock, #915 real mode |
 | Unclaimed player history | implemented in source | Admin history reads the club-only record's finalized match facts by its club-player ID; a missing record is a not-found response, not an Admin permission denial | — |
@@ -66,7 +66,6 @@ duplicate issues merely because a related epic is open.
 
 - [ ] Contact-change approve / apply / retry / status Route Handlers over existing services. Ticket: needed (after #244 enforcement answers).
 - [ ] Admin-reviewed password recovery (#491) is verified with the hosted provider (schema applied after sign-off).
-- [ ] Club price change and club-name review routes. Ticket: needed.
 - [ ] Admin player write routes (create/edit/archive/restore/remove/registration link). Ticket: needed — confirm MVP scope.
 - [ ] Audit reads for feature flags and ranking settings. Ticket: needed.
 - [ ] Scheduled license-lapse refresh and retention sweep runner. Ticket: needed — confirm MVP scope.

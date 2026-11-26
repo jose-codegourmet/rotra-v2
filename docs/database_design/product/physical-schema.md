@@ -1,6 +1,6 @@
 # Physical schema (drafted)
 
-**Last verified:** 2026-11-22 (session host snapshots, session hosts and trusted club hosts sections; leftover merge markers removed, both November 20 sections kept); 2026-11-20 (P12.7 Admin link section); 2026-11-18 (P15.8 section); 2026-11-07.
+**Last verified:** 2026-11-25 (`session_courts.position`, live-label unique index dropped; migration `20261125000100_session_court_position`); 2026-11-22 (session host snapshots, session hosts and trusted club hosts sections; leftover merge markers removed, both November 20 sections kept); 2026-11-20 (P12.7 Admin link section); 2026-11-18 (P15.8 section); 2026-11-07.
 
 **Status:** Draft Prisma models and **unapplied** migration SQL in `packages/db/prisma/`. Each migration
 needs human sign-off before it touches any database ([coding conventions §13](../../coding-conventions.md#13-database-later-epic)).
@@ -114,7 +114,7 @@ UUID from another club or session is rejected.
 | `club_venues` | PK `id`; unique `(club_id, id)`, expression unique `(club_id, lower(name))` | fees null or ≥ 0 | club |
 | `queue_sessions` | PK `id`; unique `(club_id, id)`, `public_slug`, `source_command_id`; partial unique `club_id WHERE state IN (active, finalizing)`; index `(club_id, scheduled_start_at desc, id)` | end > start; minimum ≥ 0; players per court 2–20; invalid ⇒ reason; completed ⇔ `finalized_at`; started unless prepared/invalid/cancelled; cancelled ⇔ `cancelled_at`, never started; reason null or 1–120 characters, only when cancelled; **exclusion** no overlapping sessions per club among prepared/active/finalizing/completed, so invalid and cancelled never clash (`btree_gist`; cancelled since `20261106000100`) | `(club_id, venue_id)`, `(club_id, start_license_term_id)` |
 | `club_session_reservations` | PK `club_id`; unique `session_id` | — | `(club_id, session_id)` |
-| `session_courts` | PK `id`; unique `(club_id, session_id, id)`; partial unique `(session_id, label) WHERE removed_at IS NULL` | non-blank label; soft removal; `opened_early_at` ⇒ `starts_at`; set `open_until` > set `starts_at` | `(club_id, session_id)` |
+| `session_courts` | PK `id`; unique `(club_id, session_id, id)`; index `(session_id)`. No label uniqueness and no unique on `position` (owner decision, 2026-11-25; `20261125000100` drops `session_courts_live_label_key`) | non-blank label; `position` > 0, NOT NULL (court order; `session_courts_position_check`); soft removal; `opened_early_at` ⇒ `starts_at`; set `open_until` > set `starts_at` | `(club_id, session_id)` |
 | `session_players` | PK `id`; unique `(club_id, session_id, id)`, `(session_id, club_player_id)`, `(session_id, player_id_at_entry)`; index `(session_id, present, id)` | release time ⇔ reason; locked ⇒ level + assessment, not released; never both released and a no show (`session_players_no_show_check`, nullable `no_show_at`, #839); **level-lock** trigger; **no delete** trigger | `(club_id, session_id)`, `(club_id, club_player_id)`, `(club_id, session_id, id, assessment_id)` → the entry's own assessment |
 | `session_waitlist` | PK `id`; unique `(session_id, club_player_id)` (also serves the per-session read; the order index was dropped in `20261031001100`) | demotion time ⇔ demoted slot time | `(club_id, session_id)`, `(club_id, club_player_id)` |
 | `session_join_requests` | PK `id`; index `(session_id, status, requested_at)` | pending ⇔ no decision time (so `closed` carries one); confirmed ⇒ club player | `(club_id, session_id)`, `(club_id, club_player_id)` |
@@ -139,8 +139,9 @@ nullable `no_show_at` on a live, level-locked entry instead of releasing it (CHE
 `session_players_no_show_check`: never both released and a no show); the live roster is
 `released_at IS NULL AND no_show_at IS NULL`, and Back to roster clears it.
 
-**Waitlist order (proposal, #245).** Demoted entries first (latest demotion batch at the front), each
-batch in original slot order (`demoted_confirmed_at`); then everyone else by `added_at`; `id` breaks
+**Waitlist order (D-2026-11-23-06, replacing proposal #245).** Strictly first come, first served by
+the time each entry joined the waitlist: `demoted_at` for a player moved off the roster, otherwise
+`added_at`; a demotion batch keeps its original slot order (`demoted_confirmed_at`); `id` breaks
 ties. Historical timestamps are never rewritten and there is no position column.
 
 **Roster/assessment cycle.** No fake history: insert the roster row with `assessment_id` null, insert
@@ -411,7 +412,7 @@ linked player's `players.nickname` after `btrim` (case-sensitive). Checked on a 
 ## Q23.8 — Record games (D-2026-11-18-06)
 
 `20261119000100_session_record_games` (#976; the owner authorized the migration for the Q23 batch on
-November 19, 2026). **Status: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` still held for sign-off).** One new column; one CHECK replaced
+November 19, 2026). **Status: applied to a local disposable database 2026-11-19; **applied to the shared database 2026-11-19** (`prisma db execute` + `migrate resolve`; `20261114000400_sign_in_tables` held then, applied to the shared database 2026-11-23).** One new column; one CHECK replaced
 by a wider one; two triggers. No table, column or row is dropped, moved, rewritten or backfilled.
 
 | Table | Keys and uniques | Checks and triggers | Scoped FKs |
@@ -436,13 +437,13 @@ name found in the repo: the block skips with a notice when the role does not exi
 
 ## D-2026-11-20-02 — Record games off takes a winner again
 
-`20261120000200_record_games_ranks_only`. **Status: written; applied to a local disposable database
-2026-11-20 only; not applied to the shared database (owner sign-off needed).** `CREATE OR REPLACE`
+`20261120000200_record_games_ranks_only`. **Status: written; applied to a local disposable database 2026-11-20; recorded as applied in the shared database's migration history (seen 2026-11-24).** `CREATE OR REPLACE`
 of `match_decisions_record_games_guard()` only: every completed decision needs a winner, whatever the
 session's `record_games`. The trigger, `match_decisions_kind_check` (still the November 19 wider form)
 and every table, column and row are unchanged, so no-result rows written under the November 19 rule
 stay valid. Function revoked from PUBLIC. Checked: rebuild with no drift, seed, 80/80 checks
-([verification](verification.md)).
+([verification](verification.md)). The services that go with it (facts written for these sessions; the
+leaderboard, win-rate and rank reads skip them) are built in Q28.9 (#1080); no further migration.
 
 ## P12.7 — Registration from the Admin link (D-2026-11-20-01)
 
@@ -502,3 +503,17 @@ Checked on a disposable local database (`rotra_disposable_e1002`, Postgres 16 on
 also run on a separate throwaway database seeded with host rows before the migration (names filled,
 completed/invalid current rows frozen, removed and open rows not). Design: [sessions and roster ›
 `session_hosts`](queue/modules/sessions-roster.md#session_hosts).
+
+## D-2026-11-19-12 — Session level restrictions (#1076)
+
+`20261124000100_session_level_restriction` (epic #1071). **Status: written; applied to a local disposable database 2026-11-24; applied to the shared database 2026-11-24 (`prisma migrate deploy`, after the epic #1071 merge).** One enum, four
+columns on `queue_sessions` and one check; additive, no backfill, nothing dropped or rewritten.
+
+| Table | Columns | Checks and triggers |
+|---|---|---|
+| `queue_sessions` (added) | `level_restriction` enum `level_restriction` (`all`, `beginners`, `beginners_intermediate`, `slots_per_band`) NOT NULL DEFAULT `all`; `beginner_slots`, `intermediate_slots`, `advanced_slots` integer, nullable; no index | `queue_sessions_level_slots_check`: with `slots_per_band` all three slot counts are set and 0 or more; otherwise all three are null. The sum against the session's slots is checked in the service |
+
+Checked on a disposable local database (`rotra_disposable_q285`, Postgres on 127.0.0.1:54322): 52
+migrations, rebuild with no drift, seed, 117/117 checks (none new). The check was exercised by hand:
+slot counts with `slots_per_band` accepted, a slot count on an `all` session refused. Design:
+[sessions and roster](queue/modules/sessions-roster.md).

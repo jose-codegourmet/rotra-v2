@@ -1,6 +1,6 @@
 # Queue app: Settings court Until is always editable and drives Follows session end; time fields fill the card
 
-Status: NEW
+Status: IN MOCK APP — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `liveSettings()` `courtTimePickers()`; CSS `.ls-times .dt-field`

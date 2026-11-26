@@ -9,6 +9,8 @@ export function editPlayerDetailsDefaultValues(
   return {
     fullName: details.fullName,
     nickname: details.nickname ?? '',
+    gender: details.gender ?? '',
+    level: details.level ?? '',
     phone: '',
     email: profile?.email ?? '',
     playingStyle: profile?.playingStyle ?? '',

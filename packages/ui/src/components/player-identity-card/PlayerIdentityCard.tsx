@@ -13,6 +13,7 @@ import {
 import { ProfileHero } from '@rotra/ui/profile-hero'
 import { ProfileLeaderboardChips } from '@rotra/ui/profile-leaderboard-chips'
 import {
+  PublicVerificationChip,
   VerificationStatusChip,
   type VerificationStatusChipProps,
 } from '@rotra/ui/verification-status-chip'
@@ -114,6 +115,8 @@ export function PlayerIdentityCard({
               </>
             ) : savedBy ? (
               <Chip tone="warn">Not registered yet</Chip>
+            ) : profile.verified !== undefined ? (
+              <PublicVerificationChip verified={profile.verified} />
             ) : undefined
           }
         />

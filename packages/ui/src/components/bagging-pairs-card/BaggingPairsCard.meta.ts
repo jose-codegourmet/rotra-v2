@@ -7,6 +7,7 @@ export const baggingPairsCardMeta = {
   usage: [
     'Rendered by AutoQueueWorkspace while the Bagging mode switch is on; doubles sessions only, Queue Master only.',
     'Pairs guide Generate matches drafts only. Auto Queue (court filling), Suggest, Add match and Make match never read them.',
+    'Every pair picture carries the level ring (Beginner, Intermediate, Advanced; grey with no level); hover names the level.',
     'Add pair opens BaggingPairSheet. Remove acts at once with the toast "Pair removed · A and B".',
   ],
   prototype: {
@@ -15,6 +16,7 @@ export const baggingPairsCardMeta = {
   },
   docs: [
     'docs/screens/product/modules/queue/match-queue.md',
+    'docs/mockup-changes/2026-11-19-queue-bagging-exempt-rings.md',
     'docs/business_logic/product/queue/modules/queueing/README.md',
   ],
   variants: ['empty', 'with-pairs'],

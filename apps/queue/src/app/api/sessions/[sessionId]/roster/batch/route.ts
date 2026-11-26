@@ -10,10 +10,14 @@ import { routeCookieAdapter } from '@rotra/db/service/route-cookies'
 import { phoneField } from '@rotra/schema/phone'
 import { cookies } from 'next/headers'
 
-/** Add anyway / Add to waitlist on a full roster (#735); only `true` counts. */
+/**
+ * Add anyway / Add to waitlist on a full roster (#735), and the Queue Master's second press after
+ * the level restriction warning (`allowOutsideLevels`, D-2026-11-19-12); only `true` counts.
+ */
 const placementOf = (body: Record<string, unknown>) => ({
   allowOverfill: body.allowOverfill === true,
   toWaitlist: body.toWaitlist === true,
+  allowOutsideLevels: body.allowOutsideLevels === true,
 })
 
 /** One wire operation, shaped like the single-op routes read theirs; anything else is `invalid`. */
@@ -56,6 +60,7 @@ function operationOf(raw: unknown): RosterBatchOperation {
         phone: phone?.success ? phone.data : undefined,
         email: text(body.email) || null,
         socialLink: text(body.socialLink) || null,
+        clubPlayerId: text(body.clubPlayerId) || null,
         level,
         ...placementOf(body),
       }
@@ -68,6 +73,7 @@ function operationOf(raw: unknown): RosterBatchOperation {
         operationId,
         requestId: text(body.requestId),
         level: text(body.level),
+        allowOutsideLevels: body.allowOutsideLevels === true,
       }
     case 'declineRequest':
       return { op: 'declineRequest', operationId, requestId: text(body.requestId) }

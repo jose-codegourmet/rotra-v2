@@ -1,0 +1,288 @@
+{
+  "kind": "rule",
+  "rule": "levelRestrictionBlock",
+  "version": 1,
+  "cases": [
+    {
+      "name": "all levels: a beginner is allowed",
+      "input": {
+        "restriction": {
+          "kind": "all"
+        },
+        "band": "beginner"
+      },
+      "expected": null
+    },
+    {
+      "name": "all levels: an advanced player is allowed",
+      "input": {
+        "restriction": {
+          "kind": "all"
+        },
+        "band": "advanced"
+      },
+      "expected": null
+    },
+    {
+      "name": "no restriction saved reads as all levels",
+      "input": {
+        "restriction": null,
+        "band": "advanced"
+      },
+      "expected": null
+    },
+    {
+      "name": "an unknown restriction reads as all levels",
+      "input": {
+        "restriction": {
+          "kind": "experts"
+        },
+        "band": "advanced"
+      },
+      "expected": null
+    },
+    {
+      "name": "beginners only: a beginner is allowed",
+      "input": {
+        "restriction": {
+          "kind": "beginners"
+        },
+        "band": "beginner"
+      },
+      "expected": null
+    },
+    {
+      "name": "beginners only: an intermediate player is blocked",
+      "input": {
+        "restriction": {
+          "kind": "beginners"
+        },
+        "band": "intermediate"
+      },
+      "expected": "This session is for beginners only."
+    },
+    {
+      "name": "beginners only: an advanced player is blocked",
+      "input": {
+        "restriction": {
+          "kind": "beginners"
+        },
+        "band": "advanced"
+      },
+      "expected": "This session is for beginners only."
+    },
+    {
+      "name": "beginners only: a player with no level is allowed",
+      "input": {
+        "restriction": {
+          "kind": "beginners"
+        },
+        "band": null
+      },
+      "expected": null
+    },
+    {
+      "name": "beginners to intermediate: a beginner is allowed",
+      "input": {
+        "restriction": {
+          "kind": "beginners-intermediate"
+        },
+        "band": "beginner"
+      },
+      "expected": null
+    },
+    {
+      "name": "beginners to intermediate: an intermediate player is allowed",
+      "input": {
+        "restriction": {
+          "kind": "beginners-intermediate"
+        },
+        "band": "intermediate"
+      },
+      "expected": null
+    },
+    {
+      "name": "beginners to intermediate: an advanced player is blocked",
+      "input": {
+        "restriction": {
+          "kind": "beginners-intermediate"
+        },
+        "band": "advanced"
+      },
+      "expected": "This session is for beginners to intermediate only."
+    },
+    {
+      "name": "beginners to intermediate: a player with no level is allowed",
+      "input": {
+        "restriction": {
+          "kind": "beginners-intermediate"
+        },
+        "band": null
+      },
+      "expected": null
+    },
+    {
+      "name": "slots per level: a band with a slot left is allowed",
+      "input": {
+        "restriction": {
+          "kind": "per-level",
+          "slots": {
+            "beginner": 6,
+            "intermediate": 5,
+            "advanced": 0
+          }
+        },
+        "band": "beginner",
+        "taken": {
+          "beginner": 5,
+          "intermediate": 5,
+          "advanced": 0
+        }
+      },
+      "expected": null
+    },
+    {
+      "name": "slots per level: nobody on the roster yet",
+      "input": {
+        "restriction": {
+          "kind": "per-level",
+          "slots": {
+            "beginner": 6,
+            "intermediate": 5,
+            "advanced": 0
+          }
+        },
+        "band": "intermediate"
+      },
+      "expected": null
+    },
+    {
+      "name": "slots per level: a full band is blocked",
+      "input": {
+        "restriction": {
+          "kind": "per-level",
+          "slots": {
+            "beginner": 6,
+            "intermediate": 5,
+            "advanced": 0
+          }
+        },
+        "band": "beginner",
+        "taken": {
+          "beginner": 6,
+          "intermediate": 0,
+          "advanced": 0
+        }
+      },
+      "expected": "All 6 beginner slots are taken."
+    },
+    {
+      "name": "slots per level: a band over its slots is blocked",
+      "input": {
+        "restriction": {
+          "kind": "per-level",
+          "slots": {
+            "beginner": 6,
+            "intermediate": 5,
+            "advanced": 0
+          }
+        },
+        "band": "intermediate",
+        "taken": {
+          "beginner": 0,
+          "intermediate": 7,
+          "advanced": 0
+        }
+      },
+      "expected": "All 5 intermediate slots are taken."
+    },
+    {
+      "name": "slots per level: a band with no slots is blocked",
+      "input": {
+        "restriction": {
+          "kind": "per-level",
+          "slots": {
+            "beginner": 6,
+            "intermediate": 5,
+            "advanced": 0
+          }
+        },
+        "band": "advanced",
+        "taken": {
+          "beginner": 0,
+          "intermediate": 0,
+          "advanced": 0
+        }
+      },
+      "expected": "This session has no advanced slots."
+    },
+    {
+      "name": "slots per level: other bands being full does not block",
+      "input": {
+        "restriction": {
+          "kind": "per-level",
+          "slots": {
+            "beginner": 6,
+            "intermediate": 5,
+            "advanced": 0
+          }
+        },
+        "band": "beginner",
+        "taken": {
+          "beginner": 0,
+          "intermediate": 5,
+          "advanced": 3
+        }
+      },
+      "expected": null
+    },
+    {
+      "name": "slots per level: a player with no level is allowed",
+      "input": {
+        "restriction": {
+          "kind": "per-level",
+          "slots": {
+            "beginner": 6,
+            "intermediate": 5,
+            "advanced": 0
+          }
+        },
+        "band": null,
+        "taken": {
+          "beginner": 6,
+          "intermediate": 5,
+          "advanced": 0
+        }
+      },
+      "expected": null
+    },
+    {
+      "name": "slots per level without counts reads every band as no slots",
+      "input": {
+        "restriction": {
+          "kind": "per-level"
+        },
+        "band": "beginner"
+      },
+      "expected": "This session has no beginner slots."
+    },
+    {
+      "name": "the other picks ignore slot counts",
+      "input": {
+        "restriction": {
+          "kind": "beginners",
+          "slots": {
+            "beginner": 0,
+            "intermediate": 0,
+            "advanced": 0
+          }
+        },
+        "band": "beginner",
+        "taken": {
+          "beginner": 9
+        }
+      },
+      "expected": null
+    }
+  ]
+}

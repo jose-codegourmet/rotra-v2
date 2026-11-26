@@ -37,6 +37,8 @@ const meta = {
     inId: null,
     onPickOut: fn(),
     onPickIn: fn(),
+    onPickSwap: fn(),
+    onSwapFromMatch: fn(),
     onBack: fn(),
     onConfirm: fn(),
   },
@@ -82,4 +84,39 @@ export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
 /** During play Replace fixes a mistake: the notice replaces the lineup-change line */
 export const Playing: Story = {
   args: { playing: true, outId: inMatch[0]?.id ?? null, inId: candidates[0]?.id ?? null },
+}
+
+/** Swap from match offered, no one coming out yet: the row says to choose first */
+export const SwapNoOneChosen: Story = {}
+
+/** Someone is coming out: their two opponents are listed, marked Team B · opponent */
+export const SwapOpponentsListed: Story = { args: { outId: inMatch[0]?.id ?? null } }
+
+/** An opponent is picked: the primary button becomes Swap players with the note */
+export const SwapOpponentPicked: Story = {
+  args: { outId: inMatch[0]?.id ?? null, swapId: inMatch[2]?.id ?? null },
+}
+
+export const SwapOpponentPickedLight: Story = {
+  ...SwapOpponentPicked,
+  globals: { theme: 'light' },
+}
+
+/** Singles: one opponent */
+export const SwapSingles: Story = {
+  args: {
+    inMatch: [inMatch[0], inMatch[2]].flatMap((p) => (p ? [{ ...p, present: true }] : [])),
+    outId: inMatch[0]?.id ?? null,
+    swapId: inMatch[2]?.id ?? null,
+  },
+}
+
+/** A Suggestion player is picked: a plain replace, with Replace player */
+export const SwapRowPlainReplace: Story = {
+  args: { outId: inMatch[0]?.id ?? null, inId: candidates[0]?.id ?? null },
+}
+
+/** Playing: the swap row shows too, with the Replace notice until an opponent is picked */
+export const SwapPlaying: Story = {
+  args: { playing: true, outId: inMatch[0]?.id ?? null },
 }

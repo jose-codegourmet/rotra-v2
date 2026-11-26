@@ -8,6 +8,7 @@ import { playerLoginUrl, playerOrigin, playerRegisterUrl } from '@rotra/data/pub
 import { usePlayerSessionAccess } from '@rotra/data/public-session/player-access'
 import type {
   MyJoinRequest,
+  PlayerLevelBlock,
   PlayerSessionAccess,
   PublicCourtNow,
   PublicQueuedMatch,
@@ -32,12 +33,14 @@ import type { JoinRequestPlacement } from '@rotra/data/session-roster/types'
 import { useClaimTransferLink } from '@rotra/data/slot-transfer/useClaimTransferLink'
 import { useTransferLink } from '@rotra/data/slot-transfer/useTransferLink'
 import { useWithdrawTransferClaim } from '@rotra/data/slot-transfer/useWithdrawTransferClaim'
+import { levelRestrictionDescription, levelRestrictionLabel } from '@rotra/schema/level-restriction'
 import { scoringMode } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { JoinRequestCard, type JoinRequestCardProps } from '@rotra/ui/join-request-card'
+import { levelLabel } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
 import { PublicAccountBar } from '@rotra/ui/public-account-bar'
 import { type PublicParticipant, PublicParticipants } from '@rotra/ui/public-participants'
@@ -122,6 +125,8 @@ type SignedInViewer = {
   onJoinFromWaitlist: () => void
   /** A club member (D-2026-11-12-02): Join as NAME on an upcoming session unless it requires a request */
   member: boolean
+  /** Not open to your level (D-2026-11-19-12): set while their level here can't take a slot; no request is offered */
+  levelBlock: PlayerLevelBlock | null
 }
 
 /** The signed-in Player's ID: the mock session's account, or the Player app's access read. */
@@ -186,6 +191,12 @@ function joinCardProps(
         : { variant: 'confirmed-slot', registerNudge: true }
   }
   if (page.status === 'active') return started
+  if (signedIn?.levelBlock)
+    return {
+      variant: 'not-open-to-level',
+      reason: signedIn.levelBlock.reason,
+      levelLabel: levelLabel(signedIn.levelBlock.level),
+    }
   if (!page.acceptJoinRequests) return { variant: 'off' }
   const availability = signedIn
     ? {
@@ -250,6 +261,8 @@ function queueAccess(playerId: string, queue: PublicQueuedMatch[]): PlayerSessio
     players.map((player) => ({
       name: player.name,
       level: player.level,
+      pictureUrl: player.pictureUrl,
+      masked: player.masked,
       participant: player.participant,
     }))
   // Only the queue is read here; the join fields come from the signed-in read's own data.
@@ -264,6 +277,7 @@ function queueAccess(playerId: string, queue: PublicQueuedMatch[]): PlayerSessio
     queue: queue.map((match) => ({
       matchNo: match.matchNo,
       format: match.format,
+      label: match.label,
       teamA: side(match.teamA),
       teamB: side(match.teamB),
     })),
@@ -530,6 +544,8 @@ export function PublicSession({
           realPlayer && !viewerAccount
             ? realPlayer.isClubMember
             : (night.data?.isClubMember ?? false),
+        levelBlock:
+          (realPlayer && !viewerAccount ? realPlayer.levelBlock : night.data?.levelBlock) ?? null,
         waitlistPosition:
           realPlayer && !viewerAccount
             ? (realPlayer.waitlistPosition ?? null)
@@ -581,6 +597,7 @@ export function PublicSession({
     !signedRead &&
     (signedInPage.isError || signedInPage.fetchStatus === 'paused')
   const sessionOpen = p.status === 'prepared' || p.status === 'active'
+  // Any signed-in Player sees the whole roster (D-2026-11-25-05): the access read sends it all.
   const uncapped = !!signedRead || access?.fullRoster === true
   // #731: any signed-in Player can open a participant's profile card (mock: the signed-in read;
   // real: the Player app's access read, which says who each participant is).
@@ -596,7 +613,8 @@ export function PublicSession({
         : null,
   })
   const participants = (access && !signedRead ? access.participants : p.participants).map(tile)
-  const waitlist = p.waitlist.map(tile)
+  // The waitlist follows the same signed-in name rule (D-2026-11-25-05); visitors stay masked.
+  const waitlist = (access && !signedRead ? (access.waitlist ?? p.waitlist) : p.waitlist).map(tile)
   // Hosts (#1006): the same name rule as Players. Real mode's signed-in names come from the Player
   // app's access read, like `participants`; zero hosts hides the section.
   const hosts = (access && !signedRead ? (access.hosts ?? p.hosts) : p.hosts)?.map((h, i) => ({
@@ -617,20 +635,19 @@ export function PublicSession({
   // A finished session (2026-11-13-queue-finished-session-page): the Leaderboard tab exists only
   // once the club shared the Standings, and the page then opens on it.
   const finished = p.status === 'completed'
-  // Record games off (D-2026-11-18-06): no Leaderboard tab, no awards, Match history says so.
-  const unrecorded = p.recordGames === false
+  // Record games off (D-2026-11-20-02): everything shows as usual; Details adds the Not ranked tile.
+  const notRanked = p.recordGames === false
   // The published rows carry no viewer flag in real mode (the public copy is cacheable, D-2026-11-09-09);
   // the signed-in read's participants do, and each row points at its participant, so your row is
   // marked here: the leaderboard highlights it and shows Your position.
-  const standings =
-    finished && !unrecorded
-      ? p.results?.standings?.map((row) => ({
-          ...row,
-          isViewer:
-            row.isViewer ??
-            (row.participant !== undefined ? participants[row.participant]?.isViewer : undefined),
-        }))
-      : undefined
+  const standings = finished
+    ? p.results?.standings?.map((row) => ({
+        ...row,
+        isViewer:
+          row.isViewer ??
+          (row.participant !== undefined ? participants[row.participant]?.isViewer : undefined),
+      }))
+    : undefined
   const activeTab =
     tab === 'auto' || (tab === 'leaderboard' && !standings)
       ? standings
@@ -782,17 +799,20 @@ export function PublicSession({
             >
               <TabsContent value="details" className="flex flex-col gap-5">
                 <PublicSessionDetails
-                  when={`${date(p.start)}, ${time(p.start)}–${time(p.end)} (${duration(p.start, p.end)})`}
+                  dateLabel={date(p.start)}
+                  timeLabel={`${time(p.start)}–${time(p.end)} · ${duration(p.start, p.end)}`}
                   venueName={p.venue.name}
                   venueAddress={p.venue.address}
                   courtLabels={p.courts}
                   formats={p.formats}
                   modeLabel={mode.label}
                   modeDescription={mode.text}
+                  levelsLabel={levelRestrictionLabel(p.levelRestriction)}
+                  levelsDescription={levelRestrictionDescription(p.levelRestriction)}
                   scoringLabel={scoringMode(p.scoring).label}
                   scoringDescription={scoringMode(p.scoring).text}
                   minimumGames={p.minimum}
-                  recorded={!unrecorded}
+                  ranked={!notRanked}
                   amountDuePerPlayer={p.amountDuePerPlayer}
                   notes={p.notes}
                   lastUpdatedLabel={time(p.lastSyncedAt)}
@@ -809,9 +829,7 @@ export function PublicSession({
                   queueSlot={
                     // A finished session shows its Match history where the Queue was.
                     finished ? (
-                      unrecorded ? (
-                        <MatchHistory history={null} recorded={false} />
-                      ) : signedRead ? (
+                      signedRead ? (
                         <MatchHistory
                           history={signedRead.history}
                           onOpenParticipant={openParticipant}
@@ -876,7 +894,7 @@ export function PublicSession({
                     />
                   </Card>
                 ) : null}
-                {finished && !unrecorded ? (
+                {finished ? (
                   p.results && (p.results.awards || p.results.offDay) ? (
                     <SessionAwards
                       results={p.results}

@@ -8,6 +8,10 @@ export type LeaderboardListProps = {
   children?: ReactNode
   period?: LeaderboardPeriod
   loading?: boolean
+  /** Placeholder rows while loading (8 on a leaderboard page, 4 on a club page card) */
+  loadingRows?: number
+  /** Shown instead of the column header and rows, e.g. "Everyone on this list so far is on the podium." */
+  note?: ReactNode
   /** Refresh existing rows without replacing them with placeholders. */
   busy?: boolean
   shown?: number
@@ -18,8 +22,11 @@ export type LeaderboardListProps = {
 
 const LOADING_NAME_WIDTHS = ['w-12', 'w-20', 'w-28', 'w-36'] as const
 
-function LoadingRows({ period }: Pick<LeaderboardListProps, 'period'>) {
-  return Array.from({ length: 8 }, (_, index) => (
+function LoadingRows({
+  period,
+  count = 8,
+}: Pick<LeaderboardListProps, 'period'> & { count?: number }) {
+  return Array.from({ length: count }, (_, index) => (
     <div
       key={index}
       className={cn(
@@ -42,6 +49,8 @@ export function LeaderboardList({
   children,
   period,
   loading = false,
+  loadingRows,
+  note,
   busy = false,
   shown,
   total,
@@ -60,7 +69,8 @@ export function LeaderboardList({
           {search.total} {search.total === 1 ? 'player matches' : 'players match'} “{search.query}”.
         </p>
       ) : null}
-      {loading && period ? null : (
+      {note && !loading ? <p className="m-0 text-[13px] text-fg2">{note}</p> : null}
+      {(loading && period) || (note && !loading) ? null : (
         <div
           aria-hidden
           className={cn(
@@ -75,7 +85,9 @@ export function LeaderboardList({
           <span className="text-right">{period ? 'Wins' : 'Rank'}</span>
         </div>
       )}
-      <div>{loading ? <LoadingRows period={period} /> : children}</div>
+      {note && !loading ? null : (
+        <div>{loading ? <LoadingRows period={period} count={loadingRows} /> : children}</div>
+      )}
       {shown !== undefined && total !== undefined ? (
         <footer
           className={cn(

@@ -1,6 +1,6 @@
 # Queue app: preparation gets a Settings tab; the Edit preparation button is gone
 
-Status: NEW
+Status: IN MOCK APP — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `viewPrepare()`, `prepSettings(s)`, `ACT.editSetup`

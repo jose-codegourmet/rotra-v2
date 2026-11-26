@@ -10,6 +10,13 @@ export type AdminPlayerStatsProps = {
   onChange: (patch: Partial<AdminPlayerListParams>) => void
 }
 
+const ACCOUNT_LABEL = {
+  registered: 'Registered',
+  unclaimed: 'Unclaimed',
+  verified: 'Verified',
+  unverified: 'Not verified',
+} as const
+
 export function AdminPlayerStats({ stats, filters, onChange }: AdminPlayerStatsProps) {
   const bands = ['advanced', 'intermediate', 'beginner', 'noRank'] as const
   const cards = [
@@ -25,9 +32,9 @@ export function AdminPlayerStats({ stats, filters, onChange }: AdminPlayerStatsP
         account: false,
       }
     }),
-    ...(['registered', 'unclaimed'] as const).map((key) => ({
+    ...(['registered', 'unclaimed', 'verified', 'unverified'] as const).map((key) => ({
       key,
-      label: key === 'registered' ? 'Registered' : 'Unclaimed',
+      label: ACCOUNT_LABEL[key],
       value: stats?.[key],
       active: filters.account === key,
       select: () => onChange({ account: filters.account === key ? 'all' : key }),

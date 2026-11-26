@@ -22,7 +22,16 @@ const meta = {
   args: {
     filters: {},
     onChange: () => {},
-    stats: { advanced: 3, intermediate: 8, beginner: 5, noRank: 2, registered: 10, unclaimed: 8 },
+    stats: {
+      advanced: 3,
+      intermediate: 8,
+      beginner: 5,
+      noRank: 2,
+      registered: 10,
+      unclaimed: 8,
+      verified: 6,
+      unverified: 4,
+    },
   },
 } satisfies Meta<typeof AdminPlayerStats>
 export default meta

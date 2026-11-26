@@ -1,7 +1,8 @@
 import 'server-only'
+import { deriveAccountVerification } from '@rotra/data/account-verification/rules'
 import { levelBandOf } from '@rotra/data/admin-player/management-rules'
 import { createdOnFromRtrId } from '@rotra/data/admin-player/rules'
-import type { AdminPlayer } from '@rotra/data/admin-player/types'
+import type { AdminPlayer, AdminPlayerVerification } from '@rotra/data/admin-player/types'
 import type { PlayerSessionRecord } from '@rotra/data/player/types'
 import type { AdminContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -85,6 +86,7 @@ async function readSharedEntryRows(id?: string): Promise<AdminPlayerRow[]> {
         archivedAt: null,
         revision: entry.revision.toString(),
         removalReason: 'Saved by its club only; the club manages this record',
+        verification: null,
       },
     ]
   })
@@ -158,8 +160,40 @@ async function readClubOnlyRecords(id?: string): Promise<AdminPlayerRow[]> {
       archivedAt: null,
       revision: record.revision.toString(),
       removalReason: 'Saved by its club only; the club manages this record',
+      verification: null,
     }
   })
+}
+
+/**
+ * D-2026-11-23-07: the derived status only. A pending email change doesn't change whether the
+ * player is verified, so the requests are left out here; the Verification card reads them.
+ */
+function verificationOf(
+  player: {
+    id: string
+    verificationOverride: string | null
+    account: { googleEmail: string | null } | null
+    privateContact: { email: string | null; phoneE164: string | null } | null
+  },
+  claimed: boolean,
+): AdminPlayerVerification | null {
+  if (!claimed || !player.account) return null
+  const v = deriveAccountVerification(
+    {
+      playerId: player.id,
+      googleEmail: player.account.googleEmail,
+      email: player.privateContact?.email ?? '',
+      phone: player.privateContact?.phoneE164 ?? '',
+    },
+    [],
+    player.verificationOverride === 'verified',
+  )
+  return {
+    verified: v.verified,
+    verifiedByAdmin: v.verifiedByAdmin,
+    completedSteps: v.completedSteps,
+  }
 }
 
 /**
@@ -178,12 +212,14 @@ export async function readAdminPlayerDirectory(
       id: true,
       fullName: true,
       nickname: true,
+      gender: true,
       avatarRef: true,
       profileState: true,
       hidePhoneFromClubs: true,
       revision: true,
       privateContact: { select: { phoneE164: true, email: true } },
-      account: { select: { claimedAt: true } },
+      verificationOverride: true,
+      account: { select: { claimedAt: true, googleEmail: true } },
       idAllocation: {
         select: {
           rtrId: true,
@@ -226,6 +262,8 @@ export async function readAdminPlayerDirectory(
         id: player.id,
         name: player.fullName,
         nickname: player.nickname ?? player.clubPlayers.find((p) => p.nickname)?.nickname ?? null,
+        // D-2026-11-19-01: public, set by the player; read-only for Admin. Null = Not added yet.
+        gender: player.gender,
         rtrId: allocation.rtrId,
         createdByClubId: allocation.creatingClubId,
         createdOn,
@@ -260,6 +298,7 @@ export async function readAdminPlayerDirectory(
         archivedAt: null,
         revision: player.revision.toString(),
         removalReason: "This part of ROTRA isn't connected to saved data yet.",
+        verification: verificationOf(player, claimed),
       },
     ]
   })
@@ -351,7 +390,7 @@ export async function readAdminPlayerGames(
             finishedAt: s.finishedAt,
             games: s.games.map((g) => ({
               ...g,
-              counting: g.counting as 'counted' | 'fun' | 'partial',
+              counting: g.counting as 'counted' | 'fun' | 'partial' | 'not_ranked',
               result: g.result as 'won' | 'lost',
             })),
           },
@@ -429,4 +468,72 @@ export async function updateAdminPlayerProfile(
   const [player] = await readAdminPlayerDirectory(context, input.playerId)
   if (!player) throw new ServiceError('not_found')
   return player
+}
+
+const NO_STORED_GENDER =
+  "This record is saved by its club only. Its gender isn't connected to saved data yet."
+
+/**
+ * Admin Players › Set gender (owner, November 25, 2026, D-2026-11-19-01): sets or clears (null) the
+ * gender of every selected allocated player, registered or not, one transaction and one audit event
+ * per player. The same value again is not a write. A club-only record or a shared entry has no
+ * gender column yet, so that player reports a failure instead of an invented save. The player's
+ * revision moves so an open Edit profile reloads before it saves over the change.
+ */
+export async function setAdminPlayersGender(
+  context: AdminContext,
+  input: { ids: string[]; gender: 'male' | 'female' | null },
+): Promise<{ id: string; name: string; success: boolean; error?: string }[]> {
+  requireAdmin(context)
+  if (input.gender !== null && input.gender !== 'male' && input.gender !== 'female')
+    throw new ServiceError('invalid', { gender: 'Choose Male, Female or Not given.' })
+  const results: { id: string; name: string; success: boolean; error?: string }[] = []
+  for (const id of [...new Set(input.ids)]) {
+    if (!UUID.test(id)) {
+      results.push({ id, name: id, success: false, error: 'Player not found. Reload the list.' })
+      continue
+    }
+    try {
+      const name = await prisma.$transaction(async (tx) => {
+        const rows = await tx.$queryRaw<{ id: string }[]>`
+          SELECT "id" FROM "players" WHERE "id" = ${id}::uuid FOR UPDATE`
+        if (!rows.length) return null
+        const player = await tx.player.findUniqueOrThrow({
+          where: { id },
+          select: { fullName: true, gender: true, idAllocation: { select: { playerId: true } } },
+        })
+        if (!player.idAllocation) return null
+        if (player.gender !== input.gender) {
+          await tx.player.update({
+            where: { id },
+            data: { gender: input.gender, revision: { increment: 1 } },
+          })
+          await recordAudit(tx, context, {
+            action: 'player.gender_set',
+            targetType: 'player',
+            targetId: id,
+            metadata: { name: player.fullName, before: player.gender, gender: input.gender },
+          })
+        }
+        return player.fullName
+      })
+      if (name === null) {
+        const entry = await prisma.sharedPlayerEntry.findUnique({
+          where: { id },
+          select: { id: true },
+        })
+        const clubOnly = entry
+          ? null
+          : await prisma.clubPlayer.findUnique({ where: { id }, select: { id: true } })
+        results.push(
+          entry || clubOnly
+            ? { id, name: id, success: false, error: NO_STORED_GENDER }
+            : { id, name: id, success: false, error: 'Player not found. Reload the list.' },
+        )
+      } else results.push({ id, name, success: true })
+    } catch {
+      results.push({ id, name: id, success: false, error: 'Could not save.' })
+    }
+  }
+  return results
 }

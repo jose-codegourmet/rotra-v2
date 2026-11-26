@@ -37,7 +37,7 @@ Order by:
 1. Most wins.
 2. Fewest losses.
 
-**Shared positions (owner, November 18, 2026, [D-2026-11-18-05](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-05); [log](../../../../../mockup-changes/2026-11-18-queue-shared-standings-positions.md); mockup only).** Players with the same wins and the same losses share one position. Positions run on without gaps: two players at 1 are followed by 2 (1, 1, 2), so the standings table's rows read 1, 2, 3 … (owner artifact comment, November 19, 2026, [log](../../../../../mockup-changes/2026-11-19-queue-standings-no-gaps.md); this replaces the November 18 answer “1, 1, 3”). Head-to-head no longer separates anyone, and the name only orders the players inside a shared position. On the standings tables a shared position is one row with the players' pictures stacked; share images and the Standings slide keep one row per player and show the shared number.
+**Shared positions (owner, November 18, 2026, [D-2026-11-18-05](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-05); [log](../../../../../mockup-changes/2026-11-18-queue-shared-standings-positions.md); mockup only).** Players with the same wins and the same losses share one position. Positions run on without gaps: two players at 1 are followed by 2 (1, 1, 2), so the standings table's rows read 1, 2, 3 … (owner artifact comment, November 19, 2026, [log](../../../../../mockup-changes/2026-11-19-queue-standings-no-gaps.md); this replaces the November 18 answer “1, 1, 3”). Head-to-head no longer separates anyone, and the name only orders the players inside a shared position. On the standings tables, the Standings slide and the downloaded images a shared position is one row with the players' pictures stacked and their names listed, “A & B” for two and “A, B, C” for three or more (owner, November 25, 2026, [log](../../../../../mockup-changes/2026-11-25-queue-standings-image-shared-rows.md); before, images kept one row per player).
 
 Only players with at least one counted game are listed; players who never completed a counted game are left out. Games do not provide an independent tiebreaker. Do not substitute opposition strength as a tiebreaker. The standings rule (`computeStandings`, in TypeScript and Go) returns this order and each row's shared position (Q23.4, #972); the Queue screens group them into one row per position. Stored standings are never rewritten, but every screen shows them with shared positions without gaps (owner, November 20, 2026: results saved before November 19 had one position per player, and results saved since had gaps; both now show 1, 1, 2). The rule numbers without gaps in TypeScript and Go since November 20, 2026.
 
@@ -89,8 +89,8 @@ Publishing does not delay profile, performance, or global leaderboard updates af
 
 - Two formats: **Story** (tall) and **Feed post** (4:5).
 - Choose Standings, Awards, and Include Off Day (off by default for every download).
-- Long standings continue onto extra images so every name stays readable: **14 rows per Story image, 10 per Feed image**.
-- Each image shows the club name, slide title, rows, and "powered by rotra". The preview shows every image and the count before download.
+- Long standings continue onto extra images so every name stays readable: **14 rows per Story image, 9 per Feed image**, one row per position. A position with more than three names counts one row per three names, and a position is never split across images.
+- Each image shows the club name, slide title, rows, and "powered by rotra". The preview shows every image, scaled down, and the count before download.
 - Images are files for the operator to share. There is no automatic posting or social login.
 
 Downloads do not require publishing first.

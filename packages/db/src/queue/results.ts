@@ -1,6 +1,6 @@
 import 'server-only'
 import { sharePositions } from '@rotra/data/match/match.rules'
-import { ROWS_PER_FRAME } from '@rotra/data/session-result/sessionResult.rules'
+import { paginateStandings } from '@rotra/data/session-result/sessionResult.rules'
 import type { SessionAwards, StandingRow } from '@rotra/data/session-result/types'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
@@ -23,8 +23,6 @@ import { derivedId, LIVE_ENTRY, lockSession, requireSessionAccess, type Tx } fro
  */
 
 const SLIDES: ResultSlide[] = ['standings', 'awards']
-/** The refusal for a session with Record games off: the same words as mock mode. */
-const NO_RESULT_SLIDES = 'This session has no result slides yet.'
 
 function validSlides(slides: ResultSlide[], includeOffDay: boolean) {
   const unique = [...new Set(slides)]
@@ -110,8 +108,8 @@ export async function readSessionResults(context: ClubContext, sessionId: string
     include: { publication: true, finalization: { select: { state: true, stage: true } } },
   })
   if (!session) throw new ServiceError('not_found')
-  // An invalid session has no results; nor has one with Record games off (D-2026-11-18-06).
-  if (session.state === 'invalid' || !session.recordGames) return null
+  // An invalid session has no results. Record games off keeps them (D-2026-11-20-02).
+  if (session.state === 'invalid') return null
   await requireSessionAccess(context, session)
   const snapshot = await latestSnapshot(prisma, sessionId)
   const exports = await prisma.resultExport.findMany({
@@ -183,8 +181,6 @@ export async function publishResults(
     }
     if (session.state !== 'completed')
       throw new ServiceError('invalid', { state: 'Finish the session before publishing results.' })
-    // Record games off: nothing to publish, whatever rows exist (no publication row is written).
-    if (!session.recordGames) throw new ServiceError('invalid', { results: NO_RESULT_SLIDES })
     const snapshot = await latestSnapshot(tx, sessionId)
     if (!snapshot)
       throw new ServiceError('unavailable', { results: 'Results are still being prepared.' })
@@ -303,7 +299,6 @@ export async function requestResultExport(
     if (done) return { id: done.id, frameCount: done.frameCount, ready: !!done.assetRef }
     if (session.state !== 'completed')
       throw new ServiceError('invalid', { state: 'Finish the session first.' })
-    if (!session.recordGames) throw new ServiceError('invalid', { results: NO_RESULT_SLIDES })
     const snapshot = await latestSnapshot(tx, sessionId)
     if (!snapshot)
       throw new ServiceError('unavailable', { results: 'Results are still being prepared.' })
@@ -311,9 +306,9 @@ export async function requestResultExport(
       where: { id: context.clubId },
       select: { name: true, logoRef: true },
     })
-    const rows = (snapshot.standings as unknown as StandingRow[]).length
+    const standings = sharePositions(snapshot.standings as unknown as StandingRow[])
     const standingFrames = slides.includes('standings')
-      ? Math.max(1, Math.ceil(rows / ROWS_PER_FRAME[input.format]))
+      ? paginateStandings(standings, input.format).length
       : 0
     const created = await tx.resultExport.create({
       data: {

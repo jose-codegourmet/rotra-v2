@@ -1,6 +1,6 @@
 # Queue app: every time input opens the time picker dialog (Settings court times included)
 
-Status: NEW
+Status: IN MOCK APP — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `liveSettings()` `courtTimePickers()`, `dtPicker()` (new optional `title`), `SHEETS.timePick`

@@ -165,6 +165,7 @@ export function createCourtWindowFixtures(now = Date.now()) {
     id: `window-court-${i + 1}`,
     sessionId: session.id,
     label: `Court ${i + 1}`,
+    position: i + 1,
     startsAt: start + (i >= 3 ? 3600000 : 0),
     openUntil: i === 4 ? start + 2 * 3600000 : null,
     removedAt: null,

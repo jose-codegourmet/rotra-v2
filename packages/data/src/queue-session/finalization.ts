@@ -17,8 +17,8 @@ import { recordChange } from '../sync/fetchers'
 import { integrityIn } from '../sync/integrity'
 import type { SaveOutcome } from '../sync/sync.types'
 import {
+  FINALIZATION_STAGES,
   type FinalizationStage,
-  finalizationStagesFor,
   type QueueSession,
   recordsGames,
   type SessionDoneBlocker,
@@ -112,8 +112,7 @@ function setFinalization(sessionId: string, patch: Partial<SessionFinalization>)
 }
 /**
  * Session done: active → finalizing → completed through four staged steps; one finalization per
- * command. An unrecorded session (Record games off) runs only the first two: it completes, and no
- * player records, ranking, standings, awards or result slides are written.
+ * command. A session with Record games off runs the same four steps; only the toast says "not ranked".
  */
 export async function finalizeSession(
   input: FinalizeSessionInput,
@@ -158,9 +157,20 @@ export async function finalizeSession(
   if (blocked) throw blocked
   return run(session, commandId, 'checking', input)
 }
+/**
+ * Session done deducts each shuttle plan line's tubes from its inventory item (D-2026-11-26-01).
+ * Stock stops at zero; removed items and sessions without an estimate are skipped. Runs once, in
+ * the step that completes the session.
+ */
+function deductPlannedShuttles(draft: MockState, sessionId: string) {
+  for (const line of draft.costEstimates[sessionId]?.shuttles ?? []) {
+    const item = draft.inventory.find((i) => i.id === line.inventoryItemId && !i.removedAt)
+    if (item) item.stock = Math.max(0, item.stock - line.tubes)
+  }
+}
 type FinishedSession = Pick<QueueSession, 'id' | 'title' | 'recordGames'>
 const doneNote = (session: Pick<QueueSession, 'recordGames'>) =>
-  recordsGames(session) ? 'player records updated' : 'games not recorded'
+  recordsGames(session) ? 'player records updated' : 'player records updated, not ranked'
 const doneToast = (session: Pick<QueueSession, 'recordGames'>) =>
   `Session finished · ${doneNote(session)}`
 const doneLogText = (session: FinishedSession) => `${session.title} finished · ${doneNote(session)}`
@@ -170,15 +180,10 @@ async function run(
   from: FinalizationStage,
   input: FinalizeSessionInput,
 ): Promise<SaveOutcome & { data: SessionFinalization }> {
-  // The flag is fixed once the session starts, so the stages are decided once, up front. An
-  // unrecorded session never reaches `player_records` or `slides`: those two writes cannot run.
   const sessionId = session.id,
-    all = finalizationStagesFor(session),
-    last = all[all.length - 1] ?? 'slides',
     generation = mockStore.getGeneration(),
     failAt = input.failAtStage ?? 'checking',
-    // A stage this session does not run (a replay after an unrecorded commit) leaves nothing to do.
-    stages = all.includes(from) ? all.slice(all.indexOf(from)) : []
+    stages = FINALIZATION_STAGES.slice(FINALIZATION_STAGES.indexOf(from))
   mockStore.update((draft) => {
     const s = sessionIn(draft, sessionId)
     if (s.state === 'active') s.state = 'finalizing'
@@ -216,8 +221,12 @@ async function run(
           now = Date.now()
         s.state = 'completed'
         s.finalizedAt = now
+        // Handicap · tonight is session only (D-2026-11-25-03): Session done clears it.
+        for (const p of draft.roster) if (p.sessionId === sessionId) p.handicapSpots = []
         // #1008: the hosts current at the end are this session's hosts from now on.
         freezeSessionHosts(draft, sessionId, now)
+        // D-2026-11-26-01: the planned tubes come off stock, never below zero.
+        deductPlannedShuttles(draft, sessionId)
         // Finishing closes pending join requests, drop-out notices and match requests (kept, hidden).
         closeSessionRequests(draft, sessionId, now)
         const f = draft.finalizations[sessionId]
@@ -241,7 +250,7 @@ async function run(
       })
   }
   mockStore.update((draft) => {
-    draft.finalizations[sessionId] = { sessionId, commandId, state: 'done', stage: last }
+    draft.finalizations[sessionId] = { sessionId, commandId, state: 'done', stage: 'slides' }
     outcome = recordChange(draft, { text: doneLogText(session), area: 'Session done' })
   })
   const data = readMockState().finalizations[sessionId]

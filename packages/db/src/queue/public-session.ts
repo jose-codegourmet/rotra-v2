@@ -8,6 +8,7 @@ import {
   holdsCourt,
   sharePositions,
 } from '@rotra/data/match/match.rules'
+import { matchLabel } from '@rotra/data/match/matchCategory.rules'
 import type { Match } from '@rotra/data/match/types'
 import { resolveProfileBanner } from '@rotra/data/profile-banner/rules'
 import {
@@ -28,6 +29,7 @@ import type {
 } from '@rotra/data/public-session/types'
 import { sessionRecordHistory } from '@rotra/data/queue-session/sessionRecord.rules'
 import type { SessionCourt as CourtView } from '@rotra/data/queue-session/types'
+import { amountDuePerHead } from '@rotra/data/session-cost/rules'
 import type { SessionPlayer as RosterView } from '@rotra/data/session-roster/types'
 import { readShownProfileBanners } from '../admin/profile-banners'
 import { type ClubContext, loadAccountContext, type PlayerContext } from '../auth/account-context'
@@ -35,13 +37,17 @@ import { type CookieAdapter, verifySubject } from '../auth/supabase'
 import { prisma } from '../client/prisma'
 import type { JoinRequestPlacement, QueueSession, StatedBand } from '../generated/prisma/client'
 import { ServiceError } from '../service/errors'
+import { savedLevelOf } from './club-players'
+import { levelRestrictionDto } from './dto'
+import { estimateFor } from './financials'
 import { closeStaleMatchRequests } from './match-request-store'
 import { peopleFor, readMyMatchRequest } from './match-requests'
 import { matchContext } from './match-store'
 import { readPublishedResults } from './results'
 import { endedState, shownHostRows } from './session-host-snapshots'
-import { placeClubMember, stepDownIn } from './session-roster'
+import { levelRestrictionBlockIn, placeClubMember, stepDownIn } from './session-roster'
 import {
+  COURT_ORDER,
   capacityOf,
   derivedId,
   LIVE_ENTRY,
@@ -196,7 +202,9 @@ export async function readPreviewAudience(cookies: CookieAdapter, sessionId: str
 /**
  * Q-PUBLIC-* (`public-session.page`): the allowlisted `PublicSessionPage` from accepted server
  * state. No phone, presence, games, notes beyond the session notes, costs, Off Day or raw
- * sync data. Participant and waitlist names are masked here (`maskPublicName`, #475), so a full
+ * sync data. The one money field is `amountDuePerPlayer` (Details › Payment, D-2026-11-25-05): the
+ * amount each player pays, never the cost lines or the estimate behind it. Participant and
+ * waitlist names are masked here (`maskPublicName`, #475), so a full
  * name never leaves the server. `skillMix` is aggregate counts only (#474). `results` is the stored public copy of the published slides, or null.
  */
 export async function readPublicSession(slug: string) {
@@ -262,6 +270,8 @@ export async function readPublicSession(slug: string) {
       courts: courts.map((c) => c.label),
       formats: { singles: session.allowSingles, doubles: session.allowDoubles },
       mode: session.sessionMode,
+      /** Restrictions (D-2026-11-19-12): the Levels row in Details. */
+      levelRestriction: levelRestrictionDto(session),
       minimum: session.minimumGames,
       notes: session.notes,
       participantCount: roster.length,
@@ -306,12 +316,16 @@ export async function readPublicSession(slug: string) {
       slotBudget: capacity,
       acceptJoinRequests: session.acceptJoinRequests && TAKES_REQUESTS.includes(session.state),
       alwaysRequireRequest: session.alwaysRequireRequest,
-      /** Record games (D-2026-11-18-06): false = "Not recorded", no results or match history. */
+      // Details › Payment (D-2026-11-25-05): the same amount due the Queue Master's Payments and
+      // Share payment status read (custom amount or break-even share, integer centavos). Null when
+      // no estimate is saved, so the row is omitted; 0 reads "Free".
+      amountDuePerPlayer: amountDuePerHead((await estimateFor(tx, session)).estimate),
+      /** Record games (D-2026-11-20-02): false = "Not ranked"; results and match history as usual. */
       recordGames: session.recordGames,
       lastSyncedAt: session.updatedAt.getTime(),
       hasPendingChanges: streams.some((s) => s.highestReceivedSeq > s.contiguousSequence),
       results:
-        session.state === 'completed' && session.recordGames
+        session.state === 'completed'
           ? withResultPictures(
               await readPublishedResults(session.id, tx),
               roster.map((entry) => ({
@@ -557,6 +571,41 @@ async function memberOf(tx: Tx, clubId: string, playerId: string) {
   return level ? { clubPlayer, skillLevelId: level.skillLevelId } : null
 }
 
+/**
+ * The Player's level at the club (D-2026-11-19-12): on their current saved record, the level the
+ * club gave outside a session or the latest session assessment, whichever is newer. Null when the
+ * Player is not saved in the club or has no level there yet.
+ */
+async function clubLevelIdOf(tx: Tx, clubId: string, playerId: string) {
+  const clubPlayer = await tx.clubPlayer.findFirst({
+    where: { clubId, playerId, removedAt: null },
+    select: {
+      savedSkillLevelId: true,
+      savedLevelAt: true,
+      assessments: {
+        orderBy: [{ assessedAt: 'desc' }, { id: 'desc' }],
+        take: 1,
+        select: { skillLevelId: true, assessedAt: true },
+      },
+    },
+  })
+  return clubPlayer ? savedLevelOf(clubPlayer) : null
+}
+
+/**
+ * **Not open to your level** (D-2026-11-19-12) for a signed-in Player who holds no slot or waitlist
+ * place on an upcoming session: the reason and their level at the club, or null when they may
+ * request. A Player with no level at the club always may.
+ */
+async function playerLevelBlock(tx: Tx, sessionId: string, playerId: string) {
+  const session = await tx.queueSession.findUnique({ where: { id: sessionId } })
+  if (!session || session.state !== 'prepared' || session.levelRestriction === 'all') return null
+  const skillLevelId = await clubLevelIdOf(tx, session.clubId, playerId)
+  const level = levelCodeFor(skillLevelId)
+  const reason = await levelRestrictionBlockIn(tx, session, skillLevelId)
+  return reason && level ? { reason, level } : null
+}
+
 /** #569: authenticated Player only. Eligibility is the current roster link, never a browser ID. */
 export async function readPlayerSessionAccess(context: PlayerContext, slug: string) {
   const session = await prisma.queueSession.findUnique({
@@ -576,6 +625,8 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         select: {
           avatarRef: true,
           nickname: true,
+          // Public (D-2026-11-19-01); read only to name a waiting match ("Mixed Doubles").
+          gender: true,
           profileState: true,
           profileVisibility: true,
           banner: { select: { id: true, image: true } },
@@ -587,8 +638,14 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       where: { id: { in: roster.map((entry) => entry.clubPlayerId) } },
       select: linkedSelect,
     })
-    // Epic #1002 (#1006): the current hosts get the same name and card rule as the roster. They
-    // never feed `fullRoster` below (a host who is not playing does not unlock the full roster).
+    // The waitlist, in its public order, by the same signed-in name rule as the roster
+    // (D-2026-11-25-05). The name is this club's saved name, as on the visitor's page.
+    const waitlist = await orderedWaitlist(tx, session.id)
+    const waiting = await tx.clubPlayer.findMany({
+      where: { id: { in: waitlist.map((w) => w.clubPlayerId) }, clubId: session.clubId },
+      select: { ...linkedSelect, displayName: true },
+    })
+    // Epic #1002 (#1006): the current hosts get the same name and card rule as the roster.
     // A finished session: the rows frozen at its end, by their snapshot name (#1008).
     const ended = endedState(session.state)
     const hostRows = await tx.sessionHost.findMany({
@@ -605,11 +662,10 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       },
     })
     const shownBanners = await readShownProfileBanners(tx)
-    const fullRoster = linked.some((entry) => entry.playerId === context.playerId)
-    const pictures = new Map(
-      [...linked, ...hostPlayers].map((entry) => [entry.id, pictureOf(entry)]),
-    )
-    const people = new Map([...linked, ...hostPlayers].map((entry) => [entry.id, entry]))
+    const waitingNames = new Map(waiting.map((entry) => [entry.id, entry.displayName]))
+    const known = [...linked, ...waiting, ...hostPlayers]
+    const pictures = new Map(known.map((entry) => [entry.id, pictureOf(entry)]))
+    const people = new Map(known.map((entry) => [entry.id, entry]))
     /**
      * D-2026-11-09-02 for a signed-in Player, #731: a registered (claimed) player's full name,
      * nickname and RTR ID, and which card the tile opens; guests and unclaimed profiles stay
@@ -670,9 +726,13 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         },
       },
     })
-    // The participants this read returns (capped at 12 unless the Player is in the session); a
-    // face points at its entry there so it can open the same profile card.
-    const listed = fullRoster ? roster.length : Math.min(roster.length, 12)
+    // The match's name ("Mixed Doubles", D-2026-11-19-07) by the shared rule: each player's gender
+    // is their ROTRA profile's; a guest, a club-only record or a player who gave none counts as not
+    // given, which makes the match Genderless.
+    const genders = roster.map((entry) => ({
+      id: entry.id,
+      gender: people.get(entry.clubPlayerId)?.player?.gender ?? null,
+    }))
     /** A face on a Courts now tile or a queued match: first name by the signed-in name rule. */
     const faceOf = (sessionPlayerId: string) => {
       const entry = byId.get(sessionPlayerId)
@@ -684,7 +744,9 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         pictureUrl: entry ? (pictures.get(entry.clubPlayerId) ?? null) : null,
         masked: who?.masked ?? true,
         isViewer: who?.isViewer ?? false,
-        ...(index >= 0 && index < listed ? { participant: index } : {}),
+        // `participants` below is the whole roster, so every face points at its entry there and
+        // can open the same profile card.
+        ...(index >= 0 ? { participant: index } : {}),
       }
     }
     const team = (members: { team: string; sessionPlayerId: string }[], side: string) =>
@@ -738,9 +800,23 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
       ...standing,
       // D-2026-11-12-02: whether the join card offers Join as NAME instead of a request
       isClubMember: !!(await memberOf(tx, session.clubId, context.playerId)),
-      fullRoster,
-      participants: (fullRoster ? roster : roster.slice(0, 12)).map((entry) => ({
+      // D-2026-11-19-12: Not open to your level, while they hold no slot or waitlist place
+      levelBlock: standing.inSession
+        ? null
+        : await playerLevelBlock(tx, session.id, context.playerId),
+      // A signed-in Player sees the whole roster, whether or not they hold a slot
+      // (D-2026-11-25-05); the 12-tile cap is the visitor's page only.
+      fullRoster: true,
+      participants: roster.map((entry) => ({
         ...person(entry),
+        pictureUrl: pictures.get(entry.clubPlayerId) ?? null,
+        ...publicLevel(levelCodeFor(entry.skillLevelId)),
+      })),
+      waitlist: waitlist.map((entry) => ({
+        ...person({
+          clubPlayerId: entry.clubPlayerId,
+          nameSnapshot: waitingNames.get(entry.clubPlayerId) ?? '',
+        }),
         pictureUrl: pictures.get(entry.clubPlayerId) ?? null,
         ...publicLevel(levelCodeFor(entry.skillLevelId)),
       })),
@@ -760,12 +836,17 @@ export async function readPlayerSessionAccess(context: PlayerContext, slug: stri
         ]
       }),
       courtsNow,
-      queue: matches.map((match) => ({
-        matchNo: match.matchNo,
-        format: match.format,
-        teamA: team(match.participations, 'A'),
-        teamB: team(match.participations, 'B'),
-      })),
+      queue: matches.map((match) => {
+        const side = (name: string) =>
+          match.participations.filter((m) => m.team === name).map((m) => m.sessionPlayerId)
+        return {
+          matchNo: match.matchNo,
+          format: match.format,
+          label: matchLabel({ format: match.format, teamA: side('A'), teamB: side('B') }, genders),
+          teamA: team(match.participations, 'A'),
+          teamB: team(match.participations, 'B'),
+        }
+      }),
     }
   })
 }
@@ -915,6 +996,9 @@ export async function readMyNight(context: PlayerContext, slug: string) {
           : null,
       joinRequest: standing.joinRequest,
       isClubMember: !!(await memberOf(tx, session.clubId, context.playerId)),
+      levelBlock: standing.inSession
+        ? null
+        : await playerLevelBlock(tx, session.id, context.playerId),
       canInvite:
         session.state === 'prepared' && session.acceptJoinRequests && (!!row || waitlisted),
       inviteCode: invite?.code ?? null,
@@ -928,13 +1012,13 @@ export async function readMyNight(context: PlayerContext, slug: string) {
  * Q-PUBLIC-JOIN › Match history (2026-11-13 finished session and match history courts logs) in real
  * mode: a finished session's matches for the signed-in Player, in the `PublicMatchHistory` shape
  * (`@rotra/data/public-session/types`), epoch-ms times, newest first, with the replay's courts and
- * bounds. `null` for any session that is not completed; no matches for one with Record games off
- * (D-2026-11-18-06). Publication gate (results module ›
+ * bounds. `null` for any session that is not completed; a session with Record games off lists its
+ * matches as usual (D-2026-11-20-02). Publication gate (results module ›
  * Publishing): until the club shares the results (a `published` publication with a public copy)
  * only the matches the Player played in are listed and `courtLabels` is empty; `total` always
  * counts every finished or invalid match. Faces follow the signed-in name rule, first name only;
- * `participant` is the face's index in the access read's roster (confirmation order), sent only
- * while the Player is on the live roster (the access read's full roster). Never player IDs,
+ * `participant` is the face's index in the access read's roster (confirmation order), which is the
+ * whole roster for any signed-in Player (D-2026-11-25-05). Never player IDs,
  * contacts, presence, operator notes or waiting matches.
  */
 export async function readPublicMatchHistory(
@@ -949,9 +1033,6 @@ export async function readPublicMatchHistory(
   return prisma.$transaction(async (tx) => {
     const session = await tx.queueSession.findUniqueOrThrow({ where: { id: found.id } })
     if (session.state !== 'completed') return null
-    // Record games off (D-2026-11-18-06): no match history or replay, so no matches, `total` 0
-    // and never `shared`, as in mock mode.
-    const recorded = session.recordGames
     const { ctx, roster: live } = await matchContext(tx, session)
     // Every entry, released and no show too, so a player who played and then left keeps their face.
     const [entries, courts] = await Promise.all([
@@ -960,10 +1041,7 @@ export async function readPublicMatchHistory(
         orderBy: [{ confirmedAt: 'asc' }, { id: 'asc' }],
       }),
       // Removed courts too: a match played on a court removed later keeps its label.
-      tx.sessionCourt.findMany({
-        where: { sessionId: session.id },
-        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-      }),
+      tx.sessionCourt.findMany({ where: { sessionId: session.id }, orderBy: COURT_ORDER }),
     ])
     const record = sessionRecordHistory({
       fallbackStart: (session.startedAt ?? session.scheduledStartAt).getTime(),
@@ -972,6 +1050,7 @@ export async function readPublicMatchHistory(
           id: c.id,
           sessionId: c.sessionId,
           label: c.label,
+          position: c.position,
           startsAt: c.startsAt?.getTime(),
           openedEarlyAt: c.openedEarlyAt?.getTime() ?? null,
           openUntil: c.openUntil?.getTime() ?? null,
@@ -992,16 +1071,15 @@ export async function readPublicMatchHistory(
           confirmedAt: r.confirmedAt.getTime(),
         }),
       ),
-      matches: recorded ? ctx.matches : [],
+      matches: ctx.matches,
     })
     const people = await peopleFor(tx, entries, context.playerId)
     const levels = new Map(entries.map((r) => [r.id, levelCodeFor(r.skillLevelId)]))
-    // The access read sends the full roster only while the Player is on the live roster.
-    const fullRoster = live.some((entry) => people.get(entry.id)?.isViewer)
+    // The access read sends the whole roster to any signed-in Player (D-2026-11-25-05).
     const indexes = new Map(live.map((entry, index) => [entry.id, index]))
     const face = (id: string): PublicMatchPlayer => {
       const person = people.get(id)
-      const participant = fullRoster ? indexes.get(id) : undefined
+      const participant = indexes.get(id)
       return {
         name: publicFirstName(person?.name ?? ''),
         level: levels.get(id) ?? null,
@@ -1031,7 +1109,7 @@ export async function readPublicMatchHistory(
         }),
       )
       .sort((a, b) => b.number - a.number)
-    const shared = recorded && (await readPublishedResults(session.id, tx)) !== null
+    const shared = (await readPublishedResults(session.id, tx)) !== null
     return {
       shared,
       total: all.length,
@@ -1093,6 +1171,16 @@ export async function joinSessionAsPlayer(
       const standing = await playerStanding(tx, context.playerId, session.id)
       if (standing.joinRequest?.status === 'pending')
         throw new ServiceError('conflict', { request: 'Your request is already sent.' })
+      // D-2026-11-19-12: a Player whose level here is outside the restriction, or whose band's
+      // slots are full, can't request or join. A waitlisted Player's Join from waitlist isn't checked.
+      if (placement !== 'from_waitlist' && !standing.inSession) {
+        const blocked = await levelRestrictionBlockIn(
+          tx,
+          current,
+          await clubLevelIdOf(tx, session.clubId, context.playerId),
+        )
+        if (blocked) throw new ServiceError('forbidden', { request: blocked })
+      }
       const full = await slotsFull(tx, current)
       // D-2026-11-12-02: a club member joins right away (Join from waitlist stays a request).
       const member =

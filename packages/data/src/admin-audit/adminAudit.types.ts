@@ -16,6 +16,7 @@ export type AdminAuditAction =
   | 'player_created'
   | 'player_updated'
   | 'player_archived'
+  | 'player_gender_set'
   | 'player_restored'
   | 'player_removed'
   | 'player_link_issued'

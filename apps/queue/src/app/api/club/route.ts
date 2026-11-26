@@ -13,8 +13,9 @@ export async function GET() {
 }
 
 /**
- * Logo write, or the Facebook post fields (template, description, court rules) and the Players can
- * check themselves in switch (`selfCheckInEnabled`). Scope comes from the
+ * Logo write, or the Facebook post fields (template, description, court rules), the Players can
+ * check themselves in switch (`selfCheckInEnabled`) and the session defaults (players per court,
+ * entrance fee). Scope comes from the
  * verified club account, never the request body. `template: null` restores the default template.
  */
 export async function PATCH(request: Request) {
@@ -35,10 +36,22 @@ export async function PATCH(request: Request) {
         throw new ServiceError('invalid', { template: 'Enter text.' })
       if (body.selfCheckInEnabled !== undefined && typeof body.selfCheckInEnabled !== 'boolean')
         throw new ServiceError('invalid', { selfCheckInEnabled: 'Choose on or off.' })
+      const defaultPlayersPerCourt = body.defaultPlayersPerCourt
+      if (defaultPlayersPerCourt !== undefined && typeof defaultPlayersPerCourt !== 'number')
+        throw new ServiceError('invalid', { playersPerCourt: 'Enter a number.' })
+      const defaultEntranceFeeMinor = body.defaultEntranceFeeMinor
+      if (
+        defaultEntranceFeeMinor !== undefined &&
+        defaultEntranceFeeMinor !== null &&
+        typeof defaultEntranceFeeMinor !== 'number'
+      )
+        throw new ServiceError('invalid', { entranceFee: 'Enter an amount.' })
       return {
         body: {
           club: await updateClubSettings(club, {
             expectedRevision: body.expectedRevision,
+            defaultPlayersPerCourt,
+            defaultEntranceFeeMinor,
             postTemplate: body.template as string | null | undefined,
             description: text(body.description, 'description'),
             courtRules: text(body.courtRules, 'courtRules'),

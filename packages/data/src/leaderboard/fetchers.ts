@@ -1,6 +1,8 @@
 import { getSession } from '../auth/fetchers'
+import { MockError } from '../mock/errors'
 import { readMockState } from '../mock/store'
 import {
+  realGetClubLeaderboardPage,
   realGetLeaderboardPage,
   realGetMyLeaderboardPosition,
   realGetMyPeriodPosition,
@@ -36,7 +38,34 @@ export async function getLeaderboardPage(
   }
 }
 
-/** Search only public rows in the selected top 50. A masked entry never matches even its initials. */
+/**
+ * A club's leaderboard (D-2026-11-25-04): the ROTRA rules over the games of that club's own sessions
+ * only. Pages of the same list shape as the ROTRA leaderboard; full names for everyone.
+ */
+export async function getClubLeaderboardPage(
+  input: { clubId: string; offset: number; limit?: 25; period?: LeaderboardPeriod },
+  signal?: AbortSignal,
+  viewerScope?: string | null,
+): Promise<LeaderboardPage> {
+  const { clubId, offset, limit = 25, period = 'year' } = input
+  if (isRealDataMode()) return realGetClubLeaderboardPage({ ...input, limit, period }, signal)
+  await playerRequest(signal)
+  const state = readMockState()
+  if (!state.clubs.some((club) => club.id === clubId))
+    throw new MockError('permission', "Couldn't load the club leaderboard.")
+  const board = mockLeaderboard(state)
+  const entries = board.entries(period, await mockViewer(viewerScope), { clubId })
+  return {
+    entries: entries.slice(offset, offset + limit),
+    total: entries.length,
+    periodStart: new Date(leaderboardPeriodStart(period, board.now)).toISOString(),
+  }
+}
+
+/**
+ * Search the selected top 50 (plus ties at the cut). Leaderboards show every listed player's full
+ * name and nickname (D-2026-11-25-04), so every listed player can match.
+ */
 export async function searchLeaderboard(
   query: string,
   signal?: AbortSignal,
@@ -49,10 +78,7 @@ export async function searchLeaderboard(
   const viewerId = await mockViewer(viewerScope)
   const entries = mockLeaderboard(readMockState()).entries(period ?? 'year', viewerId)
   const hits = entries.filter(
-    (e) =>
-      q &&
-      !e.masked &&
-      (e.fullName.toLowerCase().includes(q) || e.nickname?.toLowerCase().includes(q)),
+    (e) => q && (e.fullName.toLowerCase().includes(q) || e.nickname?.toLowerCase().includes(q)),
   )
   return { hits, total: hits.length }
 }

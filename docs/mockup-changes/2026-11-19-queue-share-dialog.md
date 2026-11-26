@@ -1,6 +1,6 @@
 # Queue app: one Share button on the session header opens a share dialog
 
-Status: NEW
+Status: IN MOCK APP — #1071
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `viewPrepare()` header, `SHEETS.share`, `ACT.openShare`

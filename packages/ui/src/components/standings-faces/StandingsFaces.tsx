@@ -11,6 +11,14 @@ export function formatStandingsGames(games: StandingsGames) {
   return games.min === games.max ? String(games.min) : `${games.min}–${games.max}`
 }
 
+/**
+ * The names of a shared position (the prototype's tiedNames()): "A & B" for two, "A, B, C" for
+ * three or more (owner, November 25, 2026).
+ */
+export function tiedNames(names: readonly string[]) {
+  return names.join(names.length === 2 ? ' & ' : ', ')
+}
+
 /** One face of a standings row. Without onOpen the face is plain (masked or private players). */
 export type StandingsFace = {
   id: string
@@ -18,12 +26,33 @@ export type StandingsFace = {
   pictureUrl?: string | null
   /** Opens this player's profile */
   onOpen?: () => void
+  /**
+   * The level band drawn as a 3 px ring around the picture (Beginner, Intermediate, Advanced; none
+   * is grey). Leave it out for no ring (the session record's Results tab).
+   */
+  band?: StandingsFaceBand
 }
+
+export type StandingsFaceBand = 'beginner' | 'intermediate' | 'advanced' | 'none'
+
+const BAND_RING: Record<StandingsFaceBand, string> = {
+  beginner: '[--ring:var(--lv-beg)]',
+  intermediate: '[--ring:var(--lv-int)]',
+  advanced: '[--ring:var(--lv-adv)]',
+  none: '[--ring:var(--lv-none)]',
+}
+const BAND_OUTLINE =
+  '[&>:first-child]:outline-[3px] [&>:first-child]:outline-offset-1 [&>:first-child]:outline-(--ring)'
 
 export type StandingsFacesProps = {
   faces: StandingsFace[]
   /** The face's size in px (the prototype uses 36 on the console and 28 on the session page) */
   size?: 28 | 36
+  /**
+   * The most faces to draw. A bigger tie draws one fewer and a "+N" chip, so the names keep their
+   * width (the standings image uses 4). Leave it out to draw every face.
+   */
+  limit?: number
   /** The profile button's accessible name; defaults to "View NAME's profile" */
   profileLabel?: (name: string) => string
   className?: string
@@ -31,22 +60,35 @@ export type StandingsFacesProps = {
 
 /**
  * The prototype's .lb-stack: a shared standings position shows its players' faces overlapping,
- * the first on top, each ringed in the surface colour; hovering or focusing a face lifts it. Each
+ * the first on top, each separated by a surface-colour edge and, with a band, ringed in its level colour; hovering or focusing a face lifts it. Each
  * face with onOpen is its own profile button. Wraps onto a second line for a big tie.
  */
 export function StandingsFaces({
   faces,
   size = 36,
   profileLabel = (name) => `View ${name}'s profile`,
+  limit,
   className,
 }: StandingsFacesProps) {
+  const over = limit !== undefined && faces.length > limit
+  const shown = over ? faces.slice(0, Math.max(1, limit - 1)) : faces
+  const more = faces.length - shown.length
   return (
-    <span className={cn('inline-flex flex-none flex-wrap items-center gap-y-1 pl-2.5', className)}>
-      {faces.map((face, index) => {
+    <span
+      className={cn(
+        'inline-flex flex-none items-center gap-y-1 pl-2.5',
+        limit === undefined && 'flex-wrap',
+        className,
+      )}
+    >
+      {shown.map((face, index) => {
         const avatar = (
           <Avatar key={face.id} name={face.name} src={face.pictureUrl ?? undefined} size={size} />
         )
-        const ring = '-ml-2.5 relative rounded-full shadow-[0_0_0_2px_var(--surface)]'
+        const ring = cn(
+          '-ml-2.5 relative rounded-full shadow-[0_0_0_2px_var(--surface)]',
+          face.band && [BAND_RING[face.band], BAND_OUTLINE],
+        )
         const style = { zIndex: Math.max(1, 6 - index) }
         return face.onOpen ? (
           <button
@@ -74,6 +116,15 @@ export function StandingsFaces({
           </span>
         )
       })}
+      {more > 0 ? (
+        <span
+          aria-hidden
+          style={{ width: size, height: size }}
+          className="-ml-2.5 relative z-0 inline-grid flex-none place-items-center rounded-full bg-surface font-bold text-[11px] text-fg2 shadow-[0_0_0_2px_var(--surface)]"
+        >
+          +{more}
+        </span>
+      ) : null}
     </span>
   )
 }

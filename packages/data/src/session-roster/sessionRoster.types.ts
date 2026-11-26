@@ -1,4 +1,6 @@
+import type { Gender } from '../club-player/clubPlayer.types'
 import type { PlayingLevel } from '../player/player.types'
+import type { HandicapSpot } from './handicap.rules'
 export type SessionPlayer = {
   id: string
   sessionId: string
@@ -23,6 +25,11 @@ export type SessionPlayer = {
    */
   clubNickname?: string | null
   /**
+   * The saved player's gender (D-2026-11-19-01). Derived by the Queue Master roster and match reads
+   * (`withGender`), never stored on the roster row. Missing = not given: matches are Genderless.
+   */
+  gender?: Gender | null
+  /**
    * The linked Player's own **I'm here** (D-2026-11-09-03). The QM's last action wins: the
    * “Checked in themselves” mark shows only while the row is present and no presence change came
    * after it (`selfCheckInMark` in public-session rules). Missing on older rows means never.
@@ -36,6 +43,11 @@ export type SessionPlayer = {
    * missing or 0 means no override.
    */
   gamesAdjustment?: number
+  /**
+   * Handicap · tonight (D-2026-11-25-03): spot codes the Queue Master marked; any spot shortens the
+   * games-in-a-row limit in Generate matches. Session only; missing or empty means no handicap.
+   */
+  handicapSpots?: HandicapSpot[]
 }
 /**
  * No show (cancelled): a live roster player who was away, played no games and was in no match,
@@ -122,12 +134,18 @@ export type SessionInviteCode = {
 export type DirectoryPlayer = {
   /** The public player id: what the add commands take as `playerId` */
   id: string
-  /** '' for another club's unclaimed player: no club is shown another club's name */
+  /**
+   * An unclaimed player another club saved shows the name of the club that saved them first
+   * (D-2026-11-23-01)
+   */
   fullName: string
   nickname: string | null
   rtrId: string
   identity: 'registered' | 'unclaimed'
-  /** Their own profile picture as an avatar reference, or null for initials (always null for unclaimed) */
+  /**
+   * Their own profile picture as an avatar reference, or null for initials. For an unclaimed player:
+   * the picture the club that saved them first set (D-2026-11-23-01)
+   */
   picture: string | null
   /** Their Player Information level, or null when they have none yet (always null for unclaimed) */
   suggestion: PlayingLevel | null
@@ -135,8 +153,8 @@ export type DirectoryPlayer = {
   rankLabel: string
   phoneHidden?: boolean
   /**
-   * Another club's unclaimed player: "Not registered yet" with the RTR ID only. The add commands
-   * then need `name`, this club's own name for them.
+   * Another club's unclaimed player: the add commands need `name`, this club's own name for them
+   * (the sheet prefills it with `fullName`).
    */
   ownNameRequired?: boolean
 }
@@ -147,10 +165,23 @@ export type DirectoryPlayer = {
  * and `savedName` is this club's name for them ("NAME is already in your saved players."). Both
  * null: nothing typed yet, or "No ROTRA player has that RTR ID or email."
  */
-export type PlayerLookup = { player: DirectoryPlayer | null; savedName: string | null }
+export type PlayerLookup = {
+  player: DirectoryPlayer | null
+  savedName: string | null
+  /**
+   * D-2026-11-23-01: with no exact match, the unclaimed players whose name contains the query (two
+   * letters or more), leaving out anyone already in this club's saved players. Absent reads as none.
+   */
+  matches?: DirectoryPlayer[]
+}
 
 /** Add anyway / Add to waitlist on a full roster (#735, D-OVERFILL); omitted on an ordinary add. */
-type AddPlacementFlags = { allowOverfill?: boolean; toWaitlist?: boolean }
+type AddPlacementFlags = {
+  allowOverfill?: boolean
+  toWaitlist?: boolean
+  /** The second press after the level restriction warning (D-2026-11-19-12); omitted otherwise */
+  allowOutsideLevels?: boolean
+}
 /**
  * One change of the roster burst batch (#718): the Queue Master's adds, removes and join-request
  * decisions of one burst, sent together in click order and applied on the server in one
@@ -179,16 +210,30 @@ export type RosterBatchOperation =
       source: 'new'
       name: string
       nickname?: string
+      /** Optional gender (D-2026-11-19-01); missing = not given */
+      gender?: Gender | null
       /** No email saves a guest; an email saves an unclaimed player or links a ROTRA player */
       email?: string
       /** #1019: a social link is an entry key too, and wins over the email */
       socialLink?: string
       /** Optional, private to the club; kept for an unclaimed player only */
       phone?: string
+      /**
+       * The new saved player's id, chosen on the device so the club-set picture can be saved once
+       * the batch lands (the server derives one from `operationId` when absent)
+       */
+      clubPlayerId?: string
       level: PlayingLevel
     })
   | { op: 'remove'; operationId: string; rosterId: string }
-  | { op: 'acceptRequest'; operationId: string; requestId: string; level: PlayingLevel }
+  | {
+      op: 'acceptRequest'
+      operationId: string
+      requestId: string
+      level: PlayingLevel
+      /** Confirm again after the level restriction warning (D-2026-11-19-12) */
+      allowOutsideLevels?: boolean
+    }
   | { op: 'declineRequest'; operationId: string; requestId: string }
 /** What one operation of the batch ended as: the saved roster row or waitlist entry, if any. */
 export type RosterBatchResult = {

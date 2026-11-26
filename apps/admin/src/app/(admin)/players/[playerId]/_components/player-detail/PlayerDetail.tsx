@@ -176,7 +176,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
         title={player.name}
         meta={
           <>
-            <PlayerAccountChip claimed={player.claimed} />
+            <PlayerAccountChip claimed={player.claimed} verification={player.verification} />
             {player.detailsRequired && !player.claimed ? (
               <Chip tone="warn">Details required</Chip>
             ) : null}
@@ -228,6 +228,7 @@ export function PlayerDetail({ playerId, from }: { playerId: string; from: strin
               <AdminPlayerIdentityCard
                 fullName={player.name}
                 nickname={player.nickname}
+                gender={player.gender}
                 rtrId={player.rtrId}
                 createdOn={player.createdOn}
                 createdBy={createdBy}

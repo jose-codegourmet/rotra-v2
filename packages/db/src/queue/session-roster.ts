@@ -1,4 +1,6 @@
 import 'server-only'
+import { handicapSpotsOf, isHandicapSpot } from '@rotra/data/session-roster/handicap'
+import { levelRestrictionBlockFor } from '@rotra/data/session-roster/levelRestriction.rules'
 import {
   normalizeSocialLink,
   SOCIAL_LINK_ERROR,
@@ -19,7 +21,7 @@ import {
 import { ServiceError } from '../service/errors'
 import { toIsoOrNull } from '../service/serialize'
 import { ownDetailsJson, readOwnDetails } from './club-player-own-details'
-import { joinRequestDto, rosterEntryDto, waitlistDto } from './dto'
+import { joinRequestDto, levelRestrictionDto, rosterEntryDto, waitlistDto } from './dto'
 import { countedGamesByEntry } from './finalization'
 import { closeStaleMatchRequests } from './match-request-store'
 import {
@@ -28,6 +30,7 @@ import {
   derivedId,
   isOffRoster,
   LIVE_ENTRY,
+  levelCodeFor,
   levelIdFor,
   liveRoster,
   lockSession,
@@ -44,6 +47,7 @@ import {
 } from './session-store'
 
 const E164 = /^\+[1-9][0-9]{7,14}$/
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const NEW_PLAYER_EMAIL_ERROR = 'Enter an email address, like name@example.com, or leave it empty.'
 
 /**
@@ -80,14 +84,42 @@ async function waitlistPosition(tx: Tx, sessionId: string, entryId: string) {
  * Master's explicit choice to go past the slot budget (marked `over_budget_at`); `toWaitlist`
  * always waits. Neither keeps the budget rule.
  */
-export type AddPlacement = { allowOverfill?: boolean; toWaitlist?: boolean }
+export type AddPlacement = {
+  allowOverfill?: boolean
+  toWaitlist?: boolean
+  /**
+   * Level restrictions (D-2026-11-19-12): the Queue Master's second press, after the warning, adds
+   * or confirms a player outside the session's restriction (or into a full band). Without it such
+   * a slot is refused with the reason. The waitlist is never checked.
+   */
+  allowOutsideLevels?: boolean
+}
+
+/**
+ * Level restrictions on slots (D-2026-11-19-12): why a player of this level can't take a slot in the
+ * session now, or null. Counts the live roster by band; the caller holds the session lock.
+ */
+export async function levelRestrictionBlockIn(
+  tx: Tx,
+  session: QueueSession,
+  skillLevelId: number | null,
+) {
+  if (session.levelRestriction === 'all' || skillLevelId == null) return null
+  return levelRestrictionBlockFor(
+    levelRestrictionDto(session),
+    levelCodeFor(skillLevelId),
+    (await liveRoster(tx, session.id)).map((entry) => levelCodeFor(entry.skillLevelId)),
+  )
+}
 
 /**
  * Places a club player: a slot while one is open, otherwise the waitlist. `toWaitlist` (a Be
  * waitlisted request, D-2026-11-11-02, or Add to waitlist) always gives the waitlist place, even
  * during play; `allowOverfill` (Add anyway, #735) gives the slot beyond the budget. Refuses a
  * player already live on the roster or waiting. Concurrent admissions are serialized by the session
- * lock, so they cannot exceed capacity without `allowOverfill`. Repeat-safe on `operationId`.
+ * lock, so they cannot exceed capacity without `allowOverfill`. A slot outside the session's level
+ * restriction (D-2026-11-19-12) is refused with the reason unless `allowOutsideLevels`; a retry of
+ * an operation that already placed the player is never re-checked. Repeat-safe on `operationId`.
  */
 async function place(
   tx: Tx,
@@ -99,6 +131,7 @@ async function place(
   addedAt: Date,
   toWaitlist = false,
   allowOverfill = false,
+  allowOutsideLevels = false,
 ) {
   const waitlistId = await derivedId(operationId, 'waitlist')
   // A retry of the same operation returns what it already did.
@@ -144,6 +177,11 @@ async function place(
     await notifyWaitlistPlace(tx, session, clubPlayer.playerId, waiter.id, position)
     return { rosterEntry: null, waitlist: waitlistDto(waiter, position) }
   }
+  if (!allowOutsideLevels) {
+    const blocked = await levelRestrictionBlockIn(tx, session, skillLevelId)
+    // Refused: the transaction rolls back, so nothing of this add or confirm is kept.
+    if (blocked) throw new ServiceError('forbidden', { levelRestriction: blocked })
+  }
   const entry = await promoteWaiter(tx, context, session, waiter, operationId, new Date(), atBudget)
   return {
     rosterEntry: rosterEntryDto(entry, await rosterNamesFor(tx, clubPlayer.id)),
@@ -168,7 +206,20 @@ export function placeClubMember(
   now: Date,
   toWaitlist: boolean,
 ) {
-  return place(tx, context, session, clubPlayer, skillLevelId, operationId, now, toWaitlist)
+  // No level restriction check here (D-2026-11-19-12): the Player's own join ran it before this
+  // call, and a host is the Queue Master's own pick.
+  return place(
+    tx,
+    context,
+    session,
+    clubPlayer,
+    skillLevelId,
+    operationId,
+    now,
+    toWaitlist,
+    false,
+    true,
+  )
 }
 
 /**
@@ -213,6 +264,7 @@ async function addSavedPlayerIn(
     new Date(),
     input.toWaitlist,
     input.allowOverfill,
+    input.allowOutsideLevels,
   )
 }
 
@@ -231,10 +283,17 @@ export async function createClubPlayer(
     email?: string | null
     /** #1019: a social link is an entry key too, and wins over the email */
     socialLink?: string | null
+    /** An id chosen on the device (session Add player); else derived from the operation */
+    clubPlayerId?: string | null
   },
   now: Date,
 ) {
-  const id = await derivedId(operationId, 'club-player')
+  // The session Add player chooses the id on the device so the club-set picture can follow it
+  // (repeat-safe: a retried operation carries the same id); otherwise it comes from the operation.
+  const id =
+    input.clubPlayerId && UUID_RE.test(input.clubPlayerId)
+      ? input.clubPlayerId
+      : await derivedId(operationId, 'club-player')
   const existing = await tx.clubPlayer.findUnique({
     where: { clubId_id: { clubId: context.clubId, id } },
   })
@@ -337,8 +396,9 @@ const OWN_NAME_ERROR = 'Enter a name.'
 /**
  * The club's saved player for a Player lookup match (D-2026-11-16-04), created when the club has
  * not saved them yet. `profileId` is a registered player's id, or the id of an unclaimed person's
- * shared entry: then the club's own record is made with `ownName` (another club's name, picture
- * and level are never shown) and no nickname. A deleted saved player is restored rather than
+ * shared entry: then the club's own record is made with `ownName` and no nickname, starting with the
+ * picture of the club that saved them first, the one Player lookup showed (D-2026-11-23-01; the
+ * level is never copied). A deleted saved player is restored rather than
  * duplicated (one row per person per club). A registered player's row keeps no nickname: the
  * account's shows, and the club nickname is set on its own (D-2026-11-18-03).
  */
@@ -371,6 +431,22 @@ export async function clubPlayerForProfile(
   if (saved && !saved.removedAt) return { clubPlayer: saved, created: false }
   const name = entry ? (ownName?.trim() ?? '') : (player?.fullName ?? '')
   if (!name) throw new ServiceError('invalid', { name: OWN_NAME_ERROR })
+  // D-2026-11-23-01: an unclaimed person keeps the picture lookup showed (the first club's record).
+  const picture = entry
+    ? ((
+        await tx.clubPlayer.findFirst({
+          where: {
+            sharedEntryId: entry.id,
+            removedAt: null,
+            linkedToClubPlayerId: null,
+            playerId: null,
+            NOT: { clubId: context.clubId },
+          },
+          orderBy: [{ addedAt: 'asc' }, { id: 'asc' }],
+          select: { avatarRef: true },
+        })
+      )?.avatarRef ?? null)
+    : null
   // A deleted saved player is restored rather than duplicated (one saved row per person per club).
   // The guarded write restores once, so a replayed operation tells a registered player once.
   if (saved) {
@@ -380,6 +456,7 @@ export async function clubPlayerForProfile(
         removedAt: null,
         linkedToClubPlayerId: null,
         ...(entry ? { displayName: name } : {}),
+        ...(picture && !saved.avatarRef ? { avatarRef: picture } : {}),
         revision: { increment: 1 },
       },
     })
@@ -395,6 +472,7 @@ export async function clubPlayerForProfile(
       ...key,
       displayName: name,
       nickname: null,
+      avatarRef: picture,
       addedAt: now,
     },
   })
@@ -450,6 +528,7 @@ async function addDirectoryPlayerIn(
     now,
     input.toWaitlist,
     input.allowOverfill,
+    input.allowOutsideLevels,
   )
 }
 
@@ -465,6 +544,7 @@ export async function addNewPlayerToSession(
     /** D-2026-11-16-04: no email adds a guest; an email adds an unclaimed player or links one */
     email?: string | null
     socialLink?: string | null
+    clubPlayerId?: string | null
     level: string
   },
 ) {
@@ -483,6 +563,7 @@ async function addNewPlayerIn(
     phone?: string
     email?: string | null
     socialLink?: string | null
+    clubPlayerId?: string | null
     level: string
   },
 ) {
@@ -499,6 +580,7 @@ async function addNewPlayerIn(
     now,
     input.toWaitlist,
     input.allowOverfill,
+    input.allowOutsideLevels,
   )
   // What the email did, for the toast ("unclaimed · RTR-…"); null for a guest.
   return { ...placed, emailWords: words }
@@ -565,10 +647,10 @@ export async function removeRosterPlayerIn(tx: Tx, session: QueueSession, roster
 }
 
 /**
- * Move to waitlist (#735): the admitted player steps down to the **front** of the waitlist, before
+ * Move to waitlist (#735): the admitted player steps down to the **back** of the waitlist, before
  * and after Start. Like a budget demotion, the roster entry is released (reason `demoted`), so its
  * assessments, paid mark and finished matches stay on the record and regaining a slot reactivates
- * the same entry; the waitlist row carries the level and `demoted_at` puts it first. Refused while
+ * the same entry; the waitlist row carries the level and `demoted_at` is its waitlist time (D-2026-11-23-06). Refused while
  * the player is in any waiting, On court or Playing match. Repeat-safe on `operationId`.
  */
 export async function stepDownToWaitlist(
@@ -807,6 +889,31 @@ export async function setGamesPlayed(
   })
 }
 
+/**
+ * Handicap · tonight (D-2026-11-25-03): the whole set of marked spots on one live entry (empty
+ * clears it). Active sessions only; Session done empties every entry. Repeat-safe: the same set
+ * writes nothing.
+ */
+export async function setHandicap(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; rosterId: string; spots: unknown[] },
+) {
+  return rosterCommand(context, sessionId, async (tx, session) => {
+    requireState(session, ['active'], 'Start the session first.')
+    if (!input.spots.every(isHandicapSpot))
+      throw new ServiceError('invalid', { spots: 'Choose spots on the figure.' })
+    const entry = await liveEntry(tx, sessionId, input.rosterId)
+    const spots = handicapSpotsOf(input.spots)
+    if (handicapSpotsOf(entry.handicapSpots).join() !== spots.join())
+      await tx.sessionPlayer.update({
+        where: { id: entry.id },
+        data: { handicapSpots: spots, revision: { increment: 1 } },
+      })
+    return { rosterId: entry.id, name: entry.nameSnapshot, spots }
+  })
+}
+
 export async function setAllPresence(context: ClubContext, sessionId: string, present: boolean) {
   return rosterCommand(context, sessionId, async (tx, session) => {
     requireState(session, ['prepared'], 'Mark players individually after the session starts.')
@@ -903,7 +1010,14 @@ async function pendingRequest(tx: Tx, context: ClubContext, requestId: string) {
  */
 export async function confirmJoinRequest(
   context: ClubContext,
-  input: { operationId: string; requestId: string; level: string; deviceId?: string | null },
+  input: {
+    operationId: string
+    requestId: string
+    level: string
+    deviceId?: string | null
+    /** Confirm again after the level restriction warning (D-2026-11-19-12) */
+    allowOutsideLevels?: boolean
+  },
 ) {
   levelIdFor(input.level)
   const request = await prisma.sessionJoinRequest.findUnique({
@@ -920,7 +1034,14 @@ async function confirmJoinRequestIn(
   tx: Tx,
   context: ClubContext,
   session: QueueSession,
-  input: { operationId: string; requestId: string; level: string; deviceId?: string | null },
+  input: {
+    operationId: string
+    requestId: string
+    level: string
+    deviceId?: string | null
+    /** Confirm again after the level restriction warning (D-2026-11-19-12) */
+    allowOutsideLevels?: boolean
+  },
 ) {
   const skillLevelId = levelIdFor(input.level)
   const current = await pendingRequest(tx, context, input.requestId)
@@ -1011,6 +1132,8 @@ async function confirmJoinRequestIn(
     input.operationId,
     current.requestedAt,
     current.placement === 'waitlist',
+    false,
+    input.allowOutsideLevels,
   )
   const decided = await tx.sessionJoinRequest.update({
     where: { id: current.id },
@@ -1147,10 +1270,17 @@ export type RosterBatchOperation =
       phone?: string
       email?: string | null
       socialLink?: string | null
+      clubPlayerId?: string | null
       level: string
     })
   | { op: 'remove'; operationId: string; rosterId: string }
-  | { op: 'acceptRequest'; operationId: string; requestId: string; level: string }
+  | {
+      op: 'acceptRequest'
+      operationId: string
+      requestId: string
+      level: string
+      allowOutsideLevels?: boolean
+    }
   | { op: 'declineRequest'; operationId: string; requestId: string }
 
 export const MAX_ROSTER_BATCH_OPERATIONS = 100

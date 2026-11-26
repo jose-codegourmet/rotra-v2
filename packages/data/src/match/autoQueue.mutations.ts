@@ -24,6 +24,7 @@ import {
   selectAutoQueueDraft,
 } from './autoQueue.rules'
 import type { AutoQueueCount, AutoQueueMode } from './autoQueue.types'
+import { exemptionOf } from './exemption.rules'
 import { append, matchContext, requireLive } from './queue.mutations'
 
 export function draftState(s: MockState, sessionId: string) {
@@ -119,6 +120,7 @@ export function generateAutoQueueDrafts(input: {
       retained,
       catchUpTarget: input.catchUpTarget,
       bagging: state.bagging,
+      exempt: exemptionOf(s, session.id),
     })
     if (result.error) throw new MockError('permission', result.error)
     const fingerprint = autoQueueFingerprint(session, ctx)

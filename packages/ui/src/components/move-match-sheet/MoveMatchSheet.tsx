@@ -16,7 +16,9 @@ export type MoveMatchSheetProps = {
   courts: CourtPickerCourt[]
   /** 1 court, or 2 for a 5v5 */
   required: 1 | 2
-  /** The chosen court ids */
+  /** Getting ready (default): it stays getting ready on the new court. Playing: it keeps playing and its time doesn't restart. */
+  variant?: 'gettingReady' | 'playing'
+  /** The chosen court ids; pass a court already picked (a two-court match dropped on a court) to open with it chosen */
   value: string[]
   onChange: (courtIds: string[]) => void
   /** Back returns to OnCourtSheet without changing anything */
@@ -34,7 +36,8 @@ export type MoveMatchSheetProps = {
 /**
  * "Move match N" for a match On court: where it is now, the free open courts to choose from (two
  * for a 5v5), and Back / Move match (needs the right number of courts). The match stays getting
- * ready on the new court; nothing starts.
+ * ready on the new court; nothing starts. The `playing` variant is for a Playing match: it keeps
+ * playing on the new court and its time doesn't restart.
  */
 export function MoveMatchSheet({
   open,
@@ -43,6 +46,7 @@ export function MoveMatchSheet({
   currentLabel,
   courts,
   required,
+  variant = 'gettingReady',
   value,
   onChange,
   onBack,
@@ -77,13 +81,17 @@ export function MoveMatchSheet({
       }
     >
       <p className="m-0 text-[13px] text-fg2">
-        Now on {currentLabel}. It stays getting ready on the new court.
+        Now on {currentLabel}.{' '}
+        {variant === 'playing'
+          ? "It keeps playing on the new court; its time doesn't restart."
+          : 'It stays getting ready on the new court.'}
       </p>
       {courts.length ? (
         <CourtPicker
           courts={courts}
           value={value}
           required={required}
+          label={required === 2 ? undefined : 'Move to'}
           onChange={onChange}
           disabled={isPending}
         />

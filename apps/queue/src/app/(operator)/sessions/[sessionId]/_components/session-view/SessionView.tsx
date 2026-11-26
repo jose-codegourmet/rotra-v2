@@ -1,16 +1,18 @@
 'use client'
 
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
+import { canPauseMatch, canTradeCourts } from '@rotra/data/match/liveMatch.rules'
 import {
   activeMatchFor,
-  countedGames,
   courtFreeSince,
   courtMatches,
+  courtNames,
   courtOpen,
   courtsNeeded,
   FORMAT_LABELS,
   freeCourtMinutes,
   freeCourts,
+  gamesPlayedFor,
   isBookingEnded,
   type MatchContext,
   matchStatus,
@@ -22,13 +24,19 @@ import {
   waitingMatches,
   waitMinutes,
 } from '@rotra/data/match/match.rules'
+import { matchCategoryFor } from '@rotra/data/match/matchCategory.rules'
+import { matchExpectedFinish } from '@rotra/data/match/plan-ahead-rules'
 import type { Match } from '@rotra/data/match/types'
+import { useMoveCourt } from '@rotra/data/match/useMoveCourt'
+import { usePauseMatch } from '@rotra/data/match/usePauseMatch'
 import { usePlaceOnCourt } from '@rotra/data/match/usePlaceOnCourt'
 import { useRemoveWaitingMatch } from '@rotra/data/match/useRemoveWaitingMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useStartMatch } from '@rotra/data/match/useStartMatch'
+import { useTradeCourts } from '@rotra/data/match/useTradeCourts'
 import { courtFillModeOf } from '@rotra/data/queue-session/courtFill'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
+import { sessionScoring } from '@rotra/data/queue-session/types'
 import { useFillOpenedCourts } from '@rotra/data/queue-session/useFillOpenedCourts'
 import { useOpenAllCourtsEarly } from '@rotra/data/queue-session/useOpenAllCourtsEarly'
 import { useOpenCourtEarly } from '@rotra/data/queue-session/useOpenCourtEarly'
@@ -57,6 +65,7 @@ import { type UpcomingQueueMatch, UpcomingQueueRow } from '@rotra/ui/upcoming-qu
 import { useEffect, useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { OnCourt } from '@/app/(operator)/sessions/[sessionId]/_components/on-court/OnCourt'
+import { usePlayerGames } from '@/app/(operator)/sessions/[sessionId]/_components/player-games/PlayerGames'
 
 export type SessionViewProps = {
   sessionId: string
@@ -82,8 +91,13 @@ export type SessionViewProps = {
   onStartMatch?: (matchId: string, courtId?: string) => void
   /** Pick another on a free court: open the Start a match on Court X sheet (Queue › Match control). Hidden until given. */
   onPickAnother?: (courtId: string) => void
-  /** Open match on a Playing court card: open the active match sheet (Queue › Match control). Hidden until given. A Getting ready card's Open match opens the On court sheet here. */
-  onOpenMatch?: (matchId: string) => void
+  /**
+   * Open match on a Playing court card or its drawing: open the active match sheet (Queue › Match
+   * control). With `move` it opens straight on Move match (⋯ Move to a free court, or a two-court
+   * match dropped on a court, which arrives preselected). Hidden until given. A Getting ready
+   * card's Open match opens the On court sheet here.
+   */
+  onOpenMatch?: (matchId: string, move?: { courtId?: string }) => void
 }
 
 /**
@@ -137,15 +151,21 @@ export function SessionView({
   const undoEarlyOpen = useUndoCourtEarlyOpen()
   const placeOnCourt = usePlaceOnCourt()
   const startMatch = useStartMatch()
+  const pauseMatch = usePauseMatch()
+  const moveCourt = useMoveCourt()
+  const tradeCourts = useTradeCourts()
   const setCourtFill = useSetCourtFillMode()
   const fillOpened = useFillOpenedCourts()
   const updateCourt = useUpdateCourt()
+  const playerGames = usePlayerGames()
   // One placement or start per tap: a second tap can land before isPending reaches this render.
   const committing = useRef(false)
   /** The On court match whose sheet is open (Open match on a Getting ready card) */
   const [onCourtId, setOnCourtId] = useState<string | null>(null)
   /** The court card's ⋯ menu Swap with #P opened the swap sheet directly (Cancel closes it) */
   const [swapFirst, setSwapFirst] = useState(false)
+  /** A two-court Getting ready match was dropped on a court: Move match opens with it preselected */
+  const [moveFirst, setMoveFirst] = useState<{ courtId?: string } | null>(null)
   /** The Start anyway confirmation: one court, or every not-open court (Open all courts now) */
   const [opening, setOpening] = useState<{ courtId: string | null } | null>(null)
   const [openError, setOpenError] = useState<string | undefined>()
@@ -225,22 +245,44 @@ export function SessionView({
         : undefined,
     }
   }
-  /** A court face: the game badge shows the player's counted games this session */
+  /** A court face: the game badge shows the player's games this session (counted plus set by hand) */
   const courtPlayer = (id: string): CourtPlayer => ({
     ...player(id),
-    games: countedGames(id, ctx.matches),
+    games: gamesPlayedFor(id, ctx),
   })
   const names = (ids: string[]) => ids.map((id) => player(id).shortName)
+  const scoring = sessionScoring(s)
+  /** The expected finish line of a Playing court: Finishing soon is accent, Running long is warn */
+  const finishLine = (m: Match) => {
+    const finish = matchExpectedFinish(m, scoring, now)
+    return {
+      text: finish.text,
+      tone:
+        finish.phase === 'soon'
+          ? ('accent' as const)
+          : finish.phase === 'long'
+            ? ('warn' as const)
+            : ('muted' as const),
+    }
+  }
   const live = s.state === 'active'
   /** A queue face: the wait timer while the session is live (prototype queueCard wait()) */
   const queuePlayer = (id: string): MatchCardPlayer => {
-    if (!live) return player(id)
+    const games = gamesPlayedFor(id, ctx)
+    if (!live) return { ...player(id), games }
     const p = byId(id)
     const busy = activeMatchFor(id, ctx.matches)
     return {
       ...player(id),
+      games,
       wait: busy
-        ? { kind: busy.state === 'on_court' ? 'on-court' : 'playing' }
+        ? busy.state === 'on_court'
+          ? { kind: 'on-court', courtLabel: courtNames(busy, s.courts) }
+          : {
+              kind: 'playing',
+              courtLabel: courtNames(busy, s.courts),
+              minutes: busy.startedAt != null ? (now - busy.startedAt) / 60_000 : 0,
+            }
         : !p || !p.present
           ? { kind: 'not-here' }
           : { kind: 'minutes', minutes: waitMinutes(p, ctx.matches, s.startedAt, now) },
@@ -362,6 +404,47 @@ export function SessionView({
     startMatch.mutate({ matchId: m.id, courtIds: [], operationId: crypto.randomUUID() }, commit)
   }
 
+  /** Pause match from the card: back to Getting ready at once, no confirmation */
+  const pauseOnCourt = (m: Match) => {
+    if (committing.current || pauseMatch.isPending) return
+    committing.current = true
+    pauseMatch.mutate({ matchId: m.id, operationId: crypto.randomUUID() }, commit)
+  }
+  /**
+   * A drawing was dropped on a free court: a one-court match moves there with the command's toast;
+   * a two-court match opens Move match with that court preselected so the second can be chosen.
+   * Dropped on another busy one-court court (owner, November 25, 2026), the two matches trade
+   * courts. Dropping on nothing never reaches here.
+   */
+  const dropOnCourt = (m: Match, courtId: string) => {
+    const other = onCourts.find((x) => x.id !== m.id && x.courtIds.includes(courtId))
+    if (other) {
+      if (!canTradeCourts(m, other) || committing.current || tradeCourts.isPending) return
+      committing.current = true
+      tradeCourts.mutate(
+        { matchId: m.id, withMatchId: other.id, operationId: crypto.randomUUID() },
+        commit,
+      )
+      return
+    }
+    if (!free.some((c) => c.id === courtId) || free.length < courtsNeeded(m)) return
+    if (courtsNeeded(m) === 2) {
+      if (m.state === 'active') onOpenMatch?.(m.id, { courtId })
+      else {
+        setSwapFirst(false)
+        setMoveFirst({ courtId })
+        setOnCourtId(m.id)
+      }
+      return
+    }
+    if (committing.current || moveCourt.isPending) return
+    committing.current = true
+    moveCourt.mutate(
+      { matchId: m.id, courtIds: [courtId], operationId: crypto.randomUUID() },
+      commit,
+    )
+  }
+
   // A 5v5 on two courts draws once, as one merged card, under its first court.
   const covered = new Set<string>()
   const cards: CourtCardProps[] = []
@@ -382,8 +465,12 @@ export function SessionView({
         teamA: m.teamA.map(courtPlayer),
         teamB: m.teamB.map(courtPlayer),
         onOpenProfile: openProfile,
+        onOpenGames: playerGames.open,
         formatLabel: FORMAT_LABELS[m.format],
         matchNo: m.matchNo,
+        onDragMove: (courtId: string) => dropOnCourt(m, courtId),
+        // Owner, November 25, 2026: a one-court match's court takes a dropped drawing (trade courts).
+        dropCourtId: merged ? undefined : c.id,
         ...menuFor(c),
       }
       if (m.state === 'on_court') {
@@ -396,10 +483,12 @@ export function SessionView({
           onStartMatch: () => startOnCourt(m),
           onOpenMatch: () => {
             setSwapFirst(false)
+            setMoveFirst(null)
             setOnCourtId(m.id)
           },
           onSwap: () => {
             setSwapFirst(true)
+            setMoveFirst(null)
             setOnCourtId(m.id)
           },
           swapWith: swapWith
@@ -413,7 +502,11 @@ export function SessionView({
         variant: 'in-game',
         minutes: Math.max(0, Math.round((now - (m.startedAt ?? now)) / 60000)),
         substitutions: m.substitutions.length,
+        expectedFinish: finishLine(m),
         onOpenMatch: onOpenMatch ? () => onOpenMatch(m.id) : undefined,
+        onPause: live && canPauseMatch(m) ? () => pauseOnCourt(m) : undefined,
+        onMoveToFree: onOpenMatch ? () => onOpenMatch(m.id, {}) : undefined,
+        noFreeCourt: free.length < courtsNeeded(m),
       })
       continue
     }
@@ -426,6 +519,7 @@ export function SessionView({
       untilLabel: untilLabel(c),
       startLabel: startLabel(c),
       notOpen: !courtOpen(c, now),
+      dropCourtId: free.some((f) => f.id === c.id) ? c.id : undefined,
       // "Free · N min": since the last match on it ended, or from the planned start, even when opened early (plain "Free" until then), or the session start.
       freeMinutes: live
         ? freeCourtMinutes(
@@ -445,6 +539,8 @@ export function SessionView({
             formatLabel: FORMAT_LABELS[next.match.format],
             teamA: names(next.match.teamA),
             teamB: names(next.match.teamB),
+            facesA: next.match.teamA.map(queuePlayer),
+            facesB: next.match.teamB.map(queuePlayer),
           }
         : null,
       notEnoughFreePlayers: next.notEnoughFreePlayers,
@@ -463,12 +559,14 @@ export function SessionView({
     position: i + 1,
     matchNo: m.matchNo,
     format: m.format,
+    categoryPrefix: matchCategoryFor(m, ctx.roster),
     origin: m.origin,
     manualProtected: m.manualProtected,
     status: matchStatus(m, ctx),
     teamA: m.teamA.map(queuePlayer),
     teamB: m.teamB.map(queuePlayer),
     onSelectPlayer: openProfile,
+    onOpenGames: playerGames.open,
     onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
     canOpenCourt,
     onEdit: onEditMatch ? () => onEditMatch(m.id) : undefined,
@@ -535,9 +633,6 @@ export function SessionView({
             if (!next) setLabelCourtId(null)
           }}
           currentLabel={labelCourt.label}
-          otherLabels={courts
-            .filter((c) => c.id !== labelCourt.id && !c.removedAt)
-            .map((c) => c.label)}
           onSubmit={({ label }) => onSaveLabel(labelCourt, label)}
           isPending={updateCourt.isPending}
           serverError={labelError}
@@ -548,9 +643,11 @@ export function SessionView({
         now={now}
         matchId={onCourtId}
         swapFirst={swapFirst}
+        moveFirst={moveFirst}
         onClose={() => {
           setOnCourtId(null)
           setSwapFirst(false)
+          setMoveFirst(null)
         }}
       />
     </>

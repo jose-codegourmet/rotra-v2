@@ -38,7 +38,7 @@ export const Pending: Story = { args: { isPending: true } }
 export const Refused: Story = {
   args: { error: 'Thursday Open Play is already running. One session at a time.' },
 }
-/** Record games off: "Off · no results kept" */
+/** Record games off: "Off · not ranked" */
 export const RecordGamesOff: Story = { args: { recordGames: false } }
 export const RecordGamesOffLight: Story = { ...RecordGamesOff, globals: { theme: 'light' } }
 /** Scoring (Q22): the session's scoring mode after Mode. */
@@ -90,4 +90,13 @@ export const LateStartPhone: Story = {
 export const LateStartDesktop: Story = {
   args: LateStartYesterday.args,
   globals: { viewport: { value: 'desktop' } },
+}
+
+/** The Levels row (D-2026-11-19-12) with slots per level. */
+export const LevelsSlotsPerLevel: Story = {
+  args: { levelsLabel: '6 beginner · 5 intermediate · 5 advanced' },
+}
+export const LevelsSlotsPerLevelLight: Story = {
+  ...LevelsSlotsPerLevel,
+  globals: { theme: 'light' },
 }

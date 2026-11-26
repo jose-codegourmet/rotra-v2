@@ -47,6 +47,8 @@ export function AdminPlayerFilters({
           options={[
             { value: 'all', label: 'All' },
             { value: 'registered', label: 'Registered' },
+            { value: 'verified', label: 'Verified' },
+            { value: 'unverified', label: 'Not verified' },
             { value: 'unclaimed', label: 'Unclaimed' },
             { value: 'details', label: 'Details required' },
           ]}
@@ -122,6 +124,22 @@ export function AdminPlayerFilters({
                   ...places.map((p) => ({ value: p.code, label: p.name })),
                 ]}
                 onChange={(place) => onChange({ place: place === 'all' ? undefined : [place] })}
+              />
+            </Field>
+            <Field label="Gender">
+              <Select
+                value={f.gender ?? 'all'}
+                options={[
+                  { value: 'all', label: 'All' },
+                  { value: 'male', label: 'Male' },
+                  { value: 'female', label: 'Female' },
+                  { value: 'none', label: 'Not given' },
+                ]}
+                onChange={(gender) =>
+                  onChange({
+                    gender: gender === 'all' ? undefined : (gender as 'male' | 'female' | 'none'),
+                  })
+                }
               />
             </Field>
             <Field label="Archive status">

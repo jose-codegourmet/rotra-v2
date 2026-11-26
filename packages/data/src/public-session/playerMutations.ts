@@ -28,6 +28,7 @@ import {
   makeInviteCode,
   memberClubPlayer,
   membersJoinDirectly,
+  playerLevelBlock,
   playerSlot,
 } from './publicSession.rules'
 import type { JoinAsPlayerInput, PlayerSessionInput } from './publicSession.types'
@@ -114,6 +115,12 @@ export function joinAsPlayer(slug: string, input: JoinAsPlayerInput) {
         )
       )
         fail('Your request is already sent.', 'conflict')
+      // D-2026-11-19-12: a Player whose level here is outside the restriction, or whose band's
+      // slots are full, can't request or join; a waitlisted Player's Join from waitlist isn't checked.
+      if (placement !== 'from_waitlist' && !slot.roster && !slot.waitlist) {
+        const blocked = playerLevelBlock(s, session, input.playerId)
+        if (blocked) fail(blocked.reason)
+      }
       // D-2026-11-12-02: a club member joins an upcoming session right away (slot or waitlist).
       const member =
         placement !== 'from_waitlist' && membersJoinDirectly(session)

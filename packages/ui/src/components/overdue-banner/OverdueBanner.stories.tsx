@@ -25,8 +25,17 @@ type Story = StoryObj<typeof meta>
 /** "Planned end passed 15 min ago." */
 export const Overdue: Story = {}
 
-/** "Planned end passed 1 h 20 min ago." */
+/** "Planned end passed 1 h ago." (whole hours, rounded down) */
 export const LongOverdue: Story = { args: { now: end + HOUR + 20 * MINUTE } }
+
+/** "Planned end passed 45 min ago." */
+export const Overdue45Min: Story = { args: { now: end + 45 * MINUTE } }
+
+/** "Planned end passed 2 h ago." */
+export const Overdue2Hours: Story = { args: { now: end + 2 * HOUR } }
+
+/** "Planned end passed long time ago." (from 24 h) */
+export const Overdue30Hours: Story = { args: { now: end + 30 * HOUR } }
 
 /** Session done needs internet. */
 export const Offline: Story = { args: { offline: true } }

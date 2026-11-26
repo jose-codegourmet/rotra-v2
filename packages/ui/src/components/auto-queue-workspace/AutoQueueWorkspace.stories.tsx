@@ -1,19 +1,37 @@
 import { matchLineupFixtures } from '@rotra/data/fixtures/match-lineups'
 import { toggleBaggingGame } from '@rotra/data/match/auto-queue-rules'
+import { AVAILABLE_PLAYERS_EMPTY, PLAN_AHEAD_NO_PRESENT } from '@rotra/data/match/plan-ahead-rules'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { expect, fn, within } from 'storybook/test'
+import type { ExemptionPlayer } from '../player-picker-sheet/PlayerPickerSheet'
 import {
   type AutoQueueBaggingProps,
   type AutoQueueCount,
+  type AutoQueueExemptionProps,
   type AutoQueueMode,
   AutoQueueWorkspace,
   type AutoQueueWorkspaceProps,
-  type QueueWorkspace,
 } from './AutoQueueWorkspace'
 
 const fixture = matchLineupFixtures.autoQueueWorkspace
 const baggingFixture = matchLineupFixtures.bagging
+
+/** Every present roster player with a few games each; one is away. */
+const exemptionPlayers: ExemptionPlayer[] = baggingFixture.players.map((p, i) => ({
+  id: p.id,
+  name: p.name,
+  shortName: p.shortName,
+  level: p.level,
+  games: i % 5,
+  present: i % 7 !== 6,
+}))
+/** The Exemption list card with the list held in story state. */
+const exemptionArgs = (exemptIds: string[] = []): AutoQueueExemptionProps => ({
+  players: exemptionPlayers,
+  exemptIds,
+  onSave: fn(),
+})
 
 /** Bagging mode props with the switch and the pairs list held in story state. */
 function useBaggingDemo(initial: AutoQueueBaggingProps | undefined) {
@@ -66,19 +84,26 @@ const baggingArgs = (enabled: boolean, pairs = baggingFixture.pairs): AutoQueueB
 })
 
 function Demo(args: AutoQueueWorkspaceProps) {
-  const [workspace, setWorkspace] = useState<QueueWorkspace>(args.workspace)
   const [mode, setMode] = useState<AutoQueueMode>(args.mode)
   const [count, setCount] = useState<AutoQueueCount | null>(args.count)
   const [target, setTarget] = useState(args.catchUpTarget)
   const [batches, setBatches] = useState(args.batches)
   const [selected, setSelected] = useState(args.selectedIds)
   const bagging = useBaggingDemo(args.bagging)
+  const [exemptIds, setExemptIds] = useState(args.exemption?.exemptIds ?? [])
+  const exemption = args.exemption && {
+    ...args.exemption,
+    exemptIds,
+    onSave: (ids: string[]) => {
+      args.exemption?.onSave(ids)
+      setExemptIds(ids)
+    },
+  }
   return (
     <AutoQueueWorkspace
       {...args}
       bagging={bagging}
-      workspace={workspace}
-      onWorkspaceChange={setWorkspace}
+      exemption={exemption}
       mode={mode}
       onModeChange={setMode}
       count={count}
@@ -130,19 +155,12 @@ const meta = {
   title: 'Queue/AutoQueueWorkspace',
   component: AutoQueueWorkspace,
   args: {
-    workspace: 'auto',
-    onWorkspaceChange: fn(),
-    mainQueue: (
-      <div className="rounded-lg border border-border p-4 text-fg">
-        Queued matches · Main Queue controls remain here.
-      </div>
-    ),
     mode: 'available',
     onModeChange: fn(),
     count: null,
     onCountChange: fn(),
     minimumGames: matchLineupFixtures.session.minimumGames,
-    hasEligiblePlayers: true,
+    noEligibleText: null,
     catchUpTarget: '',
     onCatchUpTargetChange: fn(),
     batches: fixture,
@@ -164,7 +182,6 @@ type Story = StoryObj<typeof meta>
 
 export const Generated: Story = { args: { count: 2 } }
 export const Empty: Story = { args: { batches: {} } }
-export const MainQueue: Story = { args: { workspace: 'main' } }
 export const CrossTabSelected: Story = {
   args: { selectedIds: ['draft-available-1', 'draft-ahead-1'] },
 }
@@ -224,10 +241,10 @@ export const CatchUpWithoutTarget: Story = {
   args: { mode: 'catchup', count: 2, batches: {} },
 }
 export const NoEligiblePlayers: Story = {
-  args: { count: 2, batches: {}, hasEligiblePlayers: false },
+  args: { count: 2, batches: {}, noEligibleText: AVAILABLE_PLAYERS_EMPTY },
 }
 export const NoPresentPlayers: Story = {
-  args: { mode: 'ahead', count: 2, batches: {}, hasEligiblePlayers: false },
+  args: { mode: 'ahead', count: 2, batches: {}, noEligibleText: PLAN_AHEAD_NO_PRESENT },
 }
 export const ShortBatch: Story = {
   args: { count: 2, batches: { available: matchLineupFixtures.autoQueueCopyStates.shortBatch } },
@@ -252,7 +269,7 @@ export const CatchUpShortfall: Story = {
 export const NoEligiblePlayersAfterGeneration: Story = {
   args: {
     count: 2,
-    hasEligiblePlayers: false,
+    noEligibleText: AVAILABLE_PLAYERS_EMPTY,
     batches: { available: matchLineupFixtures.autoQueueCopyStates.shortBatch },
   },
 }
@@ -304,4 +321,38 @@ export const BaggingAddPair: Story = {
     await userEvent.click(sheet.getByRole('button', { name: 'Add pair' }))
     await expect(canvas.getByRole('heading', { name: 'Bagging pairs · 1' })).toBeVisible()
   },
+}
+
+/** From 1280 px: strategy card on the left, Exemption list (and Bagging pairs when on) on the right. */
+export const TwoColumns: Story = {
+  args: { count: 2, exemption: exemptionArgs(exemptionPlayers.slice(0, 3).map((p) => p.id)) },
+  globals: { viewport: { value: 'desktop' } },
+}
+export const TwoColumnsBaggingOn: Story = {
+  args: {
+    count: 2,
+    bagging: baggingArgs(true),
+    exemption: exemptionArgs(exemptionPlayers.slice(0, 3).map((p) => p.id)),
+  },
+  globals: { viewport: { value: 'desktop' } },
+}
+/** Bagging off, nobody exempt, no drafts yet: the side column is only the empty Exemption list. */
+export const TwoColumnsEmpty: Story = {
+  args: { count: 2, batches: {}, bagging: baggingArgs(false), exemption: exemptionArgs() },
+  globals: { viewport: { value: 'desktop' } },
+}
+export const TwoColumnsCatchUp: Story = {
+  args: {
+    mode: 'catchup',
+    count: 2,
+    catchUpTarget: '3',
+    bagging: baggingArgs(true),
+    exemption: exemptionArgs(exemptionPlayers.slice(0, 2).map((p) => p.id)),
+  },
+  globals: { viewport: { value: 'desktop' } },
+}
+/** Under 1280 px the columns stack with the side column first. */
+export const StackedPhone: Story = {
+  args: { count: 2, exemption: exemptionArgs(exemptionPlayers.slice(0, 3).map((p) => p.id)) },
+  globals: { viewport: { value: 'phone' } },
 }

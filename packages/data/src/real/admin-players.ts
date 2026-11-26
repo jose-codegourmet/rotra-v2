@@ -1,6 +1,7 @@
 import type { AdminPlayerCreateValues, AdminPlayerEditValues } from '@rotra/schema/admin-player'
 import type {
   AdminPlayer,
+  AdminPlayerBulkResult,
   AdminPlayerDetail,
   AdminPlayerEdit,
   AdminPlayerEditResult,
@@ -120,4 +121,16 @@ export async function realCreateAdminPlayer(values: AdminPlayerCreateValues): Pr
     body: values,
   })
   return playerOf(player)
+}
+
+/** Set gender for the selected players: one result per player, saved on `players.gender`. */
+export async function realSetAdminPlayersGender(input: {
+  ids: string[]
+  gender: 'male' | 'female' | null
+}): Promise<AdminPlayerBulkResult[]> {
+  const { results } = await realRequest<{ results: AdminPlayerBulkResult[] }>(
+    '/api/players/gender',
+    { method: 'PATCH', body: input },
+  )
+  return results
 }

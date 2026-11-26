@@ -1,17 +1,10 @@
 'use client'
 
 import { rotraProfileUrl } from '@rotra/data/app-origins'
-import { savedPlayerName } from '@rotra/data/club-player/clubNickname-rules'
 import { registeredCity } from '@rotra/data/club-player/fetchers'
-import type { DeleteImpact } from '@rotra/data/club-player/types'
-import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useClubPlayerYearStats } from '@rotra/data/club-player/useClubPlayerYearStats'
-import { useCreatePlayerInvite } from '@rotra/data/club-player/useCreatePlayerInvite'
-import { useDeleteClubPlayer } from '@rotra/data/club-player/useDeleteClubPlayer'
 import { useSavedPlayerStats } from '@rotra/data/club-player/useSavedPlayerStats'
-import { useSetClubNickname } from '@rotra/data/club-player/useSetClubNickname'
-import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { statsYear } from '@rotra/data/player/rules'
 import { isStatsHidden, visibleStats } from '@rotra/data/public-session/rules'
@@ -21,11 +14,8 @@ import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { AlphabetIndex } from '@rotra/ui/alphabet-index'
 import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
-import { DeletePlayerSheet } from '@rotra/ui/delete-player-sheet'
 import { EmptyState } from '@rotra/ui/empty-state'
-import { ClubNicknameForm } from '@rotra/ui/forms/club-nickname-form'
 import { usePhotoViewer } from '@rotra/ui/hooks/use-photo-viewer'
-import { InviteSheet } from '@rotra/ui/invite-sheet'
 import { LetterGroup, letterHeadingId } from '@rotra/ui/letter-group'
 import { PageHeader } from '@rotra/ui/page-header'
 import { PhotoViewer } from '@rotra/ui/photo-viewer'
@@ -39,14 +29,13 @@ import {
   type SavedPlayersFilters,
 } from '@rotra/ui/saved-players-filter-bar'
 import { Skeleton } from '@rotra/ui/skeleton'
-import { toast } from '@rotra/ui/toaster'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
+import { usePlayerProfileActions } from '@/app/(operator)/_components/player-profile-actions/PlayerProfileActions'
 import { longDateLabel, shortDateLabel } from '@/lib/dates'
 import { AddPlayer } from '../../../_components/add-player/AddPlayer'
 import { QueryError } from '../../../_components/query-error/QueryError'
-import { EditPlayerDetails } from '../edit-player-details/EditPlayerDetails'
 
 type LiveState = { kind: 'playing' | 'waiting'; text: string }
 type LiveStates = Record<string, LiveState>
@@ -115,7 +104,6 @@ export function SavedPlayers() {
   const pathname = usePathname()
   const params = useSearchParams()
   const filters = readFilters(params)
-  const offline = !useConnectivity().online
   const nowCard = useNowCard()
   const live = nowCard.data?.live ?? null
 
@@ -131,20 +119,7 @@ export function SavedPlayers() {
   })
 
   const [profileId, setProfileId] = useState<string | null>(null)
-  const [inviteId, setInviteId] = useState<string | null>(null)
-  const [editId, setEditId] = useState<string | null>(null)
-  const [nicknameId, setNicknameId] = useState<string | null>(null)
-  const setClubNickname = useSetClubNickname()
-  // D-DELETE-PLAYER, only when the player is in the Active Session
-  const [deleting, setDeleting] = useState<{
-    id: string
-    name: string
-    shortName: string
-    impact: DeleteImpact
-  } | null>(null)
-  const del = useDeleteClubPlayer()
   const [adding, setAdding] = useState(false)
-  const invite = useCreatePlayerInvite()
 
   const setFilters = (next: SavedPlayersFilters) =>
     router.replace(`${pathname}${writeFilters(next)}`, { scroll: false })
@@ -165,6 +140,11 @@ export function SavedPlayers() {
   const photo = usePhotoViewer()
   const profile = byId(profileId)
   const profileStats = useClubPlayerYearStats(profileId)
+  const actions = usePlayerProfileActions(profile, {
+    hideProfile: () => setProfileId(null),
+    showProfile: setProfileId,
+    closeProfile: () => setProfileId(null),
+  })
   const profilePhotoUrl = profile
     ? profilePictureSrc(
         profile.picture,
@@ -172,14 +152,6 @@ export function SavedPlayers() {
         profile.pictureName ?? profile.fullName,
       )
     : undefined
-  const invitee = byId(inviteId)
-  const nicknamePlayer = byId(nicknameId)
-  // Load Edit details while the profile is open, so choosing it swaps sheets with no blank gap.
-  useClubPlayerDetails(
-    profile && (profile.identity === 'guest' || profile.identity === 'unclaimed')
-      ? profile.id
-      : null,
-  )
 
   const jump = (letter: string) => {
     const heading = document.getElementById(letterHeadingId(letter))
@@ -187,56 +159,6 @@ export function SavedPlayers() {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     heading.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
     heading.focus({ preventScroll: true })
-  }
-
-  const openInvite = (id: string) => {
-    setProfileId(null)
-    setInviteId(id)
-    if (!offline)
-      invite.mutate(id, {
-        onError: (error) => {
-          setInviteId(null)
-          toast.error(error.message)
-        },
-      })
-  }
-  const removePlayer = (id: string) =>
-    del.remove.mutate(id, {
-      onSuccess: (result) => {
-        toast(`${result.name} deleted`)
-        setDeleting(null)
-        setProfileId(null)
-      },
-      onError: (error) => {
-        if (!deleting) toast.error(error.message)
-      },
-    })
-  /** Delete player: acts at once unless they're in the Active Session, which asks first. */
-  const startDelete = (p: { id: string } & Parameters<typeof savedPlayerName>[0]) =>
-    del.check.mutate(p.id, {
-      onSuccess: (impact) => {
-        if (!impact.activeSession) {
-          removePlayer(p.id)
-          return
-        }
-        del.remove.reset()
-        setProfileId(null)
-        setDeleting({
-          id: p.id,
-          name: p.fullName,
-          shortName: savedPlayerName(p),
-          impact,
-        })
-      },
-      onError: (error) => toast.error(error.message),
-    })
-  const copyLink = async (link: string) => {
-    try {
-      await navigator.clipboard.writeText(link)
-      toast('Invite link copied')
-    } catch {
-      toast('Select the link and copy it')
-    }
   }
 
   const render = (liveStates: LiveStates) => (
@@ -315,7 +237,7 @@ export function SavedPlayers() {
                     onOpenProfile={() => setProfileId(p.id)}
                     onInvite={
                       p.identity === 'guest' || p.identity === 'unclaimed'
-                        ? () => openInvite(p.id)
+                        ? () => actions.openInvite(p.id)
                         : undefined
                     }
                   />
@@ -344,14 +266,6 @@ export function SavedPlayers() {
           identity={profile.identity}
           nickname={profile.nickname}
           clubNickname={profile.identity === 'registered' ? profile.clubNickname : undefined}
-          onClubNickname={
-            profile.identity === 'registered'
-              ? () => {
-                  setProfileId(null)
-                  setNicknameId(profile.id)
-                }
-              : undefined
-          }
           level={profile.suggestion}
           registeredCity={registeredCity(profile.rtrId)}
           rtrId={profile.rtrId}
@@ -367,97 +281,11 @@ export function SavedPlayers() {
           phoneOnFile={profile.hasPhone}
           emailOnFile={profile.emailOnFile}
           detailsRequired={profile.detailsRequired}
-          onInvite={
-            profile.identity === 'guest' || profile.identity === 'unclaimed'
-              ? () => openInvite(profile.id)
-              : undefined
-          }
-          onDelete={() => startDelete(profile)}
-          deleting={del.check.isPending || (del.remove.isPending && !deleting)}
-          onEdit={
-            profile.identity === 'guest' || profile.identity === 'unclaimed'
-              ? () => {
-                  setProfileId(null)
-                  setEditId(profile.id)
-                }
-              : undefined
-          }
+          {...actions.profileProps(profile)}
         />
       ) : null}
       {photo.viewerProps ? <PhotoViewer {...photo.viewerProps} /> : null}
-      {deleting?.impact.activeSession ? (
-        <DeletePlayerSheet
-          open
-          onOpenChange={(open) => {
-            if (!open && !del.remove.isPending) setDeleting(null)
-          }}
-          name={deleting.name}
-          shortName={deleting.shortName}
-          sessionTitle={deleting.impact.activeSession.title}
-          waitingMatches={deleting.impact.activeSession.waitingMatches}
-          busy={deleting.impact.busy}
-          isPending={del.remove.isPending}
-          error={del.remove.error?.message}
-          onConfirm={() => removePlayer(deleting.id)}
-        />
-      ) : null}
-      {editId ? (
-        <EditPlayerDetails
-          key={editId}
-          clubPlayerId={editId}
-          onClose={() => {
-            setProfileId(editId)
-            setEditId(null)
-          }}
-          onMoved={(intoId) => {
-            setProfileId(intoId)
-            setEditId(null)
-          }}
-        />
-      ) : null}
-      {nicknamePlayer?.identity === 'registered' ? (
-        <ClubNicknameForm
-          key={nicknamePlayer.id}
-          open
-          onOpenChange={(open) => {
-            if (open) return
-            setClubNickname.reset()
-            setProfileId(nicknamePlayer.id)
-            setNicknameId(null)
-          }}
-          name={nicknamePlayer.fullName}
-          currentNickname={nicknamePlayer.clubNickname}
-          accountNickname={nicknamePlayer.nickname}
-          isPending={setClubNickname.isPending}
-          serverError={setClubNickname.error?.message}
-          onSubmit={(values) =>
-            setClubNickname.mutate(
-              { clubPlayerId: nicknamePlayer.id, clubNickname: values.nickname },
-              {
-                onSuccess: (result) => {
-                  toast(result.message)
-                  setProfileId(nicknamePlayer.id)
-                  setNicknameId(null)
-                },
-              },
-            )
-          }
-        />
-      ) : null}
-      {invitee && (invitee.identity === 'guest' || invitee.identity === 'unclaimed') ? (
-        <InviteSheet
-          open={inviteId !== null}
-          onOpenChange={(open) => {
-            if (!open) setInviteId(null)
-          }}
-          name={invitee.fullName}
-          identity={invitee.identity}
-          emailOnFile={invitee.emailOnFile}
-          link={invite.data?.url}
-          offline={offline}
-          onCopy={copyLink}
-        />
-      ) : null}
+      {actions.sheets}
       <AddPlayer open={adding} onOpenChange={setAdding} />
     </main>
   )

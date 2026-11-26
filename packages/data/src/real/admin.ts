@@ -1,3 +1,4 @@
+import type { ClubPriceValues } from '@rotra/schema/club-price'
 import type { AdminSession, AdminSignInInput } from '../admin-account/adminAccount.types'
 import {
   adminClubAccessFilter,
@@ -49,6 +50,8 @@ type WireAdminClub = {
   licensePricing: 'paid' | 'free'
   licenseMonthly: WireMoney
   licenseYearly: WireMoney
+  /** Bigint revision as a decimal string; a write sends it back as `expectedRevision`. */
+  revision: string
   username: string | null
   provisionedAt: string | null
   city: string
@@ -179,6 +182,37 @@ export function realReviewClubNameChange(
       body: { requestId, decision },
     },
   )
+}
+
+/**
+ * A-CLUB-PRICE › Save price. Reads the club first for its revision and to answer "nothing changed"
+ * without a write or audit row (as the mock does); `price` is already validated by the caller.
+ */
+export async function realChangeClubPrice(
+  clubId: string,
+  price: ClubPriceValues,
+): Promise<{ changed: boolean; priceLine: string }> {
+  const { club } = await realRequest<{ club: WireAdminClub }>(
+    `/api/clubs/${encodeURIComponent(clubId)}`,
+  )
+  const current = listItemOf(club)
+  const before = formatClubPriceLine(current)
+  const same =
+    price.pricing === 'free'
+      ? current.licensePricing === 'free'
+      : current.licensePricing === 'paid' &&
+        current.licenseMonthlyMinor === price.monthly &&
+        current.licenseYearlyMinor === price.yearly
+  if (same) return { changed: false, priceLine: before }
+  const { club: saved } = await realRequest<{ club: WireAdminClub }>(
+    `/api/clubs/${encodeURIComponent(clubId)}/price`,
+    {
+      method: 'PATCH',
+      body: { sourceCommandId: crypto.randomUUID(), expectedRevision: club.revision, price },
+      fields: { price: 'price.monthly' },
+    },
+  )
+  return { changed: true, priceLine: formatClubPriceLine(listItemOf(saved)) }
 }
 
 export async function realGetAdminClub(

@@ -20,6 +20,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { GamePlayerProfile } from '@/app/_components/game-player-profile/GamePlayerProfile'
+import { useOpenMatch } from '@/app/_components/match-link/useOpenMatch'
 import { pictureSrc } from '@/app/_components/profile-picture/pictureSrc'
 import { usePlayerShareSheet } from '@/app/_components/share/usePlayerShareSheet'
 import { useAppSelector } from '@/store/hooks'
@@ -40,6 +41,7 @@ export function GameHistory({ playerId }: { playerId: string }) {
   const account = useAppSelector(selectAccount),
     { offline } = useAppSelector(selectDev)
   const sharing = usePlayerShareSheet(account?.id === playerId ? playerId : null)
+  const openMatch = useOpenMatch('Games')
   const mySessions = useMySessions(account?.id === playerId ? playerId : null)
   if (
     rank.error?.message === PROFILE_LOGIN_MESSAGE ||
@@ -125,7 +127,7 @@ export function GameHistory({ playerId }: { playerId: string }) {
           onFilterChange={(next) => {
             setFilter(next)
             setPage(1)
-            // Tapping a bar on Fun and partial switches to Singles and doubles and filters there.
+            // Tapping a bar on Fun, partial and not ranked switches to Singles and doubles and filters there.
             if (next) setActiveTab('counted')
           }}
         />
@@ -154,6 +156,7 @@ export function GameHistory({ playerId }: { playerId: string }) {
         onShareResult={own ? sharing.openResult : undefined}
         onShareGames={own ? sharing.openGames : undefined}
         onShareGame={own ? sharing.openGame : undefined}
+        onOpenGame={openMatch}
       />
       <GamePlayerProfile
         player={openPlayer}

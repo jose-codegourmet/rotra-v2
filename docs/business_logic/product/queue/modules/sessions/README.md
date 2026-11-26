@@ -97,7 +97,7 @@ The club keeps a list of venues it books: name (required, unique within the club
 
 **Owner, November 18, 2026 ([D-2026-11-18-06](../../../../../mvp/decisions/2026-11-18.md#d-2026-11-18-06); [log](../../../../../mockup-changes/2026-11-18-queue-record-games-option.md); in the mock app, and in real mode since Q23.8 #976).** One session-wide switch on the session form, **on by default**. It can change while the session is Prepared and is fixed once the session starts. A session saved before this change reads as recorded.
 
-While it is **off**, the games are recorded as usual, but **their wins don't count toward the leaderboards or win rate** (owner, November 20, 2026, [D-2026-11-20-02](../../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02); [log](../../../../../mockup-changes/2026-11-20-queue-record-games-not-ranked.md); mockup only — the mock app and real mode still run the November 18 rule “run only, keep nothing”):
+While it is **off**, the games are recorded as usual, but **their wins don't count toward the leaderboards or win rate** (owner, November 20, 2026, [D-2026-11-20-02](../../../../../mvp/decisions/2026-11-20.md#d-2026-11-20-02); [log](../../../../../mockup-changes/2026-11-20-queue-record-games-not-ranked.md); mock app #1079, real mode #1080):
 
 - Everything works as in a recorded session: the queue, courts, presence, payments and minimum games; **Match done** with a winner and score; the Leaderboard, Match History, standings, result slides, awards and Publish results; player records and each player's history in the Player app.
 - **The only difference:** the wins and losses are not part of the Top annual / monthly / weekly leaderboards' wins, the win rate or the shared rank ([ranking](../../../player-information/modules/ranking/README.md)).
@@ -175,6 +175,23 @@ length, rounded up to the next 15 minutes, and must be after now (at most 24 hou
 until it is. Starting saves the new end; courts that follow the session end move with it, courts with their own
 set times do not.
 
+**Starting on an earlier day than planned (owner, November 25, 2026, [log](../../../../../mockup-changes/2026-11-25-queue-early-day-start.md)).**
+When the planned start is still ahead (a session planned for tomorrow started today), Start also moves the
+planned start to now, so the session's window is now → the new end and the end never falls before the start.
+The notice adds "Starting now moves its start to now." Courts that follow the session start open now; a court
+with its own later start keeps it, and one that would open at or after the new end blocks Start until it is
+edited. The minimum still freezes from the planned window. Before this, such a start failed with "Something
+went wrong."
+
+**Back to preparation (owner, November 25, 2026, [log](../../../../../mockup-changes/2026-11-25-queue-back-to-preparation.md)).**
+Until any game starts, the Queue Master can undo Start from the live console's ⋯ menu (**Back to
+preparation…**, confirmed in [D-BACK-TO-PREP](../../../../../screens/product/dialogs.md#d-back-to-prep--undo-start)). It is refused once any match is active,
+completed or invalid, and offline. Confirming makes the session prepared again: the start time clears, every
+level unlocks, the planned start and end and each court's planned start go back to what they were before
+Start (a late or other-day start had changed them), and matches waiting in the Main Queue or put on court
+are removed. Join requests closed at Start stay closed; the session link takes new join requests again. How
+the real database keeps the pre-Start planned times is still an open question (see the log).
+
 The actual start time (`startedAt`) is fixed once play begins: "Start time is fixed: it records when play began."
 
 ## Running
@@ -183,6 +200,8 @@ The actual start time (`startedAt`) is fixed once play begins: "Start time is fi
 
 - The operator can add players at any time, including offline; late players get a level that locks immediately.
 - **Add court:** label (defaults to the next "Court N") and **Open until** — either until the session ends (moves when the end time changes) or until a set time within the session; the planned start determines when the court becomes available, unless the operator opens it early with **Start anyway**.
+- **Court order (owner, November 25, 2026; [log](../../../../../mockup-changes/2026-11-25-queue-settings-courts-arrange.md)):** the courts keep one order for the session. New courts go last; the Queue Master changes the order during play by dragging a court card by its handle in the Settings tab (or with the arrow keys on the handle), and it saves at once. That order is used everywhere: the Courts tab, the public page, and Auto Queue, which fills free courts in court order ([court filling](../queueing/README.md#auto-queue-and-manual-queue-court-filling)).
+- **Court labels may repeat (owner, November 25, 2026):** a label is required and up to 20 characters; two courts in a session may share one. The Queue Master renames a court from the Courts tab's ⋯ menu or by pressing its label in the Settings tab.
 - **Remove court:** only a free court, and a session keeps at least one court. Removing a court is blocked while any match (On court or Playing) is on it.
 - **Change a court's time while a match is on it (owner comment, November 11, 2026; [log](../../../../../mockup-changes/2026-11-11-queue-courts-and-time-sheet.md)):** the court's **end** (until the session ends, or a set time) and its label can change even while a match is On court or Playing, and the match is not touched. The planned start stays fixed once the court has been used. This replaces the earlier rule that editing a court was blocked while a match was on it.
 - **Bagging mode (November 11, 2026):** a session-wide Generate matches setting for doubles sessions, changed by the Queue Master during play: on or off, and a list of bagging pairs. See [Queueing › Bagging mode](../queueing/README.md#bagging-mode-and-bagging-pairs).

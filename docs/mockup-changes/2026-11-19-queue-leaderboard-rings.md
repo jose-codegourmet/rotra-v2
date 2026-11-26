@@ -1,6 +1,6 @@
 # Queue app: the live Leaderboard's pictures show the level ring
 
-Status: NEW
+Status: IN MOCK APP — #1055
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `boardPane()` (`.lb-stack .lv-ring`)

@@ -53,14 +53,14 @@ export const Players24: Story = { args: { rows: rows(24) } }
 export const YouHighlighted: Story = { args: { rows: rows(24, 12) }, globals: { theme: 'dark' } }
 export const Phone: Story = { globals: { theme: 'dark', viewport: { value: 'phone' } } }
 
-/** Positions 1, 1, 3, 3, 3, 6 ...: the number is the position, not the row index. */
+/** Positions 1, 1, 2, 2, 2, 3 ...: the number is the position, not the row index. */
 export const SharedPositions: Story = {
   args: {
-    rows: [1, 1, 3, 3, 3, 6, 6, 6, 6, 6, 6, 12].map((position, i) => ({
+    rows: [1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4].map((position, i) => ({
       position,
       name: NAMES[i % NAMES.length] ?? 'Player',
-      wins: 8 - Math.floor(position / 2),
-      losses: Math.floor(position / 2),
+      wins: 9 - position,
+      losses: position - 1,
       games: 8,
       isViewer: i === 4,
     })),

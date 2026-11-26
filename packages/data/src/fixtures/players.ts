@@ -1,4 +1,4 @@
-import type { ClubPlayer, JoinedVia } from '../club-player/clubPlayer.types'
+import type { ClubPlayer, Gender, JoinedVia } from '../club-player/clubPlayer.types'
 import { PLAYING_LEVELS, type Player, type PlayingLevel } from '../player/player.types'
 import seed from './players.seed.json'
 
@@ -262,8 +262,38 @@ const joinedViaSeeds: Record<string, JoinedVia> = {
 }
 const seededJoinedVia = (playerId: string): JoinedVia => joinedViaSeeds[playerId] ?? 'added'
 
+/**
+ * Sample genders for the demo club's saved players (D-2026-11-19-01). Gab and the unclaimed Gab
+ * Torres stay unset to show Genderless matches; anyone not listed has no gender.
+ */
+export const genderSeeds: Record<string, Gender> = {
+  Jose: 'male',
+  Aaron: 'male',
+  Raymark: 'male',
+  'Mikee Abellana': 'female',
+  Dexter: 'male',
+  Dalton: 'male',
+  Joeriz: 'female',
+  Albion: 'female',
+  Vince: 'male',
+  Karl: 'male',
+  Klod: 'female',
+  Jasper: 'male',
+  Emji: 'female',
+  Russel: 'male',
+  Santino: 'male',
+  Andrew: 'male',
+  Derrick: 'male',
+  Nathan: 'male',
+  Trixie: 'female',
+  Kenji: 'male',
+  Kenjie: 'female',
+  'Maria Steph': 'female',
+}
+
 export const clubPlayers = savedClubPlayers.map((player, index) => ({
   ...player,
+  gender: genderSeeds[player.fullName] ?? null,
   joinedVia:
     player.playerId === JOSE_PLAYER_ID ? ('club' as const) : seededJoinedVia(player.playerId),
   // The final three additions are recent on every fresh mock-store load, even just after Monday.
@@ -328,5 +358,6 @@ clubPlayers.push({
   nickname: null,
   identity: 'registered',
   playingLevel: 'intermediate_low',
+  gender: 'male',
   joinedVia: 'added',
 })

@@ -8,11 +8,13 @@ import { EmptyState } from '@rotra/ui/empty-state'
 import { levelLabel } from '@rotra/ui/level-pill'
 import {
   formatStandingsGames,
+  type StandingsFaceBand,
   type StandingsGames,
   StandingsPlayerCell,
+  tiedNames,
 } from '@rotra/ui/standings-faces'
 import { createColumnHelper } from '@tanstack/react-table'
-import { useMemo } from 'react'
+import { type ReactNode, useMemo } from 'react'
 
 /** One player inside a standings position. */
 export type LiveLeaderboardPlayer = {
@@ -24,10 +26,10 @@ export type LiveLeaderboardPlayer = {
 
 /**
  * One standings row: a position and the players who hold it. Players with the same wins and losses
- * share one row (1, 1, 3); the caller computes the position and orders the players inside it.
+ * share one row (1, 1, 2); the caller computes the position and orders the players inside it.
  */
 export type LiveLeaderboardRow = {
-  /** The shared position number: 1, 1, 3 */
+  /** The shared position number: 1, 1, 2 */
   position: number
   /** One or more players, in the order their names and faces show */
   players: LiveLeaderboardPlayer[]
@@ -46,6 +48,8 @@ type LiveLeaderboardBaseProps = {
   rows: LiveLeaderboardRow[]
   /** The player's picture opens their profile */
   onOpenProfile: (playerId: string) => void
+  /** The session's TopThreePodium, between the copy and the table (D-2026-11-25-04) */
+  podium?: ReactNode
   className?: string
 }
 
@@ -68,6 +72,10 @@ export type LiveLeaderboardProps = LiveLeaderboardBaseProps &
   )
 
 const column = createColumnHelper<LiveLeaderboardRow>()
+
+/** "intermediate_mid" → "intermediate"; no level → "none" (grey ring). */
+const bandOf = (level: PlayingLevel | null): StandingsFaceBand =>
+  level ? (level.split('_')[0] as StandingsFaceBand) : 'none'
 
 const profileLabelOf = (name: string) => `${name}. View profile`
 
@@ -101,6 +109,7 @@ export function LiveLeaderboard({
   rows,
   minimumGames,
   onOpenProfile,
+  podium,
   className,
 }: LiveLeaderboardProps) {
   const record = variant === 'record'
@@ -127,10 +136,11 @@ export function LiveLeaderboard({
                 id: p.playerId,
                 name: p.name,
                 pictureUrl: p.photoUrl,
+                band: record ? undefined : bandOf(p.level),
                 onOpen: () => onOpenProfile(p.playerId),
               }))}
               profileLabel={record ? profileLabelOf : undefined}
-              names={<b>{players.map((p) => p.name).join(', ')}</b>}
+              names={<b>{tiedNames(players.map((p) => p.name))}</b>}
               detail={
                 record ? undefined : (
                   <span className="block text-[13px] text-fg2">{levels.join(', ')}</span>
@@ -202,6 +212,7 @@ export function LiveLeaderboard({
           </p>
         </div>
       )}
+      {podium}
       {rows.length ? (
         <Card padding="none" className="overflow-hidden px-1.5 max-[760px]:px-4">
           <DataTable

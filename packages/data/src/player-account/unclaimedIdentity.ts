@@ -6,7 +6,6 @@ import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import type { PlayingLevel } from '../player/player.types'
 import { clubRecordsOf, emailKey, isCurrentRecord } from '../player/unclaimed'
-import { recordsGames } from '../queue-session/queueSession.types'
 import { isRealDataMode } from '../real/mode'
 import { levelLabel } from '../session-roster/sessionRoster.rules'
 
@@ -85,12 +84,10 @@ function playingSince(years: number | null, months: number | null, now: number) 
 
 /**
  * Games and sessions the record played at its club: finished sessions and their completed games.
- * An unrecorded session (Record games off) adds nothing to a player's record.
+ * A session with Record games off counts too: its games are recorded as usual.
  */
 function playedHere(s: MockState, clubPlayerId: string) {
-  const finished = new Set(
-    s.sessions.filter((x) => x.state === 'completed' && recordsGames(x)).map((x) => x.id),
-  )
+  const finished = new Set(s.sessions.filter((x) => x.state === 'completed').map((x) => x.id))
   const slots = s.roster.filter((r) => r.clubPlayerId === clubPlayerId && finished.has(r.sessionId))
   if (!slots.length) return identityPlayedSeeds[clubPlayerId] ?? { games: 0, sessions: 0 }
   const ids = new Set(slots.map((r) => r.id))

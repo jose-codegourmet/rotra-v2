@@ -13,6 +13,8 @@ import {
   realPlayerNotifications,
 } from '../real/player-notifications'
 import {
+  GENDER_REMINDER_ID,
+  genderReminder,
   isPlayerNotificationVisible,
   playerNotificationUnreadCount,
   VERIFICATION_REMINDER_ID,
@@ -34,6 +36,17 @@ function mockReminder(state: MockState, playerId: string, now: number): PlayerNo
     state.verificationReminderReads[playerId] ?? null,
     now,
   )
+}
+
+function mockGenderReminder(
+  state: MockState,
+  playerId: string,
+  now: number,
+): PlayerNotification | null {
+  const profile = state.playerProfiles.find((entry) => entry.playerId === playerId)
+  // No profile or a gender already added: no reminder.
+  if (!profile || profile.gender) return null
+  return genderReminder(state.genderReminderReads[playerId] ?? null, now)
 }
 
 function resolveClubTarget(
@@ -70,6 +83,8 @@ export async function getPlayerNotifications(
     .map((notification) => resolveClubTarget(notification, state, playerId))
   const reminder = mockReminder(state, playerId, now)
   if (reminder) rows.unshift(reminder)
+  const gender = mockGenderReminder(state, playerId, now)
+  if (gender) rows.unshift(gender)
   return rows
 }
 
@@ -99,11 +114,17 @@ async function markRead(playerId: string, notificationId?: string): Promise<void
         ? mockReminder(draft, playerId, now)
         : null
     const markReminder = reminder?.readAt === null
-    if (!unread.length && !markReminder) return
+    const gender =
+      notificationId === undefined || notificationId === GENDER_REMINDER_ID
+        ? mockGenderReminder(draft, playerId, now)
+        : null
+    const markGender = gender?.readAt === null
+    if (!unread.length && !markReminder && !markGender) return
 
     checkMockSave()
     for (const notification of unread) notification.readAt = readAt
     if (markReminder) draft.verificationReminderReads[playerId] = readAt
+    if (markGender) draft.genderReminderReads[playerId] = readAt
   })
 }
 

@@ -1,6 +1,6 @@
 # Leaderboards, rank explanation, and game history
 
-**Last verified:** 2026-10-28 for profile sync timing and confirmed guest-history linkage.
+**Last verified:** 2026-11-25 for P-LEADERBOARD and P-ELIGIBILITY (four periods, shared places, podium, full names; [D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)); 2026-10-28 for profile sync timing and confirmed guest-history linkage.
 
 **Surfaces:** `P-LEADERBOARD`, `P-RANK-DETAIL`, `P-ELIGIBILITY`, `P-MATCH-HISTORY`.
 
@@ -8,54 +8,89 @@
 
 ## P-LEADERBOARD — ROTRA leaderboards
 
-Public without sign-in. **Top annual** is the default. The **Top annual · Top monthly · Top weekly**
-switch sits below the page title with the period and comparison, e.g. “2026 · compared with last
-year”, “November 2026 · compared with last month” or “Nov 16 to Nov 22 · compared with last week”.
-Labels use the calendar in Asia/Manila. [Decision](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-05) ·
-[Prototype change](../../../../mockup-changes/2026-11-16-player-leaderboard-periods.md).
+Public without sign-in. **Top annual** is the default. The **Top annual · Top quarterly · Top monthly
+· Top weekly** switch sits below the page title with the period and comparison, e.g. “2026 · compared
+with last year”, “Oct to Dec 2026 · compared with last quarter”, “November 2026 · compared with last
+month” or “Nov 16 to Nov 22 · compared with last week”. Labels use the calendar in Asia/Manila.
+[Decision](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-05) ·
+[four periods, shared places, podium, full names](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04) ·
+[Prototype change](../../../../mockup-changes/2026-11-16-player-leaderboard-periods.md) ·
+[November 25 change](../../../../mockup-changes/2026-11-25-player-leaderboard-podium.md).
 
 The selected period drives the podium, **Your position** card, search and list. Each row shows the
-place, movement mark, picture, name and “N wins”. On a phone, wins sit under the name. The heading
-reads # · Player · Wins. The podium replaces rows 1–3 when there are at least three players and no
-name search. When all 50 places are filled, the footer starts at “Showing 1–25 of the top 50” with
-**Show 25 more**. A shorter list gives its actual number of places. Name search covers all publicly
-readable names and nicknames in the selected top 50 and retains each hit's place. No hits reads `No one
-in the top 50 matches “name”.` Entering a full RTR ID can open a profile outside the top 50.
+place, movement mark, picture, full name, nickname and “N wins”. On a phone, wins sit under the name.
+The heading reads # · Player · Wins.
 
-Movement compares places with the previous calendar period. The mark is an up arrow with the number
-of places, a down arrow with the number, a dash for no move or **New** for a player with no place in
-the prior top 50. Pointing at the mark or focusing the row shows the earlier place where available.
-The same words are included in the row's accessible name.
+**Shared places.** Players with the same wins and the same win rate share a place, and the next place
+follows on without a gap (1, 1, 2). Rows inside a shared place are ordered by nickname (full name when
+none), then ID. A shared row's accessible name says “shared”.
 
-A signed-in player in the selected top 50 sees “Your position this month”, their place and wins,
-the movement sentence, and **Show my row**. A player with qualifying matches below place 50 sees
-“You're not in the top 50 this year” with their wins and place 50's wins. The card mentions a better
-win rate only if it decided the tie. A player with no qualifying matches sees “You haven't played a
-standard match this week yet” (with the selected period) and **Open my profile**. A profile link can
-select the period and focus and flash the player's row using `/?period=month&player=<id>`, loading
-the second page when needed.
+**Podium (always shown).** The **Top three** podium (2nd, 1st, 3rd steps) is always shown once the
+list has loaded: with fewer than three places, a place no one holds keeps its step with an empty
+dashed circle and **No one yet**; with an empty list, all three steps are empty above the empty
+message. It also stays during a name search. A place one player holds shows their picture, full name,
+nickname and “N wins” and opens the profile dialog. A place several players share stacks their
+pictures on the step (two or three overlapping, or two and a **+N** circle), lists the first two full
+names with “+N more” and “N wins each”, and opens the **shared place dialog**. The podium holds every
+player in places 1 to 3, so the list starts at place 4. When all of the top 50 are on the podium the
+list reads “Everyone on this list so far is on the podium.”
 
-A row or podium place opens the profile dialog. For visitors, a **Private** player's name is masked
-(“Jose Adrian” → “J*** A***”), their picture shows the mask's initials, the place is unavailable as
-a button and the name cannot be found by search. A private RTR ID shows the same “Profile not found”
-as an unknown ID. **Always private** players keep their public picture and banner, with a masked
-name and only the private dialog available to other viewers. Their own row is shown in full.
-[Private visibility](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-07) ·
+**Shared place dialog.** Title “1st place · 4 players”; a line “ROTRA · Top weekly · Nov 23 to Nov
+29. The same wins and the same win rate, so they share this place.”; one row per player in the
+place, in the list's order: picture, full name, nickname, **You** or **Not registered yet** chip,
+“N wins” and “N% win rate”. A row opens the profile dialog; a row of a profile the viewer may not open
+does nothing. **Close**.
+
+**List.** When all 50 rows are filled, the footer starts at “Showing 1–25 of the top 50” with **Show
+25 more** (it opens at least the podium and one row after it). The top 50 is the first 50 players
+plus anyone sharing the 50th player's place, so a list can hold a few more than 50. A shorter list
+gives its actual number. Name search covers every name and nickname in the selected top 50 and
+retains each hit's place. No hits reads `No one in the top 50 matches “name”.` Entering a full RTR ID
+can open a profile outside the top 50.
+
+Movement compares places with the previous calendar period (last year, last quarter, last month,
+last week). The mark is an up arrow with the number of places, a down arrow with the number, a dash
+for no move or **New** for a player with no place in the prior top 50. Pointing at the mark or
+focusing the row shows the earlier place where available. The same words are included in the row's
+accessible name.
+
+A signed-in player in the selected top 50 sees “Your position this month”, their place and wins
+(“· shared place” when shared), the movement sentence, and **Show my row**. A player with qualifying
+matches below the top 50 sees “You're not in the top 50 this year” with their wins and “The last
+player in the top 50 has N”, adding “and a better win rate” only when the wins are equal. A player
+with no qualifying matches sees “You're not on the leaderboard yet” and **Open my profile**. A profile
+link can select the period and focus and flash the player's row using
+`/?period=month&player=<id>`, loading the second page when needed.
+
+**Names and pictures** ([D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)):
+every row, podium place and shared place dialog shows the full name, nickname and picture to everyone,
+signed in or not, whatever the player's profile visibility, and the name search finds them. A row
+or podium place opens the profile dialog, except for a profile the viewer may not open (a **Private**
+player for a visitor, an **Always private** player for anyone else): that row or place still shows the
+name and picture but is not a button. A private RTR ID shows the same “Profile not found” as an
+unknown ID. The profile itself keeps its masking. [Private visibility](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-07) ·
 [Always private](../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11).
 
 An unclaimed player saved by one club is public and has a **Not registered yet** chip on their
 leaderboard row. Their row opens the profile dialog. A person saved by more than one club joins the
 list after registering. [Unclaimed players](../../../../mvp/decisions/2026-11-16.md#d-2026-11-16-04).
 
-**Who appears here** explains standard matches, the calendar resets, tie-breaking by win rate,
-excluded matches and sessions, movement marks and unclaimed players. **How ranks work** opens the
-separate skill rank explanation.
+**Who appears here** explains the four lists and standard matches, shared places (“Players with the
+same wins and the same win rate share a place, and the next place follows on (1, 1, 2). Tap a podium
+step that several players share to see them all.”), the calendar resets and the quarters, excluded
+matches and sessions, movement marks, “Every leaderboard shows each player's full name and picture,
+whatever their profile is set to.” and unclaimed players. **How ranks work** opens the separate skill
+rank explanation.
 
-States include loading, an empty period (“No one on the leaderboard has played a standard match
-this week yet.”), fetch failure with **Try again**, refresh in progress and a cached copy while
-offline. Pull down from the top or return to the tab to refresh the selected list, active search and
-signed-in place at most once every 10 seconds. The refresh pill reports the live state.
+States include loading, an empty period (podium with three empty steps, then “No one has won a
+standard match this week yet. The list fills as clubs finish sessions.”), fetch failure with **Try
+again**, refresh in progress and a cached copy while offline. Pull down from the top or return to the
+tab to refresh the selected list, active search and signed-in place at most once every 10 seconds.
+The refresh pill reports the live state.
 [Pull-to-refresh change](../../../../mockup-changes/2026-11-12-player-pull-to-refresh.md).
+
+A club has its own leaderboard with the same parts, on the club page and its leaderboard page: see
+[P-CLUB-PAGE › Leaderboard and P-CLUB-LEADERBOARD](club-page.md#leaderboard-card).
 
 ## P-RANK-DETAIL — Explain the shared rank
 
@@ -79,7 +114,7 @@ three months. After three months without play the old label remains visible with
 reassessment** and the profile explains the fresh club assessment. See [profile states](profile.md#profile-states).
 
 **Leaderboards** appears above the shared rank only when the player places in at least one of the
-three top 50 lists. Each box shows the list name, place and period wins. Opening it selects that
+four ROTRA top 50 lists (annual, quarterly, monthly, weekly; up to four boxes, [D-2026-11-25-04](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)). Club places are not shown. Each box shows the list name, place and period wins. Opening it selects that
 period and scrolls to and highlights the player's row. Places follow the calendar leaderboard rules
 independently of the skill rank or its progress.
 
@@ -93,7 +128,7 @@ Route `/player/players/<id>/sessions` (owner artifact comment, November 13, 2026
 
 **Three sessions per page** (owner artifact comment, November 13, 2026): the Games page lists three sessions per page with **Newer** · “Page N of M · K sessions” · **Older** under the list.
 
-**Game row as a court** (owner, November 13, 2026; [log](../../../../mockup-changes/2026-11-13-player-game-row-court.md)): every game row in ROTRA Player (Games page, Recent games, the session matches dialog) is a small badminton court drawn like the Queue app's courts (court green, white lines, dashed net; names on dark pills): the player's side on the left (the player — “You” on your own — and their partner), the opponents on the right, each a 44 px face (36 px on phones) with the first name under it, on a court about 112 px tall; the winning side is lit (accent rings and a soft accent tint); in the middle, on the net between the pairs, a dark box with only the score (or “No score”, tooltip “Winner recorded; score not entered”) and a **Won** / **Lost** chip (**Not counted** for partial games); the format (DOUBLES, SINGLES, …) is a small pill in the court's top-left corner and, on your own games, a share icon sits in the top-right corner. Every face opens the profile card (a limited “Not on ROTRA yet” card for a guest). Fun or partial notes show under the row. Opponents' faces and first names are shown; which opponent details are public otherwise stays open below. **Games badge** (owner, November 14, 2026; [log](../../../../mockup-changes/2026-11-14-player-game-row-games-badge.md)): every face carries a small round badge on its top-right corner with how many games that person had played in that session, this game included (white with dark digits; accent on the winning side; accessible name “NAME, game 3 of that session”).
+**Game row as a court** (owner, November 13, 2026; [log](../../../../mockup-changes/2026-11-13-player-game-row-court.md)): every game row in ROTRA Player (Games page, Recent games, the session matches dialog) is a small badminton court drawn like the Queue app's courts (court green, white lines, dashed net; names on dark pills): the player's side on the left (the player — “You” on your own — and their partner), the opponents on the right, each a 44 px face (36 px on phones) with the first name under it, on a court about 112 px tall; the winning side is lit (accent rings and a soft accent tint); in the middle, on the net between the pairs, a dark box with only the score (or “No score”, tooltip “Winner recorded; score not entered”) and a **Won** / **Lost** chip (**Not counted** for partial games); the format (DOUBLES, SINGLES, …) is a small pill in the court's top-left corner and, on your own games, a share icon sits in the top-right corner. Every face opens the profile card (a limited “Not on ROTRA yet” card for a guest). Fun or partial notes show under the row. Opponents' faces and first names are shown; which opponent details are public otherwise stays open below. **Games badge** (owner, November 14, 2026; [log](../../../../mockup-changes/2026-11-14-player-game-row-games-badge.md)): every face carries a small round badge on its top-right corner with how many games that person had played in that session, this game included (white with dark digits; accent on the winning side; accessible name “NAME, game 3 of that session”). **Court tap** (owner, November 25, 2026; [log](../../../../mockup-changes/2026-11-25-player-match-page.md)): tapping the court box (not a face or the share icon) opens that game's public match page, [P-MATCH-PAGE](match-page.md).
 
 Show only official records from valid finalized sessions for a linked player. Each supported row can show date, club/session, format, teams/opponents permitted by visibility policy, result, and final score **if supplied**. A missing score is displayed as “Winner recorded; score not entered,” not 0–0.
 
@@ -119,7 +154,7 @@ Own profile only ([D-2026-11-09-08](../../../../mvp/decisions/2026-11-09.md#d-20
 - **Share rank:** on the own profile when ranked. The card shows the level, the **Top annual** place if present, and the skill ladder.
 - **Share result:** in Home's Upcoming sessions card (Finished) and on each session group in Match history. Card: session title, date and club, “#N in Standings”, “G games · W–L”.
 - **Share games:** on each session group in Match history. Card: date and club, avatar groups for each team with a prominent score between them, and “Total W–L”. Post shows 3 games, Story 4, then “+N more games”. A missing score shows an em dash and “Winner recorded”.
-- **Your own games, any time** (since November 13, 2026, [D-2026-11-13-06](../../../../mvp/decisions/2026-11-13.md#d-2026-11-13-06)): **Share performance** (one card: session title, date · club, your counted record big as “W–L” with “N% won”, then Games, Won, Lost and, once published, Standing “#N”; also in the session matches dialog footer on your own profile) and **Share games** show on every session of your own history, and each counted game has a share icon (**Share game**, one game). **Share result** still appears only after the Queue Master publishes; before that the row says “Share result opens once the club shares the Standings.”
+- **Your own games, any time** (since November 13, 2026, [D-2026-11-13-06](../../../../mvp/decisions/2026-11-13.md#d-2026-11-13-06)): **Share performance** (one card: session title, date · club, your counted record big as “W–L” with “N% won”, then Games, Won, Lost and, once published, Standing “#N”; also in the session matches dialog footer on your own profile) and **Share games** show on every session of your own history, and each counted game has a share icon (**Share game**, one game). Since November 25, 2026, the **Share game** dialog's **Link** field and copy icon hold the game's match page (`/matches/<matchId>`, [P-MATCH-PAGE](match-page.md)) instead of the profile link; the other share kinds keep theirs. **Share result** still appears only after the Queue Master publishes; before that the row says “Share result opens once the club shares the Standings.”
 - **Names on images:** other players show as a visitor would see them. Private and Always private players and guests are masked (first letter plus `***` per word), public registered players in full, whoever is signed in.
 - **Story** shows 4 avatar rows; **Post** shows 3. Both keep scores prominent and names secondary.
 
@@ -130,6 +165,6 @@ Own profile only ([D-2026-11-09-08](../../../../mvp/decisions/2026-11-09.md#d-20
 - Updating weights changes explanatory copy only when the corresponding configured calculation is in effect.
 - Deleting a club's public page leaves the player's retained official record intact.
 
-**Owner revision, November 10, 2026:** Share games uses paired avatar groups with a large score between them. The owner and partners appear on the left, opponents on the right, with short labels below. Public players may show pictures; private players and guests show masked initials only. A missing score shows an em dash and “Winner recorded”. Post shows 3 games, Story 4, with “+N more games” and the full session W–L total.
+**Owner revision, November 10, 2026:** Share games uses paired avatar groups with a large score between them. The owner and partners appear on the left, opponents on the right, with short labels below. Public players may show pictures; private players show masked initials only; guests show a masked name with the picture the club set ([D-2026-11-09-12](../../../../mvp/decisions/2026-11-09.md#d-2026-11-09-12)), else initials (owner, November 25, 2026). A missing score shows an em dash and “Winner recorded”. Post shows 3 games, Story 4, with “+N more games” and the full session W–L total.
 
 **Owner follow-up, November 10:** Games share cards use player names rather than “You”. The winning player or pair has green avatar borders; the same borders appear in the PNG export. Masked names remain masked.

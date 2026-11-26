@@ -16,6 +16,7 @@
   --font: "Satoshi", "Manrope", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
   --r: 10px; --r-sm: 6px;
   --court: #14603f; --court-line: rgba(255, 255, 255, 0.85); --court-free: #232328; --court-free-line: rgba(255, 255, 255, 0.16);
+  --lv-beg: #3d9bff; --lv-int: #ffd23f; --lv-adv: #ff5a5f; --lv-none: var(--border-strong); /* skill-group rings, as the Queue prototype and packages/config/theme.css */
   --shadow: none; --knob: var(--fg); --field: var(--bg);
   color-scheme: dark;
 }
@@ -27,6 +28,7 @@
   --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09); --ann-bg: #fff3b0; --ann-border: #e6b800; --ann-tag: #7a5c00;
   --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
   --court: #2e8b57; --court-line: #ffffff; --court-free: #e8ebe5; --court-free-line: rgba(18, 21, 19, 0.14);
+  --lv-beg: #1d6fd1; --lv-int: #d19a00; --lv-adv: #d6293a; --lv-none: var(--border-strong);
   --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
   color-scheme: light;
 } }
@@ -38,6 +40,7 @@
   --error: #c62828; --error-subtle: rgba(198, 40, 40, 0.07); --warn: #a35600; --warn-subtle: rgba(217, 119, 6, 0.09); --ann-bg: #fff3b0; --ann-border: #e6b800; --ann-tag: #7a5c00;
   --border: #e2e5df; --border-strong: #cdd2c9; --scrim: rgba(18, 21, 19, 0.4);
   --court: #2e8b57; --court-line: #ffffff; --court-free: #e8ebe5; --court-free-line: rgba(18, 21, 19, 0.14);
+  --lv-beg: #1d6fd1; --lv-int: #d19a00; --lv-adv: #d6293a; --lv-none: var(--border-strong);
   --shadow: 0 1px 2px rgba(18, 24, 20, 0.05), 0 2px 8px rgba(18, 24, 20, 0.04); --knob: #ffffff; --field: #ffffff;
   color-scheme: light;
 }
@@ -445,7 +448,8 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 /* Leaderboard */
 .lb { display: flex; flex-direction: column; }
 .lb-head, .lb-row { display: grid; grid-template-columns: 56px 30px 36px minmax(0, 1fr) minmax(0, auto); gap: 12px; align-items: center; padding: 8px 12px; }
-/* Owner, November 16, 2026: three leaderboards (annual, monthly, weekly), ordered by wins in the period. A mark beside the
+/* Owner, November 16, 2026: three leaderboards (annual, monthly, weekly), ordered by wins in the period (quarterly added
+   November 25, 2026, D-2026-11-25-04; the same lists on each club's leaderboard). A mark beside the
    place shows a move since the previous period: up, down, or New. Hover or focus shows where the player was before. */
 .lb-move { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 2px; min-width: 30px; height: 24px; font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--fg2); }
 .lb-move svg { width: 10px; height: 10px; flex: none; }
@@ -541,6 +545,26 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .pod-step b { font-size: 26px; }
   .pod-step small { font-size: 10px; }
   .fire { width: 140px; height: 118px; bottom: calc(100% - 78px); }
+}
+/* Owner, November 25, 2026 (D-2026-11-25-04): a place several players share stacks their pictures on its step (overlapping,
+   two or three, or two and "+N"); tapping it opens the dialog of everyone in that place. A place no one holds keeps its
+   step, with an empty dashed circle and "No one yet". */
+.pod-stack { position: relative; z-index: 1; display: flex; justify-content: center; margin-bottom: 8px; }
+.pod-stack .avatar { width: 48px; height: 48px; font-size: 16px; margin-bottom: 0; }
+.pod-stack .avatar + .avatar { margin-left: -16px; }
+.pod.p1 .pod-stack .avatar { width: 60px; height: 60px; font-size: 20px; margin-bottom: 0; }
+.pod-more { font-family: var(--mono); font-weight: 700; color: var(--fg); background: var(--elev); }
+.pod.stacked .pod-name { font-size: 13px; }
+.pod.p1.stacked .pod-name { font-size: 14px; }
+.pod.empty { cursor: default; }
+.pod.empty .pod-name { color: var(--fg2); font-weight: 600; }
+.pod.empty:hover .pod-step { filter: none; }
+.pod-who .avatar.pod-none { background: transparent; border: 2px dashed var(--border-strong); box-shadow: none; }
+@media (max-width: 560px) {
+  .pod-stack .avatar { width: 38px; height: 38px; font-size: 13px; }
+  .pod-stack .avatar + .avatar { margin-left: -14px; }
+  .pod.p1 .pod-stack .avatar { width: 46px; height: 46px; font-size: 15px; }
+  .pod.stacked .pod-name, .pod.p1.stacked .pod-name { font-size: 12px; }
 }
 .lb-name { min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; row-gap: 2px; }
 .lb-name b { font-weight: 700; overflow-wrap: anywhere; }
@@ -806,6 +830,29 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .gm-noscore { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .8); white-space: nowrap; }
 .gm-note { color: var(--warn); }
 @media (max-width: 480px) { .gm-court { min-height: 100px; } .gm-pl .avatar { width: 36px; height: 36px; font-size: 12px; } .gm-pl { max-width: 56px; } .gm-g { min-width: 16px; height: 16px; font-size: 10px; right: -6px; } .gm-res { min-width: 0; padding: 8px 8px; margin: 0 2px; } .gm-score { font-size: 17px; } .gm-noscore { font-size: 11px; } }
+/* Match page (mockup change 2026-11-25-player-match-page): the whole court box opens the game's match page. A full-size button sits
+   under the faces; the faces and the share button stay their own buttons above it, and the score box and format pill let taps through. */
+.gm-open { position: absolute; inset: 0; z-index: 0; padding: 0; border: 0; border-radius: 8px; background: none; cursor: pointer; }
+.gm-open:hover { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .55); }
+.gm-open:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.gm-court.opens .gm-side, .gm-court.opens .gm-res, .gm-court.opens .gm-fmt { pointer-events: none; }
+.gm-court.opens .gm-pl, .gm-court.opens .gm-share { pointer-events: auto; }
+/* Skill-group rings on the match page court: the picture's own border is the skill group (the public session tiles' colors);
+   the winning side keeps an outer accent ring, set off from the skill ring by a dark gap so both read. */
+.gm.rings .gm-pl { --ring: var(--lv-none); }
+.gm.rings .gm-pl.lv-beginner { --ring: var(--lv-beg); } .gm.rings .gm-pl.lv-intermediate { --ring: var(--lv-int); } .gm.rings .gm-pl.lv-advanced { --ring: var(--lv-adv); }
+.gm.rings .gm-pl .avatar { box-shadow: 0 0 0 3px var(--ring); }
+.gm.rings .gm-pl.won .avatar { box-shadow: 0 0 0 3px var(--ring), 0 0 0 5px rgba(0, 0, 0, .72), 0 0 0 8px var(--accent); }
+.gm.rings .gm-pl:hover .avatar, .gm.rings .gm-pl:focus-visible .avatar { box-shadow: 0 0 0 3px var(--ring), 0 0 0 5px rgba(0, 0, 0, .72), 0 0 0 8px rgba(255, 255, 255, .6); }
+.gm.rings .gm-side { padding: 16px 6px; }
+.mt-src { margin: 0; }
+.mt-src .sh-linkish { font-weight: 600; }
+.mt-who { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 0; border: 0; background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.mt-who .avatar { width: 36px; height: 36px; font-size: 12px; flex: none; }
+.mt-who b { font-size: 15px; }
+.mt-who:hover b, .mt-who:focus-visible b { text-decoration: underline; }
+.mt-blk + .mt-blk { border-top: 1px solid var(--border); padding-top: 14px; }
+.mt-blk .gm:first-of-type { border-top: 0; }
 .rg-item + .rg-item { border-top: 1px solid var(--border); }
 .rg-item .game { padding-bottom: 2px; }
 .rg-src { margin: -4px 0 10px; }
@@ -1262,6 +1309,7 @@ for (let i = 0; i < 1283; i++) {
     rtr: `RTR-PH-${CITIES[(h >>> 12) % CITIES.length]}-${DATES[(h >>> 6) % DATES.length]}-${String(100 + i).padStart(4, '0')}`,
     profilePrivate: PRIVATE_SEED.has(i) || ALWAYS_SEED.has(i), alwaysPrivate: ALWAYS_SEED.has(i), hiddenDir: HIDDEN_SEED.has(i),
     unclaimed: i in UNCLAIMED_SEED, savedBy: UNCLAIMED_SEED[i] || null, gender: FIXED_GENDER[i] || null,
+    verified: !(i in UNCLAIMED_SEED) && (h >>> 3) % 3 !== 0,
   });
 }
 
@@ -1303,6 +1351,11 @@ const MIGS_SESSIONS = [
     G('Doubles', ['Kat Lim'], ['Bea Castillo', 'Rafa Aquino'], 'L', '20–22'),
   ] },
 ];
+// Match page (mockup change 2026-11-25-player-match-page): every game carries the match id its match page opens at
+// (/matches/<matchId>), the same for every player in that match. In this prototype each player's history is its own fixture,
+// so the id is derived from the session and the game's place in it: "<sessionId>-<n>", like m1-2.
+const withMatchIds = (s) => { s.games.forEach((g, i) => { g.mid = `${s.id}-${i + 1}`; }); return s; };
+MIGS_SESSIONS.forEach(withMatchIds);
 
 // Generated history for every other profile: enough counted games for the leaderboard figure they carry.
 function genSessions(seed, counted) {
@@ -1322,7 +1375,7 @@ function genSessions(seed, counted) {
       games.push(G(single ? 'Singles' : 'Doubles', single ? [] : [pick(`p${n}${g}`)], single ? [pick(`o${n}${g}`)] : [pick(`o${n}${g}`), pick(`q${n}${g}`)], won ? 'W' : 'L', (hh >>> 9) % 3 === 0 ? null : (won ? `${a}–${b}` : `${b}–${a}`)));
     }
     if (n === 0) games.push(G('4v4 fun', [pick('f1'), pick('f2'), pick('f3')], [pick('f4'), pick('f5'), pick('f6'), pick('f7')], 'L', '18–21', 'fun'));
-    out.push({ id: `${seed}-s${n}`, title: titles[(h0 >>> n) % titles.length], club, ago, pageGone: ago > 60, games });
+    out.push(withMatchIds({ id: `${seed}-s${n}`, title: titles[(h0 >>> n) % titles.length], club, ago, pageGone: ago > 60, games }));
     left -= take; n += 1; ago += 2 + ((h0 >>> (n + 2)) % 6);
   }
   return out;
@@ -1568,6 +1621,10 @@ const hiddenFromViewer = (p) => !!p && p.id !== S.me && (!!p.alwaysPrivate || (!
 const isUnclaimed = (p) => !!p && p.claimed === false;
 const savedByName = (p) => (CLUB_DIR[p.savedBy] || CLUB_DIR.c1).name; // Jomar was saved by Lahug Smash Club
 const unclaimedChip = () => chip('Not registered yet', 'warn');
+// Owner, November 23, 2026: other people see whether a registered player is verified. Only the result shows here;
+// the steps (Google, phone, email) and whether Admin set it stay on the player's own Verification page.
+const isPublicVerified = (p) => (S.accounts[p.id] ? verifyOf(S.accounts[p.id]).ok : !!p.verified);
+const publicVerifyChip = (p) => isPublicVerified(p) ? chip(`${I.check} Verified`, 'ok') : chip('Not verified');
 const maskName = (name) => name.split(/\s+/).filter(Boolean).map((w) => `${w[0]}***`).join(' ');
 const maskedView = (e) => ({ id: e.id, name: maskName(e.name), nick: '', photo: e.photo, face: e.face, photoUrl: e.photoUrl, level: e.level }); // picture stays visible: D-2026-11-11-11
 // Migs joins the list only while his own figures qualify; everyone else is filtered by the current threshold.
@@ -1619,22 +1676,39 @@ const people = (names) => listNames(names.map(esc));
 // solid court green, white lines, a dashed net — with faces ringed in white and names on dark pills.
 const gmCourtSVG = () => `<svg class="gm-svg" viewBox="0 0 134 61" preserveAspectRatio="none" aria-hidden="true"><rect width="134" height="61" fill="var(--court)"/><g fill="none" stroke="var(--court-line)" stroke-width="1.5" vector-effect="non-scaling-stroke"><rect x="0.75" y="0.75" width="132.5" height="59.5" vector-effect="non-scaling-stroke"/><path d="M0 4.6H134M0 56.4H134M7.6 0V61M126.4 0V61M47.2 0V61M86.8 0V61M0 30.5H47.2M86.8 30.5H134" vector-effect="non-scaling-stroke"/></g><path d="M67 0V61" stroke="var(--court-line)" stroke-width="3" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/></svg>`;
 const idByName = (n) => { const a = Object.keys(S.accounts).find((k) => S.accounts[k].name === n); if (a) return a; const i = BASE.findIndex((e) => e.name === n); return i >= 0 ? `b${i}` : null; };
-function gameRow(g, who, ctx = null, at = null) {
-  const won = g.res === 'W', partial = g.kind === 'partial';
+// Match page (mockup change 2026-11-25-player-match-page). `o.open` (default on): the court box opens the game's match page; the faces
+// and the share button keep their own actions. `o.rings`: each face gets its skill-group ring (the match page court). `o.mask`: names
+// follow the profile privacy rules for this viewer (the match page is public). `at.ownerName`: the profile whose session this is, when
+// the row is drawn from another player's side (their own count is then their appearances, not the game's place).
+const skillGroupOf = (p) => (!p || p.level == null || hiddenFromViewer(p) ? 'none' : ['beginner', 'intermediate', 'advanced'][LEVELS[p.level].tier]);
+const faceMasked = (q) => (q.real ? hiddenFromViewer(q.p) : !S.me);
+function gameRow(g, who, ctx = null, at = null, o = {}) {
+  const won = g.res === 'W', partial = g.kind === 'partial', opens = o.open !== false && !!g.mid;
   // Owner, November 14, 2026: each face carries how many games that person had played in that session up to and
   // including this one (the Queue console's face badge). The profile owner's count is the game's place in the session;
   // the others count their appearances in the session's games so far.
-  const played = (n) => at ? at.s.games.slice(0, at.gi + 1).filter((x) => x.partner.includes(n) || x.opp.includes(n)).length : null;
+  const played = (n) => at ? (at.ownerName && n === at.ownerName ? at.gi + 1 : at.s.games.slice(0, at.gi + 1).filter((x) => x.partner.includes(n) || x.opp.includes(n)).length) : null;
   const badge = (n, label) => n ? `<i class="gm-g tnum" role="img" aria-label="${esc(label)}: game ${n} of that session">${n}</i>` : '';
   // Artifact comment, same day ("since there are avatars they should open a dialog"): every face opens the profile card.
-  const face = (q, label, lit, n) => { const id = q.real ? q.id : '', a = id ? `data-id="${esc(id)}"` : `data-name="${esc(q.name)}"`; return `<button type="button" class="gm-pl${lit ? ' won' : ''}" data-act="openProfileCard" ${a} aria-label="${esc(q.name)}${n ? `, game ${n} of that session` : ''}. View profile"><span class="gm-av">${avatar(q.real ? q.p : q)}${badge(n, q.name)}</span><b>${esc(label)}</b></button>`; };
+  const face = (q, label, lit, n) => {
+    const hid = o.mask && faceMasked(q), name = hid ? maskName(q.name) : q.name, shown = hid ? maskName(label) : label;
+    const id = q.real ? q.id : '', a = id ? `data-id="${esc(id)}"` : `data-name="${esc(name)}"`;
+    const lv = o.rings ? ` lv-${skillGroupOf(q.real ? q.p : null)}` : '';
+    return `<button type="button" class="gm-pl${lit ? ' won' : ''}${lv}" data-act="openProfileCard" ${a} aria-label="${esc(name)}${n ? `, game ${n} of that session` : ''}. View profile"><span class="gm-av">${avatar(q.real ? (hid ? maskedView(q.p) : q.p) : { ...q, name })}${badge(n, name)}</span><b>${esc(shown)}</b></button>`;
+  };
   const other = (n) => { const id = idByName(n); return id ? { real: true, id, name: n, p: profileOf(id) } : { id: `x-${n}`, name: n, photo: hashStr(n) % 4 !== 0 }; };
-  const meLabel = who ? (who.id === S.me ? 'You' : firstName(who)) : 'Player';
-  const mine = [who ? face({ real: true, id: who.id, name: who.name, p: who }, meLabel, won && !partial, at ? at.gi + 1 : null) : '', ...g.partner.map((n) => face(other(n), n.split(' ')[0], won && !partial, played(n)))].join('');
-  const theirs = g.opp.map((n) => face(other(n), n.split(' ')[0], !won && !partial, played(n))).join('');
+  const whoQ = who ? (who.guest ? { id: who.id, name: who.name, photo: who.photo } : { real: true, id: who.id, name: who.name, p: who }) : null;
+  const meLabel = who ? (who.id === S.me ? 'You' : who.guest ? who.name.split(' ')[0] : firstName(who)) : 'Player';
+  const whoN = at ? (at.ownerName && who && who.name !== at.ownerName ? played(who.name) : at.gi + 1) : null;
+  // On the match page (at.ownerName set) the viewer reads "You" and the session's profile its usual first name wherever they sit.
+  const lbl = (q, n) => (at && at.ownerName && q.real ? (q.id === S.me ? 'You' : n === at.ownerName ? firstName(q.p) : n.split(' ')[0]) : n.split(' ')[0]);
+  const mine = [whoQ ? face(whoQ, meLabel, won && !partial, whoN) : '', ...g.partner.map((n) => { const q = other(n); return face(q, lbl(q, n), won && !partial, played(n)); })].join('');
+  const theirs = g.opp.map((n) => { const q = other(n); return face(q, lbl(q, n), !won && !partial, played(n)); }).join('');
   const res = partial ? '<span class="chip">Not counted</span>' : `<span class="chip ${won ? 'ok' : 'bad'}">${won ? 'Won' : 'Lost'}</span>`;
   const score = g.score ? `<span class="gm-score tnum" aria-label="Score ${g.score}">${g.score}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
-  return `<div class="gm${partial ? ' partial' : ''}"><div class="gm-court ${won ? 'w-left' : 'w-right'}" role="group" aria-label="${esc(g.fmt)}: ${esc(meLabel)}${g.partner.length ? ` and ${esc(g.partner.join(' and '))}` : ''} versus ${esc(g.opp.join(' and '))}">${gmCourtSVG()}<div class="gm-side">${mine}</div><span class="gm-fmt">${esc(g.fmt)}</span>${ctx && !partial ? `<button type="button" class="gm-share" data-act="openShare" data-kind="game" data-sid="${esc(ctx.sid)}" data-gi="${ctx.gi}" aria-label="Share this game" title="Share this game">${I.share}</button>` : ''}<div class="gm-res">${score}${res}</div><div class="gm-side">${theirs}</div></div>${g.note ? `<div class="gm-note small">${esc(g.note)}${g.kind === 'unranked' ? '' : ' · not counted'}</div>` : ''}</div>`;
+  const nm = (n) => (o.mask && faceMasked(other(n)) ? maskName(n) : n), meName = o.mask && whoQ && faceMasked(whoQ) ? maskName(meLabel) : meLabel;
+  const label = `${esc(g.fmt)}: ${esc(meName)}${g.partner.length ? ` and ${esc(g.partner.map(nm).join(' and '))}` : ''} versus ${esc(g.opp.map(nm).join(' and '))}`;
+  return `<div class="gm${partial ? ' partial' : ''}${o.rings ? ' rings' : ''}"><div class="gm-court ${won ? 'w-left' : 'w-right'}${opens ? ' opens' : ''}" role="group" aria-label="${label}">${gmCourtSVG()}${opens ? `<button type="button" class="gm-open" data-act="openMatch" data-mid="${esc(g.mid)}" aria-label="Open the match page: ${label}"></button>` : ''}<div class="gm-side">${mine}</div><span class="gm-fmt">${esc(g.fmt)}</span>${ctx && !partial ? `<button type="button" class="gm-share" data-act="openShare" data-kind="game" data-sid="${esc(ctx.sid)}" data-gi="${ctx.gi}" aria-label="Share this game" title="Share this game">${I.share}</button>` : ''}<div class="gm-res">${score}${res}</div><div class="gm-side">${theirs}</div></div>${g.note ? `<div class="gm-note small">${esc(g.note)}${g.kind === 'unranked' ? '' : ' · not counted'}</div>` : ''}</div>`;
 }
 // Owner, November 13, 2026: "in profile it should show latest sessions joined · when they click on the session then they will see their matches from there".
 // Replaces the Latest matches card: the four latest sessions this player played in, newest first; a row opens that session's matches in a dialog.
@@ -1656,6 +1730,62 @@ function recentGamesCard(p) {
   return `<section class="card stack"><div class="between"><h2>Recent games</h2>${games.length ? `<button class="btn xs" data-act="openHistory" data-id="${esc(p.id)}">All games (${total})</button>` : ''}</div>
         ${games.length ? `<div class="rg-list">${games.slice(0, 3).map(({ g, s }) => `<div class="rg-item">${gameRow(g, p, p.id === S.me ? { sid: s.id, gi: s.games.indexOf(g) } : null, { s, gi: s.games.indexOf(g) })}<p class="small muted rg-src">${esc(s.title)} · ${fmtDay(s.ago)} · ${esc(s.club)}</p></div>`).join('')}</div>` : '<div class="empty">No games recorded yet.</div>'}
       </section>`;
+}
+// ---------- P-MATCH: the public match page, /matches/<matchId> (mockup change 2026-11-25-player-match-page) ----------
+// Owner, November 25, 2026: one public page per match, the same for every player in it; anyone can open it, signed out too.
+// The match id is "<sessionId>-<n>" (see withMatchIds): the session names the history it comes from, n the game's place in it.
+function matchOf(mid) {
+  const m = /^(.+)-(\d+)$/.exec(mid || '');
+  if (!m) return null;
+  const sid = m[1], ownerId = /^m\d+$/.test(sid) ? 'u1' : (/^(.+)-s\d+$/.exec(sid) || [])[1];
+  const owner = ownerId && (Object.hasOwn(S.accounts, ownerId) || /^b\d+$/.test(ownerId)) ? profileOf(ownerId) : null;
+  const s = owner && owner.sessions.find((x) => x.id === sid), g = s && s.games.find((x) => x.mid === mid);
+  return g ? { owner, s, g, gi: s.games.indexOf(g) } : null;
+}
+// A game redrawn from another player's side: that player on the left with their partners; the result and score turn round
+// when they were on the other team.
+function gameFrom(g, ownerName, n) {
+  if (n === ownerName) return g;
+  if (g.partner.includes(n)) return { ...g, partner: [ownerName, ...g.partner.filter((x) => x !== n)] };
+  return { ...g, partner: g.opp.filter((x) => x !== n), opp: [ownerName, ...g.partner], res: g.res === 'W' ? 'L' : 'W', score: g.score ? g.score.split('–').reverse().join('–') : g.score };
+}
+const matchWho = (n, owner) => { if (n === owner.name) return owner; const id = idByName(n); return id ? profileOf(id) : { guest: true, id: `x-${n}`, name: n, photo: hashStr(n) % 4 !== 0 }; };
+const funNote = (g) => (g.kind === 'fun' && !g.note ? { ...g, note: 'Fun game' } : g);
+const matchLink = (mid) => `${/^https?:/.test(location.origin) ? location.origin : 'https://rotra.example'}/player/matches/${mid}`;
+// Where the match page's back button goes: the page the court was tapped on, else the leaderboard.
+const matchFromLabel = () => {
+  const p = S.viewId && ['profile', 'rank'].includes(S.screen) ? profileOf(S.viewId) : null;
+  if (S.screen === 'history') return 'Games';
+  if (S.screen === 'sessions') return 'Sessions';
+  if (p) return hiddenFromViewer(p) ? maskName(p.name) : p.name;
+  return S.screen === 'board' ? 'Leaderboard' : 'Back';
+};
+function viewMatch() {
+  const x = matchOf(S.viewId), from = S.ui.matchFrom, back = backBtn('matchBack', from ? from.label : 'Leaderboard');
+  if (!x) return `<main class="wrap slim"><div class="page-head">${back}<h1>Game not found</h1></div>
+    ${notice('', `No game has the ID <span class="mono">${esc(S.viewId || '')}</span>. Check the link and try again.`)}</main>`;
+  const { owner, s, g, gi } = x, meName = S.me ? (S.me === owner.id ? owner.name : S.accounts[S.me]?.name) : null;
+  // A signed-in player who played in it sees their side on the left as "You"; everyone else sees Team A (the first team) on the left.
+  const lead = meName && (meName === owner.name || g.partner.includes(meName) || g.opp.includes(meName)) ? meName : owner.name;
+  const drawn = gameFrom(g, owner.name, lead), at = (i) => ({ s, gi: i, ownerName: owner.name });
+  const shareCtx = (n, i) => (owner.id === S.me && n === owner.name ? { sid: s.id, gi: i } : null);
+  const court = gameRow(funNote(drawn), matchWho(lead, owner), shareCtx(lead, gi), at(gi), { open: false, rings: true, mask: true });
+  const title = s.pageGone ? esc(s.title) : `<button type="button" class="sh-linkish" data-act="sessionPage" data-title="${esc(s.title)}">${esc(s.title)}</button>`;
+  // Before this game: one block per player, the left side then the right, with that player's earlier games of the session in play order.
+  const blocks = [lead, ...drawn.partner, ...drawn.opp].map((n) => {
+    const who = matchWho(n, owner), q = who.guest ? { real: false, name: n } : { real: true, p: who };
+    const hid = faceMasked(q), shown = who.id === S.me ? 'You' : hid ? maskName(n.split(' ')[0]) : (who.guest ? n.split(' ')[0] : firstName(who));
+    const earlier = s.games.slice(0, gi).map((y, i) => ({ y, i })).filter(({ y }) => n === owner.name || y.partner.includes(n) || y.opp.includes(n));
+    const a = who.guest ? `data-name="${esc(hid ? maskName(n) : n)}"` : `data-id="${esc(who.id)}"`;
+    const pic = avatar(who.guest ? { ...who, name: hid ? maskName(n) : n } : hid ? maskedView(who) : who);
+    return `<div class="mt-blk"><div class="between"><button type="button" class="mt-who" data-act="openProfileCard" ${a} aria-label="${esc(hid ? maskName(n) : n)}. View profile">${pic}<b>${esc(shown)}</b></button><span class="small muted">${earlier.length ? `${earlier.length} earlier ${earlier.length === 1 ? 'game' : 'games'}` : 'No earlier games'}</span></div>
+      ${earlier.map(({ y, i }) => gameRow(funNote(gameFrom(y, owner.name, n)), who, shareCtx(n, i), at(i), { mask: true })).join('')}</div>`;
+  }).join('');
+  return `<main class="wrap mid">
+    <div class="page-head">${back}<h1>Game</h1></div>
+    <section class="card stack">${court}<p class="small muted mt-src">${title} · ${fmtDay(s.ago)} · ${esc(s.club)}</p></section>
+    <section class="card stack"><h2>Before this game</h2>${blocks}</section>
+  </main>`;
 }
 function viewSessions() {
   const p = profileOf(S.viewId);
@@ -1728,115 +1858,155 @@ function emailBanner() {
 
 // ---------- P-LEADERBOARD ----------
 // Owner, November 16, 2026: Top annual, Top monthly and Top weekly. Each list is ordered by standard-match wins in that
-// period (win rate breaks a tie), and compares each place with the previous period. The annual list takes the place of the
-// old overall list, so a profile's position is its annual place. The prototype makes the monthly and weekly numbers up.
-const LB_PERIODS = [['year', 'Top annual'], ['month', 'Top monthly'], ['week', 'Top weekly']];
-const lbP = () => (LB_PERIODS.some(([k]) => k === S.ui.lbP) ? S.ui.lbP : 'year');
-const LB_WORDS = { year: ['this year', 'last year', 'annual'], month: ['this month', 'last month', 'monthly'], week: ['this week', 'last week', 'weekly'] };
-const lbWhen = (k) => { const d = new Date(); if (k === 'year') return String(d.getFullYear()); if (k === 'month') return d.toLocaleDateString('en', { month: 'long', year: 'numeric' }); const m = new Date(d); m.setDate(d.getDate() - ((d.getDay() + 6) % 7)); const e = new Date(m); e.setDate(m.getDate() + 6); const f = (x) => x.toLocaleDateString('en', { month: 'short', day: 'numeric' }); return `${f(m)} to ${f(e)}`; };
+// period, and compares each place with the previous period. The annual list takes the place of the old overall list,
+// so a profile's position is its annual place. The prototype makes the quarterly, monthly and weekly numbers up.
+// Owner, November 25, 2026 (D-2026-11-25-04): "LEADERBOARDS needs to be Annually , Quarterly , Monthly and Weekly Same with
+// club and rotra". Four lists for the ROTRA leaderboard and for each club's leaderboard. Players with the same wins and the
+// same win rate share a place; places run without gaps (1, 1, 2), like the Queue session standings. Inside a shared place,
+// players are ordered by nickname (full name when there is none), then ID.
+const LB_PERIODS = [['year', 'Top annual'], ['quarter', 'Top quarterly'], ['month', 'Top monthly'], ['week', 'Top weekly']];
+const lbKey = (v) => (LB_PERIODS.some(([k]) => k === v) ? v : 'year');
+const lbP = () => lbKey(S.ui.lbP);
+const clubLbP = () => lbKey(S.ui.clubLbP);
+const lbLabel = (k) => LB_PERIODS.find(([x]) => x === k)[1];
+const LB_WORDS = { year: ['this year', 'last year', 'annual'], quarter: ['this quarter', 'last quarter', 'quarterly'], month: ['this month', 'last month', 'monthly'], week: ['this week', 'last week', 'weekly'] };
+// Quarters: Q1 January to March, Q2 April to June, Q3 July to September, Q4 October to December ("Oct to Dec 2026").
+const lbWhen = (k) => { const d = new Date(); if (k === 'year') return String(d.getFullYear()); if (k === 'quarter') { const q = Math.floor(d.getMonth() / 3) * 3, f = (m) => new Date(d.getFullYear(), m, 1).toLocaleDateString('en', { month: 'short' }); return `${f(q)} to ${f(q + 2)} ${d.getFullYear()}`; } if (k === 'month') return d.toLocaleDateString('en', { month: 'long', year: 'numeric' }); const m = new Date(d); m.setDate(d.getDate() - ((d.getDay() + 6) % 7)); const e = new Date(m); e.setDate(m.getDate() + 6); const f = (x) => x.toLocaleDateString('en', { month: 'short', day: 'numeric' }); return `${f(m)} to ${f(e)}`; };
 // Owner, same day: each leaderboard lists the top 50 only, and a row shows the number of wins, not the skill level.
+// With shared places, the top 50 is the first 50 players and anyone who shares the 50th player's place.
 const LB_TOP = 50;
-let lbCache = { key: '', list: [], full: [] };
-function periodList(k = lbP()) {
-  const base = S.board === 'empty' ? [] : boardAll(), key = `${k}|${base.length}|${S.me}|${S.board}|${S.rank}|${S.ui.lbMe || 'auto'}`;
-  if (lbCache.key === key) return lbCache.list;
+// Prototype numbers: the most wins a player gets in a period ([ROTRA, one club]) and the share of players who won or lost a
+// standard match in it (Migs always has). A club list counts only that club's own sessions, so its numbers are smaller.
+const LB_SCALE = { year: [0, 70], quarter: [40, 24], month: [16, 10], week: [7, 5] };
+const LB_PLAYED = { year: 100, quarter: 100, month: 85, week: 55 };
+const lbCaches = {};
+const lbName = (e) => (e.nick || e.name).toLowerCase();
+const sameRate = (a, b) => a.w * (b.w + b.l) === b.w * (a.w + a.l);
+// Most wins first, then the higher win rate; a shared place is ordered by nickname (full name when none), then ID.
+const lbSort = (rows) => rows.sort((a, b) => b.w - a.w || (b.w * (a.w + a.l) - a.w * (b.w + b.l)) || lbName(a.e).localeCompare(lbName(b.e)) || (a.e.id < b.e.id ? -1 : a.e.id > b.e.id ? 1 : 0));
+// A club leaderboard: anyone who played in the club's sessions (its members and players from other clubs who joined one).
+const playedAtClub = (e, cid) => (e.id === 'u1' ? (S.accounts.u1.clubs || []).some((c) => c.id === cid) : CLUB_IDS[hashStr(`club-${e.id}`) % CLUB_IDS.length] === cid) || hashStr(`plays-${cid}-${e.id}`) % 5 === 0;
+function periodList(k = lbP(), club = null) {
+  const base = S.board === 'empty' ? [] : club ? boardAll().filter((e) => playedAtClub(e, club)) : boardAll();
+  const ck = `${club || ''}|${k}`, key = `${k}|${club || ''}|${base.length}|${S.me}|${S.board}|${S.rank}|${S.ui.lbMe || 'auto'}`;
+  if (lbCaches[ck] && lbCaches[ck].key === key) return lbCaches[ck].list;
+  const n0 = Math.max(1, base.length);
   const rows = base.map((e, i) => {
-    const h = hashStr(`lb-${k}-${e.id}`);
+    const h = hashStr(club ? `lb-${club}-${k}-${e.id}` : `lb-${k}-${e.id}`);
+    if (e.id !== 'u1' && h % 100 >= LB_PLAYED[k]) return null;
     let w, l;
-    if (k === 'year') { w = Math.max(3, i < 60 ? 118 - Math.floor(i * 0.75) : 73 - Math.floor((i - 60) * 0.057)); l = Math.floor(w * 0.4) + (i % 4); }
-    else { const month = k === 'month', top = month ? 14 : 5, skill = 1 - i / Math.max(1, base.length), r = (h % 1000) / 1000; w = Math.min(top, Math.round(top * (0.3 + 0.7 * skill) * (0.3 + 0.72 * r))); l = (w >= (month ? 8 : 4) ? 1 : 0) + ((h >>> 12) % (month ? 6 : 3)); if (!w && (h >>> 8) % 3) l = 0; }
-    return { e, w, l, h, i };
-  }).filter((r) => r.w + r.l > 0);
-  if (k !== 'year') rows.sort((a, b) => b.w - a.w || b.w / (b.w + b.l) - a.w / (a.w + a.l) || a.i - b.i);
-  const list = rows.map((r, n) => {
-    const pos = n + 1, roll = (r.h >>> 4) % 100, step = 1 + ((r.h >>> 16) % (pos < 10 ? 3 : 9));
+    if (k === 'year' && !club) { w = Math.max(3, i < 60 ? 118 - Math.floor(i * 0.75) : 73 - Math.floor((i - 60) * 0.057)); l = Math.floor(w * 0.4) + (i % 4); }
+    else { const top = LB_SCALE[k][club ? 1 : 0], skill = 1 - i / n0, r = (h % 1000) / 1000; w = Math.round(top * (0.2 + 0.8 * skill ** 2) * (0.45 + 0.6 * r)); l = Math.round(w * (0.15 + ((h >>> 12) % 40) / 100)) + ((h >>> 20) % 2); }
+    return { e, w, l, h, i, fixPrev: null };
+  }).filter((r) => r && r.w + r.l > 0);
+  lbSort(rows);
+  // Prototype data: four players share 1st place on the ROTRA Top weekly list, so the stacked podium step and its dialog show.
+  if (!club && k === 'week' && rows.length > 4) { for (let n = 1; n < 4; n++) { rows[n].w = rows[0].w; rows[n].l = rows[0].l; } lbSort(rows); }
+  // Prototype control "My place on the leaderboard": put Migs inside or just outside the top 50 on every ROTRA list.
+  const at = { in: 16, out: LB_TOP + 23 }[S.ui.lbMe], mr = rows.find((r) => r.e.id === 'u1');
+  if (!club && at != null && mr && rows.length > at + 1) { const t = rows.filter((r) => r !== mr)[at]; mr.w = t.w; mr.l = t.l + 1; mr.fixPrev = S.ui.lbMe === 'in' ? 5 : 0; lbSort(rows); }
+  let place = 0;
+  const full = rows.map((r, n) => {
+    if (!n || !(r.w === rows[n - 1].w && sameRate(r, rows[n - 1]))) place += 1;
+    const roll = (r.h >>> 4) % 100, step = 1 + ((r.h >>> 16) % (place < 10 ? 3 : 9));
     // prev: the place in the previous period; null = not on that list then (New); the same number = no move.
-    const prev = roll < 12 ? null : roll < 34 ? pos : roll < 68 ? pos + step : Math.max(1, pos - step);
-    return { ...r.e, lbW: r.w, lbL: r.l, lbPrev: prev };
+    const prev = r.fixPrev != null ? place + r.fixPrev : roll < 12 ? null : roll < 34 ? place : roll < 68 ? place + step : Math.max(1, place - step);
+    return { ...r.e, lbW: r.w, lbL: r.l, lbPlace: place, lbPrev: prev };
   });
-  // Prototype control "My place on the leaderboard": put Migs inside or just outside the top 50 on every list.
-  const at = { in: 16, out: LB_TOP + 23 }[S.ui.lbMe], mi = list.findIndex((e) => e.id === 'u1');
-  if (at != null && mi >= 0 && list.length > at) { const [me] = list.splice(mi, 1); list.splice(at, 0, { ...me, lbW: list[at].lbW, lbL: list[at].lbL + 1, lbPrev: at + 1 + (S.ui.lbMe === 'in' ? 5 : 0) }); }
-  lbCache = { key, list: list.slice(0, LB_TOP), full: list };
-  return lbCache.list;
+  const count = {};
+  full.forEach((e) => { count[e.lbPlace] = (count[e.lbPlace] || 0) + 1; });
+  full.forEach((e) => { e.lbShared = count[e.lbPlace] > 1; });
+  const cut = full.length > LB_TOP ? full.findIndex((e, n) => n >= LB_TOP && e.lbPlace !== full[LB_TOP - 1].lbPlace) : -1;
+  lbCaches[ck] = { key, list: cut < 0 ? full : full.slice(0, cut), full };
+  return lbCaches[ck].list;
 }
-// A player's own place and wins in the period, also below the top 50 (their own "Your position" card only).
-// A place in the top 50 of one list, or null. A profile only ever names a place from here.
-const topPlace = (id, k) => { const i = periodList(k).findIndex((e) => e.id === id); return i < 0 ? null : i + 1; };
-// Owner, same day: "profile should not say it if it doesnt qualify for top 50. and should show 3 boxes if qualified for each
-// category". One box per list the player is in the top 50 of; nothing at all when they are in none.
-const topPlaces = (id) => LB_PERIODS.map(([k, label]) => { const pos = topPlace(id, k); return pos ? { k, label, pos, wins: periodList(k)[pos - 1].lbW } : null; }).filter(Boolean);
+const lbFull = (k = lbP(), club = null) => { periodList(k, club); return lbCaches[`${club || ''}|${k}`].full; };
+// A place in the top 50 of one ROTRA list, or null. A profile only ever names a place from here.
+const topPlace = (id, k) => { const e = periodList(k).find((x) => x.id === id); return e ? e.lbPlace : null; };
+// The player's row number on a list (1-based, 0 when not on it): how many rows Show more must open to reach it.
+const topRow = (id, k) => periodList(k).findIndex((x) => x.id === id) + 1;
+// Owner, November 16, 2026: "profile should not say it if it doesnt qualify for top 50. and should show 3 boxes if qualified for each
+// category". One box per list the player is in the top 50 of (up to four since D-2026-11-25-04); nothing at all when they are in none.
+const topPlaces = (id) => LB_PERIODS.map(([k, label]) => { const e = periodList(k).find((x) => x.id === id); return e ? { k, label, pos: e.lbPlace, wins: e.lbW } : null; }).filter(Boolean);
 const lbBoxes = (p) => { const tp = topPlaces(p.id); return tp.length ? `<div class="lb-boxes">${tp.map((x) => `<button type="button" class="lb-box" data-act="lbGo" data-v="${x.k}" data-id="${esc(p.id)}" aria-label="${x.label}: number ${x.pos}, ${x.wins} wins. See on the leaderboard"><span class="label">${x.label}</span><b class="tnum">#${num(x.pos)}</b><span class="small muted">${num(x.wins)} ${x.wins === 1 ? 'win' : 'wins'} ${LB_WORDS[x.k][0]}</span></button>`).join('')}</div>` : ''; };
 const lbChips = (p) => topPlaces(p.id).map((x) => chip(`${x.label} #${num(x.pos)}`)).join('');
-const periodPlace = (id, k = lbP()) => { periodList(k); const i = lbCache.full.findIndex((e) => e.id === id); return i < 0 ? null : { pos: i + 1, e: lbCache.full[i] }; };
+// A player's own place and wins in the period, also below the top 50 (their own "Your position" card only).
+const periodPlace = (id, k = lbP()) => { const e = lbFull(k).find((x) => x.id === id); return e ? { pos: e.lbPlace, e } : null; };
 const LB_ARROW = { up: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1 9.5 8.5H.5z" fill="currentColor"/></svg>', down: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 9 .5 1.5h9z" fill="currentColor"/></svg>' };
 // [class, mark, words]. The words are the tooltip and are read out with the row.
-function lbMove(e, pos) {
-  const [, last, name] = LB_WORDS[lbP()];
+function lbMove(e, pos, k = lbP()) {
+  const [, last, name] = LB_WORDS[k];
   if (e.lbPrev === undefined) return ['', '', ''];
   if (e.lbPrev === null) return ['new', 'New', `New on the ${name} list. Not on it ${last}.`];
   const d = e.lbPrev - pos;
   if (!d) return ['same', '–', `Same place as ${last}: #${num(pos)}.`];
   return d > 0 ? ['up', `${LB_ARROW.up}${d}`, `Up ${d} ${d === 1 ? 'place' : 'places'}. Was #${num(e.lbPrev)} ${last}.`] : ['down', `${LB_ARROW.down}${-d}`, `Down ${-d} ${d === -1 ? 'place' : 'places'}. Was #${num(e.lbPrev)} ${last}.`];
 }
-const lbMoveEl = (e, pos) => { const [cls, mark, words] = lbMove(e, pos); return cls ? `<span class="lb-move ${cls}" data-tip="${esc(words)}" title="${esc(words)}">${mark}</span>` : '<span class="lb-move"></span>'; };
+const lbMoveEl = (e, pos, k = lbP()) => { const [cls, mark, words] = lbMove(e, pos, k); return cls ? `<span class="lb-move ${cls}" data-tip="${esc(words)}" title="${esc(words)}">${mark}</span>` : '<span class="lb-move"></span>'; };
 const lbWinsEl = (e) => (e.lbW === undefined ? '<span></span>' : `<span class="lb-wins"><b>${num(e.lbW)} ${e.lbW === 1 ? 'win' : 'wins'}</b></span>`);
-function lbRow(e, pos) {
-  const me = e.id === S.me;
+// Owner, November 25, 2026 (D-2026-11-25-04): "please do not hide the full name". Every leaderboard shows the full name, the
+// nickname and the picture to everyone, signed in or not, whatever the player's profile visibility. The profile keeps its
+// own rules: the row of a profile this viewer can't open shows the name and picture but opens nothing.
+function lbRow(e, k = lbP()) {
+  const pos = e.lbPlace, me = e.id === S.me;
   const medal = ['', 'first', 'second', 'third'][pos] || '';
-  if (hiddenFromViewer(e)) {
-    const m = maskedView(e);
-    return `<div class="lb-row${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" aria-disabled="true"><span class="lb-pos">${num(pos)}</span>${lbMoveEl(e, pos)}${avatar(m)}
-    <span class="lb-name"><b>${esc(m.name)}</b></span>${lbWinsEl(e)}</div>`;
-  }
-  return `<button class="lb-row${me ? ' me' : ''}${medal ? ` podium p${pos}` : ''}" id="row-${e.id}" data-act="openProfileCard" data-id="${e.id}" aria-label="${medal ? `${medal[0].toUpperCase()}${medal.slice(1)} place` : `Number ${pos}`}, ${esc(e.name)}${me ? ' (you)' : ''}${e.unclaimed ? ', not registered yet' : ''}, ${e.lbW === undefined ? '' : `${e.lbW} ${e.lbW === 1 ? 'win' : 'wins'}`}${lbMove(e, pos)[2] ? `. ${esc(lbMove(e, pos)[2])}` : ''}">
-    <span class="lb-pos">${num(pos)}</span>${lbMoveEl(e, pos)}${avatar(e)}
+  const cls = `lb-row${me ? ' me' : ''}${medal ? ` podium p${pos}` : ''}`;
+  const inner = `<span class="lb-pos">${num(pos)}</span>${lbMoveEl(e, pos, k)}${avatar(e)}
     <span class="lb-name"><b>${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}${me ? chip('You', 'ok') : ''}${e.unclaimed ? unclaimedChip() : ''}</span>
-    ${lbWinsEl(e)}</button>`;
+    ${lbWinsEl(e)}`;
+  if (hiddenFromViewer(e)) return `<div class="${cls}" id="row-${e.id}" aria-disabled="true">${inner}</div>`;
+  return `<button class="${cls}" id="row-${e.id}" data-act="openProfileCard" data-id="${e.id}" aria-label="${medal ? `${medal[0].toUpperCase()}${medal.slice(1)} place` : `Number ${pos}`}${e.lbShared ? ', shared' : ''}, ${esc(e.name)}${me ? ' (you)' : ''}${e.unclaimed ? ', not registered yet' : ''}, ${e.lbW === undefined ? '' : `${e.lbW} ${e.lbW === 1 ? 'win' : 'wins'}`}${lbMove(e, pos, k)[2] ? `. ${esc(lbMove(e, pos, k)[2])}` : ''}">
+    ${inner}</button>`;
 }
 function meCard(list) {
   if (!S.me) return '';
   const p = profileOf(S.me);
-  const pos = list.findIndex((e) => e.id === S.me) + 1;
-  if (pos) return `<section class="card hl between"><div class="row" style="gap:12px">${avatar(p, '', true)}<div><p class="small muted">Your position ${LB_WORDS[lbP()][0]}</p><p><b class="mono" style="font-size:20px">#${num(pos)}</b> · ${num(list[pos - 1].lbW)} ${list[pos - 1].lbW === 1 ? 'win' : 'wins'}</p><p class="small muted">${esc(lbMove(list[pos - 1], pos)[2])}</p></div></div><button class="btn sm" data-act="jumpMe" data-pos="${pos}">Show my row</button></section>`;
+  const row = list.findIndex((e) => e.id === S.me) + 1;
+  if (row) { const e = list[row - 1]; return `<section class="card hl between"><div class="row" style="gap:12px">${avatar(p, '', true)}<div><p class="small muted">Your position ${LB_WORDS[lbP()][0]}</p><p><b class="mono" style="font-size:20px">#${num(e.lbPlace)}</b> · ${num(e.lbW)} ${e.lbW === 1 ? 'win' : 'wins'}${e.lbShared ? ' · shared place' : ''}</p><p class="small muted">${esc(lbMove(e, e.lbPlace)[2])}</p></div></div><button class="btn sm" data-act="jumpMe" data-pos="${row}">Show my row</button></section>`; }
   // Below the top 50: the player still sees their own wins, not a place on the list.
   const mine = periodPlace(S.me);
-  if (mine) return `<section class="card stack tight"><div class="row" style="gap:12px">${avatar(p, '', true)}<div><h3>You're not in the top ${LB_TOP} ${LB_WORDS[lbP()][0]}</h3><p class="small muted">${num(mine.e.lbW)} ${mine.e.lbW === 1 ? 'win' : 'wins'} ${LB_WORDS[lbP()][0]}. The player in place ${LB_TOP} has ${num(list[list.length - 1].lbW)}${list[list.length - 1].lbW === mine.e.lbW ? ' and a better win rate' : ''}.</p></div></div></section>`;
+  if (mine) return `<section class="card stack tight"><div class="row" style="gap:12px">${avatar(p, '', true)}<div><h3>You're not in the top ${LB_TOP} ${LB_WORDS[lbP()][0]}</h3><p class="small muted">${num(mine.e.lbW)} ${mine.e.lbW === 1 ? 'win' : 'wins'} ${LB_WORDS[lbP()][0]}. The last player in the top ${LB_TOP} has ${num(list[list.length - 1].lbW)}${list[list.length - 1].lbW === mine.e.lbW ? ' and a better win rate' : ''}.</p></div></div></section>`;
   const st = rankStatus(p, null);
   return `<section class="card stack tight"><div class="between"><h3>You're not on the leaderboard${p.state === 'reassess' ? ' right now' : ' yet'}</h3>${st.chips}</div><p class="small muted">${st.text}</p>
     <div class="row"><button class="btn xs" data-act="openProfile" data-id="${p.id}">Open my profile</button></div></section>`;
 }
+const lbTabs = (k, act) => `<div class="seg" role="group" aria-label="Leaderboard period">${LB_PERIODS.map(([x, l]) => `<button type="button" aria-pressed="${k === x}" data-act="${act}" data-v="${x}">${l}</button>`).join('')}</div>`;
+const lbSkeleton = (n) => `<div class="lb" aria-busy="true" aria-label="Loading the leaderboard">${Array.from({ length: n }, (_, i) => `<div class="lb-row" style="cursor:default"><span class="skel" style="width:28px;justify-self:end"></span><span></span><span class="avatar"></span><span class="skel" style="width:${50 + ((i * 37) % 40)}%"></span><span class="skel" style="width:110px"></span></div>`).join('')}</div>`;
+// The podium holds places 1 to 3 (every player in them), so the list carries on from place 4.
+const lbAfterPodium = (rows) => rows.filter((e) => e.lbPlace > 3);
+// How many players Show more has opened, never fewer than the podium and one row after it.
+const lbShown = (list, n) => Math.min(list.length, Math.max(n, list.length - lbAfterPodium(list).length + 1));
 function viewBoard() {
-  const per = lbP(), [now, last, lname] = LB_WORDS[per];
+  const per = lbP(), [now, last] = LB_WORDS[per];
   const list = periodList(per);
   const q = S.q.trim();
   const isId = /^rtr-/i.test(q);
   const ql = q.toLowerCase();
   let body;
   if (S.board === 'loading') {
-    body = `<div class="lb" aria-busy="true" aria-label="Loading the leaderboard">${Array.from({ length: 8 }, (_, i) => `<div class="lb-row" style="cursor:default"><span class="skel" style="width:28px;justify-self:end"></span><span></span><span class="avatar"></span><span class="skel" style="width:${50 + ((i * 37) % 40)}%"></span><span class="skel" style="width:110px"></span></div>`).join('')}</div>`;
+    body = lbSkeleton(8);
   } else if (S.board === 'error') {
     body = `${notice('bad', '<b>Couldn\'t load the leaderboard.</b> Check your connection, then try again.')}<div class="row"><button class="btn sm" data-act="retryBoard">Try again</button></div>`;
   } else if (!list.length) {
     body = `<div class="empty">No one has won a standard match ${now} yet. The list fills as clubs finish sessions.</div>`;
   } else if (q && !isId) {
-    const hits = list.map((e, i) => ({ e, pos: i + 1 })).filter(({ e }) => !hiddenFromViewer(e) && (e.name.toLowerCase().includes(ql) || (e.nick || '').toLowerCase().includes(ql)));
+    // D-2026-11-25-04: full names are on every leaderboard, so the name search finds every listed player.
+    const hits = list.filter((e) => e.name.toLowerCase().includes(ql) || (e.nick || '').toLowerCase().includes(ql));
     body = hits.length
-      ? `<p class="small muted" aria-live="polite">${hits.length} ${hits.length === 1 ? 'player matches' : 'players match'} “${esc(q)}”${hits.length > 50 ? '. Showing the first 50.' : '.'}</p><div class="lb">${lbHead()}${hits.slice(0, 50).map(({ e, pos }) => lbRow(e, pos)).join('')}</div>`
+      ? `<p class="small muted" aria-live="polite">${hits.length} ${hits.length === 1 ? 'player matches' : 'players match'} “${esc(q)}”${hits.length > 50 ? '. Showing the first 50.' : '.'}</p><div class="lb">${lbHead()}${hits.slice(0, 50).map((e) => lbRow(e, per)).join('')}</div>`
       : `<div class="empty" aria-live="polite">No one in the top ${LB_TOP} matches “${esc(q)}”.</div>`;
   } else {
-    // The podium above holds 1–3, so the list carries on from 4.
-    const shown = Math.min(S.shown, list.length);
-    const from = list.length >= 3 ? 3 : 0;
-    body = `<div class="lb">${lbHead()}${list.slice(from, shown).map((e, i) => lbRow(e, from + i + 1)).join('')}</div>
+    const shown = lbShown(list, S.shown), rows = lbAfterPodium(list.slice(0, shown));
+    body = `${rows.length ? `<div class="lb">${lbHead()}${rows.map((e) => lbRow(e, per)).join('')}</div>` : '<p class="small muted" style="margin:0">Everyone on this list so far is on the podium.</p>'}
       <div class="between"><span class="small muted">Showing 1–${num(shown)} of the top ${num(list.length)}</span>${shown < list.length ? '<button class="btn sm" data-act="showMore">Show 25 more</button>' : ''}</div>`;
   }
-  const showPodium = S.board === 'ok' && list.length >= 3 && !(q && !isId);
+  // Owner, November 25, 2026: "I want the leaderboards to always show the PODIUM", also with fewer than three places or no one.
+  const showPodium = S.board === 'ok' || S.board === 'empty';
   return `<main class="wrap mid">
     <section class="page-head"><span class="label">ROTRA leaderboards</span><h1>Leaderboard</h1>
       <p class="muted">The top ${LB_TOP} across every club. Most wins ${now} comes first. Singles and doubles count together.</p>
-      <div class="lb-tabs"><div class="seg" role="group" aria-label="Leaderboard period">${LB_PERIODS.map(([k, l]) => `<button type="button" aria-pressed="${per === k}" data-act="lbPeriod" data-v="${k}">${l}</button>`).join('')}</div><span class="small muted">${esc(lbWhen(per))} · compared with ${last}</span></div></section>
-    ${showPodium ? podium(list) : ''}
+      <div class="lb-tabs">${lbTabs(per, 'lbPeriod')}<span class="small muted">${esc(lbWhen(per))} · compared with ${last}</span></div></section>
+    ${showPodium ? podium(list, per) : ''}
     ${meCard(list)}
     <section class="card stack">
       <form data-form="find" role="search" class="field"><label for="find" style="font-size:13px;font-weight:600;color:var(--fg2)">Search the leaderboard</label>
@@ -1847,10 +2017,12 @@ function viewBoard() {
     </section>
     <section class="card stack tight"><h2>Who appears here</h2>
       <ul class="bul muted">
-        <li><b style="color:var(--fg)">Top annual, Top monthly and Top weekly</b> each list the <b style="color:var(--fg)">50 players with the most wins</b> in standard matches in that year, month or week. Nothing else decides who is listed. Win rate breaks a tie.</li>
-        <li>Each list starts again when a new year, month or week begins.</li>
+        <li><b style="color:var(--fg)">Top annual, Top quarterly, Top monthly and Top weekly</b> each list the <b style="color:var(--fg)">50 players with the most wins</b> in standard matches in that year, quarter, month or week. Nothing else decides who is listed.</li>
+        <li>Players with the same wins and the same win rate <b style="color:var(--fg)">share a place</b>, and the next place follows on (1, 1, 2). Tap a podium step that several players share to see them all.</li>
+        <li>Each list starts again when a new year, quarter, month or week begins. Quarters run January to March, April to June, July to September and October to December.</li>
         <li>Fun games, partial games after a substitution, games from not-ranked sessions, and invalid games or sessions don't count.</li>
         <li>The mark beside a place shows the move since the period before: up, down, or <b style="color:var(--fg)">New</b> when the player wasn't on that list then. Point at it to see their earlier place.</li>
+        <li>Every leaderboard shows each player's full name and picture, whatever their profile is set to.</li>
         <li>Players marked <b style="color:var(--fg)">Not registered yet</b> were saved by one club and haven't registered with ROTRA. A player saved by more than one club joins the list after they register.</li>
         <li>A player's skill rank is separate and isn't shown here. <button class="btn xs ghost" data-act="openRank" data-id="">How ranks work</button></li>
       </ul></section>
@@ -1859,20 +2031,83 @@ function viewBoard() {
 const lbHead = () => '<div class="lb-head" aria-hidden="true"><span>#</span><span></span><span></span><span>Player</span><span>Wins</span></div>';
 // Podium: 1st in the middle on the tallest step with pixel fire behind the picture, 2nd left, 3rd right.
 // The DOM stays in 1–2–3 order for screen readers; CSS order places the steps.
-function podium(list) {
-  const place = ['First', 'Second', 'Third'], short = ['1st', '2nd', '3rd'];
-  const embers = Array.from({ length: 14 }, (_, k) => `<i style="left:${4 + ((k * 37) % 92)}%;animation-delay:${((k * 0.73) % 5).toFixed(2)}s;animation-duration:${4 + (k % 4)}s"></i>`).join('');
+// Owner, November 25, 2026 (D-2026-11-25-04): the podium always shows its three steps; an empty place keeps its step. "multiple
+// people can be in the podium per place as long as it is stacked": a shared place stacks the pictures on its step (two, or
+// three, or two and "+N"), lists the first two names and "+N more", and opens a dialog with everyone in that place.
+function podium(list, k = lbP(), club = null) {
+  const words = ['First', 'Second', 'Third'], short = ['1st', '2nd', '3rd'];
+  const embers = Array.from({ length: 14 }, (_, n) => `<i style="left:${4 + ((n * 37) % 92)}%;animation-delay:${((n * 0.73) % 5).toFixed(2)}s;animation-duration:${4 + (n % 4)}s"></i>`).join('');
+  const steps = [1, 2, 3].map((place, i) => {
+    const at = list.filter((e) => e.lbPlace === place);
+    const step = `<span class="pod-step" aria-hidden="true"><b>${place}</b><small>${short[i]}</small></span>`;
+    const fire = i === 0 && at.length ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : '';
+    if (!at.length) return `
+    <div class="pod p${place} empty" role="group" aria-label="${words[i]} place: no one yet"><span class="pod-who"><span class="avatar pod-none" aria-hidden="true"></span><b class="pod-name">No one yet</b></span>${step}</div>`;
+    if (at.length === 1) {
+      const e = at[0];
+      const who = `<span class="pod-who">${fire}${avatar(e, 'pod-av')}
+        <b class="pod-name">${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}<span class="pod-lv">${e.lbW === undefined ? '' : `${num(e.lbW)} wins`}</span></span>`;
+      return hiddenFromViewer(e) ? `
+    <div class="pod p${place}" aria-disabled="true">${who}${step}</div>` : `
+    <button class="pod p${place}${e.id === S.me ? ' me' : ''}" data-act="openProfileCard" data-id="${e.id}" aria-label="${words[i]} place, ${esc(e.name)}${e.id === S.me ? ' (you)' : ''}${e.lbW === undefined ? '' : `, ${e.lbW} wins`}">${who}${step}</button>`;
+    }
+    const faces = at.length > 3 ? at.slice(0, 2) : at, more = at.length - faces.length;
+    const who = `<span class="pod-who">${fire}<span class="pod-stack">${faces.map((e) => avatar(e, 'pod-av')).join('')}${more ? `<span class="avatar pod-more" aria-hidden="true">+${more}</span>` : ''}</span>
+        ${at.slice(0, 2).map((e) => `<b class="pod-name">${esc(e.name)}${e.id === S.me ? ' · You' : ''}</b>`).join('')}${at.length > 2 ? `<span class="small muted">+${at.length - 2} more</span>` : ''}<span class="pod-lv">${num(at[0].lbW)} wins each</span></span>`;
+    return `
+    <button class="pod p${place} stacked" data-act="openLbPlace" data-k="${k}" data-club="${esc(club || '')}" data-place="${place}" aria-label="${words[i]} place, shared by ${at.length} players: ${esc(listNames(at.map((e) => e.name)))}, ${at[0].lbW} wins each. See who's in this place">${who}${step}</button>`;
+  }).join('');
   return `<section class="podium" aria-labelledby="pod-title"><span class="embers" aria-hidden="true">${embers}</span>
-    <div class="pod-head"><h2 id="pod-title">Top three</h2><span class="small muted">${LB_PERIODS.find(([k]) => k === lbP())[1]} · ${esc(lbWhen(lbP()))} · top ${LB_TOP}</span></div>
-    <div class="pod-stage">${list.slice(0, 3).map((e, i) => hiddenFromViewer(e) ? `
-    <div class="pod p${i + 1}" aria-disabled="true">
-      <span class="pod-who">${i === 0 ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : ''}${avatar(maskedView(e), 'pod-av')}
-        <b class="pod-name">${esc(maskName(e.name))}</b><span class="pod-lv">${e.lbW === undefined ? '' : `${num(e.lbW)} wins`}</span></span>
-      <span class="pod-step" aria-hidden="true"><b>${i + 1}</b><small>${short[i]}</small></span></div>` : `
-    <button class="pod p${i + 1}${e.id === S.me ? ' me' : ''}" data-act="openProfileCard" data-id="${e.id}" aria-label="${place[i]} place, ${esc(e.name)}${e.id === S.me ? ' (you)' : ''}${e.lbW === undefined ? '' : `, ${e.lbW} wins`}">
-      <span class="pod-who">${i === 0 ? '<canvas class="fire" id="fire" width="48" height="40" aria-hidden="true"></canvas>' : ''}${avatar(e, 'pod-av')}
-        <b class="pod-name">${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}<span class="pod-lv">${e.lbW === undefined ? '' : `${num(e.lbW)} wins`}</span></span>
-      <span class="pod-step" aria-hidden="true"><b>${i + 1}</b><small>${short[i]}</small></span></button>`).join('')}</div></section>`;
+    <div class="pod-head"><h2 id="pod-title">Top three</h2><span class="small muted">${lbLabel(k)} · ${esc(lbWhen(k))} · top ${LB_TOP}</span></div>
+    <div class="pod-stage">${steps}</div></section>`;
+}
+// Owner, November 25, 2026: "if multiple people are in a place of the podium. clickin it should open a dialog on who's in that place".
+// Everyone in the place, in the list's order: picture, full name, nickname, wins and win rate. A row opens the profile card.
+function lbPlaceSheet(sh) {
+  const k = lbKey(sh.k), club = sh.club ? CLUB_DIR[sh.club] : null, at = periodList(k, club ? sh.club : null).filter((e) => e.lbPlace === sh.place);
+  const short = ['1st', '2nd', '3rd'][sh.place - 1] || `#${sh.place}`;
+  const rate = (e) => Math.round((e.lbW / Math.max(1, e.lbW + e.lbL)) * 100);
+  const row = (e) => {
+    const inner = `${avatar(e, 'lg')}<span class="main"><b>${esc(e.name)}</b>${e.nick ? `<span class="small muted">“${esc(e.nick)}”</span>` : ''}${e.id === S.me ? `<span>${chip('You', 'ok')}</span>` : ''}${e.unclaimed ? `<span>${unclaimedChip()}</span>` : ''}</span><span class="ls-rec"><b class="tnum">${num(e.lbW)} ${e.lbW === 1 ? 'win' : 'wins'}</b><span class="small muted">${rate(e)}% win rate</span></span>`;
+    return hiddenFromViewer(e) ? `<div class="crow">${inner}</div>` : `<button type="button" class="crow mbtn" data-act="openProfileCard" data-id="${esc(e.id)}" aria-label="${esc(e.name)}, ${e.lbW} wins, ${rate(e)}% win rate. View profile">${inner}</button>`;
+  };
+  return sheetWrap(`${short} place · ${at.length} ${at.length === 1 ? 'player' : 'players'}`,
+    `<p class="small muted" style="margin:0">${club ? esc(club.name) : 'ROTRA'} · ${lbLabel(k)} · ${esc(lbWhen(k))}. The same wins and the same win rate, so they share this place.</p>
+    ${at.length ? `<div>${at.map(row).join('')}</div>` : '<div class="empty">No one is in this place now.</div>'}`,
+    '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+}
+// Owner, November 25, 2026 (D-2026-11-25-04): each club has its own leaderboard. Only standard-match wins in that club's own
+// sessions count, and anyone who played in them can be on it. The same four lists, podium and rows as the ROTRA leaderboard.
+// The club page card shows the podium and the next 7 players after it (the top 10 when no place is shared); See all opens
+// the club's leaderboard page (/clubs/<clubId>/leaderboard) with the whole top 50.
+const CLUB_LB_CARD = 7;
+function clubBoardBody(id, k, limit, card = false) {
+  const list = periodList(k, id), [now] = LB_WORDS[k];
+  if (S.board === 'loading') return lbSkeleton(4);
+  if (S.board === 'error') return `${notice('bad', '<b>Couldn\'t load the club leaderboard.</b> Check your connection, then try again.')}<div class="row"><button class="btn sm" data-act="retryBoard">Try again</button></div>`;
+  if (!list.length) return `<div class="empty">No one has won a standard match in this club's sessions ${now} yet.</div>`;
+  const rows = card ? lbAfterPodium(list).slice(0, limit) : lbAfterPodium(list.slice(0, lbShown(list, limit)));
+  return rows.length ? `<div class="lb">${lbHead()}${rows.map((e) => lbRow(e, k)).join('')}</div>` : '<p class="small muted" style="margin:0">Everyone on this list so far is on the podium.</p>';
+}
+function clubBoardCard(id) {
+  const k = clubLbP(), list = periodList(k, id), [, last] = LB_WORDS[k];
+  return `<section class="card stack" aria-labelledby="club-lb-title"><div class="between"><h2 id="club-lb-title">Leaderboard</h2>${S.board === 'ok' && list.length ? `<button type="button" class="btn xs" data-act="openClubBoard" data-id="${id}">See all</button>` : ''}</div>
+          <div class="lb-tabs">${lbTabs(k, 'clubLbPeriod')}<span class="small muted">${esc(lbWhen(k))} · compared with ${last}</span></div>
+          ${S.board === 'ok' || S.board === 'empty' ? podium(list, k, id) : ''}
+          ${clubBoardBody(id, k, CLUB_LB_CARD, true)}</section>`;
+}
+function viewClubBoard() {
+  const id = S.viewId, club = CLUB_DIR[id];
+  if (!club) return viewNotFound();
+  const k = clubLbP(), list = periodList(k, id), [now, last] = LB_WORDS[k], shown = lbShown(list, S.shown);
+  return `<main class="wrap mid">
+    <section class="page-head">${backBtn('openClubBack', club.name)}<span class="label">${esc(club.name)}</span><h1>Leaderboard</h1>
+      <p class="muted">The top ${LB_TOP} in ${esc(club.name)}'s sessions. Most wins ${now} comes first. Only games played in this club's sessions count.</p>
+      <div class="lb-tabs">${lbTabs(k, 'clubLbPeriod')}<span class="small muted">${esc(lbWhen(k))} · compared with ${last}</span></div></section>
+    ${S.board === 'ok' || S.board === 'empty' ? podium(list, k, id) : ''}
+    <section class="card stack">${clubBoardBody(id, k, S.shown)}
+      ${S.board === 'ok' && list.length ? `<div class="between"><span class="small muted">Showing 1–${num(shown)} of the top ${num(list.length)}</span>${shown < list.length ? '<button class="btn sm" data-act="showMore">Show 25 more</button>' : ''}</div>` : ''}</section>
+  </main>`;
 }
 
 // Pixel fire (the classic spreading-flame effect) drawn in the brand green. The canvas is tiny and scaled up
@@ -1963,7 +2198,7 @@ function viewProfile() {
     <aside class="side stack">
       <section class="card hero p-hero">
         <div class="hero-top"><div class="hero-banner bn-${esc(bannerOf(p))}" aria-hidden="true"></div>${own ? `<button type="button" class="bn-cam" data-act="openBanner" aria-label="Change banner" title="Change banner">${I.edit}</button>` : ''}</div>
-        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight p-name"><h1>${esc(p.nick || p.name)}</h1>${p.nick ? `<p class="muted">${esc(p.name)}</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}<button type="button" class="chip-btn" data-act="goVerify" style="background:none;border:0;padding:0;cursor:pointer">${verifyChip(S.accounts[S.me])}</button></div>` : isUnclaimed(p) ? `<div class="row">${unclaimedChip()}</div>` : ''}</div></div>
+        <div class="who">${own ? `<span class="av-edit">${avatar(p, 'xxl', true)}<button type="button" class="av-cam" data-act="openAvatar" aria-label="Change profile picture" title="Change profile picture">${I.edit}</button></span>` : avatar(p, 'xxl', true)}<div style="min-width:0" class="stack tight p-name"><h1>${esc(p.nick || p.name)}</h1>${p.nick ? `<p class="muted">${esc(p.name)}</p>` : ''}${own ? `<div class="row">${chip('This is you', 'ok')}<button type="button" class="chip-btn" data-act="goVerify" style="background:none;border:0;padding:0;cursor:pointer">${verifyChip(S.accounts[S.me])}</button></div>` : `<div class="row">${isUnclaimed(p) ? unclaimedChip() : publicVerifyChip(p)}</div>`}</div></div>
         ${isUnclaimed(p) && !own ? heroFacts(p, pos) : ''}
         <div class="stack tight"><span class="label">Player ID</span>
           <div class="rtr-line"><code id="rtr-${p.id}">${esc(p.rtr)}</code><button class="btn xs" data-act="copyId" data-id="${p.id}" aria-label="Copy player ID">${I.copy} Copy</button></div>
@@ -2217,6 +2452,7 @@ function viewClub() {
         ${nextCard}
         <section class="card stack"><div class="between"><h2>Upcoming sessions</h2><span class="small muted">${num(up.length)}</span></div>
           ${rest.length ? `<div>${rest.map(sessionRow).join('')}</div>` : next ? '<p class="small muted" style="margin:0">That\'s the only one scheduled so far.</p>' : '<div class="empty">No upcoming sessions.</div>'}</section>
+        ${clubBoardCard(id)}
         <section class="card stack cal-section" aria-label="Calendar"><div class="cal-head"><h2>${esc(cal.title)}</h2><div class="row" style="gap:4px"><button class="btn xs icon-btn" data-act="clubMonth" data-v="${off - 1}" aria-label="Previous month" ${off <= minOff(all) ? 'disabled' : ''}>${I.back}</button><button class="btn xs" data-act="clubToday">Today</button><button class="btn xs icon-btn" data-act="clubMonth" data-v="${off + 1}" aria-label="Next month" ${off >= maxOff(all) ? 'disabled' : ''}>${I.fwd}</button></div></div>
           ${cal.grid}
           ${cal.legend}
@@ -2529,6 +2765,7 @@ function viewAccount() {
     <div class="page-head">${backBtn('openProfile', 'My profile', p.id)}<h1>Privacy and contact</h1></div>
     <section class="card stack"><h2>Profile visibility</h2>
       <div class="choices" role="radiogroup" aria-label="Profile visibility">${VIS.map(([k, l, h]) => `<button type="button" class="choice" role="radio" aria-checked="${vis === k}" data-act="setVisibility" data-v="${k}" ${S.ui.profilePending ? 'disabled aria-busy="true"' : ''}><span class="dot" aria-hidden="true"></span><span class="stack tight"><b>${l}</b><span class="small muted">${h}</span></span></button>`).join('')}</div>
+      <p class="small muted" style="margin:0">Leaderboards always show your full name and picture, whatever this is set to.</p>
       <p class="small" aria-live="polite">${S.ui.profilePending ? 'Saving…' : esc(`Saved: your profile is ${VIS_LABEL[vis]}.`)}</p>
       ${S.ui.profileErr ? notice('bad', esc(S.ui.profileErr)) : ''}
     </section>
@@ -3477,7 +3714,8 @@ function shareModel(sh) {
   }
   if (sh.kind === 'game') {
     const g = s.games[+sh.gi]; if (!g) return null;
-    return { kind: 'games', one: true, title: 'Share game', top, link, blocks: [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` }, { t: 'lines', lines: [{ res: g.res, score: g.score, mine: [p, ...g.partner.map(sharePerson)], theirs: g.opp.map(sharePerson), mineLabel: [p.name, ...g.partner.map(shareName)].map((n) => n.split(' ')[0]).join(' + '), theirsLabel: g.opp.map((n) => shareName(n).split(' ')[0]).join(' + ') }] }, { t: 'stat', text: `${g.fmt} · ${g.res === 'W' ? 'Won' : 'Lost'}${g.score ? ` ${g.score}` : ''}` }] };
+    // Mockup change 2026-11-25-player-match-page: the Link field holds the game's match page.
+    return { kind: 'games', one: true, title: 'Share game', top, link: matchLink(g.mid), blocks: [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` }, { t: 'lines', lines: [{ res: g.res, score: g.score, mine: [p, ...g.partner.map(sharePerson)], theirs: g.opp.map(sharePerson), mineLabel: [p.name, ...g.partner.map(shareName)].map((n) => n.split(' ')[0]).join(' + '), theirsLabel: g.opp.map((n) => shareName(n).split(' ')[0]).join(' + ') }] }, { t: 'stat', text: `${g.fmt} · ${g.res === 'W' ? 'Won' : 'Lost'}${g.score ? ` ${g.score}` : ''}` }] };
   }
   const gs = s.games.filter((g) => g.kind !== 'partial'), w = gs.filter((g) => g.res === 'W').length, l = gs.length - w;
   const head = [{ t: 'h', text: s.title }, { t: 'p', text: `${fmtDay(s.ago)} · ${s.club}` }];
@@ -3679,6 +3917,7 @@ const SHEETS_SESSION = (sh) => {
 };
 const SHEETS = {
   sessionGames: SHEETS_SESSION,
+  lbPlace: lbPlaceSheet,
   // Owner, November 13, 2026: a club profile dialog in the same style as the player card (banner strip, logo over it, name block, About).
   // Opened from the Clubs card on a profile; Open club page goes to the club page.
   clubCard: (sh) => {
@@ -3911,6 +4150,9 @@ const ACT = {
   goBoard: () => go('board'),
   goLogin: () => go('login'),
   openProfile: (el) => go('profile', el.dataset.id),
+  // Mockup change 2026-11-25-player-match-page: tapping a game court opens its match page.
+  openMatch: (el) => { if (S.screen !== 'match') S.ui.matchFrom = { to: S.screen, id: S.viewId, label: matchFromLabel() }; go('match', el.dataset.mid); },
+  matchBack: () => { const f = S.ui.matchFrom; S.ui.matchFrom = null; if (f) go(f.to, f.id); else go('board'); },
   // Artifact comment, November 13, 2026: leaderboard rows and the podium open this card first; its Open full profile goes to the profile page.
   openClubCard: (el) => { S.ui.sheet = { type: 'clubCard', id: el.dataset.id }; render(); },
   openSessionGames: (el) => { S.ui.sheet = { type: 'sessionGames', id: el.dataset.id, sid: el.dataset.sid }; render(); },
@@ -3937,7 +4179,7 @@ const ACT = {
     const link = `${/^https?:/.test(location.origin) ? location.origin : 'https://rotra.example'}/player/clubs/${el.dataset.club}`;
     try { navigator.clipboard.writeText(link).then(() => toast('Club page link copied'), () => toast(`Couldn't copy. The club page link is ${link}`)); } catch (e) { toast(`Couldn't copy. The club page link is ${link}`); }
   },
-  seeOnBoard: (el) => { const id = el.dataset.id, pos = positionOf(id) || 1; S.ui.lbP = 'year'; go('board'); S.q = ''; S.shown = Math.max(S.shown, Math.ceil(pos / 25) * 25); render(); setTimeout(() => { const r = document.getElementById(`row-${id}`); if (r) { r.scrollIntoView({ block: 'center' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 1600); } }, 60); },
+  seeOnBoard: (el) => { const id = el.dataset.id, pos = topRow(id, 'year') || 1; S.ui.lbP = 'year'; go('board'); S.q = ''; S.shown = Math.max(S.shown, Math.ceil(pos / 25) * 25); render(); setTimeout(() => { const r = document.getElementById(`row-${id}`); if (r) { r.scrollIntoView({ block: 'center' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 1600); } }, 60); },
   openHistory: (el) => { S.ui.hist = 'counted'; S.ui.wpf = null; S.ui.histPage = 0; go('history', el.dataset.id); },
   openSessions: (el) => go('sessions', el.dataset.id),
   histTab: (el) => { S.ui.hist = el.dataset.v; S.ui.wpf = null; S.ui.histPage = 0; render(); },
@@ -3954,7 +4196,10 @@ const ACT = {
   closeSheet: () => { if (avatarDraft?.photoUrl?.startsWith('blob:')) URL.revokeObjectURL(avatarDraft.photoUrl); avatarDraft = null; bannerDraft = null; S.ui.sheet = null; S.ui.pendingGo = null; render(); },
   showMore: () => { S.shown += 25; render(); },
   lbPeriod: (el) => { S.ui.lbP = el.dataset.v; S.shown = 25; render(); },
-  lbGo: (el) => { const id = el.dataset.id; S.ui.lbP = el.dataset.v; const pos = topPlace(id, S.ui.lbP) || 1; go('board'); S.q = ''; S.shown = Math.max(25, Math.ceil(pos / 25) * 25); render(); setTimeout(() => { const r = document.getElementById(`row-${id}`); if (r) { r.scrollIntoView({ block: 'center' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 1600); } }, 60); },
+  clubLbPeriod: (el) => { S.ui.clubLbP = el.dataset.v; S.shown = 25; render(); },
+  openClubBoard: (el) => { S.shown = 25; go('clubBoard', el.dataset.id); },
+  openLbPlace: (el) => { S.ui.sheet = { type: 'lbPlace', k: el.dataset.k, club: el.dataset.club || null, place: +el.dataset.place }; render(); },
+  lbGo: (el) => { const id = el.dataset.id; S.ui.lbP = el.dataset.v; const pos = topRow(id, S.ui.lbP) || 1; go('board'); S.q = ''; S.shown = Math.max(25, Math.ceil(pos / 25) * 25); render(); setTimeout(() => { const r = document.getElementById(`row-${id}`); if (r) { r.scrollIntoView({ block: 'center' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 1600); } }, 60); },
   jumpMe: (el) => {
     S.q = ''; S.shown = Math.max(S.shown, Math.ceil(+el.dataset.pos / 25) * 25); render();
     const row = document.getElementById(`row-${S.me}`);
@@ -3967,8 +4212,9 @@ const ACT = {
   shareView: (el) => { if (S.ui.sheet?.type === 'share') { S.ui.sheet.shv = el.dataset.v; render(); } },
   shareViewClose: () => { if (S.ui.sheet) { S.ui.sheet.shv = null; render(); } },
   copyShareLink: () => {
-    const link = profileLink(S.ui.sheet?.pid || S.me);
-    try { navigator.clipboard.writeText(link).then(() => toast('Link copied'), () => toast(`Couldn't copy. Your profile link is ${link}`)); } catch (e) { toast(`Couldn't copy. Your profile link is ${link}`); }
+    const m = S.ui.sheet ? shareModel(S.ui.sheet) : null, game = S.ui.sheet?.kind === 'game';
+    const link = m ? m.link : profileLink(S.ui.sheet?.pid || S.me), what = game ? 'The game link' : 'Your profile link';
+    try { navigator.clipboard.writeText(link).then(() => toast('Link copied'), () => toast(`Couldn't copy. ${what} is ${link}`)); } catch (e) { toast(`Couldn't copy. ${what} is ${link}`); }
   },
   shareNative: () => toast('Share sheet opened'),
   savePhotos: () => toast('Share menu opened. Tap Save Image to add it to Photos.'),
@@ -4536,7 +4782,9 @@ function prototypePath() {
   let path = playerPaths[S.screen];
   if (['profile', 'history', 'rank', 'sessions'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : S.screen === 'sessions' ? '/sessions' : ''}` : '/rank';
   if (S.screen === 'club') path = `/clubs/${encodeURIComponent(S.viewId)}`;
+  if (S.screen === 'match') path = `/matches/${encodeURIComponent(S.viewId || '')}`;
   if (S.screen === 'clubMembers') path = `/clubs/${encodeURIComponent(S.viewId)}/members`;
+  if (S.screen === 'clubBoard') path = `/clubs/${encodeURIComponent(S.viewId)}/leaderboard`;
   if (S.screen === 'notfound') path = `/find/${encodeURIComponent(S.ui.findId || S.viewId || 'unknown')}`;
   if (['claim', 'claimDone', 'reset'].includes(S.screen)) path = `/${S.screen === 'reset' ? 'reset-password' : 'claim'}/${encodeURIComponent(prototypeToken)}${S.screen === 'claimDone' ? '?complete=1' : ''}`;
   if (['register', 'registerDone', 'joinClub', 'joinSession'].includes(S.screen)) {
@@ -4557,8 +4805,12 @@ function applyPrototypeRoute(url) {
   const profile = path.match(/^\/players\/([^/]+)(?:\/(rank|games|sessions))?$/);
   const token = path.match(/^\/(claim|reset-password)\/([^/]+)$/);
   const find = path.match(/^\/find\/([^/]+)$/);
+  const matchPage = path.match(/^\/matches\/([^/]+)$/);
+  if (matchPage) { screen = 'match'; id = decodeURIComponent(matchPage[1]); } // an unknown id shows the page's not-found state
   const clubMembersPage = path.match(/^\/clubs\/([^/]+)\/members$/);
   if (clubMembersPage) { id = decodeURIComponent(clubMembersPage[1]); if (!CLUB_DIR[id]) return false; screen = 'clubMembers'; S.ui.cm = { q: '', band: 'all' }; }
+  const clubBoardPage = path.match(/^\/clubs\/([^/]+)\/leaderboard$/);
+  if (clubBoardPage) { id = decodeURIComponent(clubBoardPage[1]); if (!CLUB_DIR[id]) return false; screen = 'clubBoard'; S.shown = 25; }
   const clubPage = path.match(/^\/clubs\/([^/]+)$/);
   if (clubPage) { id = decodeURIComponent(clubPage[1]); if (!CLUB_DIR[id]) return false; screen = 'club'; S.ui.clubMonth = 0; S.ui.clubShown = CLUB_MEMBERS_PAGE; }
   if (profile) { screen = profile[2] === 'games' ? 'history' : profile[2] === 'rank' ? 'rank' : profile[2] === 'sessions' ? 'sessions' : 'profile'; id = decodeURIComponent(profile[1]); if (!Object.hasOwn(S.accounts, id) && !BASE.some((p) => p.id === id)) return false; }
@@ -4601,7 +4853,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { onboard: viewOnboard, obDetails: viewObDetails, register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, home: viewHome, profile: viewProfile, club: viewClub, clubMembers: viewClubMembers, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
+  const views = { onboard: viewOnboard, obDetails: viewObDetails, register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, home: viewHome, profile: viewProfile, match: viewMatch, club: viewClub, clubMembers: viewClubMembers, clubBoard: viewClubBoard, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
   if (needsGoogle() && S.gDeadline === 'passed' && !['gRequired', 'board', 'privacy', 'terms'].includes(S.screen)) S.screen = 'gRequired';
   if (S.screen === 'gRequired' && !needsGoogle()) S.screen = 'profile';
   const sh = S.ui.sheet;

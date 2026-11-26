@@ -10,7 +10,7 @@ import { useState } from 'react'
 
 /**
  * One share-image row: still one row per player. `position` is the standings position, shared by
- * players with the same wins and losses (1, 1, 3), so two rows can carry the same number.
+ * players with the same wins and losses (1, 1, 2), so two rows can carry the same number.
  */
 export type LeaderboardShareRow = {
   position: number

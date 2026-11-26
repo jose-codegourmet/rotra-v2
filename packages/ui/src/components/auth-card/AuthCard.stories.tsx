@@ -99,6 +99,39 @@ export const PlayerWithGoogleLight: Story = {
   globals: { theme: 'light' },
 }
 
+// Art is the same in both themes; the card keeps the theme surface.
+export const WithArtQueue: Story = {
+  args: { art: '/art/auth/queue-club-login-rion.webp' },
+}
+
+export const WithArtQueueLight: Story = {
+  args: { ...WithArtQueue.args },
+  globals: { theme: 'light' },
+}
+
+export const WithArtPlayer: Story = {
+  args: { ...Player.args, art: '/art/auth/player-sign-in-tara.webp', google: <GoogleButton /> },
+}
+
+export const WithArtPlayerLight: Story = {
+  args: { ...WithArtPlayer.args },
+  globals: { theme: 'light' },
+}
+
+export const WithArtAdmin: Story = {
+  args: { ...Admin.args, art: '/art/auth/admin-sign-in-arena.webp' },
+}
+
+export const WithArtAdminLight: Story = {
+  args: { ...WithArtAdmin.args },
+  globals: { theme: 'light' },
+}
+
+export const WithArtPhone: Story = {
+  args: { ...WithArtQueue.args },
+  globals: { viewport: { value: 'phone' } },
+}
+
 export const Offline: Story = { args: { offline: true, children: <QueueForm disabled /> } }
 
 export const Phone: Story = { globals: { viewport: { value: 'phone' } } }

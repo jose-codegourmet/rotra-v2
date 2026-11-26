@@ -6,9 +6,10 @@ import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
+import { levelLabel } from '@rotra/ui/level-pill'
 import { PlayerFaceButton, type PlayerWait } from '@rotra/ui/player-face-button'
 import { SwappablePlayer } from '@rotra/ui/swap-sides-area/swappable-player'
-import type { ComponentProps } from 'react'
+import { type ComponentProps, Fragment } from 'react'
 import { matchCardVariants } from './MatchCard.variants'
 
 /** One player on a queue card: picture and short name, full name and level for the label. */
@@ -20,10 +21,12 @@ export type MatchCardPlayer = {
   level: PlayingLevel | null
   photoUrl?: string
   /**
-   * Live session wait under the name ("M min", On court, Playing, Not here). Omit when the session
+   * Live session status pill under the name (In queue Nm, Playing Nm, Getting ready, Away). Omit when the session
    * is not live; the console computes the minutes (Q12.22).
    */
   wait?: PlayerWait
+  /** Games this player has played in the session: the badge on the picture's ring (0 shows "0") */
+  games?: number
 }
 
 export type MatchCardTeam = 'A' | 'B'
@@ -31,7 +34,7 @@ export type MatchCardTeam = 'A' | 'B'
 /** The flow arrow the queue grid draws after a card: right or left along the snake, down at a row end */
 export type MatchCardFlow = 'right' | 'left' | 'down'
 
-/** A small fact under a player's name on a draft: "3 played", "Playing now" (warn) */
+/** @deprecated Draft tiles no longer show chips under the names (2026-11-23); kept so callers compile. */
 export type MatchCardPlayerChip = { text: string; tone?: 'warn' }
 
 /**
@@ -44,7 +47,12 @@ export type MatchCardDraft = {
   pickOrder?: number
   onToggle: () => void
   disabled?: boolean
-  /** Chips under each player's name, by player id */
+  /**
+   * Status line tone: 'warn' when the awaited match runs long ("Waits for Court 2 · running long").
+   * Default 'muted'; the info icon stays. The text is `status.reason`.
+   */
+  statusTone?: 'muted' | 'warn'
+  /** @deprecated Ignored: draft tiles show the ring and the games badge only. */
   playerChips?: Record<string, MatchCardPlayerChip[]>
 }
 
@@ -54,6 +62,11 @@ export type MatchCardProps = {
   /** Match number N, used in the handle and Remove labels */
   matchNo: number
   format: MatchFormat
+  /**
+   * Category prefix of the format chip: "Mixed" gives "Mixed Doubles", "Genderless" gives
+   * "Genderless 3v3 fun". Omit for the plain format label.
+   */
+  categoryPrefix?: string
   origin: MatchOrigin
   /** Manual matches (added, made or edited by the Queue Master) are protected from regeneration */
   manualProtected: boolean
@@ -71,6 +84,13 @@ export type MatchCardProps = {
   swappable?: boolean
   /** Opens the player's profile */
   onSelectPlayer?: (playerId: string, team: MatchCardTeam) => void
+  /** Opens the player's games this session (the games badge). Makes the badge its own button. */
+  onOpenGames?: (playerId: string) => void
+  /**
+   * 'button': the badge is a focusable button next to the face button (needs onOpenGames).
+   * 'static': display only, for faces inside other dialogs. Default: 'button' with onOpenGames, else 'static'.
+   */
+  gamesBadge?: 'button' | 'static'
   /** Start: rendered only when given, enabled only when the match is ready */
   onStart?: () => void
   /**
@@ -89,6 +109,12 @@ export type MatchCardProps = {
   /** Search highlights matching players without changing the match. */
   searchState?: 'hit' | 'dim'
   highlightedPlayerIds?: string[]
+  /**
+   * 'compact' (Courts tab › Upcoming queued matches): no wait times; each team is an overlapping stack
+   * of 34 px pictures with level rings and the short names on one line. Head, status line and
+   * buttons stay. Default 'default'. Draft tiles ignore it.
+   */
+  variant?: 'default' | 'compact'
   className?: string
 }
 
@@ -103,11 +129,72 @@ const FORMAT_LABEL: Record<MatchFormat, string> = {
 
 const FLOW_ARROW: Record<MatchCardFlow, string> = { right: '→', left: '←', down: '↓' }
 
+/** The 3 px level ring (prototype .qtile .qf outline): Beginner, Intermediate, Advanced; grey with no level. */
+function levelRingClass(level: PlayingLevel | null) {
+  const colour = level?.startsWith('beginner')
+    ? 'outline-lv-beg'
+    : level?.startsWith('intermediate')
+      ? 'outline-lv-int'
+      : level?.startsWith('advanced')
+        ? 'outline-lv-adv'
+        : 'outline-lv-none'
+  return `outline-3 outline-offset-2 ${colour}`
+}
+
+const gamesCopy = (n: number) => `${n} game${n === 1 ? '' : 's'}`
+
+// The prototype's .pf-g on a queue face: top right of the ring, white at rest, accent on hover.
+const BADGE_BASE =
+  'absolute top-[-3px] left-[calc(50%+31px)] z-[1] grid h-[17px] min-w-[17px] -translate-x-full place-items-center rounded-full bg-on-photo/90 px-1 text-[11px] leading-none font-extrabold text-photo-label tabular-nums'
+
+/** The games badge beside a face: its own button with onOpenGames, display only otherwise. */
+function GamesBadge({
+  player,
+  mode,
+  onOpenGames,
+}: {
+  player: MatchCardPlayer
+  mode: 'button' | 'static'
+  onOpenGames?: (playerId: string) => void
+}) {
+  if (player.games === undefined) return null
+  if (mode === 'button' && onOpenGames) {
+    return (
+      <button
+        type="button"
+        aria-label={`${player.name}'s games this session, ${player.games}`}
+        title={`${player.name}'s games this session · tap to see them`}
+        onClick={(e) => {
+          e.stopPropagation()
+          onOpenGames(player.id)
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+        className={cn(
+          BADGE_BASE,
+          'cursor-pointer border-0 before:absolute before:-inset-1.5 before:content-[""]',
+          'hover:bg-accent hover:text-on-accent hover:ring-2 hover:ring-surface',
+          'focus-visible:bg-accent focus-visible:text-on-accent focus-visible:ring-2 focus-visible:ring-surface',
+          'touch:before:-inset-2',
+        )}
+      >
+        {player.games}
+      </button>
+    )
+  }
+  return (
+    <span role="img" aria-label={gamesCopy(player.games)} className={BADGE_BASE}>
+      {player.games}
+    </span>
+  )
+}
+
 function Faces({
   players,
   team,
   swappable,
   onSelectPlayer,
+  onOpenGames,
+  gamesBadge,
   highlightedPlayerIds = [],
 }: {
   highlightedPlayerIds?: string[]
@@ -115,79 +202,204 @@ function Faces({
   team: MatchCardTeam
   swappable: boolean
   onSelectPlayer?: (playerId: string, team: MatchCardTeam) => void
+  onOpenGames?: (playerId: string) => void
+  gamesBadge: 'button' | 'static'
 }) {
   return (
-    <div className="flex flex-wrap justify-center gap-x-2 gap-y-1">
+    <div className="flex flex-wrap justify-center gap-x-3.5 gap-y-1.5">
       {players.map((p, i) => {
         const face = (
-          <PlayerFaceButton
-            key={p.id}
-            name={p.name}
-            shortName={p.shortName}
-            level={p.level}
-            photoUrl={p.photoUrl}
-            label={`${p.name}, Team ${team}. View profile`}
-            size="queue"
-            wait={p.wait}
-            className={
-              highlightedPlayerIds.includes(p.id)
-                ? '[&>:first-child]:!ring-[3px] [&>:first-child]:!ring-warn [&>:nth-child(2)]:!font-extrabold [&>:nth-child(2)]:!text-warn'
-                : undefined
-            }
-            swap={swappable ? { team, index: i } : undefined}
-            onClick={() => onSelectPlayer?.(p.id, team)}
-          />
+          <div key={p.id} className="relative flex min-w-0 flex-col items-center">
+            <PlayerFaceButton
+              name={p.name}
+              shortName={p.shortName}
+              level={p.level}
+              photoUrl={p.photoUrl}
+              label={`${p.name}, Team ${team}${p.games === undefined ? '' : `, ${gamesCopy(p.games)}`}. View profile`}
+              size="queue"
+              wait={p.wait}
+              className={cn(
+                '[&>:first-child]:outline-3 [&>:first-child]:outline-offset-2',
+                levelRingVariant(p.level),
+                highlightedPlayerIds.includes(p.id) &&
+                  '[&>:first-child]:!ring-[3px] [&>:first-child]:!ring-warn [&>:nth-child(2)]:!font-extrabold [&>:nth-child(2)]:!text-warn',
+              )}
+              swap={swappable ? { team, index: i } : undefined}
+              onClick={() => onSelectPlayer?.(p.id, team)}
+            />
+            <GamesBadge player={p} mode={gamesBadge} onOpenGames={onOpenGames} />
+          </div>
         )
         return swappable ? (
           <SwappablePlayer key={p.id} team={team} index={i}>
             {face}
           </SwappablePlayer>
         ) : (
-          face
+          <Fragment key={p.id}>{face}</Fragment>
         )
       })}
     </div>
   )
 }
 
-/** A draft's faces: the same picture and name, not a profile button, with the player's chips under it. */
-function DraftFaces({
+/** The face's outline colour, applied to the picture (first child of the face button). */
+function levelRingVariant(level: PlayingLevel | null) {
+  return level?.startsWith('beginner')
+    ? '[&>:first-child]:outline-lv-beg'
+    : level?.startsWith('intermediate')
+      ? '[&>:first-child]:outline-lv-int'
+      : level?.startsWith('advanced')
+        ? '[&>:first-child]:outline-lv-adv'
+        : '[&>:first-child]:outline-lv-none'
+}
+
+/**
+ * A draft's and a read-only card's faces: the same ring, picture, games badge and name, not a
+ * profile button. The badge is its own button only when the card gives onOpenGames.
+ */
+function StaticFaces({
   players,
-  chips,
+  onOpenGames,
+  gamesBadge,
 }: {
   players: MatchCardPlayer[]
-  chips?: Record<string, MatchCardPlayerChip[]>
+  onOpenGames?: (playerId: string) => void
+  gamesBadge: 'button' | 'static'
 }) {
   return (
-    <div className="flex flex-wrap justify-center gap-x-2 gap-y-1">
+    <div className="flex flex-wrap justify-center gap-x-3.5 gap-y-1.5">
       {players.map((p) => (
-        <div key={p.id} className="flex min-w-0 flex-col items-center gap-px" title={p.name}>
+        <div
+          key={p.id}
+          className="relative flex min-w-0 flex-col items-center gap-px p-0.5"
+          title={p.name}
+        >
           <Avatar
             name={p.name}
             src={p.photoUrl}
             size={44}
-            className="touch:size-[46px] touch:text-[15px]"
+            className={cn(levelRingClass(p.level), 'touch:size-[46px] touch:text-[15px]')}
           />
           <span className="max-w-[88px] truncate text-[15px] font-semibold text-fg">
             {p.shortName}
           </span>
-          {chips?.[p.id]?.length ? (
-            <span className="flex max-w-24 flex-wrap justify-center gap-0.5">
-              {chips[p.id]?.map((chip) => (
-                <span
-                  key={chip.text}
-                  className={cn(
-                    'rounded-md px-[5px] text-[10px] leading-[1.4] whitespace-nowrap',
-                    chip.tone === 'warn' ? 'bg-warn-subtle text-warn' : 'bg-bg text-fg2',
-                  )}
-                >
-                  {chip.text}
-                </span>
-              ))}
-            </span>
-          ) : null}
+          <GamesBadge player={p} mode={gamesBadge} onOpenGames={onOpenGames} />
         </div>
       ))}
+    </div>
+  )
+}
+
+/** The compact picture's level ring (prototype .qs-f): 2 px outline plus a 3 px surface gap. */
+function compactRingClass(level: PlayingLevel | null) {
+  const colour = level?.startsWith('beginner')
+    ? 'outline-lv-beg'
+    : level?.startsWith('intermediate')
+      ? 'outline-lv-int'
+      : level?.startsWith('advanced')
+        ? 'outline-lv-adv'
+        : 'outline-lv-none'
+  return `outline-2 outline-offset-0 shadow-[0_0_0_3px_var(--surface)] ${colour}`
+}
+
+/** One picture of a compact team: a profile button (a plain picture when read only). */
+function CompactFace({
+  player: p,
+  team,
+  index,
+  swappable,
+  readOnly,
+  highlighted,
+  onSelectPlayer,
+}: {
+  player: MatchCardPlayer
+  team: MatchCardTeam
+  index: number
+  swappable: boolean
+  readOnly: boolean
+  highlighted: boolean
+  onSelectPlayer?: (playerId: string, team: MatchCardTeam) => void
+}) {
+  const picture = (
+    <Avatar
+      name={p.name}
+      src={p.photoUrl}
+      size={36}
+      className={cn(
+        'size-[34px] text-xs',
+        compactRingClass(p.level),
+        highlighted && 'outline-warn',
+      )}
+    />
+  )
+  if (readOnly)
+    return (
+      <span title={`${p.name} · ${levelLabel(p.level)}`} className="-ml-2 inline-flex rounded-full">
+        {picture}
+      </span>
+    )
+  return (
+    <button
+      type="button"
+      title={`${p.name} · ${levelLabel(p.level)}${swappable ? ' · drag onto the other team to switch sides' : ''}`}
+      aria-label={`${p.name}, ${levelLabel(p.level)}, Team ${team}. View profile${swappable ? '. Left or right arrow switches sides' : ''}`}
+      data-team={swappable ? team : undefined}
+      data-i={swappable ? index : undefined}
+      onClick={() => onSelectPlayer?.(p.id, team)}
+      className="-ml-2 cursor-pointer rounded-full border-0 bg-transparent p-0 hover:relative hover:z-[1]"
+    >
+      {picture}
+    </button>
+  )
+}
+
+/**
+ * The compact variant's team (prototype .qt-vs .qstack-row, owner, November 25, 2026): an overlapping
+ * stack of 34 px pictures with level rings above the short names ("Rafa & Migo"); the two teams sit
+ * side by side with VS between. No wait times, no games badge.
+ * Pictures open the profile and, inside a SwapSidesArea, can be dragged onto the other team.
+ */
+function CompactFaces({
+  players,
+  team,
+  swappable,
+  readOnly,
+  onSelectPlayer,
+  highlightedPlayerIds = [],
+}: {
+  players: MatchCardPlayer[]
+  team: MatchCardTeam
+  swappable: boolean
+  readOnly: boolean
+  onSelectPlayer?: (playerId: string, team: MatchCardTeam) => void
+  highlightedPlayerIds?: string[]
+}) {
+  return (
+    <div className="flex min-w-0 flex-col items-center gap-1.5 text-center">
+      <div className="flex flex-none pl-2">
+        {players.map((p, i) => {
+          const canSwap = swappable && !readOnly
+          const face = {
+            player: p,
+            team,
+            index: i,
+            swappable: canSwap,
+            readOnly,
+            highlighted: highlightedPlayerIds.includes(p.id),
+            onSelectPlayer,
+          }
+          return canSwap ? (
+            <SwappablePlayer key={p.id} team={team} index={i} className="rounded-full">
+              <CompactFace {...face} />
+            </SwappablePlayer>
+          ) : (
+            <CompactFace key={p.id} {...face} />
+          )
+        })}
+      </div>
+      <span className="min-w-0 truncate text-[13px] font-semibold text-fg">
+        {players.map((p) => p.shortName).join(' & ')}
+      </span>
     </div>
   )
 }
@@ -204,6 +416,7 @@ export function MatchCard({
   position,
   matchNo,
   format,
+  categoryPrefix,
   origin,
   manualProtected,
   status,
@@ -213,6 +426,8 @@ export function MatchCard({
   handleProps,
   swappable = false,
   onSelectPlayer,
+  onOpenGames,
+  gamesBadge,
   onStart,
   canOpenCourt = false,
   onEdit,
@@ -222,8 +437,14 @@ export function MatchCard({
   readOnly = false,
   searchState,
   highlightedPlayerIds,
+  variant = 'default',
 }: MatchCardProps) {
+  const compact = variant === 'compact'
   const ready = status.kind === 'ready'
+  const badgeMode = gamesBadge ?? (onOpenGames ? 'button' : 'static')
+  const formatLabel = categoryPrefix
+    ? `${categoryPrefix} ${FORMAT_LABEL[format]}`
+    : FORMAT_LABEL[format]
   const startable = ready || (canOpenCourt && status.kind === 'waiting-for-courts')
   const attention = status.kind === 'needs-attention'
   const { className: handleClassName, ...handleRest } = handleProps ?? {}
@@ -231,7 +452,11 @@ export function MatchCard({
     <span
       className={cn(
         'flex items-start gap-1.5 text-xs',
-        ready ? 'text-accent' : attention ? 'text-warn' : 'text-fg2',
+        ready
+          ? 'text-accent'
+          : attention || draft?.statusTone === 'warn'
+            ? 'text-warn'
+            : 'text-fg2',
       )}
     >
       <Icon
@@ -253,7 +478,7 @@ export function MatchCard({
         tabIndex={0}
         aria-pressed={draft.selected}
         aria-disabled={draft.disabled || undefined}
-        aria-label={`Draft ${FORMAT_LABEL[format]}: ${teamNames(teamA)} vs ${teamNames(teamB)}${draft.selected && draft.pickOrder ? `, picked ${draft.pickOrder}` : ''}`}
+        aria-label={`Draft ${formatLabel}: ${teamNames(teamA)} vs ${teamNames(teamB)}${draft.selected && draft.pickOrder ? `, picked ${draft.pickOrder}` : ''}`}
         onClick={toggle}
         onKeyDown={(e) => {
           if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return
@@ -279,11 +504,11 @@ export function MatchCard({
         ) : null}
         <div className="flex min-w-0 items-center gap-1.5">
           <Chip>Draft</Chip>
-          <Chip tone="solid">{FORMAT_LABEL[format]}</Chip>
+          <Chip tone="solid">{formatLabel}</Chip>
         </div>
-        <DraftFaces players={teamA} chips={draft.playerChips} />
+        <StaticFaces players={teamA} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
         <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
-        <DraftFaces players={teamB} chips={draft.playerChips} />
+        <StaticFaces players={teamB} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
         {statusLine}
       </div>
     )
@@ -294,15 +519,23 @@ export function MatchCard({
       aria-label={`Queue position ${position}`}
       className={cn(
         matchCardVariants({ status: status.kind }),
+        'mt-2',
+        compact && 'gap-2',
         searchState === 'hit' &&
           '!border-warn shadow-[0_0_0_2px_var(--warn),0_0_16px_2px_color-mix(in_srgb,var(--warn)_40%,transparent)]',
         searchState === 'dim' && 'opacity-45',
         className,
       )}
     >
+      {ready ? (
+        <span className="absolute -top-2.5 left-3 inline-flex h-5 items-center gap-1 rounded-full bg-accent px-2 text-[11px] font-extrabold tracking-[0.3px] text-on-accent uppercase">
+          <Icon name="check" className="size-3" />
+          Ready for court
+        </span>
+      ) : null}
       <div className="flex min-w-0 items-center gap-1.5 touch:-mt-1.5 touch:-mr-1.5">
         <span className="font-mono font-bold">#{position}</span>
-        <Chip tone="solid">{FORMAT_LABEL[format]}</Chip>
+        <Chip tone="solid">{formatLabel}</Chip>
         {!readOnly &&
           (manualProtected ? (
             <span className="inline-flex text-fg2" title="Manual · protected from regeneration">
@@ -336,28 +569,56 @@ export function MatchCard({
           </button>
         ) : null}
       </div>
-      {readOnly ? (
-        <DraftFaces players={teamA} />
+      {compact ? (
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+          <CompactFaces
+            players={teamA}
+            team="A"
+            swappable={swappable}
+            readOnly={readOnly}
+            onSelectPlayer={onSelectPlayer}
+            highlightedPlayerIds={highlightedPlayerIds}
+          />
+          <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
+          <CompactFaces
+            players={teamB}
+            team="B"
+            swappable={swappable}
+            readOnly={readOnly}
+            onSelectPlayer={onSelectPlayer}
+            highlightedPlayerIds={highlightedPlayerIds}
+          />
+        </div>
       ) : (
-        <Faces
-          players={teamA}
-          team="A"
-          swappable={swappable}
-          onSelectPlayer={onSelectPlayer}
-          highlightedPlayerIds={highlightedPlayerIds}
-        />
-      )}
-      <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
-      {readOnly ? (
-        <DraftFaces players={teamB} />
-      ) : (
-        <Faces
-          players={teamB}
-          team="B"
-          swappable={swappable}
-          onSelectPlayer={onSelectPlayer}
-          highlightedPlayerIds={highlightedPlayerIds}
-        />
+        <>
+          {readOnly ? (
+            <StaticFaces players={teamA} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
+          ) : (
+            <Faces
+              players={teamA}
+              team="A"
+              swappable={swappable}
+              onSelectPlayer={onSelectPlayer}
+              onOpenGames={onOpenGames}
+              gamesBadge={badgeMode}
+              highlightedPlayerIds={highlightedPlayerIds}
+            />
+          )}
+          <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
+          {readOnly ? (
+            <StaticFaces players={teamB} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
+          ) : (
+            <Faces
+              players={teamB}
+              team="B"
+              swappable={swappable}
+              onSelectPlayer={onSelectPlayer}
+              onOpenGames={onOpenGames}
+              gamesBadge={badgeMode}
+              highlightedPlayerIds={highlightedPlayerIds}
+            />
+          )}
+        </>
       )}
       {statusLine}
       {!readOnly && (onStart || onEdit || onRemove) ? (

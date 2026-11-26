@@ -1,6 +1,6 @@
 # Queue app: queued match cards are at least 450 px wide
 
-Status: NEW
+Status: TICKETED — #1061
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `QUEUE_TILE_MIN`, `queueCols()`

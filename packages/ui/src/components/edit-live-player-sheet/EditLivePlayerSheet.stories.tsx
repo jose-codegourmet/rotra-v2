@@ -1,6 +1,6 @@
 import type { ClubPlayerPictureState } from '@rotra/data/club-player/types'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from 'storybook/test'
+import { expect, fn, userEvent, within } from 'storybook/test'
 import { EditLivePlayerSheet } from './EditLivePlayerSheet'
 
 const noPicture: ClubPlayerPictureState = {
@@ -31,17 +31,17 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Registered: Club nickname field, no picture editor */
+/** Registered: Full name read-only, Club nickname field, no picture editor */
 export const Registered: Story = {}
 
-/** Unclaimed: the picture editor, no nickname field */
+/** Unclaimed: editable Full name, Club nickname (their only nickname), the picture editor */
 export const Unclaimed: Story = {
   args: {
-    shownName: 'Dani Reyes',
-    fullName: 'Dani Reyes',
+    shownName: 'Jom',
+    fullName: 'Jomar Dela Cruz',
     kind: 'unclaimed',
     level: 'beginner_high',
-    clubNickname: null,
+    clubNickname: 'Jom',
     accountNickname: null,
     picture: {
       playerId: 'cp-dani',
@@ -53,17 +53,38 @@ export const Unclaimed: Story = {
   },
 }
 
-/** Guest: no Profile section, only Tonight */
+export const UnclaimedLight: Story = {
+  ...Unclaimed,
+  globals: { theme: 'light' },
+}
+
+/** Guest: editable Full name and Club nickname, no picture editor */
 export const Guest: Story = {
   args: {
-    shownName: 'Ken Villar',
-    fullName: 'Ken Villar',
+    shownName: 'Lia Bautista',
+    fullName: 'Lia Bautista',
     kind: 'guest',
     level: null,
     clubNickname: null,
     accountNickname: null,
     games: 0,
     present: false,
+  },
+}
+
+export const RegisteredLight: Story = { globals: { theme: 'light' } }
+
+/** An empty (or 1-character) Full name on Save changes: the error shows, the field takes focus, the sheet stays open */
+export const NameError: Story = {
+  args: Unclaimed.args,
+  play: async ({ args }) => {
+    const screen = within(document.body)
+    const name = await screen.findByLabelText('Full name')
+    await userEvent.clear(name)
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await expect(await screen.findByText('Enter the full name, at least 2 characters.')).toBeVisible()
+    await expect(name).toHaveFocus()
+    await expect(args.onSave).not.toHaveBeenCalled()
   },
 }
 
@@ -81,6 +102,10 @@ export const OnCourt: Story = {
 
 /** Handicap · tonight (D-2026-11-25-03): left knee and lower back marked */
 export const WithHandicap: Story = { args: { handicapSpots: ['left_knee', 'lower_back'] } }
+/** Three spots marked: the chips wrap under the figure */
+export const WithHandicapSeveral: Story = {
+  args: { handicapSpots: ['left_knee', 'lower_back', 'right_shoulder'] },
+}
 export const WithHandicapLight: Story = {
   args: { handicapSpots: ['left_knee', 'lower_back'] },
   globals: { theme: 'light' },

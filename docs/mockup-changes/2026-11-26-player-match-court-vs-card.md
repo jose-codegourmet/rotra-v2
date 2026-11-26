@@ -1,6 +1,6 @@
 # Player app: Game page is the court beside a VS card; stats only for a tapped player
 
-Status: TICKETED — #1142
+Status: IN REAL MODE — #1150
 Date: 2026-11-26
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `viewMatch`, `mtPick` action, `.mt-grid`, `.vs-*`, `.mt-figs` styles

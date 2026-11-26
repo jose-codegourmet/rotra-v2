@@ -5,6 +5,7 @@ export const playerMatchPageMeta = {
     'Container for the public match page: wires useMatchPage, the profile card, Share game and the back target to MatchPage.',
   usage: [
     'Only on `/matches/[matchId]`. Anyone can open it, signed out too; the read masks names for the viewer.',
+    'Court faces and the Profile button on a player stats card open the same profile card. Earlier games open their own Game page.',
   ],
   prototype: { file: 'apps/mockup/player-app/rotra-player.html', screen: 'Match page (viewMatch)' },
   docs: ['docs/screens/product/modules/player-information/match-page.md'],

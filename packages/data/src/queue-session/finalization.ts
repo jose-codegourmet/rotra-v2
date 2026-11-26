@@ -157,6 +157,17 @@ export async function finalizeSession(
   if (blocked) throw blocked
   return run(session, commandId, 'checking', input)
 }
+/**
+ * Session done deducts each shuttle plan line's tubes from its inventory item (D-2026-11-26-01).
+ * Stock stops at zero; removed items and sessions without an estimate are skipped. Runs once, in
+ * the step that completes the session.
+ */
+function deductPlannedShuttles(draft: MockState, sessionId: string) {
+  for (const line of draft.costEstimates[sessionId]?.shuttles ?? []) {
+    const item = draft.inventory.find((i) => i.id === line.inventoryItemId && !i.removedAt)
+    if (item) item.stock = Math.max(0, item.stock - line.tubes)
+  }
+}
 type FinishedSession = Pick<QueueSession, 'id' | 'title' | 'recordGames'>
 const doneNote = (session: Pick<QueueSession, 'recordGames'>) =>
   recordsGames(session) ? 'player records updated' : 'player records updated, not ranked'
@@ -214,6 +225,8 @@ async function run(
         for (const p of draft.roster) if (p.sessionId === sessionId) p.handicapSpots = []
         // #1008: the hosts current at the end are this session's hosts from now on.
         freezeSessionHosts(draft, sessionId, now)
+        // D-2026-11-26-01: the planned tubes come off stock, never below zero.
+        deductPlannedShuttles(draft, sessionId)
         // Finishing closes pending join requests, drop-out notices and match requests (kept, hidden).
         closeSessionRequests(draft, sessionId, now)
         const f = draft.finalizations[sessionId]

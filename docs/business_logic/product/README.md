@@ -44,7 +44,7 @@ ROTRA helps clubs run badminton sessions and gives players a lasting identity an
 | Public Details and Participants page | Public Matches and Chat tabs; required live spectator feeds |
 | One assessment/performance-based rank | Automatically inheriting old Skill Rating/MMR/EXP/tier systems |
 | One overall leaderboard | City/club filters; City/National/World competition categories |
-| Optional session cost estimate (courts, shuttlecocks, misc entrance fees) with a payment per player that is break-even or a custom amount showing profit or loss; manual paid / not-paid checklist per session; club inventory with manual stock | Collecting fees in ROTRA, receipts, per-player bills, payment gateways, automatic stock deduction |
+| Optional session cost estimate (courts, shuttlecocks, misc entrance fees) with a payment per player that is break-even or a custom amount showing profit or loss; manual paid / not-paid checklist per session; club inventory with manual stock, and the planned tubes deducted at Session done | Collecting fees in ROTRA, receipts, per-player bills, payment gateways, deducting tubes actually used (only the planned count is deducted) |
 | Live session leaderboard for the operator | Public live scores or standings during play |
 
 The old Umpire product, peer reviews, tournaments, gamification, and broad membership workflows have not been accepted into this v1 reset.

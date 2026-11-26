@@ -46,7 +46,7 @@ and [schema dependencies](schema-dependencies.md) identify their consumers.
 - Interrupted-device conflict resolution versus irreversible winners. Never implement last-write-wins as an accidental answer.
 - Long-term policy for finalization with active games (v1 refuses it); whether unused waiting matches are kept frozen or marked removed; recovery of a session already marked invalid.
 - Collision-free `match_no` allocation across offline devices, and collision-free court placement (two devices putting the same match or court On court while disconnected).
-- Offline inventory edits, automatic stock deduction, and non-peso currencies.
+- Offline inventory edits and non-peso currencies. (Stock deduction at Session done: decided, [D-2026-11-26-01](../../mvp/decisions/2026-11-26.md#d-2026-11-26-01).)
 - Phone/contact conflict handling and aliasing duplicate offline club-player IDs without rewriting confirmed history.
 - Sequence formatting above 9999 (the city registry, Admin-added cities and founding-location corrections were settled November 11, 2026).
 - Refunds, offline expiry enforcement, flag targeting, and when offline devices pick up flag changes (renewal dates and overlapping terms were settled November 11, 2026). (Per-club prices, free tester clubs, owner-added clubs and owner-created flags were settled October 27, 2026.)

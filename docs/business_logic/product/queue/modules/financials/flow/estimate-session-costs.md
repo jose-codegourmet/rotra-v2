@@ -15,7 +15,7 @@ Every value is optional. Skipping the step leaves the session without an estimat
 ## After the session
 
 1. Open Inventory from the home sidebar.
-2. Use − and + to bring stock in line with what was used. ROTRA does not deduct it automatically.
+2. Session done has already taken the planned tubes off stock (never below zero). Use − and + only if the night used a different amount.
 3. Watch for **Running low** items (2 or fewer left).
 
 Collecting the fee from players happens outside ROTRA. Nothing in this flow records payments.

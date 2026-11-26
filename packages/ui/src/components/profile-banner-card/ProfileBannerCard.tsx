@@ -278,17 +278,23 @@ export function ProfileCardSection({
 }
 
 /** “Latest stats” with the year as a small outlined chip on the right (tooltip on the chip). */
-function LatestStatsHead({ year }: { year: number }) {
+function LatestStatsHead({
+  year,
+  context,
+}: {
+  year: number
+  context?: { label: string; yearLabel: string; yearTitle: string }
+}) {
   return (
     <div className="flex items-center justify-between gap-2">
       <span className="text-[11px] font-bold tracking-[0.6px] text-fg2 uppercase">
-        Latest stats
+        {context?.label ?? 'Latest stats'}
       </span>
       <span
-        title={`Counts ${year} so far; starts again on January 1`}
+        title={context?.yearTitle ?? `Counts ${year} so far; starts again on January 1`}
         className="rounded-full border border-border-strong px-2 py-px text-[11px] font-bold text-fg2 tabular-nums"
       >
-        {year}
+        {context?.yearLabel ?? year}
       </span>
     </div>
   )
@@ -301,15 +307,24 @@ function LatestStatsHead({ year }: { year: number }) {
  * beside it (above it, capped at 40 px, under 420 px). Right: “Latest stats” and the year chip,
  * then Games, Wins, Losses as plain counters with hairline dividers.
  */
-export function ProfileLatestStats({ year, stats }: { year: number; stats: ParticipantStats }) {
+export function ProfileLatestStats({
+  year,
+  stats,
+  context,
+}: {
+  year: number
+  stats: { [Field in keyof ParticipantStats]: ParticipantStats[Field] | null }
+  context?: { label: string; yearLabel: string; yearTitle: string; gamesLabel: string }
+}) {
+  const rate = stats.winRate === null ? '—' : `${stats.winRate}%`
   const counters = [
-    { label: 'Games', value: stats.games },
+    { label: context?.gamesLabel ?? 'Games', value: stats.games },
     { label: 'Wins', value: stats.wins },
     { label: 'Losses', value: stats.losses },
   ]
   return (
     <section
-      aria-label="Latest stats"
+      aria-label={context?.label ?? 'Latest stats'}
       className={cn(
         'relative grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,7fr)] overflow-hidden rounded-lg border px-4 py-3.5',
         'border-[color-mix(in_srgb,var(--accent)_35%,var(--border))]',
@@ -322,20 +337,22 @@ export function ProfileLatestStats({ year, stats }: { year: number; stats: Parti
         <span className="text-[11px] font-bold tracking-[0.6px] text-fg2 uppercase">Win rate</span>
         <div
           role="img"
-          aria-label={`Win rate ${stats.winRate}%`}
+          aria-label={stats.winRate === null ? 'Win rate unavailable' : `Win rate ${rate}`}
           className="flex min-h-[30px] items-end gap-1 max-[420px]:flex-col-reverse max-[420px]:items-start max-[420px]:gap-0.5"
         >
           <span className="text-[32px] leading-[0.9] font-extrabold tracking-[-0.5px] text-accent tabular-nums max-[420px]:text-2xl">
-            {stats.winRate}%
+            {rate}
           </span>
-          <StatsFire
-            rate={stats.winRate}
-            className="max-[420px]:max-h-10 max-[420px]:max-w-[33px]"
-          />
+          {stats.winRate === null ? null : (
+            <StatsFire
+              rate={stats.winRate}
+              className="max-[420px]:max-h-10 max-[420px]:max-w-[33px]"
+            />
+          )}
         </div>
       </div>
       <div className="flex min-w-0 flex-col gap-3 pl-4 max-[420px]:pl-3">
-        <LatestStatsHead year={year} />
+        <LatestStatsHead year={year} context={context} />
         <dl className="m-0 grid grid-cols-3 gap-2">
           {counters.map((counter) => (
             <div
@@ -346,7 +363,7 @@ export function ProfileLatestStats({ year, stats }: { year: number; stats: Parti
                 {counter.label}
               </dt>
               <dd className="m-0 mt-1.5 text-[22px] leading-none font-extrabold tabular-nums max-[420px]:text-[19px]">
-                {counter.value}
+                {counter.value ?? '—'}
               </dd>
             </div>
           ))}

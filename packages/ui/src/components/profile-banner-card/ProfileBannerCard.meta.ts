@@ -10,6 +10,7 @@ export const profileBannerCardMeta = {
     'rtrId draws the tiny Copy button: idLabel "RTR ID" (Queue, Admin: “RTR ID copied”) or "player ID" (Player: “Player ID copied”). A refused clipboard selects the ID: “ID selected. Copy it from your device menu.”',
     'profileLink: newTab true (Queue, Admin) is the new-tab icon; false (inside Player) is a forward arrow that calls onNavigate.',
     'tonight draws the pill only while the session is live: Playing in Court N (accent), Waiting in Court N (warn), Queued #N, Free · N min (accent under 10, warn from 10, error from 16) and Away, with the full “Tonight · …” line as tooltip and accessible name.',
+    'PlayerStatsCard reuses ProfileLatestStats with context for Before this game and Played, and a year pill for the counted-game win rate.',
     'bannerKey / bannerImageUrl: the resolved banner (the Admin default for no pick, guests and unclaimed). Colours are tokens only.',
   ],
   prototype: {

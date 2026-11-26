@@ -1,43 +1,52 @@
+'use client'
+
 import type { MatchPage as MatchPageData, MatchPagePlayer } from '@rotra/data/match-page/types'
 import type { PlayerGame } from '@rotra/data/player/types'
-import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
+import { cn } from '@rotra/ui/cn'
 import { formatSessionDay } from '@rotra/ui/date-block'
 import { ErrorState } from '@rotra/ui/error-state'
-import { GameRow, type GameRowPlayer, type GameRowProps } from '@rotra/ui/game-row'
+import { GameRow, type GameRowPlayer, withFunGameNote } from '@rotra/ui/game-row'
 import { Notice } from '@rotra/ui/notice'
+import { PlayerStatsCard } from '@rotra/ui/player-stats-card'
 import { Skeleton } from '@rotra/ui/skeleton'
-import type { ReactNode } from 'react'
+import { VsCard } from '@rotra/ui/vs-card'
+import { type ReactNode, useEffect, useId, useRef, useState } from 'react'
 
 export type MatchPageProps = {
-  /** The id in the address, for the not found notice */
+  /** The id in the address, for the not found notice and the player picks. */
   matchId: string
-  /** The match page read: undefined while it loads, null when no game has this id */
+  /** The match page read: undefined while it loads, null when no game has this id. */
   page: MatchPageData | null | undefined
-  /** The read failed (the page shows Retry) */
   error?: boolean
   retrying?: boolean
   onRetry?: () => void
-  /** The page the court was tapped on (a player's name, Games, Sessions), else Leaderboard */
+  /** The page the court was tapped on (a player's name, Games, Sessions), else Leaderboard. */
   backLabel: string
   onBack: () => void
-  /** Opens a face's profile card */
+  /** Opens the profile card from the court or a picked player's stats. */
   onOpenPlayer?: (player: GameRowPlayer) => void
-  /** The signed-in player's own games only: Share game (the share icon on the court) */
+  /** The signed-in player's own games only. */
   onShareGame?: (gameId: string) => void
-  /** Opens another game's match page (the Before this game courts) */
+  /** Opens an earlier game's match page. */
   onOpenGame?: (gameId: string) => void
 }
+
+const PAGE = 'mx-auto flex max-w-[1240px] flex-col gap-5 px-4 pt-5 pb-[120px]'
+const COURT_AND_VS =
+  'grid grid-cols-[minmax(0,1fr)] gap-5 min-[900px]:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]'
+const COURT_AND_SESSION =
+  'grid min-w-0 gap-5 min-[900px]:grid-rows-[minmax(0,4fr)_minmax(84px,1fr)]'
+const SESSION_CARD = 'flex min-h-[84px] flex-col justify-center gap-0.5'
+const MANILA_YEAR = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', year: 'numeric' })
 
 const firstName = (name: string) => name.split(/\s+/)[0] ?? name
 const flipScore = (score: string) => {
   const parts = score.split('–')
   return parts.length === 2 ? `${parts[1]}–${parts[0]}` : score
 }
-/** Fun games carry “Fun game · not counted” under the court, as in the session matches dialog. */
-const withFunNote = (game: PlayerGame): PlayerGame =>
-  game.counting === 'fun' && !game.note ? { ...game, note: 'Fun game' } : game
+
 const face = (player: MatchPagePlayer): GameRowPlayer => ({
   name: player.name,
   picture: player.picture,
@@ -45,18 +54,20 @@ const face = (player: MatchPagePlayer): GameRowPlayer => ({
   sessionGameNumber: player.sessionGameNumber,
 })
 
-/**
- * Who sits on the left: a signed-in player who played sees their side, themselves first; everyone
- * else sees Team A. `flipped` when the left side is Team B (score and winner then turn round).
- */
-function drawSides(page: MatchPageData) {
+/** A signed-in player sees their side on the left, themselves first. Other visitors see Team A. */
+function drawSides(page: MatchPageData, id: string) {
   const viewer = page.viewerPlayerId
-  const inA = !!viewer && page.teamA.some((p) => p.playerId === viewer)
-  const inB = !!viewer && page.teamB.some((p) => p.playerId === viewer)
-  const [mine, theirs] = inB ? [page.teamB, page.teamA] : [page.teamA, page.teamB]
+  const a = page.teamA.map((player, ix) => ({ player, id: `${id}-a-${ix}` }))
+  const b = page.teamB.map((player, ix) => ({ player, id: `${id}-b-${ix}` }))
+  const inA = !!viewer && a.some(({ player }) => player.playerId === viewer)
+  const inB = !!viewer && b.some(({ player }) => player.playerId === viewer)
+  const [mine, theirs] = inB ? [b, a] : [a, b]
   const left =
     inA || inB
-      ? [...mine.filter((p) => p.playerId === viewer), ...mine.filter((p) => p.playerId !== viewer)]
+      ? [
+          ...mine.filter(({ player }) => player.playerId === viewer),
+          ...mine.filter(({ player }) => player.playerId !== viewer),
+        ]
       : mine
   return { left, right: theirs, flipped: inB, own: inA || inB }
 }
@@ -80,45 +91,39 @@ function Head({
   )
 }
 
-/**
- * The match page while it loads: the court and Before this game as placeholders. Without `head`
- * (the route's loading file) the back button and heading are placeholders too.
- */
+/** The route loading state previews the court, Session and VS cards. */
 export function MatchPageSkeleton({ head }: { head?: ReactNode }) {
   return (
-    <main
-      aria-busy="true"
-      aria-label="Loading the game"
-      className="mx-auto flex max-w-[920px] flex-col gap-5 px-4 pt-5 pb-[120px]"
-    >
+    <main aria-busy="true" aria-label="Loading the game" className={PAGE}>
       {head ?? (
         <div className="flex flex-col gap-1.5">
           <Skeleton className="h-9 w-32" />
           <Skeleton className="h-8 w-24" />
         </div>
       )}
-      <Card className="flex flex-col gap-3">
-        <Skeleton className="h-[132px] rounded-lg max-[480px]:h-[100px]" />
-        <Skeleton className="w-2/3" />
-      </Card>
-      <Card className="flex flex-col gap-3">
-        <Skeleton className="h-6 w-1/3" />
-        <Skeleton className="h-9 w-1/2" />
-        <Skeleton className="h-[132px] rounded-lg max-[480px]:h-[100px]" />
-        <Skeleton className="h-9 w-1/2" />
-      </Card>
+      <div className={COURT_AND_VS}>
+        <div className={COURT_AND_SESSION}>
+          <Card className="flex flex-col p-3">
+            <Skeleton className="min-h-[220px] flex-1 rounded-lg min-[900px]:min-h-[280px]" />
+          </Card>
+          <Card className={cn(SESSION_CARD, 'gap-1')}>
+            <Skeleton className="h-3 w-14" />
+            <Skeleton className="h-5 w-2/3" />
+            <Skeleton className="h-3 w-1/2" />
+          </Card>
+        </div>
+        <Card className="flex flex-col gap-3">
+          <Skeleton className="h-6 w-2/3" />
+          <Skeleton className="h-[132px] rounded-lg" />
+          <Skeleton className="mx-auto h-11 w-24 rounded-full" />
+          <Skeleton className="h-[132px] rounded-lg" />
+        </Card>
+      </div>
     </main>
   )
 }
 
-/**
- * P-MATCH-PAGE (`/matches/[matchId]`, 2026-11-25 match page log; the prototype's viewMatch): one
- * game, the same page for every player in it. The game court with skill-group rings (the viewer's
- * side on the left as “You” when they played, else Team A), the muted “session · date · club” line
- * (the title opens the public session page while it exists), then **Before this game**: one block
- * per player, left side then right, with that player's earlier games of the session drawn from
- * their side. Loading, error and **Game not found** states.
- */
+/** The public Game page. A pick belongs to this match and is cleared on navigation. */
 export function MatchPage({
   matchId,
   page,
@@ -153,33 +158,98 @@ export function MatchPage({
       <MatchPageSkeleton head={<Head title="Game" backLabel={backLabel} onBack={onBack} />} />
     )
 
-  const viewer = page.viewerPlayerId
-  const { left, right, flipped, own } = drawSides(page)
-  const [lead, ...partners] = left
-  const skill = new Map(
-    [...page.teamA, ...page.teamB].flatMap((p) => (p.playerId ? [[p.playerId, p.skillGroup]] : [])),
+  return (
+    <MatchPageContent
+      key={matchId}
+      page={page}
+      backLabel={backLabel}
+      onBack={onBack}
+      onOpenPlayer={onOpenPlayer}
+      onShareGame={onShareGame}
+      onOpenGame={onOpenGame}
+    />
   )
-  const label = (p: MatchPagePlayer) =>
-    viewer && p.playerId === viewer ? 'You' : firstName(p.name)
-  const meOf = (p: MatchPagePlayer): NonNullable<GameRowProps['me']> => ({
-    name: p.name,
-    label: label(p),
-    picture: p.picture,
-    playerId: p.playerId,
+}
+
+function MatchPageContent({
+  page,
+  backLabel,
+  onBack,
+  onOpenPlayer,
+  onShareGame,
+  onOpenGame,
+}: Pick<MatchPageProps, 'backLabel' | 'onBack' | 'onOpenPlayer' | 'onShareGame' | 'onOpenGame'> & {
+  page: MatchPageData
+}) {
+  const id = useId()
+  const statsGrid = useRef<HTMLDivElement>(null)
+  const [selection, setSelection] = useState<{ ids: string[]; scroll: boolean }>({
+    ids: [],
+    scroll: false,
   })
+  const picked = selection.ids
+
+  useEffect(() => {
+    if (!selection.scroll) return
+    statsGrid.current?.scrollIntoView({
+      block: 'nearest',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    })
+  }, [selection])
+
+  const pickPlayer = (id: string) => {
+    setSelection(({ ids }) =>
+      ids.includes(id)
+        ? { ids: ids.filter((item) => item !== id), scroll: false }
+        : { ids: [id], scroll: true },
+    )
+  }
+  const pickTeam = (team: string[]) => {
+    setSelection(({ ids }) =>
+      team.length === ids.length && team.every((id) => ids.includes(id))
+        ? { ids: [], scroll: false }
+        : { ids: team, scroll: true },
+    )
+  }
+  const closeStats = (id: string) => {
+    setSelection(({ ids }) => ({ ids: ids.filter((item) => item !== id), scroll: false }))
+    document.getElementById(id)?.focus()
+  }
+
+  const viewer = page.viewerPlayerId
+  const { left, right, flipped, own } = drawSides(page, id)
+  const players = [...left, ...right]
+  const [lead, ...partners] = left.map(({ player }) => player)
+  const pickedPlayers = players.filter(({ id }) => picked.includes(id))
+  const year = Number(MANILA_YEAR.format(Date.now()))
   const leftWon = (page.winner === 'a') !== flipped
+  const score = flipped && page.score ? flipScore(page.score) : page.score
+  const skill = new Map(
+    players.flatMap(({ player }) => (player.playerId ? [[player.playerId, player.skillGroup]] : [])),
+  )
+  const label = (player: MatchPagePlayer) =>
+    viewer && player.playerId === viewer ? 'You' : firstName(player.name)
+  const vsPlayer = ({ id, player }: (typeof players)[number]) => ({
+    id,
+    name: viewer && player.playerId === viewer ? 'You' : player.name,
+    picture: player.picture,
+    skillGroup: player.skillGroup,
+    guest: !player.playerId,
+  })
+  const share = (player: MatchPagePlayer) =>
+    own && viewer && player.playerId === viewer ? onShareGame : undefined
+  const shareCourt = lead ? share(lead) : undefined
   const court: PlayerGame | null = lead
-    ? withFunNote({
+    ? withFunGameNote({
         id: page.matchId,
         format: page.format,
-        partners: partners.map((p) => p.name),
-        opponents: right.map((p) => p.name),
+        partners: partners.map((player) => player.name),
+        opponents: right.map(({ player }) => player.name),
         partnerPlayers: partners.map(face),
-        opponentPlayers: right.map(face),
-        // Won / Lost, the chip and the note read from the left side.
+        opponentPlayers: right.map(({ player }) => face(player)),
         counting: lead.counting,
         result: leftWon ? 'won' : 'lost',
-        score: flipped && page.score ? flipScore(page.score) : page.score,
+        score,
         ...(page.gameScores
           ? { gameScores: flipped ? page.gameScores.map(flipScore) : page.gameScores }
           : {}),
@@ -187,101 +257,88 @@ export function MatchPage({
         sessionGameNumber: lead.sessionGameNumber,
       })
     : null
-  const at = Date.parse(page.session.finishedAt)
-  const share = (p: MatchPagePlayer) =>
-    onShareGame && own && viewer && p.playerId === viewer ? onShareGame : undefined
 
   return (
-    <main className="mx-auto flex max-w-[920px] flex-col gap-5 px-4 pt-5 pb-[120px]">
+    <main className={PAGE}>
       <Head title="Game" backLabel={backLabel} onBack={onBack} />
-      <Card asChild>
-        <section className="flex flex-col gap-3">
-          {court && lead ? (
-            <GameRow
-              game={court}
-              me={meOf(lead)}
+      <div className={COURT_AND_VS}>
+        <div className={COURT_AND_SESSION}>
+          <Card asChild className="p-3">
+            <section aria-label="Court" className="flex flex-col">
+              {court && lead ? (
+                <GameRow
+                  size="match-page"
+                  game={court}
+                  me={{
+                    name: lead.name,
+                    label: label(lead),
+                    picture: lead.picture,
+                    playerId: lead.playerId,
+                  }}
+                  onOpenPlayer={onOpenPlayer}
+                  onShare={shareCourt ? () => shareCourt(page.matchId) : undefined}
+                  skillRings={(player) => (player.playerId ? (skill.get(player.playerId) ?? null) : null)}
+                />
+              ) : null}
+            </section>
+          </Card>
+          <Card asChild>
+            <section aria-label="Session" className={SESSION_CARD}>
+              <span className="text-[11px] font-bold tracking-[0.6px] text-fg2 uppercase">Session</span>
+              <b className="text-[17px] [overflow-wrap:anywhere]">
+                {page.session.sessionPageUrl ? (
+                  <a
+                    href={page.session.sessionPageUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-extrabold text-accent no-underline focus-visible:outline-2 focus-visible:outline-accent"
+                  >
+                    {page.session.title}
+                  </a>
+                ) : (
+                  page.session.title
+                )}
+              </b>
+              <span className="text-[13px] text-fg2">
+                {formatSessionDay(Date.parse(page.session.finishedAt))} · {page.session.clubName}
+              </span>
+            </section>
+          </Card>
+        </div>
+        <VsCard
+          format={page.format}
+          score={score}
+          left={left.map(vsPlayer)}
+          right={right.map(vsPlayer)}
+          winner={lead?.counting === 'partial' ? null : leftWon ? 'left' : 'right'}
+          picked={picked}
+          onPickPlayer={pickPlayer}
+          onPickTeam={pickTeam}
+        />
+      </div>
+      {pickedPlayers.length ? (
+        <div
+          ref={statsGrid}
+          aria-live="polite"
+          className={cn(
+            'grid grid-cols-[minmax(0,1fr)] gap-5',
+            pickedPlayers.length > 1 && 'min-[900px]:grid-cols-[repeat(auto-fit,minmax(420px,1fr))]',
+          )}
+        >
+          {pickedPlayers.map(({ id, player }) => (
+            <PlayerStatsCard
+              key={id}
+              player={player}
+              year={year}
+              viewerPlayerId={viewer}
+              onClose={() => closeStats(id)}
               onOpenPlayer={onOpenPlayer}
-              onShare={(() => {
-                const open = share(lead)
-                return open ? () => open(page.matchId) : undefined
-              })()}
-              skillRings={(player) =>
-                player.playerId ? (skill.get(player.playerId) ?? null) : null
-              }
+              onOpenGame={onOpenGame}
+              onShareGame={share(player)}
             />
-          ) : null}
-          <p className="m-0 text-[13px] text-fg2">
-            {page.session.sessionPageUrl ? (
-              <a
-                href={page.session.sessionPageUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-accent no-underline focus-visible:outline-2 focus-visible:outline-accent"
-              >
-                {page.session.title}
-              </a>
-            ) : (
-              page.session.title
-            )}{' '}
-            · {formatSessionDay(at)} · {page.session.clubName}
-          </p>
-        </section>
-      </Card>
-      <Card asChild>
-        <section className="flex flex-col gap-3">
-          <h2>Before this game</h2>
-          <div className="flex flex-col gap-3 [&>*+*]:border-t [&>*+*]:border-border [&>*+*]:pt-3.5">
-            {[...left, ...right].map((player) => {
-              const count = player.earlierGames.length
-              const open = share(player)
-              return (
-                <div key={`${player.playerId ?? ''}-${player.name}`}>
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    {onOpenPlayer ? (
-                      <button
-                        type="button"
-                        aria-label={`${player.name}. View profile`}
-                        onClick={() => onOpenPlayer(face(player))}
-                        className="group flex min-w-0 cursor-pointer items-center gap-2.5 border-0 bg-transparent p-0 text-left font-[inherit] text-fg"
-                      >
-                        <Avatar name={player.name} src={player.picture ?? undefined} size={36} />
-                        <b className="truncate text-[15px] group-hover:underline group-focus-visible:underline">
-                          {label(player)}
-                        </b>
-                      </button>
-                    ) : (
-                      <span className="flex min-w-0 items-center gap-2.5">
-                        <Avatar name={player.name} src={player.picture ?? undefined} size={36} />
-                        <b className="truncate text-[15px]">{label(player)}</b>
-                      </span>
-                    )}
-                    <span className="text-[13px] text-fg2">
-                      {count
-                        ? `${count} earlier ${count === 1 ? 'game' : 'games'}`
-                        : 'No earlier games'}
-                    </span>
-                  </div>
-                  {count ? (
-                    <div>
-                      {player.earlierGames.map((game) => (
-                        <GameRow
-                          key={game.id}
-                          game={withFunNote(game)}
-                          me={meOf(player)}
-                          onOpenPlayer={onOpenPlayer}
-                          onShare={open ? () => open(game.id) : undefined}
-                          onOpen={onOpenGame ? () => onOpenGame(game.id) : undefined}
-                          viewerPlayerId={viewer}
-                        />
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              )
-            })}
-          </div>
-        </section>
-      </Card>
+          ))}
+        </div>
+      ) : null}
     </main>
   )
 }

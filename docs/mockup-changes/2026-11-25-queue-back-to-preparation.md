@@ -13,6 +13,7 @@ Superseded by: none
 
 ## What changed
 - The live console's ⋯ **More for this session** menu gains **Back to preparation…** after Home.
+  - Moved (D-2026-11-26-05, #1140): the opener is now the **Back to preparation…** button in the Settings tab's Setup head, after **All session settings**; the ⋯ menu is gone. The rules and D-BACK-TO-PREP are unchanged.
   It is disabled, with the reason on a second line, once any match has started or been recorded
   ("Not available once a game has started.") and offline ("Needs an internet connection.").
 - It opens **Back to preparation?** (D-BACK-TO-PREP): "TITLE goes back to preparation, as if it

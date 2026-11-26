@@ -39,8 +39,12 @@ export type SettingsViewProps = ConsoleViewProps & {
   onAddCourt: () => void
   /** Match requests · N: opens the Requests sheet */
   onOpenMatchRequests: () => void
-  /** Payments (Costs card): opens the Payments sheet */
+  /** Payments (Costs card): switches the console to the Payments tab */
   onOpenPayments: () => void
+  /** Back to preparation…: opens the D-BACK-TO-PREP confirmation */
+  onBackToPreparation: () => void
+  /** Why Back to preparation… is disabled (a game has started, or offline); undefined when it is available */
+  backToPreparationDisabledReason?: string
 }
 
 export const MODES = {
@@ -54,7 +58,8 @@ const errorMessage = (error: unknown) =>
 
 /**
  * The console's Settings tab (the prototype's liveSettings()): the Setup heading with one help line
- * and "All session settings" (opens the read-only Q-PREPARE page), the Courts box (From, Until and
+ * and "All session settings" (opens the read-only Q-PREPARE page) then "Back to preparation…" (disabled
+ * with its reason as the tooltip once a game has started or offline), the Courts box (From, Until and
  * Follows session end on useUpdateCourt, Extend on useExtendSession, Add court, drag or arrow-key
  * reorder on useReorderCourts, the label opening the Courts tab's Change court label dialog), a 2x2 grid of cards
  * (Game rules | Players, Costs | Notes), the session hosts, then the Session link and Who can join
@@ -66,6 +71,8 @@ export function SettingsView({
   onAddCourt,
   onOpenMatchRequests,
   onOpenPayments,
+  onBackToPreparation,
+  backToPreparationDisabledReason,
 }: SettingsViewProps) {
   const router = useRouter()
   const session = useQueueSession(sessionId)
@@ -217,10 +224,21 @@ export function SettingsView({
             fixed after start.
           </p>
         </div>
-        <Button size="sm" onClick={() => router.push(`/sessions/${sessionId}/preparation`)}>
-          <Icon name="nav-gear" />
-          All session settings
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" onClick={() => router.push(`/sessions/${sessionId}/preparation`)}>
+            <Icon name="nav-gear" />
+            All session settings
+          </Button>
+          <Button
+            size="sm"
+            disabled={Boolean(backToPreparationDisabledReason)}
+            title={backToPreparationDisabledReason}
+            onClick={onBackToPreparation}
+          >
+            <Icon name="edit" />
+            Back to preparation…
+          </Button>
+        </div>
       </div>
       <SettingsCourtsBox
         courts={boxCourts}

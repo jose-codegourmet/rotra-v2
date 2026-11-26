@@ -18,11 +18,11 @@ import { flushSessionPresence } from '@rotra/data/session-roster/flushSessionPre
 import { flushSessionRoster } from '@rotra/data/session-roster/flushSessionRoster'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { SCORING } from '@rotra/schema/scoring'
+import { Breadcrumb } from '@rotra/ui/breadcrumb'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { ConsoleFooterBar } from '@rotra/ui/console-footer-bar'
 import { ConsoleHeaderActions } from '@rotra/ui/console-header-actions'
-import { Icon } from '@rotra/ui/icon'
 import { NotRankedChip } from '@rotra/ui/not-ranked-chip'
 import { Notice } from '@rotra/ui/notice'
 import { formatWhen } from '@rotra/ui/now-card/helpers'
@@ -32,6 +32,7 @@ import { SessionTitleLink } from '@rotra/ui/session-title-link'
 import { Sheet } from '@rotra/ui/sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { type TabItem, Tabs, TabsContent } from '@rotra/ui/tabs'
+import Link from 'next/link'
 import { notFound, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDockAction } from '@/app/(operator)/_components/operator-shell/DockAction.context'
@@ -39,7 +40,6 @@ import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { ActiveMatch } from '@/app/(operator)/sessions/[sessionId]/_components/active-match/ActiveMatch'
 import { BackToPreparation } from '@/app/(operator)/sessions/[sessionId]/_components/back-to-preparation/BackToPreparation'
 import { CourtsAndTime } from '@/app/(operator)/sessions/[sessionId]/_components/courts-and-time/CourtsAndTime'
-import { FacebookPost } from '@/app/(operator)/sessions/[sessionId]/_components/facebook-post/FacebookPost'
 import { GenerateQueueView } from '@/app/(operator)/sessions/[sessionId]/_components/generate-queue-view/GenerateQueueView'
 import { HistoryView } from '@/app/(operator)/sessions/[sessionId]/_components/history-view/HistoryView'
 import { JoinRequests } from '@/app/(operator)/sessions/[sessionId]/_components/join-requests/JoinRequests'
@@ -70,7 +70,7 @@ export type SessionConsoleProps = { sessionId: string; resumeSessionDone?: boole
 
 /**
  * The console's tabs, in display order: Courts, Main Queue, Generate Queue, Players, Leaderboard,
- * Match History, Settings.
+ * Match History, Payments, Settings.
  */
 export type ConsoleView =
   | 'courts'
@@ -79,6 +79,7 @@ export type ConsoleView =
   | 'players'
   | 'leaderboard'
   | 'history'
+  | 'payments'
   | 'settings'
 
 /** The `?tab=` value of each tab; Courts has none. */
@@ -89,15 +90,15 @@ const TAB_PARAMS: Record<ConsoleView, string | null> = {
   players: 'roster',
   leaderboard: 'board',
   history: 'history',
+  payments: 'payments',
   settings: 'settings',
 }
 
-/** Values older links may carry, mapped to the nearest tab (Payments is a button on Settings now). */
+/** Values older links may carry, mapped to the nearest tab. */
 const LEGACY_TAB_PARAMS: Record<string, ConsoleView> = {
   session: 'courts',
   players: 'players',
   leaderboard: 'leaderboard',
-  payments: 'settings',
 }
 
 const tabFromParam = (param: string | null): ConsoleView =>
@@ -106,8 +107,6 @@ const tabFromParam = (param: string | null): ConsoleView =>
   'courts'
 export type ConsoleSheet =
   | 'join-requests'
-  | 'payments'
-  | 'post'
   | 'adjust'
   | 'add-court'
   | 'session-done'
@@ -141,11 +140,11 @@ const OFFLINE_NOTICE_REAL =
 /**
  * The views other tickets add, one container file each; the shell shows a view's tab and panel as
  * soon as it is listed here; an unlisted Queue hides its tab, while unlisted Players and
- * Leaderboard keep their tab and a Skeleton panel. Courts (SessionView) and Settings (SettingsView)
- * take extra callbacks and are rendered by the shell.
+ * Leaderboard keep their tab and a Skeleton panel. Courts (SessionView), Payments (PaymentsPanel) and
+ * Settings (SettingsView) are rendered by the shell.
  */
 const VIEWS: Partial<
-  Record<Exclude<ConsoleView, 'courts' | 'settings'>, ComponentType<ConsoleViewProps>>
+  Record<Exclude<ConsoleView, 'courts' | 'payments' | 'settings'>, ComponentType<ConsoleViewProps>>
 > = {
   queue: QueueView,
   generate: GenerateQueueView,
@@ -157,15 +156,18 @@ const VIEWS: Partial<
 const MODE_LABELS = { chill: 'Chill', fair: 'Fair', hard: 'Hard' } as const
 
 /**
- * Q-CONSOLE: the live session shell. Header with the mode, formats and minimum chips and, at the
- * upper right, ConsoleHeaderActions: Match requests · N (the Requests sheet, match requests only),
- * Share (the Share this session dialog), Courts and time, Payments and the More menu (Public page, Copy Facebook post, Home). Then the
- * view tabs (Courts, Main Queue, Generate Queue, Players, Leaderboard, Match History, Settings; on phones one
- * "Console view" menu) with live counts, the view panels (Courts here; the others arrive in their
- * own containers), the selected tab in the URL (`?tab=`), the
- * ConsoleFooterBar and the dock's Session done pill. Sessions that are not live go to their own
+ * Q-CONSOLE: the live session shell. A "Home" back button above the header, then the header with the
+ * mode, formats and minimum chips and, at the upper right, ConsoleHeaderActions: Match requests · N
+ * (the Requests sheet, match requests only) and Share (the one Share this session dialog: Player
+ * list, Social post images, Invite link). Public page is the title's link. Then the view tabs
+ * (Courts, Main Queue, Generate Queue, Players, Leaderboard, Match History, Payments, Settings; on
+ * phones a "Console view" button that opens a left drawer, "Live session") with live counts, the
+ * view panels (Courts here; the others arrive in their own containers), the selected tab in the URL
+ * (`?tab=`, Payments is `?tab=payments`), the ConsoleFooterBar and the dock's Session done pill. Sessions that are not live go to their own
  * screen: prepared to /preparation, finalizing to /finishing, finished or invalid to /record,
- * unknown ids to notFound().
+ * unknown ids to notFound(). Sheets: Requests, Courts and time (only from the overdue banner's Set
+ * end time) and Add a court (the Settings tab), Back to preparation (the Settings tab's Setup head),
+ * the match sheets and Session done.
  *
  * States: offline shows the warn notice and disables Session done in the footer and the dock (every
  * other action still works and its toast says "Saved on this device, waiting to sync"); the console
@@ -185,7 +187,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   const [sheet, setSheet] = useState<ConsoleSheet>(resumeSessionDone ? 'session-done' : null)
   const [matchSheet, setMatchSheet] = useState<MatchSheet | null>(null)
   const [profileId, setProfileId] = useState<string | null>(null)
-  // The header Share button's Share this session dialog
+  // The header Share button's Share this session dialog (live variant)
   const [shareOpen, setShareOpen] = useState(false)
   const [editCourtId, setEditCourtId] = useState<string | null>(null)
   // Courts and time opened from the overdue banner focuses the New end picker
@@ -322,6 +324,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
             badges: [{ text: String(played), longText: ' played' }],
           },
         ]),
+    { value: 'payments', label: 'Payments' },
     { value: 'settings', label: 'Settings' },
   ]
 
@@ -331,7 +334,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
     onOpenProfile: setProfileId,
     onOpenQueue: () => setView(VIEWS.queue ? 'queue' : 'courts'),
   }
-  const panel = (key: Exclude<ConsoleView, 'courts' | 'settings'>) => {
+  const panel = (key: Exclude<ConsoleView, 'courts' | 'payments' | 'settings'>) => {
     const View = VIEWS[key]
     return View ? <View {...viewProps} /> : <Skeleton className="h-56 rounded-lg" />
   }
@@ -360,6 +363,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
   return (
     <PlayerGamesProvider sessionId={sessionId}>
       <main className="flex flex-col gap-5 px-page pt-5 pb-[170px]">
+        <Breadcrumb label="Home" href="/" linkAs={Link} />
         {s ? (
           <PageHeader
             eyebrow={
@@ -388,26 +392,11 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               </>
             }
             actions={
-              <div className="flex flex-none flex-wrap items-center justify-end gap-2">
-                <Button size="sm" onClick={() => setShareOpen(true)}>
-                  <Icon name="share" />
-                  Share
-                </Button>
-                <ConsoleHeaderActions
-                  matchRequestCount={matchRequestCount}
-                  onOpenMatchRequests={() => setSheet('join-requests')}
-                  onOpenCourtsAndTime={() => {
-                    setFocusEnd(false)
-                    setSheet('adjust')
-                  }}
-                  onOpenPayments={() => setSheet('payments')}
-                  onOpenPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
-                  onCopyFacebookPost={() => setSheet('post')}
-                  onGoHome={() => router.push('/')}
-                  onBackToPreparation={() => setSheet('back-to-prep')}
-                  backToPreparationDisabledReason={backToPreparationBlocker(all, online)}
-                />
-              </div>
+              <ConsoleHeaderActions
+                matchRequestCount={matchRequestCount}
+                onOpenMatchRequests={() => setSheet('join-requests')}
+                onShare={() => setShareOpen(true)}
+              />
             }
           />
         ) : (
@@ -434,7 +423,8 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           <Notice tone="offline">{isRealDataMode() ? OFFLINE_NOTICE_REAL : OFFLINE_NOTICE}</Notice>
         )}
         <Tabs
-          phoneMenu
+          phoneMenu="drawer"
+          drawerTitle="Live session"
           aria-label="Console views"
           menuLabel="Console view"
           value={view}
@@ -487,12 +477,17 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           <TabsContent value="players">{panel('players')}</TabsContent>
           <TabsContent value="leaderboard">{panel('leaderboard')}</TabsContent>
           <TabsContent value="history">{panel('history')}</TabsContent>
+          <TabsContent value="payments">
+            <PaymentsPanel sessionId={sessionId} />
+          </TabsContent>
           <TabsContent value="settings">
             <SettingsView
               {...viewProps}
               onAddCourt={() => setSheet('add-court')}
               onOpenMatchRequests={() => setSheet('join-requests')}
-              onOpenPayments={() => setSheet('payments')}
+              onOpenPayments={() => setView('payments')}
+              onBackToPreparation={() => setSheet('back-to-prep')}
+              backToPreparationDisabledReason={backToPreparationBlocker(all, online) ?? undefined}
             />
           </TabsContent>
         </Tabs>
@@ -512,16 +507,12 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
         >
           <JoinRequests sessionId={sessionId} variant="sheet" />
         </Sheet>
-        <Sheet
-          open={sheet === 'payments'}
-          onOpenChange={(open) => setSheet(open ? 'payments' : null)}
-          title="Payments"
-          wide
-          footer={<Button onClick={() => setSheet(null)}>Done</Button>}
-        >
-          <PaymentsPanel sessionId={sessionId} asSheet />
-        </Sheet>
-        <ShareSession sessionId={sessionId} open={shareOpen} onOpenChange={setShareOpen} />
+        <ShareSession
+          sessionId={sessionId}
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+          variant="live"
+        />
         {s ? (
           <BackToPreparation
             session={s}
@@ -531,11 +522,6 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
             onOpenChange={(open) => setSheet(open ? 'back-to-prep' : null)}
           />
         ) : null}
-        <FacebookPost
-          sessionId={sessionId}
-          open={sheet === 'post'}
-          onOpenChange={(open) => setSheet(open ? 'post' : null)}
-        />
         <CourtsAndTime
           sessionId={sessionId}
           open={sheet === 'adjust' || sheet === 'add-court' ? sheet : null}

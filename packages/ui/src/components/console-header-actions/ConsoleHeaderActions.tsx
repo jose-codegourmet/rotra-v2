@@ -2,85 +2,67 @@
 
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
-import { OverflowMenu, type OverflowMenuItem } from '@rotra/ui/overflow-menu'
+import { Icon } from '@rotra/ui/icon'
 
 export type ConsoleHeaderActionsProps = {
   /** Open match requests; the button always shows and turns the warn colour (bold) while above 0 */
   matchRequestCount: number
   /** "Match requests · N": opens the Requests sheet (match requests only) */
   onOpenMatchRequests: () => void
-  /** "Courts and time": opens CourtsAndTimeSheet */
-  onOpenCourtsAndTime: () => void
-  /** "Payments": opens the payments sheet */
-  onOpenPayments: () => void
-  /** ⋯ More menu › Public page */
-  onOpenPublicPage: () => void
-  /** ⋯ More menu › Copy Facebook post */
-  onCopyFacebookPost: () => void
-  /** ⋯ More menu › Home */
-  onGoHome: () => void
-  /**
-   * ⋯ More menu › Back to preparation… (D-BACK-TO-PREP, owner November 25, 2026). `disabledReason`
-   * greys it out with the reason under the label ("Not available once a game has started.").
-   */
-  onBackToPreparation?: () => void
-  backToPreparationDisabledReason?: string | null
+  /** "Share": opens the Share dialog (list, social post images, invite link) */
+  onShare: () => void
   className?: string
 }
 
 /**
- * The live console header's controls (Q-CONSOLE), at the upper right of the title block and wrapping
- * under it on narrow screens: one compact cluster with **Match requests · N** (warn-coloured while any
- * is waiting), **Courts and time**, **Payments** and a ⋯ **More for this session** menu holding Public
- * page, Copy Facebook post, Home and Back to preparation… (the settings live in the Settings tab). The menu closes on Escape and on a tap outside.
+ * The live console header's controls (Q-CONSOLE), at the upper right of the title block. Two controls:
+ * **Match requests** (wide: a 40 px hand-icon button with the count as a badge on its corner, hidden at 0;
+ * phones: a full-width button with the icon, the words and the count in a pill) and **Share**. On phones
+ * the cluster takes the full row under the title and starts at the left.
  */
 export function ConsoleHeaderActions({
   matchRequestCount,
   onOpenMatchRequests,
-  onOpenCourtsAndTime,
-  onOpenPayments,
-  onOpenPublicPage,
-  onCopyFacebookPost,
-  onGoHome,
-  onBackToPreparation,
-  backToPreparationDisabledReason,
+  onShare,
   className,
 }: ConsoleHeaderActionsProps) {
   const waiting = matchRequestCount > 0
-  const more: OverflowMenuItem[] = [
-    { label: 'Public page', icon: 'external', onSelect: onOpenPublicPage },
-    { label: 'Copy Facebook post', icon: 'link', onSelect: onCopyFacebookPost },
-    { label: 'Home', icon: 'back', onSelect: onGoHome },
-    ...(onBackToPreparation
-      ? [
-          {
-            label: 'Back to preparation…',
-            onSelect: onBackToPreparation,
-            disabledReason: backToPreparationDisabledReason ?? undefined,
-          },
-        ]
-      : []),
-  ]
   return (
-    <div className={cn('flex flex-none flex-wrap items-center justify-end gap-2', className)}>
+    <div
+      className={cn(
+        'flex flex-none items-center justify-end gap-2 max-[640px]:flex-[1_1_100%] max-[640px]:justify-start',
+        className,
+      )}
+    >
       <Button
         size="sm"
         aria-label={`Match requests · ${matchRequestCount}${waiting ? ' waiting' : ''}`}
+        title="Match requests"
         className={cn(
+          'relative min-[641px]:w-10 min-[641px]:min-w-10 min-[641px]:p-0 max-[640px]:flex-1',
           waiting &&
             'border-warn bg-warn font-extrabold text-on-accent hover:not-disabled:bg-warn hover:not-disabled:brightness-95',
         )}
         onClick={onOpenMatchRequests}
       >
-        Match requests · {matchRequestCount}
+        <Icon name="hand" />
+        <span className="max-[640px]:inline min-[641px]:hidden">Match requests</span>
+        {waiting ? (
+          <span
+            className={cn(
+              'grid tabular-nums place-items-center rounded-full bg-warn font-extrabold text-on-accent',
+              'min-[641px]:absolute min-[641px]:-top-1.5 min-[641px]:-right-1.5 min-[641px]:h-[18px] min-[641px]:min-w-[18px] min-[641px]:border-2 min-[641px]:border-bg min-[641px]:px-[5px] min-[641px]:text-[11px]',
+              'max-[640px]:h-[22px] max-[640px]:min-w-[22px] max-[640px]:bg-[color-mix(in_srgb,var(--on-accent)_18%,transparent)] max-[640px]:px-1.5 max-[640px]:text-xs',
+            )}
+          >
+            {matchRequestCount}
+          </span>
+        ) : null}
       </Button>
-      <Button size="sm" onClick={onOpenCourtsAndTime}>
-        Courts and time
+      <Button size="sm" onClick={onShare}>
+        <Icon name="share" />
+        Share
       </Button>
-      <Button size="sm" onClick={onOpenPayments}>
-        Payments
-      </Button>
-      <OverflowMenu label="More for this session" triggerSize="sm" items={more} />
     </div>
   )
 }

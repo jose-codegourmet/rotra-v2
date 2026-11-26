@@ -12,12 +12,7 @@ const meta = {
   args: {
     matchRequestCount: 0,
     onOpenMatchRequests: fn(),
-    onOpenCourtsAndTime: fn(),
-    onOpenPayments: fn(),
-    onOpenPublicPage: fn(),
-    onCopyFacebookPost: fn(),
-    onGoHome: fn(),
-    onBackToPreparation: fn(),
+    onShare: fn(),
   },
   // In place: the title block on the left, the cluster at the upper right (under it on phones).
   render: (args) => (
@@ -37,52 +32,34 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const openMore = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-  await userEvent.click(
-    within(canvasElement).getByRole('button', { name: 'More for this session' }),
-  )
-  const body = within(canvasElement.ownerDocument.body)
-  await expect(body.getByRole('menuitem', { name: 'Public page' })).toHaveFocus()
-}
-
-/** No match requests: a plain "Match requests · 0" button. */
+/** No match requests: the hand button without a badge, then Share. */
 export const NoMatchRequests: Story = {}
 export const NoMatchRequestsLight: Story = { globals: { theme: 'light' } }
 
-/** Match requests waiting: the button turns the warn colour, bold. */
+/** Match requests waiting: warn-coloured hand button with the count badge. */
 export const MatchRequestsWaiting: Story = { args: { matchRequestCount: matchRequests.length } }
 export const MatchRequestsWaitingLight: Story = {
   args: { matchRequestCount: matchRequests.length },
   globals: { theme: 'light' },
 }
 
-/** The ⋯ More menu open: Public page, Copy Facebook post, Home, Back to preparation…. */
-export const MoreMenuOpen: Story = { play: openMore }
-export const MoreMenuOpenLight: Story = { play: openMore, globals: { theme: 'light' } }
+/** A long count (12) still fits the badge and the pill. */
+export const LongCount: Story = { args: { matchRequestCount: 12 } }
+export const LongCountLight: Story = { args: { matchRequestCount: 12 }, globals: { theme: 'light' } }
 
-/** Escape closes the menu and returns focus to the ⋯ button. */
-export const MoreMenuEscape: Story = {
-  play: async (context) => {
-    await openMore(context)
-    await userEvent.keyboard('{Escape}')
-    const body = within(context.canvasElement.ownerDocument.body)
-    await expect(body.queryByRole('menu')).toBeNull()
-    await expect(
-      within(context.canvasElement).getByRole('button', { name: 'More for this session' }),
-    ).toHaveFocus()
+/** Both buttons call their handlers. */
+export const Actions: Story = {
+  args: { matchRequestCount: 2 },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Match requests · 2 waiting' }))
+    await expect(args.onOpenMatchRequests).toHaveBeenCalledTimes(1)
+    await userEvent.click(canvas.getByRole('button', { name: 'Share' }))
+    await expect(args.onShare).toHaveBeenCalledTimes(1)
   },
 }
 
-/** A tap outside closes the menu. */
-export const MoreMenuOutsideTap: Story = {
-  play: async (context) => {
-    await openMore(context)
-    await userEvent.click(context.canvasElement.ownerDocument.body)
-    const body = within(context.canvasElement.ownerDocument.body)
-    await expect(body.queryByRole('menu')).toBeNull()
-  },
-}
-
+/** Phone: a full-width Match requests button with the words and the count pill, then Share. */
 export const Phone: Story = {
   args: { matchRequestCount: matchRequests.length },
   globals: { viewport: { value: 'phone' } },
@@ -91,17 +68,12 @@ export const PhoneLight: Story = {
   args: { matchRequestCount: matchRequests.length },
   globals: { viewport: { value: 'phone' }, theme: 'light' },
 }
+export const PhoneNone: Story = { globals: { viewport: { value: 'phone' } } }
+export const PhoneLongCount: Story = {
+  args: { matchRequestCount: 12 },
+  globals: { viewport: { value: 'phone' } },
+}
 export const Desktop: Story = {
   args: { matchRequestCount: matchRequests.length },
   globals: { viewport: { value: 'desktop' } },
-}
-
-/** A game has started: Back to preparation… is disabled with its reason. */
-export const BackToPreparationDisabled: Story = {
-  args: { backToPreparationDisabledReason: 'Not available once a game has started.' },
-  play: openMore,
-}
-export const BackToPreparationDisabledLight: Story = {
-  ...BackToPreparationDisabled,
-  globals: { theme: 'light' },
 }

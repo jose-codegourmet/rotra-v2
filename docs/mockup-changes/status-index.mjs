@@ -9,6 +9,7 @@ const STATUSES = [
   ['TICKETED', /^TICKETED — #\d+$/],
   ['IN PROGRESS', /^IN PROGRESS — #\d+( \(PR #\d+\))?$/],
   ['IN MOCK APP', /^IN MOCK APP — (#\d+( \(PR #\d+\))?|PR #\d+)$/],
+  ['IN REAL MODE', /^IN REAL MODE — (#\d+( \(PR #\d+\))?|PR #\d+)$/],
   ['CANCELLED', /^CANCELLED — .+$/],
   ['MOCKUP ONLY', /^MOCKUP ONLY — .+$/],
 ];

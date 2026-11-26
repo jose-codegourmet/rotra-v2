@@ -1,6 +1,6 @@
 # Standings images: one row per position, and previews that are the images
 
-Status: NEW
+Status: TICKETED — #1127
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Results › Standings slide (`slideStandings`) and the Download images sheet (`SHEETS.export`)

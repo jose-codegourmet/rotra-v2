@@ -1,6 +1,6 @@
 # Player app: four style options for the dock's session button
 
-Status: NEW
+Status: TICKETED — #1142
 Date: 2026-11-26
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `navSession` (`when`), `navItems` (`.ses-when`), `.dock[data-ses=…]` styles, Prototype › "Session button style"

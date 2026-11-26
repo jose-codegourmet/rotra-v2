@@ -1,6 +1,6 @@
 # Queue app: player names read club nickname › nickname › full name everywhere
 
-Status: NEW
+Status: TICKETED — #1127
 Date: 2026-11-26
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `nameStack`, `subNames`, `faceNames`, `playerTile`, `swapPicker`, `faceTeam`, `courtSides`, `queueCard`, Players cards (`.pc3-name`), `.nm-l`

@@ -1,6 +1,6 @@
 # Add player › Saved players: account and skill filters, level on each row, debounced search
 
-Status: NEW
+Status: TICKETED — #1127
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › SHEETS.add (Add player) › Saved players tab

@@ -1,6 +1,6 @@
 # Queue app: Handicap · tonight in the live Edit player sheet
 
-Status: NEW
+Status: TICKETED — #1127
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console Players tab › Edit player (pencil) › section "Handicap · tonight" (`SHEETS.editLive`, `hcFigure`, `HC_SPOTS`, `setupHcArt`, actions `hcToggle`, `saveEditLive`); Players card icon (`playersPane`, `hcText`); cleared in `confirmDone`; used by `restAfter` in Generate matches

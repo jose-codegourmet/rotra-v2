@@ -82,6 +82,7 @@
     "./gender-field": "./src/components/gender-field/GenderField.tsx",
     "./field/variants": "./src/components/field/Field.variants.ts",
     "./finalize-progress": "./src/components/finalize-progress/FinalizeProgress.tsx",
+    "./free-court-sheet": "./src/components/free-court-sheet/FreeCourtSheet.tsx",
     "./forms/add-court-form": "./src/forms/add-court-form/AddCourtForm.tsx",
     "./forms/add-court-form/default-values": "./src/forms/add-court-form/AddCourtForm.defaultValues.ts",
     "./forms/add-court-form/schema": "./src/forms/add-court-form/AddCourtForm.schema.ts",

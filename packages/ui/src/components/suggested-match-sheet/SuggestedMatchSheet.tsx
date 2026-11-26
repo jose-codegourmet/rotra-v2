@@ -5,10 +5,13 @@ import type { SessionMode } from '@rotra/data/queue-session/types'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { Chip } from '@rotra/ui/chip'
+import { Icon } from '@rotra/ui/icon'
 import { Notice } from '@rotra/ui/notice'
 import { Sheet } from '@rotra/ui/sheet'
 import type { SwapSlot } from '@rotra/ui/swap-sides-area'
 import { type MatchLineupTeam, TeamLineup, type TeamLineupPlayer } from '@rotra/ui/team-lineup'
+import { useReducedMotion } from 'motion/react'
+import { useEffect, useRef } from 'react'
 
 /** The one lineup the sheet shows, with each player's games so the reason can be explained. */
 export type SuggestedLineup = {
@@ -27,14 +30,22 @@ export type SuggestedMatchSheetProps = {
   sessionMode: SessionMode
   /** The session's minimum games */
   minimumGames: number
-  /** Opens the player's profile; its footer is Back to suggestion */
+  /** Opens the player's profile from their picture; its footer is Back to suggestion */
   onSelectPlayer: (playerId: string, team: MatchLineupTeam) => void
   /** Switch the players at the two slots (drag or ← / →); only the shown lineup changes */
   onSwap: (from: SwapSlot, to: SwapSlot) => void
-  /** Shows a new suggestion */
-  onSkip: () => void
-  /** Opens the manual editor with this lineup; saving protects it */
-  onEditThenAdd: () => void
+  /** Reshuffle: the owner draws a different fair lineup; the sheet deals it in */
+  onReshuffle: () => void
+  /** A player card was tapped: opens Replace a player in the suggested match with them chosen */
+  onReplace: (playerId: string, team: MatchLineupTeam) => void
+  /** ← Back: returns to the dialog this one was opened from */
+  onBack: () => void
+  /**
+   * Changes whenever Reshuffle draws a new lineup (a counter or id). The faces and VS deal back in
+   * with a short staggered flip each time it changes after the first render; reduced motion shows
+   * the new lineup without moving.
+   */
+  dealKey?: number | string
   /** Adds it as Suggested, unprotected unless players were switched */
   onAdd: () => void
   /** The add is running: Add to queue cannot fire twice */
@@ -59,10 +70,37 @@ function listNames(names: string[]) {
     : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
 }
 
+/** The prototype's shuf-in: each face flips in from above, one after another; VS spins in. */
+function dealIn(root: HTMLElement) {
+  const cards = root.querySelectorAll<HTMLElement>('[data-player-id]')
+  cards.forEach((card, i) => {
+    card.animate(
+      [
+        { opacity: 0, transform: 'translateY(-14px) rotateY(80deg) scale(.85)' },
+        { opacity: 1, transform: 'none' },
+      ],
+      {
+        duration: 420,
+        delay: 40 + i * 60,
+        easing: 'cubic-bezier(.2,.9,.3,1.25)',
+        fill: 'backwards',
+      },
+    )
+  })
+  root.querySelector<HTMLElement>('[data-lineup-vs]')?.animate(
+    [
+      { opacity: 0, transform: 'rotate(-180deg) scale(.4)' },
+      { opacity: 1, transform: 'none' },
+    ],
+    { duration: 500, easing: 'ease-out', fill: 'backwards' },
+  )
+}
+
 /**
- * Q-SUGGEST: one suggested lineup with the format and mode chips, Team A VS Team B (switch sides by
- * dragging or with the arrow keys), and the Why this lineup card. No win probabilities or fatigue
- * scores. When nothing can be suggested, the reason is shown with Close.
+ * Q-SUGGEST: one suggested lineup with the format and mode chips, Reshuffle, Team A VS Team B (tap a
+ * player to replace them; switch sides by dragging or with the arrow keys), and the Why this
+ * lineup card. Footer: ← Back and Add to queue. No win probabilities or fatigue scores. When
+ * nothing can be suggested, the reason is shown with Close.
  */
 export function SuggestedMatchSheet({
   open,
@@ -73,12 +111,23 @@ export function SuggestedMatchSheet({
   minimumGames,
   onSelectPlayer,
   onSwap,
-  onSkip,
-  onEditThenAdd,
+  onReshuffle,
+  onReplace,
+  onBack,
+  dealKey,
   onAdd,
   isPending = false,
 }: SuggestedMatchSheetProps) {
   const mode = MODE_LABEL[sessionMode]
+  const reduced = !!useReducedMotion()
+  const dealRef = useRef<HTMLDivElement>(null)
+  const lastDeal = useRef(dealKey)
+  useEffect(() => {
+    if (lastDeal.current === dealKey) return
+    lastDeal.current = dealKey
+    if (!reduced && dealRef.current && typeof dealRef.current.animate === 'function')
+      dealIn(dealRef.current)
+  }, [dealKey, reduced])
   if (!lineup) {
     return (
       <Sheet
@@ -102,11 +151,9 @@ export function SuggestedMatchSheet({
       dismissible={!isPending}
       footer={
         <>
-          <Button disabled={isPending} onClick={onSkip}>
-            Skip suggestion
-          </Button>
-          <Button disabled={isPending} onClick={onEditThenAdd}>
-            Edit then add
+          <Button disabled={isPending} onClick={onBack}>
+            <Icon name="back" />
+            Back
           </Button>
           <Button variant="primary" loading={isPending} onClick={onAdd}>
             Add to queue
@@ -114,19 +161,29 @@ export function SuggestedMatchSheet({
         </>
       }
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <Chip tone="solid">{FORMAT_LABEL[lineup.format]}</Chip>
-        <Chip>{mode} mode</Chip>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Chip tone="solid">{FORMAT_LABEL[lineup.format]}</Chip>
+          <Chip>{mode} mode</Chip>
+        </div>
+        <Button size="sm" disabled={isPending} onClick={onReshuffle}>
+          <Icon name="swap" />
+          Reshuffle
+        </Button>
       </div>
-      <TeamLineup
-        teamA={lineup.teamA}
-        teamB={lineup.teamB}
-        minimumGames={minimumGames}
-        onSelectPlayer={onSelectPlayer}
-        onSwap={onSwap}
-      />
+      <div ref={dealRef}>
+        <TeamLineup
+          teamA={lineup.teamA}
+          teamB={lineup.teamB}
+          minimumGames={minimumGames}
+          onSelectPlayer={onReplace}
+          onOpenProfile={onSelectPlayer}
+          playerActionLabel="Replace"
+          onSwap={onSwap}
+        />
+      </div>
       <p className="m-0 text-[13px] text-fg2">
-        Drag a player onto someone on the other team to switch sides.
+        Tap a player to replace them. Drag a player onto someone on the other team to switch sides.
       </p>
       <Card className="flex flex-col gap-1.5">
         <span className="text-xs font-semibold tracking-[0.5px] text-fg2 uppercase">

@@ -128,7 +128,12 @@ export function TeamLineup({
         swappable={swappable}
         actionLabel={playerActionLabel}
       />
-      <span className="text-center text-[11px] font-extrabold tracking-[1px] text-fg3">VS</span>
+      <span
+        data-lineup-vs
+        className="text-center text-[11px] font-extrabold tracking-[1px] text-fg3"
+      >
+        VS
+      </span>
       <Team
         team="B"
         players={teamB}

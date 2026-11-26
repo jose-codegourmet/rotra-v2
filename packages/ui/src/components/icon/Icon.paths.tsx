@@ -387,6 +387,19 @@ export const ICONS = {
     strokeWidth: 2.2,
     body: <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />,
   },
+  // Reshuffle (SHEETS.suggest, I.swap): two arrows trading places.
+  swap: {
+    size: 18,
+    strokeWidth: 2,
+    body: (
+      <>
+        <path d="M7 4L3 8l4 4" />
+        <path d="M3 8h14" />
+        <path d="M17 20l4-4-4-4" />
+        <path d="M21 16H7" />
+      </>
+    ),
+  },
   list: {
     size: 18,
     strokeWidth: 2.2,

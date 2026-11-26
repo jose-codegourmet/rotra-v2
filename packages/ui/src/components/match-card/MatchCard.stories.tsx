@@ -315,3 +315,27 @@ export const CompactFiveVsFive: Story = {
   decorators: compactDecorators,
 }
 export const CompactLight: Story = { ...Compact, globals: { theme: 'light' } }
+
+/** Put a match on Court N: a slide card with Put on court and Edit sharing the row, no handle or arrow. */
+export const CompactSlide: Story = {
+  args: {
+    ...propsFor(matchCardFixtures.ready),
+    variant: 'compact',
+    slide: true,
+    startLabel: 'Put on court',
+    startAriaLabel: 'Put on Court 2',
+    onRemove: undefined,
+  },
+  decorators: compactDecorators,
+}
+export const CompactSlideBlocked: Story = {
+  args: {
+    ...propsFor(matchCardFixtures.blocked),
+    variant: 'compact',
+    slide: true,
+    startLabel: 'Put on court',
+    startAriaLabel: 'Put on Court 2',
+    onRemove: undefined,
+  },
+  decorators: compactDecorators,
+}

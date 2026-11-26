@@ -22,8 +22,6 @@ export type SuggestMatchProps = {
   sessionId: string
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** Edit then add: the shell opens the Add match sheet pre-filled with this lineup */
-  onEditThenAdd: (lineup: MatchLineup) => void
   /** The suggestion was added: the shell switches the console to the Queue tab */
   onAdded: () => void
 }
@@ -42,20 +40,14 @@ function suggest(session: QueueSession, roster: SessionPlayer[], matches: Match[
 }
 
 /**
- * Q-SUGGEST: SuggestedMatchSheet on one lineup from generateMatches(…, 1). Skip suggestion draws a
- * new one; switching two players (drag or ← / →) changes only the shown lineup, toasts "Mikee and Dexter
- * switched sides" and marks it switched; Edit then add hands the lineup to the Add match sheet
- * (saving there protects it); Add to queue calls useAddSuggestedMatch, unprotected unless players
- * were switched. A player card opens the profile with Back to suggestion, which returns to the same
+ * Q-SUGGEST: SuggestedMatchSheet on one lineup from generateMatches(…, 1). Reshuffle draws a
+ * new one (the faces deal back in); switching two players (drag or ← / →) changes only the shown
+ * lineup, toasts "Mikee and Dexter switched sides" and marks it switched; Back closes the sheet
+ * (the stacked-dialog back stack and the per-player Replace come with Q29.7); Add to queue calls
+ * useAddSuggestedMatch, unprotected unless players were switched. A player card opens the profile with Back to suggestion, which returns to the same
  * lineup. The sheet is generated afresh each time it opens.
  */
-export function SuggestMatch({
-  sessionId,
-  open,
-  onOpenChange,
-  onEditThenAdd,
-  onAdded,
-}: SuggestMatchProps) {
+export function SuggestMatch({ sessionId, open, onOpenChange, onAdded }: SuggestMatchProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
@@ -68,7 +60,6 @@ export function SuggestMatch({
       roster={roster.data.roster}
       matches={matches.data}
       onOpenChange={onOpenChange}
-      onEditThenAdd={onEditThenAdd}
       onAdded={onAdded}
     />
   )
@@ -87,12 +78,13 @@ function OpenSuggestMatch({
   roster,
   matches,
   onOpenChange,
-  onEditThenAdd,
   onAdded,
 }: OpenSuggestMatchProps) {
   const addSuggested = useAddSuggestedMatch()
   const [suggestion, setSuggestion] = useState<Suggestion>(() => suggest(session, roster, matches))
   const [switched, setSwitched] = useState(false)
+  /** Counts the Reshuffle draws: the sheet deals the faces in again when it changes */
+  const [dealKey, setDealKey] = useState(0)
   const [profileId, setProfileId] = useState<string | null>(null)
   // One add per attempt: a second tap can land before isPending reaches this render.
   const adding = useRef(false)
@@ -126,9 +118,10 @@ function OpenSuggestMatch({
     ? { format: lineup.format, teamA: lineup.teamA.map(player), teamB: lineup.teamB.map(player) }
     : null
 
-  const onSkip = () => {
+  const onReshuffle = () => {
     setSuggestion(suggest(session, roster, matches))
     setSwitched(false)
+    setDealKey((key) => key + 1)
   }
 
   // Switching sides changes only the shown lineup; the match is protected only once added.
@@ -185,10 +178,11 @@ function OpenSuggestMatch({
         minimumGames={session.minimumGames}
         onSelectPlayer={openProfile}
         onSwap={onSwap}
-        onSkip={onSkip}
-        onEditThenAdd={() => {
-          if (lineup) onEditThenAdd(lineup)
-        }}
+        onReshuffle={onReshuffle}
+        // Replace a player in the suggested match is wired in Q29.7.
+        onReplace={() => undefined}
+        onBack={() => onOpenChange(false)}
+        dealKey={dealKey}
         onAdd={onAdd}
         isPending={addSuggested.isPending}
       />

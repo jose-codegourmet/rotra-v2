@@ -35,7 +35,8 @@ export type SwapPickerPlayer = {
 
 export type SwapPickerSheetProps = {
   open: boolean
-  matchNo: number
+  /** The match number for the default back label; omit with `backLabel` (a suggested match has none) */
+  matchNo?: number
   /** "Replace a player in match N" or "Substitute in match N": the left column's first line */
   title: string
   /** "Who's coming out?" (Replace) or "Who's coming off?" (Substitute) */
@@ -66,6 +67,8 @@ export type SwapPickerSheetProps = {
   action: ReactNode
   /** The header × ("Back to match N") and a tap on the backdrop return to the match */
   onBack: () => void
+  /** The × button's accessible name; "Back to match N" by default */
+  backLabel?: string
   /** Saving: the picker cannot be dismissed */
   isPending?: boolean
   /** e.g. "Something changed. Review the match again." */
@@ -237,6 +240,7 @@ export function SwapPickerSheet({
   extra,
   action,
   onBack,
+  backLabel,
   isPending = false,
   message,
   error,
@@ -412,7 +416,7 @@ export function SwapPickerSheet({
           if (!next && !isPending) onBack()
         }}
         title={title}
-        closeLabel={`Back to match ${matchNo}`}
+        closeLabel={backLabel ?? `Back to match ${matchNo}`}
         dismissible={!isPending}
         hideClose={isPending}
         headerClassName="absolute top-3 right-3 z-[3] p-0 [&>h2]:sr-only"

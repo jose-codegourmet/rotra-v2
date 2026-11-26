@@ -24,7 +24,18 @@ export type ReplacePlayer = {
 
 export type ReplacePlayerSheetProps = {
   open: boolean
-  matchNo: number
+  /** The match number for the default title and back label; omit with `title` and `backLabel` */
+  matchNo?: number
+  /** The title; "Replace a player in match N" by default ("Replace a player in the suggested match") */
+  title?: string
+  /**
+   * The line under Suggestion; the lineup-change or Replace-mistake text by default. The suggested
+   * match passes "This only changes the suggested lineup. Nothing is recorded until you add it to
+   * the queue."
+   */
+  note?: ReactNode
+  /** The × button's accessible name; "Back to match N" by default ("Back to the suggested match") */
+  backLabel?: string
   /** Everyone in the match, Team A first; the "Who's coming out?" tiles */
   inMatch: (ReplacePlayer & { team: 'A' | 'B'; present?: boolean })[]
   /** Present players not in this match and not busy: Suggested and the top of All players */
@@ -76,6 +87,9 @@ export type ReplacePlayerSheetProps = {
 export function ReplacePlayerSheet({
   open,
   matchNo,
+  title = `Replace a player in match ${matchNo}`,
+  note,
+  backLabel,
   inMatch,
   candidates,
   others = [],
@@ -94,7 +108,6 @@ export function ReplacePlayerSheet({
   message,
   error,
 }: ReplacePlayerSheetProps) {
-  const title = `Replace a player in match ${matchNo}`
   const out = inMatch.find((p) => p.id === outId)
   const opponent = out ? inMatch.find((p) => p.id === swapId && p.team !== out.team) : undefined
   const swapping = !!(onPickSwap && out && opponent)
@@ -129,6 +142,7 @@ export function ReplacePlayerSheet({
           : undefined
       }
       onBack={onBack}
+      backLabel={backLabel}
       isPending={isPending}
       message={message}
       error={error}
@@ -137,6 +151,8 @@ export function ReplacePlayerSheet({
           <p className="m-0 text-[13px] text-fg2">
             {short(out)} and {short(opponent)} swap places: each joins the other's partner.
           </p>
+        ) : note ? (
+          <p className="m-0 text-[13px] text-fg2">{note}</p>
         ) : playing ? (
           <Notice>
             <b>Replace fixes a mistake.</b> Use it when the wrong player was put in this match. The

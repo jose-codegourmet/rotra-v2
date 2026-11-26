@@ -98,6 +98,10 @@ export type MatchCardProps = {
    * Start match sheet offers Start anyway on that court.
    */
   canOpenCourt?: boolean
+  /** The Start button's text; "Start" by default ("Put on court" in the queue's dialogs) */
+  startLabel?: string
+  /** The Start button's accessible name when the text alone is not enough ("Put on Court 2") */
+  startAriaLabel?: string
   /** Edit the lineup: rendered only when given */
   onEdit?: () => void
   /** Remove the waiting match: rendered only when given */
@@ -115,6 +119,13 @@ export type MatchCardProps = {
    * buttons stay. Default 'default'. Draft tiles ignore it.
    */
   variant?: 'default' | 'compact'
+  /**
+   * A card inside a carousel slide (Put a match on Court N): no reorder handle and no flow arrow,
+   * the card fills the slide's height, and Start and Edit share the row at the same width. A drag
+   * anywhere on it belongs to the carousel; taps on faces and buttons still work. Used with
+   * `variant="compact"` and without `swappable`.
+   */
+  slide?: boolean
   className?: string
 }
 
@@ -429,6 +440,8 @@ export function MatchCard({
   onOpenGames,
   gamesBadge,
   onStart,
+  startLabel = 'Start',
+  startAriaLabel,
   canOpenCourt = false,
   onEdit,
   onRemove,
@@ -438,6 +451,7 @@ export function MatchCard({
   searchState,
   highlightedPlayerIds,
   variant = 'default',
+  slide = false,
 }: MatchCardProps) {
   const compact = variant === 'compact'
   const ready = status.kind === 'ready'
@@ -521,6 +535,7 @@ export function MatchCard({
         matchCardVariants({ status: status.kind }),
         'mt-2',
         compact && 'gap-2',
+        slide && 'mt-0 h-full',
         searchState === 'hit' &&
           '!border-warn shadow-[0_0_0_2px_var(--warn),0_0_16px_2px_color-mix(in_srgb,var(--warn)_40%,transparent)]',
         searchState === 'dim' && 'opacity-45',
@@ -547,12 +562,12 @@ export function MatchCard({
             </span>
           ))}
         <span className="flex-1" />
-        {flow ? (
+        {flow && !slide ? (
           <span aria-hidden className="font-extrabold text-fg3">
             {FLOW_ARROW[flow]}
           </span>
         ) : null}
-        {!readOnly ? (
+        {!readOnly && !slide ? (
           <button
             type="button"
             aria-label={`Reorder match ${matchNo}: drag, or use the arrow keys`}
@@ -628,18 +643,23 @@ export function MatchCard({
               size="xs"
               variant={ready ? 'primary' : 'secondary'}
               disabled={!startable}
+              aria-label={startAriaLabel}
               onClick={onStart}
-              className="touch:flex-1"
+              className={cn('touch:flex-1', slide && 'min-h-9 flex-1')}
             >
-              Start
+              {startLabel}
             </Button>
           ) : null}
           {onEdit ? (
-            <Button size="xs" onClick={onEdit} className="touch:flex-1">
+            <Button
+              size="xs"
+              onClick={onEdit}
+              className={cn('touch:flex-1', slide && 'min-h-9 flex-1')}
+            >
               Edit
             </Button>
           ) : null}
-          <span className="flex-1" />
+          {slide ? null : <span className="flex-1" />}
           {onRemove ? (
             <IconButton
               size="xs"

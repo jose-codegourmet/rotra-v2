@@ -562,7 +562,6 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
           sessionId={sessionId}
           open={matchSheet?.mode === 'suggest'}
           onOpenChange={(open) => setMatchSheet(open ? { mode: 'suggest' } : null)}
-          onEditThenAdd={(lineup) => setMatchSheet({ mode: 'add', lineup })}
           onAdded={showQueue}
         />
         <ActiveMatch
@@ -580,6 +579,7 @@ export function SessionConsole({ sessionId, resumeSessionDone }: SessionConsoleP
               : null
           }
           onRequestChange={setMatchSheet}
+          onEditMatch={(matchId) => setMatchSheet({ mode: 'edit', matchId })}
           onClose={() => setMatchSheet(null)}
         />
         <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />

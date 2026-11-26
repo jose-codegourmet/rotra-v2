@@ -364,6 +364,38 @@ button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: 
    notifications and light/dark mode button on the top right". Phones get a bottom dock; the top bar keeps the logo, bell,
    theme switch (and the prototype button). */
 .dock { display: none; }
+/* Settings and the session slot (owner artifact comment, November 26, 2026). */
+.top .nav a.nav-ses { display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border-radius: var(--r-sm); background: var(--accent-subtle); text-decoration: none; font-weight: 700; color: var(--accent); }
+.set-list .set-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 4px; border: 0; border-top: 1px solid var(--border);
+  background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.set-list h2 + .set-row { border-top: 0; }
+.set-row.static { cursor: default; }
+.set-row .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.set-row > svg { flex: none; color: var(--fg2); }
+@keyframes ses-pulse { 50% { opacity: .45; } }
+/* Session button (owner, November 26, 2026): options were tried; the owner picked the pixel START-style button: "please go with the ready and start button". */
+/* The same pixel button in the wide-screen top bar (owner, same day: "hey do the pixel design"). */
+.top .nav a.nav-ses.px { flex: 1.25; max-width: 150px; padding: 3px 3px 8px; min-height: 60px; margin-top: -10px; border-radius: 0; color: var(--px-ink);
+  background: linear-gradient(var(--px-ink) 0 calc(100% - 5px), var(--px-drop) calc(100% - 5px));
+  clip-path: polygon(0 6px, 3px 6px, 3px 3px, 6px 3px, 6px 0, calc(100% - 6px) 0, calc(100% - 6px) 3px, calc(100% - 3px) 3px, calc(100% - 3px) 6px, 100% 6px,
+    100% calc(100% - 9px), calc(100% - 3px) calc(100% - 9px), calc(100% - 3px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) 100%,
+    6px 100%, 6px calc(100% - 3px), 3px calc(100% - 3px), 3px calc(100% - 9px), 0 calc(100% - 9px)); }
+.top .nav a.nav-ses.px .px-face { position: relative; flex: 1; align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 4px 6px 6px; overflow: hidden;
+  font-family: var(--pixel); font-size: 20px; font-weight: 700; line-height: 1; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 1px 0 var(--px-top);
+  background: linear-gradient(var(--px-top) 0 4px, var(--px-fill) 4px calc(100% - 5px), var(--px-low) calc(100% - 5px));
+  clip-path: polygon(0 3px, 3px 3px, 3px 0, calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px));
+  transition: transform .06s steps(1); }
+.top .nav a.nav-ses.px .px-face::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, transparent 0 10%, rgba(255, 255, 255, .55) 10% 15%, transparent 15% 19%, rgba(255, 255, 255, .55) 19% 21%, transparent 21%); }
+.top .nav a.nav-ses.px.live .px-face::after { content: ""; position: absolute; top: 0; bottom: 0; width: 30%; left: -40%; pointer-events: none;
+  background: linear-gradient(115deg, transparent 0 30%, rgba(255, 255, 255, .5) 30% 55%, transparent 55%); animation: px-shine 2.4s steps(12) infinite; }
+.top .nav a.nav-ses.px svg { animation: none; }
+.top .nav a.nav-ses.px .px-face > span { position: relative; }
+.top .nav a.nav-ses.px:active { padding-bottom: 5px; padding-top: 6px; }
+.top .nav a.nav-ses.px { flex: none; max-width: none; min-width: 96px; min-height: 44px; margin: 0 4px; }
+.top .nav a.nav-ses.px .px-face { font-size: 14px; padding: 2px 12px 4px; }
+@keyframes px-shine { 0%, 40% { left: -40%; } 100% { left: 120%; } }
+@media (prefers-reduced-motion: reduce) { .dock a.nav-ses.live svg, .dock a.nav-ses, .dock a.nav-ses::after, .dock a.nav-ses span::after, .dock .px-face::after { animation: none !important; } }
 /* P-ONBOARD: fullscreen steps after an invite link (owner, November 19, 2026). No top bar or dock. */
 .ob { min-height: 100dvh; display: flex; flex-direction: column; }
 .ob-top { position: sticky; top: 0; z-index: 5; display: flex; flex-direction: column; gap: 10px; padding: calc(14px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)); background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
@@ -416,9 +448,34 @@ button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: 
   .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; justify-content: center; gap: 4px;
     padding: 6px max(12px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
     background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-top: 1px solid var(--border); }
-  .dock button { flex: 1; max-width: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 52px;
+  .dock button, .dock a { flex: 1; max-width: 160px; text-decoration: none; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 52px;
     border: 0; background: none; border-radius: var(--r); color: var(--fg2); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
-  .dock button svg { width: 22px; height: 22px; }
+  .dock button svg, .dock a svg { width: 22px; height: 22px; }
+  .dock a.nav-ses { color: var(--on-accent); background: var(--accent); }
+  .dock a.nav-ses.live svg { animation: ses-pulse 1.6s ease-in-out infinite; }
+  .dock a.nav-ses { position: relative; }
+  /* 5 Pixel (owner, November 26, 2026, with a pixel-art START button for reference: "how about something like this but
+     apply rotra branding"). An ink outline with stepped corners, a lighter top band, a darker bottom lip, two diagonal
+     gloss streaks, a green drop under it, Silkscreen type and a pixel shuttlecock. Pressing it pushes the face down.
+     While live, a shine sweeps across it in pixel steps. */
+  .dock[data-ses="pixel"] a.nav-ses { flex: 1.25; max-width: 150px; padding: 3px 3px 8px; min-height: 60px; margin-top: -10px; border-radius: 0; color: var(--px-ink);
+    background: linear-gradient(var(--px-ink) 0 calc(100% - 5px), var(--px-drop) calc(100% - 5px));
+    clip-path: polygon(0 6px, 3px 6px, 3px 3px, 6px 3px, 6px 0, calc(100% - 6px) 0, calc(100% - 6px) 3px, calc(100% - 3px) 3px, calc(100% - 3px) 6px, 100% 6px,
+      100% calc(100% - 9px), calc(100% - 3px) calc(100% - 9px), calc(100% - 3px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) 100%,
+      6px 100%, 6px calc(100% - 3px), 3px calc(100% - 3px), 3px calc(100% - 9px), 0 calc(100% - 9px)); }
+  .dock[data-ses="pixel"] .px-face { position: relative; flex: 1; align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 4px 6px 6px; overflow: hidden;
+    font-family: var(--pixel); font-size: 20px; font-weight: 700; line-height: 1; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 1px 0 var(--px-top);
+    background: linear-gradient(var(--px-top) 0 4px, var(--px-fill) 4px calc(100% - 5px), var(--px-low) calc(100% - 5px));
+    clip-path: polygon(0 3px, 3px 3px, 3px 0, calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px));
+    transition: transform .06s steps(1); }
+  .dock[data-ses="pixel"] .px-face::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(115deg, transparent 0 10%, rgba(255, 255, 255, .55) 10% 15%, transparent 15% 19%, rgba(255, 255, 255, .55) 19% 21%, transparent 21%); }
+  .dock[data-ses="pixel"] a.nav-ses.live .px-face::after { content: ""; position: absolute; top: 0; bottom: 0; width: 30%; left: -40%; pointer-events: none;
+    background: linear-gradient(115deg, transparent 0 30%, rgba(255, 255, 255, .5) 30% 55%, transparent 55%); animation: px-shine 2.4s steps(12) infinite; }
+  .dock[data-ses="pixel"] a.nav-ses svg { animation: none; }
+  .dock[data-ses="pixel"] .px-face > span { position: relative; }
+  .dock[data-ses="pixel"] a.nav-ses:active { padding-bottom: 5px; padding-top: 6px; }
+  /* Owner, same day: "maybe remove the icon I want the word to be obvious": the pixel button shows the word alone. */
   .dock button[aria-current="page"] { color: var(--accent); background: var(--accent-subtle); }
   body { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
 }
@@ -484,6 +541,8 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 /* Podium: a dark stage lit from below in the brand green, with pixel-notched steps and pixel type to match the
    pixel fire behind #1. Steps run 2nd–1st–3rd left to right; brightness, not metal colors, sets the order. */
 :root { --pixel: "Silkscreen", var(--mono); }
+/* Pixel session button (owner, November 26, 2026): a brand sprite, the same in both themes. */
+:root { --px-ink: #0b0b0c; --px-top: #8dffc6; --px-fill: #00ff88; --px-low: #00cc6a; --px-drop: #00804a; --px-hi: #ffffff; }
 .podium { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; gap: 18px; padding: 18px 18px 0; border-radius: 16px;
   border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
   background:
@@ -766,11 +825,20 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .lb-row.cur { background: var(--accent-subtle); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent); }
 .lb-row.flash { animation: rkflash 1.6s ease-out; }
 @keyframes rkflash { 0%, 40% { background: color-mix(in srgb, var(--accent) 30%, transparent); } }
-.wp-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.wp-sum > div { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: var(--r-sm); background: var(--elev); min-width: 0; }
-.wp-sum b { font-size: 18px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wp-sum .w { color: var(--accent); } .wp-sum .l { color: var(--error); }
-.wp-sum .hl { background: var(--accent-subtle); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); } .wp-sum .hl b { color: var(--accent); }
+/* Owner artifact comment, November 26, 2026, on the summary: "put this in one box and update the layout a bit, it looks so
+   bland". The four numbers sit in one box with dividers, bigger figures and a won/lost split bar along the bottom. */
+.wp-sum { container-type: inline-size; border-radius: var(--r); border: 1px solid var(--border-strong); background: linear-gradient(135deg, var(--elev), var(--surface) 70%); overflow: hidden; }
+.wp-cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.wp-cells > div { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; min-width: 0; }
+.wp-cells > div + div { border-left: 1px solid var(--border); }
+.wp-cells b { display: flex; align-items: center; gap: 6px; font-size: 24px; font-weight: 800; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wp-cells b svg { flex: none; width: 18px; height: 18px; }
+.wp-cells .w { color: var(--accent); } .wp-cells .l { color: var(--error); }
+.wp-cells .hl { background: var(--accent-subtle); } .wp-cells .hl b { color: var(--accent); }
+.wp-ds { display: none; }
+.wp-split { display: flex; gap: 2px; height: 6px; }
+.wp-split i { display: block; flex-basis: 0; min-width: 2px; }
+.wp-split .w { background: var(--accent); } .wp-split .l { background: var(--error); }
 .wp-chart { position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; padding-top: 4px; }
 .wp-col { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; padding: 6px 2px 8px; border-radius: 10px; }
 .wp-col.best { background: linear-gradient(180deg, transparent, var(--accent-subtle)); }
@@ -802,7 +870,8 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .wp-legend { display: flex; gap: 6px 16px; flex-wrap: wrap; font-size: 12px; color: var(--fg2); }
 .wp-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 .wp-legend i.w { background: var(--accent); } .wp-legend i.l { background: var(--error); }
-@media (max-width: 480px) { .wp-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); } .wp-chart { gap: 2px; } .wp-plot { height: 136px; gap: 2px; } .wp-b { width: 44%; } .wp-rate { font-size: 9px; padding: 0 4px; } .wp-v { font-size: 9px; } .wp-day { font-size: 10px; } }
+@container (max-width: 520px) { .wp-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); } .wp-cells > div:nth-child(3) { border-left: 0; } .wp-cells > div:nth-child(n+3) { border-top: 1px solid var(--border); } .wp-cells b { font-size: 20px; } .wp-dl { display: none; } .wp-ds { display: inline; } }
+@media (max-width: 480px) { .wp-chart { gap: 2px; } .wp-plot { height: 136px; gap: 2px; } .wp-b { width: 44%; } .wp-rate { font-size: 9px; padding: 0 4px; } .wp-v { font-size: 9px; } .wp-day { font-size: 10px; } }
 .gm { display: flex; flex-direction: column; gap: 6px; padding: 12px 0; }
 .gm + .gm, .sess-head + .gm { border-top: 1px solid var(--border); }
 /* Owner artifact comment, same day: a taller court, with the format, score and result in the middle, on the net. */
@@ -846,6 +915,50 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .gm.rings .gm-pl:hover .avatar, .gm.rings .gm-pl:focus-visible .avatar { box-shadow: 0 0 0 3px var(--ring), 0 0 0 5px rgba(0, 0, 0, .72), 0 0 0 8px rgba(255, 255, 255, .6); }
 .gm.rings .gm-side { padding: 16px 6px; }
 .mt-src { margin: 0; }
+.mt-left { display: grid; grid-template-rows: minmax(0, 4fr) minmax(0, 1fr); gap: 20px; min-width: 0; }
+.mt-court { display: flex; flex-direction: column; padding: 12px; }
+.mt-court .gm { flex: 1; padding: 0; }
+.mt-court .gm-court { flex: 1; min-height: 280px; }
+@media (min-width: 900px) { .mt-court .gm-pl .avatar { width: 60px; height: 60px; font-size: 18px; } .mt-court .gm-score { font-size: 30px; } }
+/* Owner artifact comment, same day, on the tall court: "re arrange the players in the court too much white space on the top".
+   On the big court each team stands spread down its half (front to back, like positions on court) instead of one row in the middle. */
+@media (min-width: 900px) { .mt-court .gm-court { align-items: stretch; } .mt-court .gm-res { align-self: center; }
+  .mt-court .gm-side { flex-direction: column; justify-content: space-evenly; padding: 40px 8px 16px; } }
+.mt-sess { display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 84px; }
+.mt-sess-t { font-size: 17px; }
+.mt-sess-t .sh-linkish { font-weight: 800; }
+@media (max-width: 899px) { .mt-left { grid-template-rows: auto auto; } .mt-court .gm-court { min-height: 220px; } }
+/* Game page, owner artifact comment, November 26, 2026: [ COURT ] [ vs card ], stats only for a tapped player. */
+.mt-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: stretch; }
+/* Owner artifact comment, same day: "court should be 70% and 30% vs card". */
+@media (min-width: 900px) { .mt-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); } }
+.vs-card { container-type: inline-size; display: flex; flex-direction: column; gap: 12px; }
+.vs-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.vs-body { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: center; }
+.vs-team { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 10px; border-radius: var(--r); background: var(--elev); align-self: stretch; justify-content: center; }
+.vs-team.won { background: var(--accent-subtle); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+.vs-team.won > .label { color: var(--accent); }
+.vs-team.r { text-align: right; }
+.vs-p { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 48px; padding: 6px; border: 1px solid transparent; border-radius: var(--r-sm); background: none; color: var(--fg); font: inherit; text-align: inherit; cursor: pointer; }
+.vs-team.r .vs-p { flex-direction: row-reverse; }
+.vs-p:hover { background: var(--surface); }
+.vs-teamhd { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 4px 6px; margin: -4px 0 0; border: 0; border-radius: var(--r-sm); background: none; color: inherit; font: inherit; cursor: pointer; }
+.vs-teamhd:hover { background: var(--surface); }
+.vs-both { font-size: 12px; font-weight: 700; color: var(--accent); }
+.vs-team.on { box-shadow: inset 0 0 0 2px var(--accent); }
+.mt-statsgrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media (min-width: 900px) { .mt-statsgrid.multi { grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); } }
+.vs-p.on { border-color: var(--accent); background: var(--surface); }
+.vs-p .avatar { width: 40px; height: 40px; flex: none; box-shadow: 0 0 0 3px var(--ring, var(--lv-none)); }
+.vs-p { --ring: var(--lv-none); } .vs-p.lv-beginner { --ring: var(--lv-beg); } .vs-p.lv-intermediate { --ring: var(--lv-int); } .vs-p.lv-advanced { --ring: var(--lv-adv); }
+.vs-p .avatar { margin: 3px; }
+.vs-n { display: flex; flex-direction: column; min-width: 0; }
+.vs-n b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vs-mid { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.vs-badge { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--fg); color: var(--bg); font-weight: 800; letter-spacing: .5px; }
+.vs-score { font-family: var(--mono); font-size: 18px; font-weight: 700; white-space: nowrap; }
+/* A narrow VS card (phones, and the 30% column) stacks the teams: left team, VS and score, right team. */
+@container (max-width: 440px) { .vs-body { grid-template-columns: minmax(0, 1fr); } .vs-team.r { text-align: left; } .vs-team.r .vs-p { flex-direction: row; } .vs-mid { flex-direction: row; justify-content: center; } }
 .mt-src .sh-linkish { font-weight: 600; }
 .mt-who { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 0; border: 0; background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
 .mt-who .avatar { width: 36px; height: 36px; font-size: 12px; flex: none; }
@@ -1430,6 +1543,13 @@ const MY_SESSIONS = [
   { slug: 's-thu-open', day: 3, time: '7:00–10:00 PM', status: 'confirmed' },
   { slug: 's-fri-smash', day: 5, time: '8:00–11:00 PM', status: 'waitlist', n: 2 },
 ];
+// Prototype switch (owner, November 26, 2026: "add a prototype for players to have a incoming session and current session"):
+// 'live' keeps tonight's session happening now, 'next' drops it so the soonest one is incoming, 'none' leaves no session.
+// It applies to whoever is signed in, also an account registered in the prototype (owner, same day: "still empty").
+// 'today' moves the next session to later today (owner artifact comment, November 26, 2026: Settings leaves the nav then too).
+const mySessions = () => { const v = S.sesDemo || 'live'; const rest = MY_SESSIONS.filter((m) => m.status !== 'live');
+  if (v === 'today') return [{ ...rest[0], day: 0, time: '8:00–11:00 PM' }, ...rest.slice(1)];
+  return v === 'none' ? [] : v === 'next' ? rest : MY_SESSIONS; };
 // Finished sessions shown in My sessions (ids from MIGS_SESSIONS). `published` is false until the Queue Master publishes the results (D-2026-11-09-08).
 const MY_FINISHED = ['m1', 'm2'];
 const VIA = { club_link: 'Joined via club link', session_link: 'Joined via session link', added_by_club: 'Added by the club' };
@@ -1583,6 +1703,7 @@ const NI = {
   trophy: svg('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>', 18),
   user: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', 18),
   shield: svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', 18),
+  gear: svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>', 18),
 };
 const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
 const notice = (kind, html) => `<div class="notice ${kind}">${kind === 'ok' ? I.check : kind ? I.alert : I.info}<div>${html}</div></div>`;
@@ -1771,20 +1892,49 @@ function viewMatch() {
   const shareCtx = (n, i) => (owner.id === S.me && n === owner.name ? { sid: s.id, gi: i } : null);
   const court = gameRow(funNote(drawn), matchWho(lead, owner), shareCtx(lead, gi), at(gi), { open: false, rings: true, mask: true });
   const title = s.pageGone ? esc(s.title) : `<button type="button" class="sh-linkish" data-act="sessionPage" data-title="${esc(s.title)}">${esc(s.title)}</button>`;
-  // Before this game: one block per player, the left side then the right, with that player's earlier games of the session in play order.
-  const blocks = [lead, ...drawn.partner, ...drawn.opp].map((n) => {
-    const who = matchWho(n, owner), q = who.guest ? { real: false, name: n } : { real: true, p: who };
-    const hid = faceMasked(q), shown = who.id === S.me ? 'You' : hid ? maskName(n.split(' ')[0]) : (who.guest ? n.split(' ')[0] : firstName(who));
-    const earlier = s.games.slice(0, gi).map((y, i) => ({ y, i })).filter(({ y }) => n === owner.name || y.partner.includes(n) || y.opp.includes(n));
-    const a = who.guest ? `data-name="${esc(hid ? maskName(n) : n)}"` : `data-id="${esc(who.id)}"`;
-    const pic = avatar(who.guest ? { ...who, name: hid ? maskName(n) : n } : hid ? maskedView(who) : who);
-    return `<div class="mt-blk"><div class="between"><button type="button" class="mt-who" data-act="openProfileCard" ${a} aria-label="${esc(hid ? maskName(n) : n)}. View profile">${pic}<b>${esc(shown)}</b></button><span class="small muted">${earlier.length ? `${earlier.length} earlier ${earlier.length === 1 ? 'game' : 'games'}` : 'No earlier games'}</span></div>
-      ${earlier.map(({ y, i }) => gameRow(funNote(gameFrom(y, owner.name, n)), who, shareCtx(n, i), at(i), { mask: true })).join('')}</div>`;
-  }).join('');
-  return `<main class="wrap mid">
+  // Owner artifact comment, November 26, 2026: "design it like this [ COURT ] [ vs card ], only show stats when a person is clicked
+  // from the vs card. The person click will show the stats, will show the win rate, will show the games played before the match."
+  // The court sits beside a vs card (above it on phones). Nothing else shows until a player on the vs card is tapped; then a stats
+  // card opens under both: their record and win rate in this session before this game, their win rate this year (registered,
+  // visible profiles only), and the games they played before this one.
+  const people = (names) => names.map((n) => { const who = matchWho(n, owner), q = who.guest ? { real: false, name: n } : { real: true, p: who }, hid = faceMasked(q);
+    return { n, who, hid, shown: who.id === S.me ? 'You' : hid ? maskName(n) : n, pic: avatar(who.guest ? { ...who, name: hid ? maskName(n) : n } : hid ? maskedView(who) : who) }; });
+  const left = people([lead, ...drawn.partner]), right = people(drawn.opp), all = [...left, ...right];
+  // Owner artifact comment, same day, on a team: "you can click on the pair and opens the players on the bottom, individual player
+  // opens one card". mtPick holds the picked names: one player, or a whole team.
+  const picked = S.ui.mtPick && S.ui.mtPick.mid === S.viewId ? S.ui.mtPick.names : [];
+  const picks = all.filter((x) => picked.includes(x.n)), isOn = (x) => picked.includes(x.n);
+  const partial = drawn.kind === 'partial', won = drawn.res === 'W';
+  // Owner artifact comment, same day, on the VS card: "remove the skill label, just use the skill borders". The picture's ring is the
+  // skill group (the court's colours); the accessible name still says it.
+  const vsP = (x, side) => { const g = x.who.guest ? 'none' : skillGroupOf(x.who), gl = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced', none: x.who.guest ? 'Guest' : 'No skill group shown' }[g];
+    return `<button type="button" class="vs-p lv-${g}${isOn(x) ? ' on' : ''}" data-act="mtPick" data-n="${esc(x.n)}" aria-pressed="${isOn(x)}" aria-label="${esc(x.shown)}, ${gl}. Show stats">${x.pic}<span class="vs-n"><b>${esc(x.shown)}</b></span></button>`; };
+  const vsTeam = (list, side, w) => { const on = list.length > 1 && list.every(isOn), lab = !partial ? (w ? 'Won' : 'Lost') : 'Not counted';
+    return `<div class="vs-team ${side}${!partial && w ? ' won' : ''}${on ? ' on' : ''}">${list.length > 1 ? `<button type="button" class="vs-teamhd" data-act="mtPickTeam" data-side="${side}" aria-pressed="${on}" aria-label="${lab} team: show stats for ${esc(list.map((x) => x.shown).join(' and '))}"><span class="label">${lab}</span><span class="vs-both">${on ? 'Showing both' : `See ${list.length === 2 ? 'both' : `all ${list.length}`}`}</span></button>` : `<span class="label">${lab}</span>`}${list.map((x) => vsP(x, side)).join('')}</div>`; };
+  const vs = `<section class="card vs-card" aria-label="Players"><div class="vs-head"><span class="chip solid">${esc(drawn.fmt)}</span><span class="small muted">Tap a player or a team for stats</span></div>
+    <div class="vs-body">${vsTeam(left, 'l', won)}<div class="vs-mid"><span class="vs-badge">VS</span>${drawn.score ? `<span class="vs-score tnum">${esc(drawn.score)}</span>` : '<span class="small muted">No score</span>'}</div>${vsTeam(right, 'r', !won)}</div></section>`;
+  const statCard = (pick) => {
+    const n = pick.n, earlier = s.games.slice(0, gi).map((y, i) => ({ y, i })).filter(({ y }) => n === owner.name || y.partner.includes(n) || y.opp.includes(n));
+    const asN = earlier.map(({ y }) => gameFrom(y, owner.name, n)).filter((y) => y.kind !== 'partial'), w = asN.filter((y) => y.res === 'W').length, l = asN.length - w;
+    const yr = !pick.who.guest && !pick.hid && pick.who.sessions ? (() => { const c = pick.who.sessions.filter((x) => x.ago >= 0 && x.ago <= YEAR_DAYS()).flatMap((x) => x.games.filter((y) => y.kind === 'counted')); return c.length ? Math.round((c.filter((y) => y.res === 'W').length / c.length) * 100) : null; })() : null;
+    const a = pick.who.guest ? `data-name="${esc(pick.hid ? maskName(n) : n)}"` : `data-id="${esc(pick.who.id)}"`;
+    return `<section class="card stack mt-stats" aria-live="polite"><div class="between"><div class="row" style="gap:10px">${pick.pic}<div class="stack tight" style="gap:0"><h2>${esc(pick.shown)}</h2><span class="small muted">Before this game</span></div></div>
+        <div class="row"><button type="button" class="btn xs" data-act="openProfileCard" ${a}>Profile</button><button type="button" class="btn xs ghost" data-act="mtPick" data-n="${esc(n)}" aria-label="Close ${esc(pick.shown)}'s stats">Close</button></div></div>
+      ${/* Owner artifact comment, same day, on these figures: "use the same style as when you open a profile using the dialog, remember the
+        background grid design". The profile card's stats block: win rate on the left with the fire, counts on the right, the accent grid. */ ''}
+      <div class="pp-sec pp-split mt-pp"><div class="pp-wrbox"><span class="label">Win rate</span><div class="pp-wr"><span class="tnum">${asN.length ? `${Math.round((w / asN.length) * 100)}%` : '—'}</span>${asN.length ? ppFire(Math.round((w / asN.length) * 100)) : ''}</div></div>
+        <div class="pp-right"><div class="pp-sec-head"><span class="label">Before this game</span><span class="pp-yr" title="${pick.who.guest ? 'Guest, no profile' : pick.hid ? 'Private profile' : 'Counted-game win rate this year'}">${new Date().getFullYear()} · ${yr != null ? `${yr}%` : '—'}</span></div>
+          <dl class="pp-cnt"><div class="g"><dt>Played</dt><dd>${earlier.length}</dd></div><div class="w"><dt>Wins</dt><dd>${w}</dd></div><div class="l"><dt>Losses</dt><dd>${l}</dd></div></dl></div></div>
+      ${earlier.length ? `<div>${earlier.map(({ y, i }) => gameRow(funNote(gameFrom(y, owner.name, n)), pick.who, shareCtx(n, i), at(i), { mask: true })).join('')}</div>` : `<div class="empty">This was ${pick.shown === 'You' ? 'your' : 'their'} first game of the session.</div>`}</section>`;
+  };
+  const stats = picks.length ? `<div class="mt-statsgrid${picks.length > 1 ? ' multi' : ''}">${picks.map(statCard).join('')}</div>` : '';
+  return `<main class="wrap">
     <div class="page-head">${back}<h1>Game</h1></div>
-    <section class="card stack">${court}<p class="small muted mt-src">${title} · ${fmtDay(s.ago)} · ${esc(s.club)}</p></section>
-    <section class="card stack"><h2>Before this game</h2>${blocks}</section>
+    ${/* Owner artifact comment, same day: "make court height big, 80% court height, and session info will be a card too about 20 percent
+      height". The left column is the court card (about 80%) over a session card (about 20%), together as tall as the VS card. */ ''}
+    <div class="mt-grid"><div class="mt-left"><section class="card mt-court" aria-label="Court">${court}</section>
+      <section class="card mt-sess" aria-label="Session"><span class="label">Session</span><b class="mt-sess-t">${title}</b><span class="small muted">${fmtDay(s.ago)} · ${esc(s.club)}</span></section></div>${vs}</div>
+    ${stats}
   </main>`;
 }
 function viewSessions() {
@@ -1829,23 +1979,69 @@ function eligibility(p, own, st) {
 }
 
 // ---------- Top bar ----------
-function topBar() {
+// Owner artifact comment, November 26, 2026, on the dock: "there should be settings and if there is a game it should be
+// leaderboard ( back to session / incoming session ) profile". Signed in: Leaderboard · the session slot · My profile ·
+// Settings. Owner, same day: "back to session is too long, keep the words small one word or 2": the slot reads
+// "Live now" or "Next up" (the full words stay in its accessible name). Then: "maybe just PLAY and if about to start say READY":
+// "Play" while live, "Ready" when the next session is today, "Next up" when it is a later day. The session slot shows only when the player has a game: "Back to session" while one is happening now, else
+// "Incoming session" for the next one they are in. It opens that session's page. Visitors keep Leaderboard · Sign in.
+function navSession() {
+  const mine = S.me ? mySessions() : [];
+  const live = mine.find((m) => m.status === 'live');
+  const end = (m) => (m.time || '').split('–')[1] || '';
+  const start = (m) => { const t = (m.time || '').split('–')[0]; return /[AP]M/.test(t) ? t : `${t} ${(end(m).match(/[AP]M/) || [''])[0]}`.trim(); };
+  if (live) return { slug: live.slug, label: 'Play', full: 'Back to session', live: true, when: `Now · until ${end(live)}` };
+  const next = mine.filter((m) => m.day >= 0).sort((a, b) => a.day - b.day)[0];
+  return next ? { slug: next.slug, label: next.day === 0 ? 'Ready' : 'Next up', full: 'Incoming session', live: false, today: next.day === 0, when: `${next.day === 0 ? 'Today' : fmtDay(-next.day).split(',')[0]} · ${start(next)}` } : null;
+}
+function navItems(dock) {
   const me = S.me && S.accounts[S.me];
   const mine = me && ((['profile', 'rank', 'history', 'sessions'].includes(S.screen) && S.viewId === S.me) || ['edit', 'id', 'account', 'verify'].includes(S.screen));
+  const ic = (k) => (dock ? NI[k] : '');
+  const lbl = (t) => (dock ? `<span>${t}</span>` : t);
+  const ses = me ? navSession() : null;
+  const sesTitle = ses && SESSION_DIR[ses.slug] ? SESSION_DIR[ses.slug].title : '';
+  return [
+    `<button data-act="go" data-to="board" ${S.screen === 'board' ? 'aria-current="page"' : ''}>${ic('trophy')}${lbl('Leaderboard')}</button>`,
+    ses ? (() => { const px = true, inner = `${lbl(ses.label)}`;
+      return `<a class="nav-ses px${ses.live ? ' live' : ''}" href="/queue/s/${encodeURIComponent(ses.slug)}" aria-label="${ses.full}: ${esc(sesTitle)}">${px ? `<span class="px-face">${inner}</span>` : inner}</a>`; })() : '',
+    me ? `<button data-act="openProfile" data-id="${me.id}" ${mine ? 'aria-current="page"' : ''}>${ic('user')}${lbl('My profile')}</button>` : `<button data-act="go" data-to="login" ${['login', 'forgot', 'reset'].includes(S.screen) ? 'aria-current="page"' : ''}>${ic('user')}${lbl('Sign in')}</button>`,
+    // Owner artifact comment, November 26, 2026: "remove settings if there is an active session and if the upcoming session is
+    // within the day". Settings stays reachable from the Your account card on My profile.
+    me && !(ses && (ses.live || ses.today)) ? `<button data-act="go" data-to="settings" ${S.screen === 'settings' ? 'aria-current="page"' : ''}>${ic('gear')}${lbl('Settings')}</button>` : '',
+  ].join('');
+}
+function topBar() {
+  const me = S.me && S.accounts[S.me];
   return `<header class="top"><div class="top-in">
     <button class="brand" data-act="go" data-to="${me ? 'home' : 'board'}" aria-label="ROTRA Players, open ${me ? 'Home' : 'the leaderboard'}">${rotraLogo('resp', 'brand-logo')}<span>Players</span></button>
-    <nav class="nav" aria-label="Main">
-      <button data-act="go" data-to="board" ${S.screen === 'board' ? 'aria-current="page"' : ''}>Leaderboard</button>
-      ${me ? `<button data-act="openProfile" data-id="${me.id}" ${mine ? 'aria-current="page"' : ''}>My profile</button>` : `<button data-act="go" data-to="login" ${['login', 'forgot', 'reset'].includes(S.screen) ? 'aria-current="page"' : ''}>Sign in</button>`}
-    </nav>
+    <nav class="nav" aria-label="Main">${navItems(false)}</nav>
     <div class="grow"></div>
     ${me ? (() => { const n = unreadCount(); return `<button class="btn xs ghost icon-btn bell" data-act="go" data-to="notifs" aria-label="Notifications${n ? `, ${n} unread` : ''}" ${S.screen === 'notifs' ? 'aria-current="page"' : ''}>${NI.bell}${n ? `<span class="cnt" aria-hidden="true">${n > 9 ? '9+' : n}</span>` : ''}</button>`; })() : ''}
     <button class="btn xs ghost icon-btn" data-act="toggleTheme" aria-label="Switch to ${isDark() ? 'light' : 'dark'} mode" title="${isDark() ? 'Light' : 'Dark'} mode">${isDark() ? I.sun : I.moon}</button>
     <button class="btn xs" data-act="openDemo">Prototype</button>
-  </div></header><nav class="dock" aria-label="Main">
-      <button data-act="go" data-to="board" ${S.screen === 'board' ? 'aria-current="page"' : ''}>${NI.trophy}<span>Leaderboard</span></button>
-      ${me ? `<button data-act="openProfile" data-id="${me.id}" ${mine ? 'aria-current="page"' : ''}>${NI.user}<span>My profile</span></button>` : `<button data-act="go" data-to="login" ${['login', 'forgot', 'reset'].includes(S.screen) ? 'aria-current="page"' : ''}>${NI.user}<span>Sign in</span></button>`}
-    </nav>${gRequiredBand()}${emailBanner()}${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this device saved at ${fmtTime(S.offlineAt || Date.now())}. Signing in and saving changes need an internet connection.</span></div></div>`}`;
+  </div></header><nav class="dock" aria-label="Main" data-ses="pixel">${navItems(true)}</nav>${gRequiredBand()}${emailBanner()}${S.online ? '' : `<div class="band-off" role="status"><div class="in">${I.alert}<span><b>You're offline.</b> Showing what this device saved at ${fmtTime(S.offlineAt || Date.now())}. Signing in and saving changes need an internet connection.</span></div></div>`}`;
+}
+
+// ---------- P-SETTINGS (owner artifact comment, November 26, 2026: "there should be settings") ----------
+// One place for the account pages that already exist: Edit profile, Privacy and contact, Verification, the light/dark
+// switch and Sign out. It adds no new setting.
+function viewSettings() {
+  if (!S.me) return viewLogin();
+  const a = S.accounts[S.me];
+  const row = (act, to, title, sub, icon) => `<button type="button" class="set-row" data-act="${act}" ${to ? `data-to="${to}"` : ''} ${act === 'openProfile' ? `data-id="${a.id}"` : ''}>${icon}<span class="main"><b>${title}</b><span class="small muted">${sub}</span></span>${I.fwd}</button>`;
+  return `<main class="wrap slim stack" style="gap:16px">
+    <div class="page-head"><h1>Settings</h1><p class="muted">Your account, privacy and how ROTRA looks on this device.</p></div>
+    <section class="card stack tight set-list"><h2>Account</h2>
+      ${row('go', 'edit', 'Edit profile', 'Name, photo, playing style and links', NI.user)}
+      ${row('go', 'account', 'Privacy and contact', 'Who sees your profile and phone, and contact changes', I.lock)}
+      ${row('go', 'verify', 'Verification', 'Google account, mobile number and email', NI.shield)}
+    </section>
+    <section class="card stack tight set-list"><h2>This device</h2>
+      <div class="set-row static">${isDark() ? I.moon : I.sun}<span class="main"><b>Dark mode</b><span class="small muted">Saved on this device</span></span>${sw(isDark(), 'toggleTheme', 'Dark mode')}</div>
+    </section>
+    <button type="button" class="btn ghost" data-act="signOut" style="align-self:flex-start">Sign out</button>
+  </main>`;
 }
 
 // Shown at the top of every page while the signed-in account has not confirmed its email (D-2026-11-09-06).
@@ -2263,12 +2459,12 @@ function privatePanel(p) {
   return `<section class="card private stack"><div class="between"><h3>Your account</h3><span class="small muted">${I.lock} Only you see this</span></div>
     <dl class="kv"><dt>Phone</dt><dd class="mono">${esc(maskPhone(p.phone))}</dd><dt>Email</dt><dd style="overflow-wrap:anywhere">${esc(p.email)}</dd><dt>Clubs</dt><dd>${p.phoneHidden ? 'Phone hidden from clubs' : 'Clubs can see your phone'}</dd></dl>
     ${open ? `<p class="small">${chip(REQ[req.status].chip, REQ[req.status].k)} ${REQ_FIELD[req.field]} change</p>` : ''}
-    <div class="acts"><button class="btn sm" data-act="go" data-to="account">Privacy and contact</button><button class="btn sm" data-act="go" data-to="verify">Verification</button><button class="btn sm ghost" data-act="signOut">Sign out</button></div></section>`;
+    <div class="acts"><button class="btn sm" data-act="go" data-to="settings">${NI.gear} Settings</button><button class="btn sm" data-act="go" data-to="account">Privacy and contact</button><button class="btn sm" data-act="go" data-to="verify">Verification</button><button class="btn sm ghost" data-act="signOut">Sign out</button></div></section>`;
 }
 
 // My sessions: the player's upcoming and live sessions (requested, confirmed or waitlisted). Loads once when the profile opens; no live updates.
 function mySessionsCard() {
-  const list = S.me === 'u1' ? MY_SESSIONS.filter((m) => m.status !== 'live') : [];
+  const list = S.me ? mySessions().filter((m) => m.status !== 'live') : [];
   const done = S.me === 'u1' ? MY_FINISHED.map((id) => migsSessions().find((x) => x.id === id)).filter(Boolean) : [];
   const stat = (m) => (m.status === 'live' ? chip('Happening now', 'ok') : m.status === 'confirmed' ? chip('Confirmed', 'solid') : m.status === 'waitlist' ? chip(`Waitlist #${m.n}`, 'warn') : chip('Requested', 'warn'));
   return `<section class="card stack"><h2>Upcoming sessions</h2>${list.length ? `<div>${list.map((m) => {
@@ -2282,7 +2478,7 @@ function mySessionsCard() {
 // Signed-in players land here; visitors keep the Leaderboard as the public home. My sessions and Your clubs moved here from
 // the own profile; other players' profiles keep their Clubs card.
 function currentSessionCard() {
-  const live = S.me === 'u1' ? MY_SESSIONS.find((m) => m.status === 'live') : null;
+  const live = S.me ? mySessions().find((m) => m.status === 'live') : null;
   if (!live) return `<section class="card stack"><h2>Current session</h2><div class="empty">No session right now. When a session you're in starts, it shows here.</div></section>`;
   const d = SESSION_DIR[live.slug];
   return `<section class="card hl stack home-now"><div class="between"><h2>Current session</h2>${chip('Happening now', 'ok')}</div>
@@ -2654,7 +2850,8 @@ function weeklyPerf(p, ro = false) {
   // with the win rate on top, the best day lifted on an accent column.
   const own = p.id === S.me, vis = p.hideWeekly ? ['Hidden', 'Only you can see this. Turn it back on in Privacy and contact.'] : p.alwaysPrivate ? ['Only you', 'Only you can see this. Your profile is always private.'] : p.profilePrivate ? ['Signed-in players', 'Players signed in to ROTRA can see this on your profile.'] : ['Public', 'Anyone who opens your profile can see this.'];
   return `<section class="card stack wp${ro ? ' wp-ro' : ''}"><div class="between"><h2>${new Date().getFullYear()} Weekly Performance</h2><div class="row" style="gap:6px">${own ? `<button type="button" class="chip wp-vis${vis[0] === 'Public' ? ' pub' : ''}" data-act="goSetting" data-k="sw-weekly" title="${vis[1]} Change it in Privacy and contact." aria-label="Visibility: ${vis[0]}. ${vis[1]} Change it in Privacy and contact"><i aria-hidden="true"></i>${vis[0]}</button>` : ''}</div></div>
-    <div class="wp-sum"><div><span class="label">Games</span><b class="tnum">${n}</b></div><div><span class="label">Record</span><b class="tnum"><span class="w">${tw}W</span> <span class="l">${tl}L</span></b></div><div><span class="label">Win rate</span><b class="tnum">${rate}%</b></div><div class="${best >= 0 ? 'hl' : ''}"><span class="label">Best day</span><b>${best >= 0 ? days[best] : '—'}</b></div></div>
+    <div class="wp-sum"><div class="wp-cells"><div><span class="label">Games</span><b class="tnum">${n}</b></div><div><span class="label">Record</span><b class="tnum"><span class="w">${tw}W</span> <span class="l">${tl}L</span></b></div><div><span class="label">Win rate</span><b class="tnum">${rate}%</b></div><div class="${best >= 0 ? 'hl' : ''}"><span class="label">Best day</span><b>${best >= 0 ? `${NI.trophy}<span class="wp-dl">${days[best]}</span><span class="wp-ds">${days[best].slice(0, 3)}</span>` : '—'}</b></div></div>
+      <div class="wp-split" role="img" aria-label="${tw} won, ${tl} lost"><i class="w" style="flex-grow:${tw}"></i><i class="l" style="flex-grow:${tl}"></i></div></div>
     <div class="wp-chart" role="list" aria-label="Wins and losses by day of the week">${agg.map(col).join('')}</div>
     <div class="wp-legend"><span><i class="w"></i>Won</span><span><i class="l"></i>Lost</span><span class="muted">${ro ? 'Singles and doubles this year' : 'Tap a bar to see those games · counted games this year'}</span></div>
     ${ro ? `<button class="btn sm" data-act="openHistory" data-id="${esc(p.id)}" style="align-self:flex-start">See all games ${I.fwd}</button>` : ''}
@@ -4067,6 +4264,7 @@ const SHEETS = {
         <span class="label">Notifications</span><div class="row"><button class="btn xs" data-act="demoNotifs">Open as Migs</button><button class="btn xs" data-act="demoNotifsReset">Reset notifications</button></div>
         <p class="small muted">In Google's window: Ana is new; Migs's example.com email matches his ROTRA account; his Gmail doesn't; Jomar is for the club-created profile (one club saved his email, so its details prefill); two clubs saved Paolo's email, so he picks an identity. On the leaderboard, #18 and #23 are unclaimed players.</p></div>
       <div class="demo-sec"><span class="label">Account</span><div class="row">${S.me ? `<span class="small">Signed in as <b>${esc(S.accounts[S.me].name)}</b></span><button class="btn xs" data-act="signOut">Sign out</button>` : '<span class="small muted">Not signed in</span><button class="btn xs" data-act="demoSignIn">Sign in as Migs</button>'}</div></div>
+      <div class="demo-sec"><span class="label">Your sessions, any signed-in player (dock and Home)</span>${seg('setSes', S.sesDemo || 'live', [['live', 'Current session'], ['today', 'Incoming today'], ['next', 'Incoming in a few days'], ['none', 'No session']])}</div>
       <div class="demo-sec"><span class="label">Migs's rank</span>${seg('setRank', S.rank, [['eligible', 'On the leaderboard'], ['below', 'Below threshold'], ['reassess', 'Needs reassessment'], ['processing', 'Updating'], ['new', 'No rank yet']])}</div>
       <div class="demo-sec"><div class="setting"><div class="main"><b>Offline</b><p class="small muted">Shows saved copies; sign-in and saving fail.</p></div>${sw(!S.online, 'toggleOnline', 'Offline')}</div></div>
       <div class="demo-sec"><span class="label">Leaderboard</span>${seg('setBoard', S.board, [['ok', 'Normal'], ['loading', 'Loading'], ['error', 'Can\'t load'], ['empty', 'No one qualifies']])}
@@ -4151,6 +4349,13 @@ const ACT = {
   goLogin: () => go('login'),
   openProfile: (el) => go('profile', el.dataset.id),
   // Mockup change 2026-11-25-player-match-page: tapping a game court opens its match page.
+  // One player: toggles that player alone (a player inside an open team closes just their card). A team: toggles the whole team.
+  mtPick: (el) => { const n = el.dataset.n, cur = S.ui.mtPick && S.ui.mtPick.mid === S.viewId ? S.ui.mtPick.names : [];
+    const names = cur.includes(n) ? cur.filter((x) => x !== n) : [n]; S.ui.mtPick = names.length ? { mid: S.viewId, names } : null; render();
+    if (S.ui.mtPick) setTimeout(() => document.querySelector('.mt-statsgrid')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 0); },
+  mtPickTeam: (el) => { const team = [...el.closest('.vs-team').querySelectorAll('.vs-p')].map((b) => b.dataset.n), cur = S.ui.mtPick && S.ui.mtPick.mid === S.viewId ? S.ui.mtPick.names : [];
+    const on = team.every((x) => cur.includes(x)) && cur.length === team.length; S.ui.mtPick = on ? null : { mid: S.viewId, names: team }; render();
+    if (S.ui.mtPick) setTimeout(() => document.querySelector('.mt-statsgrid')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 0); },
   openMatch: (el) => { if (S.screen !== 'match') S.ui.matchFrom = { to: S.screen, id: S.viewId, label: matchFromLabel() }; go('match', el.dataset.mid); },
   matchBack: () => { const f = S.ui.matchFrom; S.ui.matchFrom = null; if (f) go(f.to, f.id); else go('board'); },
   // Artifact comment, November 13, 2026: leaderboard rows and the podium open this card first; its Open full profile goes to the profile page.
@@ -4359,6 +4564,7 @@ const ACT = {
     render();
   },
   setRank: (el) => { S.rank = el.dataset.v; render(); },
+  setSes: (el) => { S.sesDemo = el.dataset.v; render(); },
   setBoard: (el) => { S.board = el.dataset.v; render(); },
   setLbMe: (el) => { S.ui.lbMe = el.dataset.v; if (el.dataset.v !== 'auto') { S.me = 'u1'; S.board = 'ok'; S.q = ''; S.ui.sheet = null; go('board'); } render(); },
   toggleOnline: () => { S.online = !S.online; S.offlineAt = S.online ? null : Date.now(); render(); },
@@ -4777,7 +4983,7 @@ document.addEventListener('keydown', (ev) => {
 // ---------- Prototype routes (same paths as apps/player, under /player) ----------
 let prototypeRouter;
 let prototypeToken = 'demo';
-const playerPaths = { verify: '/profile/verification', notifs: '/notifications', gRequired: '/connect-google', board: '', home: '/home', login: '/login', forgot: '/forgot-password', edit: '/profile/edit', id: '/profile/player-id', account: '/profile/privacy-and-contact', privacy: '/privacy', terms: '/terms' };
+const playerPaths = { verify: '/profile/verification', settings: '/settings', notifs: '/notifications', gRequired: '/connect-google', board: '', home: '/home', login: '/login', forgot: '/forgot-password', edit: '/profile/edit', id: '/profile/player-id', account: '/profile/privacy-and-contact', privacy: '/privacy', terms: '/terms' };
 function prototypePath() {
   let path = playerPaths[S.screen];
   if (['profile', 'history', 'rank', 'sessions'].includes(S.screen)) path = S.viewId ? `/players/${encodeURIComponent(S.viewId)}${S.screen === 'history' ? '/games' : S.screen === 'rank' ? '/rank' : S.screen === 'sessions' ? '/sessions' : ''}` : '/rank';
@@ -4834,12 +5040,12 @@ function applyPrototypeRoute(url) {
   if (!screen) return false;
   if (screen === 'login') {
     const next = url.searchParams.get('next');
-    const target = Object.entries(playerPaths).find(([key, value]) => ['edit', 'id', 'account', 'verify', 'home'].includes(key) && next === '/player' + value);
+    const target = Object.entries(playerPaths).find(([key, value]) => ['edit', 'id', 'account', 'verify', 'home', 'settings'].includes(key) && next === '/player' + value);
     S.ui.after = target ? { to: target[0] } : null;
   }
   S.ui.hist = url.searchParams.get('tab') === 'other' ? 'other' : 'counted';
   S.ui.editTab = EDIT_TABS.some((t) => t.id === url.searchParams.get('tab')) ? url.searchParams.get('tab') : 'basics';
-  if (['edit', 'id', 'account', 'verify', 'home'].includes(screen) && !S.me) { S.ui.after = { to: screen }; screen = 'login'; }
+  if (['edit', 'id', 'account', 'verify', 'home', 'settings'].includes(screen) && !S.me) { S.ui.after = { to: screen }; screen = 'login'; }
   S.screen = screen; S.viewId = id; S.ui.sheet = null; S.ui.pendingGo = null;
   if (screen !== 'edit') { S.ui.edit = null; S.ui.editOrig = null; }
   return true;
@@ -4853,7 +5059,7 @@ function render() {
   const focusId = a && a.id && a !== document.body ? a.id : null;
   let sel = null;
   try { sel = a && typeof a.selectionStart === 'number' ? a.selectionStart : null; } catch (e) { sel = null; }
-  const views = { onboard: viewOnboard, obDetails: viewObDetails, register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, board: viewBoard, home: viewHome, profile: viewProfile, match: viewMatch, club: viewClub, clubMembers: viewClubMembers, clubBoard: viewClubBoard, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
+  const views = { onboard: viewOnboard, obDetails: viewObDetails, register: () => viewClaim(true), registerDone: viewRegisterDone, joinClub: viewJoinClub, joinSession: viewJoinSession, gLink: viewGoogleLink, gRequired: viewGoogleRequired, notifs: viewNotifs, verify: viewVerify, settings: viewSettings, board: viewBoard, home: viewHome, profile: viewProfile, match: viewMatch, club: viewClub, clubMembers: viewClubMembers, clubBoard: viewClubBoard, rank: viewRank, sessions: viewSessions, history: viewHistory, compare: viewCompare, id: viewId, account: viewAccount, edit: viewEdit, login: viewLogin, forgot: viewForgot, reset: viewReset, claim: viewClaim, claimDone: viewClaimDone, notfound: viewNotFound, privacy: viewPrivacy, terms: viewTerms };
   if (needsGoogle() && S.gDeadline === 'passed' && !['gRequired', 'board', 'privacy', 'terms'].includes(S.screen)) S.screen = 'gRequired';
   if (S.screen === 'gRequired' && !needsGoogle()) S.screen = 'profile';
   const sh = S.ui.sheet;

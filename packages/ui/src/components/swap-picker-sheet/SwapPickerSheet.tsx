@@ -7,6 +7,7 @@ import { useMediaQuery } from '@rotra/ui/hooks/use-media-query'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { Notice } from '@rotra/ui/notice'
 import { Pager } from '@rotra/ui/pager'
+import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import { playerTileVariants } from '@rotra/ui/player-tile/variants'
 import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Sheet } from '@rotra/ui/sheet'
@@ -24,6 +25,13 @@ export type SwapPickerPlayer = {
   name: string
   /** Nickname or first name, under the picture and searched too */
   shortName: string
+  /**
+   * The player's own nickname and the club nickname (registered players only): either given (null
+   * counts) turns the tile's name into the stack (D-2026-11-26-09); without them it shows `shortName`.
+   * `name` is the full name.
+   */
+  nickname?: string | null
+  clubNickname?: string | null
   photoUrl?: string
   level: PlayingLevel | null
   /** Counted games so far */
@@ -85,6 +93,8 @@ export function pickerPlayer(
     id: string
     name: string
     shortName?: string
+    nickname?: string | null
+    clubNickname?: string | null
     photoUrl?: string
     level: PlayingLevel | null
     games: number
@@ -96,6 +106,8 @@ export function pickerPlayer(
     id: p.id,
     name: p.name,
     shortName: p.shortName ?? p.name.split(' ')[0] ?? p.name,
+    nickname: p.nickname,
+    clubNickname: p.clubNickname,
     photoUrl: p.photoUrl,
     level: p.level,
     games: p.games,
@@ -145,7 +157,7 @@ const restTone = (minutes: number) =>
 
 /**
  * The prototype's .ptile.sm: picture with the level ring and the games badge (owner, November 25,
- * 2026), first name, then the status alone (the badge shows the games, so no "games/minimum"); a
+ * 2026), the name stack (club nickname, nickname, full name; first name when none are given), then the status alone (the badge shows the games, so no "games/minimum"); a
  * free player's rest takes the wait tones.
  */
 function Tile({
@@ -194,7 +206,18 @@ function Tile({
           {player.games}
         </span>
       </span>
-      <span className="max-w-full truncate text-[13px] font-bold">{player.shortName}</span>
+      {player.nickname !== undefined || player.clubNickname !== undefined ? (
+        <PlayerNameBlock
+          layout="stack"
+          fullName={player.name}
+          nickname={player.nickname}
+          clubNickname={player.clubNickname}
+          labelClassName="text-[13px]"
+          className="w-full"
+        />
+      ) : (
+        <span className="max-w-full truncate text-[13px] font-bold">{player.shortName}</span>
+      )}
       <span className="text-[11px] whitespace-nowrap text-fg2">
         <span
           className={!note && player.status === 'free' ? restTone(player.restMinutes) : undefined}
@@ -269,7 +292,11 @@ export function SwapPickerSheet({
   const rest = players
     .filter(
       (p) =>
-        (!q || p.name.toLowerCase().includes(q) || p.shortName.toLowerCase().includes(q)) &&
+        (!q ||
+          p.name.toLowerCase().includes(q) ||
+          p.shortName.toLowerCase().includes(q) ||
+          p.nickname?.toLowerCase().includes(q) ||
+          p.clubNickname?.toLowerCase().includes(q)) &&
         (band === 'all' || (p.level !== null && p.level.startsWith(band))),
     )
     .sort(

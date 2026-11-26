@@ -12,6 +12,9 @@ export type TeamLineupPlayer = {
   name: string
   /** Nickname or first name, for "Mikee and Dexter switched sides" and the Why this lineup card */
   shortName: string
+  /** The player's own nickname and the club nickname: either (null counts) shows the name stack on the card */
+  nickname?: string | null
+  clubNickname?: string | null
   level: PlayingLevel | null
   photoUrl?: string
   /** Counted games so far this session */
@@ -70,6 +73,8 @@ function Team({
             key={p.id}
             id={p.id}
             name={p.name}
+            nickname={p.nickname}
+            clubNickname={p.clubNickname}
             level={p.level}
             photoUrl={p.photoUrl}
             games={p.games}

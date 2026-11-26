@@ -4,6 +4,7 @@ import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { PlayerFaceButton } from '@rotra/ui/player-face-button'
+import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import { type KeyboardEvent, type MouseEvent, useRef } from 'react'
 import { useCourtDrag } from './CourtDrawing.drag'
 import {
@@ -17,8 +18,15 @@ import {
 export type CourtPlayer = {
   id: string
   name: string
-  /** Nickname or first name */
+  /** Nickname or first name; inline text and the label when no nickname fields are given */
   shortName: string
+  /**
+   * The player's own nickname and the club nickname (registered players only). Giving either (null
+   * counts) draws the club-facing face names (D-2026-11-26-09): the label, then the other names in
+   * smaller lines that hide on a narrow court. `name` is the full name.
+   */
+  nickname?: string | null
+  clubNickname?: string | null
   level: PlayingLevel | null
   photoUrl?: string
   /** Completed games this session (the same count as “G/MIN games”) */
@@ -147,6 +155,8 @@ export function CourtDrawing({
               <PlayerFaceButton
                 name={p.name}
                 shortName={p.shortName}
+                nickname={p.nickname}
+                clubNickname={p.clubNickname}
                 level={p.level}
                 photoUrl={p.photoUrl}
                 size={sizeFor(n)}
@@ -177,9 +187,21 @@ export function CourtDrawing({
                     p.level?.startsWith('advanced') && 'ring-lv-adv',
                   )}
                 />
-                <span className="max-w-16 truncate rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo">
-                  {p.shortName}
-                </span>
+                {p.nickname !== undefined || p.clubNickname !== undefined ? (
+                  <PlayerNameBlock
+                    layout="face"
+                    tone="photo"
+                    fullName={p.name}
+                    nickname={p.nickname}
+                    clubNickname={p.clubNickname}
+                    className="max-w-16"
+                    labelClassName="rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo"
+                  />
+                ) : (
+                  <span className="max-w-16 truncate rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo">
+                    {p.shortName}
+                  </span>
+                )}
               </div>
             )}
             {showLevels ? (

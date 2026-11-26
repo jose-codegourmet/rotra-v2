@@ -100,3 +100,36 @@ export const Phone: Story = {
   globals: { viewport: { value: 'phone' } },
 }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+
+// Club-facing face names (D-2026-11-26-09): the label, then the other names in smaller lines.
+const named = (
+  name: string,
+  nickname: string | null,
+  clubNickname: string | null,
+): Story['args'] => ({
+  ...faceAt(0),
+  name,
+  shortName: nickname ?? name.split(' ')[0] ?? name,
+  nickname,
+  clubNickname,
+  label: `${name}, Team A. View profile`,
+})
+
+/** Club nickname over nickname over full name (dark pill on a court) */
+export const FaceClubNickname: Story = { args: named('Miguel Santos', 'Migs', 'Kuya Migs') }
+/** Nickname only: the nickname over the full name */
+export const FaceNicknameOnly: Story = { args: named('Paulo Garcia', 'Pau', null) }
+/** No nicknames: the first name over the full name */
+export const FaceNoNicknames: Story = { args: named('Ysa Fernandez', null, null) }
+export const FaceClubNicknameLight: Story = { ...FaceClubNickname, globals: { theme: 'light' } }
+export const FaceNoNicknamesLight: Story = { ...FaceNoNicknames, globals: { theme: 'light' } }
+/** On a queue card: plain text lines under the picture */
+export const QueueFaceClubNickname: Story = {
+  args: { ...named('Miguel Santos', 'Migs', 'Kuya Migs'), size: 'queue' },
+  decorators: queueDecorators,
+}
+export const QueueFaceNoNicknames: Story = {
+  args: { ...named('Ysa Fernandez', null, null), size: 'queue' },
+  decorators: queueDecorators,
+}
+export const QueueFaceLight: Story = { ...QueueFaceClubNickname, globals: { theme: 'light' } }

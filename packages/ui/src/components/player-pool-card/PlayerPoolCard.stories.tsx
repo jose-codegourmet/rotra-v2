@@ -216,8 +216,12 @@ export const LevelRings: Story = {
 }
 export const LevelRingsLight: Story = { ...LevelRings, globals: { theme: 'light' } }
 
-/** One name: club nickname first, then nickname, then the full name; hover shows the full name */
-export const ClubNickname: Story = { args: { nickname: 'Migs', clubNickname: 'Migo' } }
-export const NicknameOnly: Story = { args: { nickname: 'Migs' } }
-export const FullNameOnly: Story = {}
+/** The name stack (D-2026-11-26-09): club nickname on top, then nickname, then the full name in smaller lines; hover shows the full name */
+export const ClubNickname: Story = {
+  args: { name: 'Miguel Santos', nickname: 'Migs', clubNickname: 'Kuya Migs' },
+}
+export const NicknameOnly: Story = { args: { name: 'Paulo Garcia', nickname: 'Pau' } }
+export const FullNameOnly: Story = { args: { name: 'Ysa Fernandez' } }
 export const ClubNicknameLight: Story = { ...ClubNickname, globals: { theme: 'light' } }
+export const NicknameOnlyLight: Story = { ...NicknameOnly, globals: { theme: 'light' } }
+export const FullNameOnlyLight: Story = { ...FullNameOnly, globals: { theme: 'light' } }

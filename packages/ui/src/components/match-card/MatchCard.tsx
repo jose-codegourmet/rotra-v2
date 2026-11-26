@@ -8,6 +8,7 @@ import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { PlayerFaceButton, type PlayerWait } from '@rotra/ui/player-face-button'
+import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import { SwappablePlayer } from '@rotra/ui/swap-sides-area/swappable-player'
 import { type ComponentProps, Fragment } from 'react'
 import { matchCardVariants } from './MatchCard.variants'
@@ -16,8 +17,15 @@ import { matchCardVariants } from './MatchCard.variants'
 export type MatchCardPlayer = {
   id: string
   name: string
-  /** Nickname or first name, shown under the picture */
+  /** Nickname or first name: inline text ("A & B"), and the label when no nickname fields are given */
   shortName: string
+  /**
+   * The player's own nickname and the club nickname (registered players only). Giving either (null
+   * counts) draws the club-facing face names (D-2026-11-26-09): the label, then the other names in
+   * smaller lines under it. `name` is the full name.
+   */
+  nickname?: string | null
+  clubNickname?: string | null
   level: PlayingLevel | null
   photoUrl?: string
   /**
@@ -224,6 +232,8 @@ function Faces({
             <PlayerFaceButton
               name={p.name}
               shortName={p.shortName}
+              nickname={p.nickname}
+              clubNickname={p.clubNickname}
               level={p.level}
               photoUrl={p.photoUrl}
               label={`${p.name}, Team ${team}${p.games === undefined ? '' : `, ${gamesCopy(p.games)}`}. View profile`}
@@ -233,7 +243,7 @@ function Faces({
                 '[&>:first-child]:outline-3 [&>:first-child]:outline-offset-2',
                 levelRingVariant(p.level),
                 highlightedPlayerIds.includes(p.id) &&
-                  '[&>:first-child]:!ring-[3px] [&>:first-child]:!ring-warn [&>:nth-child(2)]:!font-extrabold [&>:nth-child(2)]:!text-warn',
+                  '[&>:first-child]:!ring-[3px] [&>:first-child]:!ring-warn [&>:nth-child(2)]:!font-extrabold [&>:nth-child(2)]:!text-warn [&>:nth-child(2)>:first-child]:!font-extrabold [&>:nth-child(2)>:first-child]:!text-warn',
               )}
               swap={swappable ? { team, index: i } : undefined}
               onClick={() => onSelectPlayer?.(p.id, team)}
@@ -291,9 +301,20 @@ function StaticFaces({
             size={44}
             className={cn(levelRingClass(p.level), 'touch:size-[46px] touch:text-[15px]')}
           />
-          <span className="max-w-[88px] truncate text-[15px] font-semibold text-fg">
-            {p.shortName}
-          </span>
+          {p.nickname !== undefined || p.clubNickname !== undefined ? (
+            <PlayerNameBlock
+              layout="face"
+              fullName={p.name}
+              nickname={p.nickname}
+              clubNickname={p.clubNickname}
+              labelClassName="max-w-[88px] text-[15px] leading-normal font-semibold text-fg"
+              lineClassName="max-w-[88px]"
+            />
+          ) : (
+            <span className="max-w-[88px] truncate text-[15px] font-semibold text-fg">
+              {p.shortName}
+            </span>
+          )}
           <GamesBadge player={p} mode={gamesBadge} onOpenGames={onOpenGames} />
         </div>
       ))}

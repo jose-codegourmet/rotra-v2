@@ -99,3 +99,27 @@ export const EmptyPhone: Story = {
   args: { matches: [], attentionCount: 0, columns: 1 },
   globals: { viewport: { value: 'phone' } },
 }
+
+// Club-facing face names (D-2026-11-26-09): club nickname, nickname, full name; none shows the first name over the full name.
+const withNames = (m: UpcomingQueueMatch): UpcomingQueueMatch => ({
+  ...m,
+  teamA: m.teamA.map((p, i) =>
+    i === 0
+      ? { ...p, name: 'Miguel Santos', nickname: 'Migs', clubNickname: 'Kuya Migs' }
+      : { ...p, nickname: null, clubNickname: null },
+  ),
+  teamB: m.teamB.map((p, i) =>
+    i === 0
+      ? { ...p, name: 'Paulo Garcia', nickname: 'Pau', clubNickname: null }
+      : { ...p, name: 'Ysa Fernandez', nickname: null, clubNickname: null },
+  ),
+})
+
+export const FaceNames: Story = {
+  args: { matches: upcoming.map(withNames), columns: 3 },
+  globals: { viewport: { value: 'desktop' } },
+}
+export const FaceNamesLight: Story = {
+  ...FaceNames,
+  globals: { viewport: { value: 'desktop' }, theme: 'light' },
+}

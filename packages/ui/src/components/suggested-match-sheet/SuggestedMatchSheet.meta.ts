@@ -10,6 +10,7 @@ export const suggestedMatchSheetMeta = {
     'Reshuffle (onReshuffle) draws a different fair lineup in the container; change dealKey with each draw and the faces and VS deal back in with a short staggered flip (reduced motion shows the new lineup without moving; the first render never animates).',
     'Tapping a player card calls onReplace(playerId, team): the container opens ReplacePlayerSheet with that player chosen. The picture still opens the profile (onSelectPlayer). Skip suggestion and Edit then add are gone; ← Back (onBack) returns to the dialog this was opened from.',
     'onSwap changes only the shown lineup (toast "Mikee and Dexter switched sides"); adding it afterwards puts it in protected.',
+    'Each player card shows the name stack (D-2026-11-26-09) when the TeamLineupPlayer carries nickname and clubNickname: the first present of club nickname, nickname, full name as the label, the others in smaller lines, then "N/M games".',
     'Never add win probabilities or fatigue scores to the Why this lineup card.',
   ],
   prototype: {
@@ -20,6 +21,7 @@ export const suggestedMatchSheetMeta = {
     'docs/screens/product/modules/queue/match-queue.md',
     'docs/business_logic/product/queue/modules/queueing/README.md',
     'docs/mockup-changes/2026-11-26-queue-free-court-flow.md',
+    'docs/mockup-changes/2026-11-26-queue-name-hierarchy.md',
   ],
   related: [
     'TeamLineup',

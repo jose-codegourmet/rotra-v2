@@ -3,13 +3,13 @@ import type { ComponentMeta } from '@rotra/ui/meta'
 export const playerPoolCardMeta = {
   name: 'PlayerPoolCard',
   description:
-    'One player in the live Players view: the picture in a level-band ring (no level text), one name (club nickname, nickname, full name; two lines at most), the Current | Total games strip, the footer (status pill icon and time, then the Present switch). The Edit player pencil is a 28 px accent circle on the card's top-right corner. Tapping the card picks the player for the next match and shows the pick order.',
+    'One player in the live Players view: the picture in a level-band ring (no level text), the name stack (club nickname, nickname, full name: the first present on top on one line, the others in smaller 11 px lines), the Current | Total games strip, the footer (status pill icon and time, then the Present switch). The Edit player pencil is a 28 px accent circle on the card’s top-right corner. Tapping the card picks the player for the next match and shows the pick order.',
   usage: [
     'handicapSpots (D-2026-11-25-03): any marked spot shows a small warning icon after the name; title and accessible name "Handicap: left knee, lower back" (handicapText).',
     'The status is a StatusPill (owner, November 25, 2026, docs/mockup-changes/2026-11-25-queue-status-pills.md): hourglass Nm (free), list Nm (queued; waitMinutes), shuttlecock Nm (status.minutes since the match began; hover names the court), clock Ready (status.minutes null) or moon Away (owner, November 26, 2026, docs/mockup-changes/2026-11-26-queue-player-status-icons.md). The queue position no longer shows on the card.',
     'Pass onNoShow only on the live Players view for a player who is away, has played no games and is in no match: "No show (cancelled)" opens the Mark NAME as No show? confirmation.',
     'There is no Move to waitlist on the live card: the session is already running (2026-11-19-queue-live-no-move-to-waitlist).',
-    'Pass name as the full name, plus nickname and clubNickname when present: the card shows one name (club nickname, nickname, full name) and keeps the full name as hover text and screen-reader label.',
+    'Pass name as the full name, plus nickname and clubNickname when present: the card shows the stack (D-2026-11-26-09, PlayerNameBlock layout stack): the first present name on top, the others in smaller lines, each once; the full name stays the hover text and screen-reader label.',
     'The level shows only as the picture ring (grey with no level); hovering the picture names the level.',
     'Pass forTheNight as played plus queued games, and selfCheckedInAt or leftAt for the presence caption.',
     'presencePending shows Saving presence… without disabling the switch; the data batch owns optimistic values and rollback.',
@@ -28,6 +28,7 @@ export const playerPoolCardMeta = {
   docs: [
     'docs/mockup-changes/2026-11-25-queue-handicap-tonight.md',
     'docs/mockup-changes/2026-11-26-queue-player-status-icons.md',
+    'docs/mockup-changes/2026-11-26-queue-name-hierarchy.md',
     'docs/screens/product/modules/queue/session-console.md#q-pool--players-view',
     'docs/business_logic/product/queue/modules/players/README.md#presence',
   ],

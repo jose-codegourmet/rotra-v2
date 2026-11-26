@@ -374,26 +374,7 @@ button.brand { background: none; border: 0; padding: 0; cursor: pointer; color: 
 .set-row > svg { flex: none; color: var(--fg2); }
 @keyframes ses-pulse { 50% { opacity: .45; } }
 /* Session button (owner, November 26, 2026): options were tried; the owner picked the pixel START-style button: "please go with the ready and start button". */
-/* The same pixel button in the wide-screen top bar (owner, same day: "hey do the pixel design"). */
-.top .nav a.nav-ses.px { flex: 1.25; max-width: 150px; padding: 3px 3px 8px; min-height: 60px; margin-top: -10px; border-radius: 0; color: var(--px-ink);
-  background: linear-gradient(var(--px-ink) 0 calc(100% - 5px), var(--px-drop) calc(100% - 5px));
-  clip-path: polygon(0 6px, 3px 6px, 3px 3px, 6px 3px, 6px 0, calc(100% - 6px) 0, calc(100% - 6px) 3px, calc(100% - 3px) 3px, calc(100% - 3px) 6px, 100% 6px,
-    100% calc(100% - 9px), calc(100% - 3px) calc(100% - 9px), calc(100% - 3px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) 100%,
-    6px 100%, 6px calc(100% - 3px), 3px calc(100% - 3px), 3px calc(100% - 9px), 0 calc(100% - 9px)); }
-.top .nav a.nav-ses.px .px-face { position: relative; flex: 1; align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 4px 6px 6px; overflow: hidden;
-  font-family: var(--pixel); font-size: 20px; font-weight: 700; line-height: 1; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 1px 0 var(--px-top);
-  background: linear-gradient(var(--px-top) 0 4px, var(--px-fill) 4px calc(100% - 5px), var(--px-low) calc(100% - 5px));
-  clip-path: polygon(0 3px, 3px 3px, 3px 0, calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px));
-  transition: transform .06s steps(1); }
-.top .nav a.nav-ses.px .px-face::before { content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(115deg, transparent 0 10%, rgba(255, 255, 255, .55) 10% 15%, transparent 15% 19%, rgba(255, 255, 255, .55) 19% 21%, transparent 21%); }
-.top .nav a.nav-ses.px.live .px-face::after { content: ""; position: absolute; top: 0; bottom: 0; width: 30%; left: -40%; pointer-events: none;
-  background: linear-gradient(115deg, transparent 0 30%, rgba(255, 255, 255, .5) 30% 55%, transparent 55%); animation: px-shine 2.4s steps(12) infinite; }
-.top .nav a.nav-ses.px svg { animation: none; }
-.top .nav a.nav-ses.px .px-face > span { position: relative; }
-.top .nav a.nav-ses.px:active { padding-bottom: 5px; padding-top: 6px; }
-.top .nav a.nav-ses.px { flex: none; max-width: none; min-width: 96px; min-height: 44px; margin: 0 4px; }
-.top .nav a.nav-ses.px .px-face { font-size: 14px; padding: 2px 12px 4px; }
+/* The pixel button stays in the phone dock; the wide-screen top bar uses the green session pill. */
 @keyframes px-shine { 0%, 40% { left: -40%; } 100% { left: 120%; } }
 @media (prefers-reduced-motion: reduce) { .dock a.nav-ses.live svg, .dock a.nav-ses, .dock a.nav-ses::after, .dock a.nav-ses span::after, .dock .px-face::after { animation: none !important; } }
 /* P-ONBOARD: fullscreen steps after an invite link (owner, November 19, 2026). No top bar or dock. */
@@ -2003,8 +1984,8 @@ function navItems(dock) {
   const sesTitle = ses && SESSION_DIR[ses.slug] ? SESSION_DIR[ses.slug].title : '';
   return [
     `<button data-act="go" data-to="board" ${S.screen === 'board' ? 'aria-current="page"' : ''}>${ic('trophy')}${lbl('Leaderboard')}</button>`,
-    ses ? (() => { const px = true, inner = `${lbl(ses.label)}`;
-      return `<a class="nav-ses px${ses.live ? ' live' : ''}" href="/queue/s/${encodeURIComponent(ses.slug)}" aria-label="${ses.full}: ${esc(sesTitle)}">${px ? `<span class="px-face">${inner}</span>` : inner}</a>`; })() : '',
+    ses ? (() => { const inner = lbl(ses.label);
+      return `<a class="nav-ses${dock ? ` px${ses.live ? ' live' : ''}` : ''}" href="/queue/s/${encodeURIComponent(ses.slug)}" aria-label="${ses.full}: ${esc(sesTitle)}">${dock ? `<span class="px-face">${inner}</span>` : inner}</a>`; })() : '',
     me ? `<button data-act="openProfile" data-id="${me.id}" ${mine ? 'aria-current="page"' : ''}>${ic('user')}${lbl('My profile')}</button>` : `<button data-act="go" data-to="login" ${['login', 'forgot', 'reset'].includes(S.screen) ? 'aria-current="page"' : ''}>${ic('user')}${lbl('Sign in')}</button>`,
     // Owner artifact comment, November 26, 2026: "remove settings if there is an active session and if the upcoming session is
     // within the day". Settings stays reachable from the Your account card on My profile.

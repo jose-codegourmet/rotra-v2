@@ -68,11 +68,19 @@ function renderNavItems(props: PlayerNavProps, dock: boolean) {
           key={item.key}
           href={href}
           aria-label={accessibleName}
-          className={cn('player-nav-session', live && 'player-nav-session-live')}
+          className={
+            dock
+              ? cn('player-nav-session', live && 'player-nav-session-live')
+              : 'inline-flex min-h-9 items-center rounded-md bg-accent-subtle px-3 font-bold text-accent no-underline touch:min-h-12'
+          }
         >
-          <span className="player-nav-session-face">
-            <span>{label}</span>
-          </span>
+          {dock ? (
+            <span className="player-nav-session-face">
+              <span>{label}</span>
+            </span>
+          ) : (
+            label
+          )}
         </a>
       )
     }

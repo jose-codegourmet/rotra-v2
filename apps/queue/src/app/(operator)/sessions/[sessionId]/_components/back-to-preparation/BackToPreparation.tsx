@@ -39,13 +39,18 @@ export function BackToPreparation({
   const removed = matches.filter((m) => m.state === 'waiting' || m.state === 'on_court').length
   const blocker = backToPreparationBlocker(matches, online)
   const confirm = () =>
-    back.mutate(session.id, {
-      onSuccess: (result) => {
+    // mutateAsync, not mutate's per-call onSuccess: the console redirects to /preparation as soon as
+    // the session reads prepared, which unmounts this sheet and would drop a per-call callback.
+    back
+      .mutateAsync(session.id)
+      .then((result) => {
         toast(result.message)
         onOpenChange(false)
         router.push(`/sessions/${session.id}/preparation`)
-      },
-    })
+      })
+      .catch(() => {
+        // The error shows in the sheet through back.error.
+      })
   return (
     <ConfirmSheet
       open={open}

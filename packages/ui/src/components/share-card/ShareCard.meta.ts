@@ -11,6 +11,7 @@ export const shareCardMeta = {
     'Pass headline, optional subline, a logo or avatar spot, the title, info lines, QR caption and link. Variants are thin wrappers: SessionJoinQr (session-join) and SessionInviteCard (session-invite) ship now.',
     'Share uses navigator.canShare({ files }); when Web Share is missing or cannot take files, only Download image shows (with actions="share-or-download"). Use onShared, onDownloaded and onError for toasts.',
     'SessionInviteCard reads “NAME invites you to play” with the player avatar spot; the QR caption is “Scan to join” or, with waitlistOpen, “Waitlist open”. Pass the link already carrying ?invite=<code>.',
+    'Live Share dialog: pass format + onFormatChange to control Post / Story from outside (the card hides its own switch so it can sit in a section heading), actions="download" to show only Download image, and hideNote to drop the size sentence.',
     'The card uses fixed brand values, so it looks the same in both themes. Images that cannot load for canvas export fall back to initials in the card and the PNG.',
   ],
   prototype: {

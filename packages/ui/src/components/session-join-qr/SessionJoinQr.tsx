@@ -15,6 +15,11 @@ export type SessionJoinQrProps = {
   timeLabel: string
   venueName: string
   initialFormat?: 'post' | 'story'
+  /** Controlled format: hides the card's own switch (the live Share dialog places it). */
+  format?: 'post' | 'story'
+  onFormatChange?: (format: 'post' | 'story') => void
+  actions?: 'both' | 'share-or-download' | 'download'
+  hideNote?: boolean
   onDownloaded?: () => void
   onError?: (message: string) => void
 }

@@ -48,9 +48,14 @@ export type ShareCardProps = {
   /** Text after the format sentence under the card. */
   noteEnd?: string
   /** `both` shows Share (when available) and Download image; `share-or-download` shows one of them. */
-  actions?: 'both' | 'share-or-download'
+  actions?: 'both' | 'share-or-download' | 'download'
   /** Invite cards switch Post and Story only. */
   initialFormat?: 'post' | 'story'
+  /** Controlled format: the card's own Post / Story switch is hidden so the caller can place it (the live Share dialog). */
+  format?: 'post' | 'story'
+  onFormatChange?: (format: 'post' | 'story') => void
+  /** Hides the sentence under the card about the size and what scanning opens. */
+  hideNote?: boolean
   /** Overrides the browser's Web Share check (stories and tests). */
   webShare?: boolean
   onShared?: () => void
@@ -85,6 +90,9 @@ export function ShareCard({
   noteEnd,
   actions = 'both',
   initialFormat = 'post',
+  format: controlledFormat,
+  onFormatChange,
+  hideNote = false,
   webShare,
   onShared,
   onDownloaded,
@@ -95,7 +103,13 @@ export function ShareCard({
   primaryRowAbove,
   additionalImages,
 }: ShareCardProps) {
-  const [format, setFormat] = useState<'post' | 'story'>(initialFormat)
+  const [ownFormat, setOwnFormat] = useState<'post' | 'story'>(initialFormat)
+  const controlled = controlledFormat !== undefined
+  const format = controlledFormat ?? ownFormat
+  const setFormat = (next: 'post' | 'story') => {
+    if (!controlled) setOwnFormat(next)
+    onFormatChange?.(next)
+  }
   const [loaded, setLoaded] = useState<Record<string, HTMLImageElement | null>>({})
   const [busy, setBusy] = useState(false)
   const [detected, setDetected] = useState(false)
@@ -209,21 +223,23 @@ export function ShareCard({
     </span>
   )
   const disabled = !qr || busy || logoLoading
-  const showShare = canShare
-  const showDownload = actions === 'both' || !canShare
+  const showShare = canShare && actions !== 'download'
+  const showDownload = actions === 'both' || actions === 'download' || !canShare
 
   return (
     <div className="flex flex-col items-center gap-4 text-center">
-      <SegmentedControl
-        aria-label="Image format"
-        options={[
-          { value: 'post', label: 'Post' },
-          { value: 'story', label: 'Story' },
-        ]}
-        value={format}
-        disabled={busy}
-        onChange={(next) => setFormat(next === 'story' ? 'story' : 'post')}
-      />
+      {controlled ? null : (
+        <SegmentedControl
+          aria-label="Image format"
+          options={[
+            { value: 'post', label: 'Post' },
+            { value: 'story', label: 'Story' },
+          ]}
+          value={format}
+          disabled={busy}
+          onChange={(next) => setFormat(next === 'story' ? 'story' : 'post')}
+        />
+      )}
       <section
         ref={cardRef}
         aria-label="Share image preview"
@@ -349,6 +365,7 @@ export function ShareCard({
           </div>
         )}
       </section>
+      {hideNote ? null : (
       <p className="m-0 text-fg2 text-sm">
         {noteStart ? `${noteStart} ` : ''}
         {format === 'story'
@@ -356,6 +373,7 @@ export function ShareCard({
           : 'Post size (4:5) for Facebook and Instagram feeds.'}
         {noteEnd ? ` ${noteEnd}` : ''}
       </p>
+      )}
       {primaryRowAbove ? <div className="flex flex-col">{primaryRowAbove}</div> : null}
       <div className="flex flex-wrap justify-center gap-2">
         {leadingAction}

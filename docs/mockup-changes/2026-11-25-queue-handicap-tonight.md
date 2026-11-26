@@ -1,6 +1,6 @@
 # Queue app: Handicap · tonight in the live Edit player sheet
 
-Status: TICKETED — #1127
+Status: IN REAL MODE — #1134
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console Players tab › Edit player (pencil) › section "Handicap · tonight" (`SHEETS.editLive`, `hcFigure`, `HC_SPOTS`, `setupHcArt`, actions `hcToggle`, `saveEditLive`); Players card icon (`playersPane`, `hcText`); cleared in `confirmDone`; used by `restAfter` in Generate matches
@@ -56,7 +56,7 @@ Superseded by: none
   hint above, card title "Handicap: SPOT, SPOT".
 - Tokens: none new (`--warn` for marked spots, their glow and pulse, and the icon; `--fg2` and `--surface` for empty
   spots and the Right / Left labels). The figure's colours live only in the art.
-- Known differences: none.
+- Known differences: the Rive breathing loop (the real app shows the still image) until the dependency decision.
 
 ## Reuse plan
 - Reuses as is: chip and the exemption-list chip with a remove button (`ex-chip`), restyled as a warning pill (`hc-chip`); the alert icon for the card icon.

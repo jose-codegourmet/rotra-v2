@@ -163,7 +163,7 @@ export function PlayerPoolCard({
       role="button"
       tabIndex={0}
       aria-pressed={selected}
-      aria-label={`${name}, ${levelLabel(level)}, ${games} games played, ${forTheNight} for the night${presenceCaption ? `, ${presenceCaption}` : ''}`}
+      aria-label={`${name}, ${level ? levelLabel(level) : 'No level'}, ${games} games played, ${forTheNight} for the night${presenceCaption ? `, ${presenceCaption}` : ''}`}
       onClick={onToggleSelect}
       onKeyDown={onKeyDown}
       className={cn(playerPoolCardVariants({ state }), RING[band], className)}
@@ -210,7 +210,7 @@ export function PlayerPoolCard({
               name={name}
               src={photoUrl}
               size={40}
-              title={levelLabel(level)}
+              title={level ? levelLabel(level) : 'No level'}
               onClick={onOpenProfile}
               className={cn(
                 'outline-[3px] outline-offset-2 outline-(--ring)',
@@ -219,7 +219,7 @@ export function PlayerPoolCard({
             />
           </span>
         ) : (
-          <span className="flex-none" title={levelLabel(level)}>
+          <span className="flex-none" title={level ? levelLabel(level) : 'No level'}>
             <Avatar
               name={name}
               src={photoUrl}

@@ -45,7 +45,10 @@ export const MatchRequestsWaitingLight: Story = {
 
 /** A long count (12) still fits the badge and the pill. */
 export const LongCount: Story = { args: { matchRequestCount: 12 } }
-export const LongCountLight: Story = { args: { matchRequestCount: 12 }, globals: { theme: 'light' } }
+export const LongCountLight: Story = {
+  args: { matchRequestCount: 12 },
+  globals: { theme: 'light' },
+}
 
 /** Both buttons call their handlers. */
 export const Actions: Story = {

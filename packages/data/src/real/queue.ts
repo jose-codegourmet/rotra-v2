@@ -855,6 +855,30 @@ export async function realSetClubNickname(input: { clubPlayerId: string; clubNic
   )
 }
 
+/**
+ * Edit player › Save changes for a guest or unclaimed player (D-2026-11-26-07): renames the saved
+ * player and their live roster entries; an empty nickname removes it. The server words the message.
+ */
+export async function realRenameClubPlayer(input: {
+  clubPlayerId: string
+  fullName: string
+  nickname: string
+}) {
+  const saved = await realRequest<{
+    clubPlayerId: string
+    fullName: string
+    nickname: string | null
+    message: string
+  }>(`/api/club/players/${encodeURIComponent(input.clubPlayerId)}/name`, {
+    method: 'PATCH',
+    body: { fullName: input.fullName, nickname: input.nickname },
+  })
+  return accepted(
+    { clubPlayerId: saved.clubPlayerId, fullName: saved.fullName, nickname: saved.nickname },
+    saved.message,
+  )
+}
+
 type RosterAdd = { rosterEntry: WireRosterEntry | null; waitlist: WireWaitlistEntry | null }
 
 /** The add's outcome and toast, worded like the mock adds ("Mikee added · Intermediate Mid"). */

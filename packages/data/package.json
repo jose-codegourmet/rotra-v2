@@ -13,6 +13,8 @@
     "./club-player/clubNickname-rules": "./src/club-player/clubNickname.rules.ts",
     "./club-player/setClubNickname": "./src/club-player/setClubNickname.ts",
     "./club-player/useSetClubNickname": "./src/club-player/useSetClubNickname.ts",
+    "./club-player/renameClubPlayer": "./src/club-player/renameClubPlayer.ts",
+    "./club-player/useRenameClubPlayer": "./src/club-player/useRenameClubPlayer.ts",
     "./club-player/useMoveSavedPlayer": "./src/club-player/useMoveSavedPlayer.ts",
     "./club-player/useRemoveClubPlayerPicture": "./src/club-player/useRemoveClubPlayerPicture.ts",
     "./club-player/useSetClubPlayerPicture": "./src/club-player/useSetClubPlayerPicture.ts",

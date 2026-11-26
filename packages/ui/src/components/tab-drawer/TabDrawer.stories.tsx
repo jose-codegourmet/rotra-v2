@@ -44,7 +44,9 @@ export const Closed: Story = { render: () => <Example /> }
 export const Open: Story = {
   render: () => <Example initial="queue" />,
   play: async ({ canvasElement }) => {
-    await userEvent.click(within(canvasElement).getByRole('button', { name: /Open the views menu/ }))
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: /Open the views menu/ }),
+    )
   },
 }
 

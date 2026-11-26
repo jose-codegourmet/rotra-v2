@@ -126,7 +126,9 @@ export function TabDrawer({
                       className={cn(
                         'flex min-h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-sm border-0 px-3 text-left font-semibold outline-none',
                         'focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-45',
-                        on ? 'bg-accent-subtle text-accent' : 'bg-transparent text-fg hover:bg-elev',
+                        on
+                          ? 'bg-accent-subtle text-accent'
+                          : 'bg-transparent text-fg hover:bg-elev',
                       )}
                     >
                       <span>{item.label}</span>

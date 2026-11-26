@@ -150,6 +150,13 @@ Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisio
 - [D-2026-11-25-02](../decisions/2026-11-25.md#d-2026-11-25-02) — the Almost done switch on a Playing court card; Plan Ahead treats those players as free soon (mockup only).
 - [D-2026-11-25-03](../decisions/2026-11-25.md#d-2026-11-25-03) — Handicap · tonight in the live Edit player sheet; a handicapped player rests after 1 game in a row (mockup only).
 - [D-2026-11-25-04](../decisions/2026-11-25.md#d-2026-11-25-04) — the session console's Leaderboard is one podium and list for the current session; a new Leaderboards page in the left nav with Club and ROTRA tabs, four periods each; full names on leaderboards (mockup only).
+- [D-2026-11-26-01](../decisions/2026-11-26.md#d-2026-11-26-01) — Session done takes the planned shuttle tubes off inventory, never below zero, once per session (written in the mock store and real-mode finalization, not run against a database).
+- [D-2026-11-26-05](../decisions/2026-11-26.md#d-2026-11-26-05) — the live session header keeps Match requests and Share; Payments becomes a console tab; ← Home at the top (mockup only).
+- [D-2026-11-26-06](../decisions/2026-11-26.md#d-2026-11-26-06) — court card match line as a green #N with category and time pills, Ending pulse pills in the top right, Grid / Slide switch (mockup only).
+- [D-2026-11-26-07](../decisions/2026-11-26.md#d-2026-11-26-07) — Edit player has Full name (editable for unclaimed and guest players) and Club nickname (mockup only).
+- [D-2026-11-26-08](../decisions/2026-11-26.md#d-2026-11-26-08) — free court flow (Court N is free: pick or generate), Suggested match with Reshuffle and Replace, stacked dialogs go back one level (mockup only).
+- [D-2026-11-26-09](../decisions/2026-11-26.md#d-2026-11-26-09) — player labels read club nickname › nickname › full name on every Queue Master screen (mockup only).
+- [D-2026-11-26-10](../decisions/2026-11-26.md#d-2026-11-26-10) — player status pill as icons with a legend, Edit player as a corner circle, In queue and Playing filters (mockup only).
 
 ## Blocking open decisions
 

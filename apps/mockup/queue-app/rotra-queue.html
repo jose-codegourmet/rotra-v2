@@ -528,8 +528,17 @@ body:not(.kbd-nav) .tabs button:focus-visible, body:not(.kbd-nav) .seg button:fo
 .cmenu-list.tabmenu-list button { flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; font-weight: 600; }
 .cmenu-list.tabmenu-list button.on { color: var(--accent); }
 .tm-cur { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.cv-dd { display: none; }
+.cv-scrim { position: fixed; inset: 0; z-index: 45; background: var(--scrim); }
+.cv-drawer { position: fixed; z-index: 46; top: 0; bottom: 0; left: 0; width: min(290px, 86vw); display: flex; flex-direction: column; gap: 2px; padding: calc(14px + env(safe-area-inset-top, 0px)) 10px 16px; background: var(--surface); border-right: 1px solid var(--border-strong); box-shadow: 8px 0 30px rgba(0, 0, 0, .35); overflow-y: auto; animation: cv-in .2s ease-out; }
+.cv-head { display: flex; align-items: center; justify-content: space-between; padding: 0 4px 8px 12px; }
+.cv-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; padding: 0 12px; border: 0; border-radius: var(--r-sm); background: none; color: var(--fg); font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
+.cv-item:hover { background: var(--elev); }
+.cv-item.on { background: var(--accent-subtle); color: var(--accent); }
+@keyframes cv-in { from { transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce) { .cv-drawer { animation: none; } }
 @media (max-width: 640px) {
-  .tabs-dd { display: block; }
+  .tabs-dd, .cv-dd { display: block; }
   .tabs.has-dd, .tabs.rv-tabs.has-dd { display: none; }
   .tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); overflow: visible; gap: 0; }
   .tabs button { flex-direction: column; justify-content: center; gap: 3px; padding: 9px 4px; font-size: 13px; white-space: normal; text-align: center; line-height: 1.2; }
@@ -568,6 +577,62 @@ body:not(.kbd-nav) .tabs button:focus-visible, body:not(.kbd-nav) .seg button:fo
 .pcard2 .stats span { font-size: 11px; color: var(--fg2); }
 select.input.inline { width: auto; min-height: 42px; }
 .courts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+/* Courts Slide mode (owner, November 26, 2026): Embla viewport; a card a slide on phones, two from 760 px, three from 1200 px. */
+.cs-embla { overflow: hidden; padding: 4px 2px; margin: -4px -2px; }
+.cs-embla .cs-track { display: flex; gap: 0; touch-action: pan-y pinch-zoom; }
+.cs-embla .cs-track > .court { flex: 0 0 88%; min-width: 0; margin-right: 12px; }
+@media (min-width: 760px) { .cs-embla .cs-track > .court { flex-basis: calc(50% - 6px); } }
+@media (min-width: 1200px) { .cs-embla .cs-track > .court { flex-basis: calc(33.333% - 8px); } }
+.fill-lbl { font-size: 14px; }
+button.pg-total { border: 0; background: none; color: inherit; font: inherit; cursor: pointer; border-radius: var(--r-sm); }
+button.pg-total:hover { background: var(--elev); } button.pg-total:hover span { text-decoration: underline; text-underline-offset: 2px; }
+/* Reshuffle (owner, November 26, 2026): faces deal back in, one after another. */
+.qteams.shuffle .sg-team > * { animation: shuf-in .42s cubic-bezier(.2, .9, .3, 1.25) both; }
+.qteams.shuffle .sg-team:nth-of-type(1) > *:nth-child(2) { animation-delay: .04s; } .qteams.shuffle .sg-team:nth-of-type(1) > *:nth-child(3) { animation-delay: .1s; }
+.qteams.shuffle .sg-team:nth-of-type(2) > *:nth-child(2) { animation-delay: .16s; } .qteams.shuffle .sg-team:nth-of-type(2) > *:nth-child(3) { animation-delay: .22s; }
+.qteams.shuffle .vs { animation: shuf-vs .5s ease-out both; }
+@keyframes shuf-in { from { opacity: 0; transform: translateY(-14px) rotateY(80deg) scale(.85); } to { opacity: 1; transform: none; } }
+@keyframes shuf-vs { 0% { transform: rotate(-180deg) scale(.4); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .qteams.shuffle .sg-team > *, .qteams.shuffle .vs { animation: none; } }
+.free-pitch { cursor: pointer; transition: filter .15s, box-shadow .15s; }
+.free-pitch:hover { box-shadow: inset 0 0 0 2px var(--accent); }
+.free-pitch .free-lbl { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; letter-spacing: 0; text-transform: none; }
+/* Owner artifact comment, same day, on the free court label: "this looks bad, please update this". A centred + disc, Free, Tap to fill. */
+.free-pitch .fp-plus { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1.5px dashed var(--accent); background: color-mix(in srgb, var(--surface) 80%, transparent); color: var(--accent); font-size: 24px; font-weight: 700; line-height: 1; transition: transform .15s, background .15s; }
+.free-pitch .free-lbl b { font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--fg); }
+.free-pitch .free-lbl small { font-size: 11px; font-weight: 600; color: var(--fg2); }
+.free-pitch:hover .fp-plus, .free-pitch:focus-visible .fp-plus { transform: scale(1.08); background: var(--accent); color: var(--on-accent); border-style: solid; }
+@container (max-width: 220px) { .free-pitch .fp-plus { width: 30px; height: 30px; font-size: 18px; } .free-pitch .free-lbl small { display: none; } }
+.fc-picks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.fc-pick { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 120px; padding: 16px; border: 1.5px solid var(--border-strong); border-radius: var(--r); background: var(--surface); color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.fc-pick:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-subtle); }
+.fc-pick:disabled { opacity: .5; cursor: not-allowed; }
+.fc-pick svg { color: var(--accent); }
+.fc-pick b { font-size: 16px; }
+@media (max-width: 480px) { .fc-picks { grid-template-columns: minmax(0, 1fr); } }
+.fi-card { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px; border: 1px solid var(--border-strong); border-radius: var(--r); background: var(--surface); }
+.fi-card.on { border-color: var(--accent); background: var(--accent-subtle); }
+.fi-art { width: 100%; height: auto; display: block; }
+.fi-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--fg2); }
+@media (max-width: 560px) { .fi-card { grid-template-columns: minmax(0, 1fr); } }
+.ch-embla { --fade: 40px; overflow: hidden; padding: 6px 2px; }
+.ch-track { display: flex; touch-action: pan-y pinch-zoom; }
+.ch-slide { flex: 0 0 min(320px, 84%); min-width: 0; margin-right: 12px; display: flex; }
+.ch-slide > .qtile { flex: 1; grid-row: auto !important; grid-column: auto !important; }
+/* Owner artifact comment, November 26, 2026: "it should be put on court and edit": the two buttons, sharing the row. */
+.ch-slide .qt-actions > .btn { flex: 1 1 0; min-height: 36px; } .ch-slide .qt-actions > .grow { display: none; }
+.ch-embla.m-r { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent); }
+.ch-embla.m-l { -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade)); mask-image: linear-gradient(to right, transparent, #000 var(--fade)); }
+.ch-embla.m-l.m-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent); mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent); }
+.cs-embla { --fade: 48px; }
+.cs-embla.m-r { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent); }
+.cs-embla.m-l { -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade)); mask-image: linear-gradient(to right, transparent, #000 var(--fade)); }
+.cs-embla.m-l.m-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent); mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent); }
+.cs-ctl { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
+.cs-next svg { transform: rotate(180deg); }
+.cs-dots { display: flex; gap: 6px; }
+.cs-dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 99px; background: var(--border-strong); cursor: pointer; transition: width .2s, background .2s; }
+.cs-dots button[aria-current="true"] { width: 22px; background: var(--accent); }
 .court { display: flex; flex-direction: column; gap: 10px; border-radius: var(--r); padding: 14px; border: 1px solid var(--border-strong); background: var(--surface); min-height: 180px; min-width: 0; box-shadow: var(--shadow); }
 /* Playing: a steady accent glow (no animation) on top of the accent border; On court (.oncourt) keeps the normal border. */
 .court.busy { border-color: var(--accent); background: linear-gradient(180deg, var(--accent-subtle), transparent 70%), var(--surface); box-shadow: 0 0 0 1px var(--accent), 0 0 18px 2px color-mix(in srgb, var(--accent) 38%, transparent); }
@@ -710,6 +775,26 @@ body.swapping, body.swapping * { cursor: grabbing !important; }
 .qt-head { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .grow { flex: 1; }
 .qt-pos { font-family: var(--mono); font-weight: 700; }
+/* Court card match line (owner artifact comment, November 26, 2026): green #N header, format pill, time pill. */
+.ct-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; }
+.ct-num { font-family: var(--mono); font-size: 20px; font-weight: 800; line-height: 1; color: var(--accent); }
+.ct-time svg { width: 12px; height: 12px; }
+/* Live Share dialog (owner, November 26, 2026). */
+.share-live h3 { margin: 0; font-size: 15px; }
+.share-live .share-card { display: flex; justify-content: center; }
+.share-live .tpl { font-size: 12px; }
+/* Owner artifact comment, November 26, 2026, on a court's Start match / Open match row: "expand this on mobile". */
+/* Same day, on that row: "stack these buttons": on phones they stack, full width, the primary one on top. */
+@media (max-width: 640px) { .court-acts { flex-direction: column; align-items: stretch; flex-wrap: nowrap; } .court-acts > .btn { width: 100%; min-height: 44px; } }
+/* Same day, on the court buttons: "these buttons should be expanding the row": on every width a court's buttons fill the row. */
+.court-acts > .btn { flex: 1 1 0; min-width: 0; }
+.ct-end { white-space: nowrap; align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; padding: 3px 10px 3px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--fg); background: var(--elev); border: 1px solid var(--border-strong); }
+.ct-end i { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--fg2); flex: none; }
+.ct-end i::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: inherit; animation: ct-pulse 1.4s ease-out infinite; }
+.ct-end.ok { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-subtle); } .ct-end.ok i { background: var(--accent); }
+.ct-end.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); background: var(--warn-subtle); } .ct-end.warn i { background: var(--warn); }
+@keyframes ct-pulse { from { transform: scale(1); opacity: .7; } to { transform: scale(2.6); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ct-end i::after { animation: none; } }
 .qt-flow { color: var(--fg3); font-weight: 800; }
 .qt-grip { border: 0; background: transparent; color: var(--fg2); cursor: grab; touch-action: none; font-size: 18px; line-height: 1; padding: 4px 6px; border-radius: 4px; }
 .qt-grip:hover { background: var(--elev); color: var(--fg); }
@@ -726,11 +811,17 @@ body.swapping, body.swapping * { cursor: grabbing !important; }
 button.qf { border: 0; background: none; padding: 2px; margin: -2px; font: inherit; color: inherit; cursor: pointer; border-radius: 8px; }
 button.qf:hover .avatar { box-shadow: 0 0 0 2px var(--accent); }
 .qf-n { font-size: 15px; font-weight: 600; max-width: 88px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.spill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--bg); color: var(--fg2); font-size: 12px; font-weight: 600; line-height: 1.3; white-space: nowrap; font-variant-numeric: tabular-nums; cursor: default; }
+.spill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--bg); color: var(--fg2); font-size: 12px; font-weight: 600; line-height: 1.3; white-space: nowrap; font-variant-numeric: tabular-nums; cursor: default; }
 .spill.warn { color: var(--warn); border-color: var(--warn); }
 .spill.err { color: var(--error); border-color: var(--error); }
 .spill.play { color: var(--accent); border-color: var(--accent); background: var(--accent-subtle); }
 .spill.away { color: var(--fg3, var(--fg2)); border-style: dashed; }
+.spill svg { flex: none; }
+/* Owner artifact comment, November 26, 2026 ("the legends dont look visible"): a bordered strip; each key is the real pill
+   (same colours as on the cards) followed by its words in the normal text colour. */
+.st-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 8px 12px; border: 1px solid var(--border-strong); border-radius: var(--r-sm); background: var(--surface); font-size: 13px; color: var(--fg); }
+.st-legend > b { font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--fg2); }
+.st-legend > span { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; } .st-legend .spill { padding: 3px 6px; }
 .qfaces .spill { font-size: 11px; padding: 1px 6px; }
 .qf-w { font-size: 12px; font-weight: 600; line-height: 1.2; color: var(--fg2); white-space: nowrap; }
 .qf-w.warn { color: var(--warn); }
@@ -1556,6 +1647,11 @@ button.tb-row:hover { background: var(--elev); }
 button.gm-pl { cursor: pointer; }
 .gm-pl .avatar { width: 46px; height: 46px; font-size: 14px; box-shadow: 0 0 0 2px rgba(255, 255, 255, .9); }
 .gm-pl.won .avatar { box-shadow: 0 0 0 3px var(--accent); }
+.gm-pl.gm-lv { --ring: rgba(255, 255, 255, .9); } .gm-pl.gm-lv.lv-beginner { --ring: var(--lv-beg); } .gm-pl.gm-lv.lv-intermediate { --ring: var(--lv-int); } .gm-pl.gm-lv.lv-advanced { --ring: var(--lv-adv); }
+.gm-pl.gm-lv .avatar { box-shadow: 0 0 0 3px var(--ring); }
+.gm-pl.gm-lv.won .avatar { box-shadow: 0 0 0 3px var(--ring), 0 0 0 5px rgba(0, 0, 0, .72), 0 0 0 8px var(--accent); }
+.gm-av { position: relative; display: inline-flex; line-height: 0; }
+.gm-av .pf-g { top: -5px; right: -8px; min-width: 18px; height: 18px; font-size: 11px; }
 button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0 0 3px var(--accent), 0 0 0 5px rgba(255, 255, 255, .5); }
 .gm-pl b { font-size: 12px; font-weight: 700; line-height: 1.3; padding: 0 7px; border-radius: 999px; background: rgba(0, 0, 0, .72); color: #fff; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gm-res { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; margin: 0 4px; border-radius: 12px; background: rgba(0, 0, 0, .78); color: #fff; text-align: center; min-width: 96px; }
@@ -1618,6 +1714,16 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .pc3-games .pg-total b { color: var(--accent); }
 .pc3-st { color: var(--fg2); }
 .pc3 .switch { transform: scale(.8); transform-origin: right center; }
+/* Owner chat and artifact comment, November 26, 2026: the edit pencil sits in the card's top-right corner, out of the name row,
+   so the name keeps nearly the full width; the footer holds the status pill and the Present switch. */
+/* Owner artifact comment, November 26, 2026 ("make this as a circle in the top right border, the button doesnt feel obvious"):
+   a round, filled button sitting on the card's top-right corner, like the pick-order badge on the left. */
+.pc3-edit { position: absolute; top: -9px; right: -9px; z-index: 2; }
+.pc3-edit .btn { width: 28px; min-width: 28px; height: 28px; min-height: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 16%, var(--elev)); color: var(--accent); border: 1.5px solid var(--accent); box-shadow: 0 2px 8px rgba(0, 0, 0, .3); transition: background .15s, color .15s, border-color .15s, transform .15s; }
+.pc3-edit .btn svg { width: 14px; height: 14px; }
+.pc3-edit .btn:hover, .pc3-edit .btn:focus-visible { background: var(--accent); color: var(--on-accent); border-color: var(--accent); transform: scale(1.08); }
+.pc3 > .pc3-top { padding-right: 10px; }
+.pc3-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; } .pc3-acts { display: inline-flex; align-items: center; gap: 2px; flex: none; }
 .selbar { position: sticky; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); z-index: 14; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: var(--r); background: var(--elev); border: 1px solid var(--accent); box-shadow: 0 12px 30px rgba(0, 0, 0, .35); }
 .sel-faces { display: flex; }
 .sel-faces .avatar { width: 28px; height: 28px; font-size: 10px; margin-left: -6px; box-shadow: 0 0 0 2px var(--elev); }
@@ -1666,6 +1772,10 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .sp-other { border-style: dashed; background: transparent; justify-content: center; }
 .sp-other-i { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 24px; font-weight: 700; color: var(--accent); background: var(--accent-subtle); margin-bottom: 4px; }
 .sp-other[aria-expanded="true"] { border-color: var(--accent); }
+.req-btn { position: relative; }
+@media (min-width: 641px) { .req-btn { width: 40px; min-width: 40px; padding: 0; } .req-btn .req-word { display: none; }
+  .req-btn .req-n { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; display: grid; place-items: center; font-size: 11px; font-weight: 800; background: var(--warn); color: var(--on-accent); border: 2px solid var(--bg); } }
+@media (max-width: 640px) { .req-btn { flex: 1; } .req-btn .req-n { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; display: grid; place-items: center; font-size: 12px; font-weight: 800; background: color-mix(in srgb, var(--on-accent) 18%, transparent); } }
 @media (max-width: 640px) { .live-acts { flex: 1 1 100% !important; justify-content: flex-start !important; } } /* live header buttons wrap on phones instead of widening the page */
 .sp-stack-scrim { position: fixed; inset: 0; z-index: 44; background: var(--scrim); }
 .sp-stack { position: fixed; z-index: 45; left: 0; right: 0; bottom: 0; max-height: 88dvh; overflow-y: auto; padding: 14px 16px calc(16px + env(safe-area-inset-bottom, 0px)); border-radius: 16px 16px 0 0; background: var(--bg); border-top: 1px solid var(--border-strong); box-shadow: 0 -12px 40px rgba(0, 0, 0, .45); animation: up .18s ease-out; }
@@ -1686,6 +1796,19 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .ptile.sm .pt-meta { font-size: 11px; color: var(--fg2); white-space: nowrap; }
 /* Owner, November 25, 2026: picker pictures show the level ring and the games badge; rest time takes the wait colours. */
 .ptile.sm { --ring: var(--border-strong); }
+.ptile.pt-ring { --ring: var(--border-strong); } .ptile.pt-ring.lv-beginner { --ring: var(--lv-beg); } .ptile.pt-ring.lv-intermediate { --ring: var(--lv-int); } .ptile.pt-ring.lv-advanced { --ring: var(--lv-adv); }
+.nm-l { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 600; line-height: 1.25; color: var(--fg2); }
+.nm-l + .nm-l { color: var(--fg3); font-weight: 500; }
+.pitch .nm-l { margin-top: 1px; padding: 0 5px; border-radius: 999px; background: rgba(0, 0, 0, .62); color: rgba(255, 255, 255, .85); font-size: 9px; }
+.pitch .nm-l + .nm-l { color: rgba(255, 255, 255, .7); }
+@container (max-width: 240px) { .pitch .nm-l { display: none; } }
+.sg-p .main .nm-l, .pcard2 .nm-l { font-size: 11px; }
+.pc3-name { display: flex; flex-direction: column; min-width: 0; } .pc3-name .pc3-top { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .pc3-name .nm-l { font-size: 11px; }
+.ptile .pt-sub { font-size: 11px; line-height: 1.25; color: var(--fg2); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ptile .pt-sub + .pt-sub { color: var(--fg3); }
+.ptile .pt-face { position: relative; display: inline-flex; margin-bottom: 6px; }
+.ptile .pt-face .avatar { outline: 3px solid var(--ring); outline-offset: 2px; }
+.ptile .pt-face .pf-g { top: -4px; right: -6px; min-width: 22px; height: 22px; font-size: 12px; }
 .ptile.sm.lv-beginner { --ring: var(--lv-beg); } .ptile.sm.lv-intermediate { --ring: var(--lv-int); } .ptile.sm.lv-advanced { --ring: var(--lv-adv); }
 .ptile.sm .sp-face { margin-bottom: 6px; }
 .ptile.sm .sp-face .avatar { margin-bottom: 0; outline: 3px solid var(--ring); outline-offset: 2px; }
@@ -2590,6 +2713,17 @@ const acctShort = (id) => { const p = P(id); return p ? (p.nick || p.name.split(
 // Club-facing name order: club nickname, then nickname, then full name. The first one present is bold; the rest sit under it.
 const nameParts = (p) => [clubNickOf(p), p.nick, p.name].filter((v, i, a) => v && a.indexOf(v) === i);
 const nameB = (p) => { const [top, ...rest] = nameParts(p); return `<b>${esc(top)}</b>${rest.length ? `<span class="small muted nm-sub">${rest.map(esc).join(' · ')}</span>` : ''}`; };
+// Owner, November 26, 2026 (chat): player labels in the pickers read top to bottom CLUB NAME (club nickname), NICK NAME,
+// FULL NAME: the first present one bold, the others in smaller lines under it, each shown once.
+const nameStack = (p) => { const [top, ...rest] = nameParts(p); return `<span class="pt-name">${esc(top)}</span>${rest.map((v) => `<span class="pt-sub">${esc(v)}</span>`).join('')}`; };
+// Owner, November 26, 2026 (chat, "yes, everywhere"): every player label on the Queue Master's screens uses the same order,
+// club nickname › nickname › full name: the first present one is the label, the others sit under it in smaller lines.
+// Public pages keep the player's own account name (pubNameText).
+const subNames = (p) => nameParts(p).slice(1).map((v) => `<span class="nm-l">${esc(v)}</span>`).join('');
+// Faces (court pictures, queue cards) are tight: with no club nickname or nickname the label is the first name, and the full
+// name goes in the line under it. The smaller lines hide on a narrow court.
+const faceNames = (pid, cls) => { const p = P(pid); if (!p) return `<span class="${cls}">?</span>`; const parts = nameParts(p), top = parts.length > 1 ? parts[0] : p.name.split(' ')[0];
+  return `<span class="${cls}">${esc(top)}</span>${parts.filter((v) => v !== top).map((v) => `<span class="nm-l">${esc(v)}</span>`).join('')}`; };
 const short = (id) => { const p = P(id); return p ? (clubNickOf(p) || p.nick || p.name.split(' ')[0]) : '?'; };
 const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
 
@@ -2709,20 +2843,30 @@ const busyOf = (s, pid, except) => courtMatches(s).find((m) => m !== except && a
 // minutes are still their wait since their last game), "Playing 1m" (since the match began; hover names the court),
 // "Getting ready" (on court, not started), "Away". Wait and In queue turn warning at 10 min and error at 16, as before.
 const shortMins = (mins) => { const m = Math.max(0, Math.floor(mins)); if (m < 60) return `${m}m`; if (m >= 1440) return '1d+'; const h = Math.floor(m / 60), r = m % 60; return r ? `${h}h ${r}m` : `${h}h`; };
+// Owner chat, November 26, 2026 ("maybe icons for in queue / playing / waiting"): the pill leads with an icon for the state
+// and keeps only the time as text, so it fits beside the Present switch. The full words stay in the hover and screen-reader label.
+const ST_ICO = {
+  wait: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12M6 21h12M7 3v3a5 5 0 0 0 10 0V3M7 21v-3a5 5 0 0 1 10 0v3"/></svg>',
+  queue: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6h11M10 12h11M10 18h11"/><circle cx="4.5" cy="6" r="1.5"/><circle cx="4.5" cy="12" r="1.5"/><circle cx="4.5" cy="18" r="1.5"/></svg>',
+  play: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="18.5" r="3"/><path d="M9.6 16.8 6 3h12l-3.6 13.8M10.4 3l.9 12.6M13.6 3l-.9 12.6"/></svg>',
+  ready: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  away: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>'
+};
+const stPill = (cls, ico, text, label) => `<span class="spill${cls}" role="img" title="${esc(label)}" aria-label="${esc(label)}">${ST_ICO[ico]}<span aria-hidden="true">${text}</span></span>`;
 function statusPill(s, pid, except) {
   const r = R(s, pid), busy = busyOf(s, pid, except);
   if (busy) {
     const court = courtsOf(s, busy);
-    if (busy.status === 'oncourt') return `<span class="spill play" title="Getting ready · ${esc(court)}">Getting ready</span>`;
+    if (busy.status === 'oncourt') return stPill(' play', 'ready', 'Ready', `Getting ready on ${court}`);
     const mins = busy.startedAt ? (Date.now() - busy.startedAt) / 6e4 : 0;
-    return `<span class="spill play" title="Playing on ${esc(court)}" aria-label="Playing on ${esc(court)} for ${shortMins(mins)}">Playing ${shortMins(mins)}</span>`;
+    return stPill(' play', 'play', shortMins(mins), `Playing on ${court} for ${shortMins(mins)}`);
   }
-  if (!r || !r.present) return '<span class="spill away">Away</span>';
+  if (!r || !r.present) return stPill(' away', 'away', 'Away', 'Away · not here');
   const mins = restInfo(s, pid).mins, tone = mins >= 16 ? ' err' : mins >= 10 ? ' warn' : '';
   const queued = waiting(s).find((m) => m !== except && all(m).includes(pid)) || (except && all(except).includes(pid) ? except : null);
   return queued
-    ? `<span class="spill${tone}" title="In the Main Queue · waiting ${shortMins(mins)} since their last game">In queue ${shortMins(mins)}</span>`
-    : `<span class="spill${tone}" title="Free · waiting ${shortMins(mins)} since their last game">Wait ${shortMins(mins)}</span>`;
+    ? stPill(tone, 'queue', shortMins(mins), `In queue · waiting ${shortMins(mins)} since their last game`)
+    : stPill(tone, 'wait', shortMins(mins), `Free · waiting ${shortMins(mins)} since their last game`);
 }
 // Expected finish (owner, November 23, 2026). ROTRA has no live score, so this is an estimate from time only: the session's
 // scoring mode (typical / long minutes) and the minutes played. left = expected minutes left; tag = the lowercase wording for drafts.
@@ -3089,6 +3233,8 @@ const I = {
   grid: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>',
   share: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/></svg>',
   ext: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg>',
+  // Match requests: a raised hand (owner, November 26, 2026: the header's Match requests becomes an icon).
+  req: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0M14 10V4a2 2 0 0 0-4 0v2M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>',
   cal: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
 };
 
@@ -3166,9 +3312,9 @@ const faceTeam = (s, ids, label, swap, card) => `<div class="sg-team" role="grou
   const p = P(pid), r = R(s, pid), g = gamesOf(s, pid);
   if (card) {
     const c = card(pid);
-    return `<div class="sg-p sg-split lv-${r ? rvBand(r) : 'none'}" title="${esc(lvLabel(r ? r.level : null))}" ${swapAttrs(swap, label === 'Team A' ? 'teamA' : 'teamB', i, pid)}><button type="button" class="face-btn sg-av" data-act="openProfile" data-id="${pid}" data-back="1" aria-label="View ${esc(p.name)}'s profile" title="View profile">${avatar(p)}</button><button type="button" class="sg-main" ${c.attrs} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${g} of ${s.minimum} games. ${c.label}${swap ? '. Left or right arrow switches sides' : ''}" title="${c.label}"><span class="main"><b>${esc(p.name)}</b><span class="small ${g < s.minimum ? 'low' : 'muted'}">${g}/${s.minimum} games</span></span><span class="sg-swap" aria-hidden="true">${I.swap}</span></button></div>`;
+    return `<div class="sg-p sg-split lv-${r ? rvBand(r) : 'none'}" title="${esc(lvLabel(r ? r.level : null))}" ${swapAttrs(swap, label === 'Team A' ? 'teamA' : 'teamB', i, pid)}><button type="button" class="face-btn sg-av" data-act="openProfile" data-id="${pid}" data-back="1" aria-label="View ${esc(p.name)}'s profile" title="View profile">${avatar(p)}</button><button type="button" class="sg-main" ${c.attrs} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${g} of ${s.minimum} games. ${c.label}${swap ? '. Left or right arrow switches sides' : ''}" title="${c.label}"><span class="main"><b>${esc(nameParts(p)[0])}</b>${subNames(p)}<span class="small ${g < s.minimum ? 'low' : 'muted'}">${g}/${s.minimum} games</span></span><span class="sg-swap" aria-hidden="true">${I.swap}</span></button></div>`;
   }
-  return `<button class="sg-p lv-${r ? rvBand(r) : 'none'}" data-act="openProfile" data-id="${pid}" data-back="1" ${swapAttrs(swap, label === 'Team A' ? 'teamA' : 'teamB', i, pid)} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${g} of ${s.minimum} games. View profile${swap ? '. Left or right arrow switches sides' : ''}">${avatar(p)}<span class="main"><b>${esc(p.name)}</b><span class="small ${g < s.minimum ? 'low' : 'muted'}">${g}/${s.minimum} games</span></span></button>`;
+  return `<button class="sg-p lv-${r ? rvBand(r) : 'none'}" data-act="openProfile" data-id="${pid}" data-back="1" ${swapAttrs(swap, label === 'Team A' ? 'teamA' : 'teamB', i, pid)} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${g} of ${s.minimum} games. View profile${swap ? '. Left or right arrow switches sides' : ''}">${avatar(p)}<span class="main"><b>${esc(nameParts(p)[0])}</b>${subNames(p)}<span class="small ${g < s.minimum ? 'low' : 'muted'}">${g}/${s.minimum} games</span></span></button>`;
 }).join('')}</div>`;
 // A player's picture as a button that opens their profile (Back returns to an open dialog).
 const faceBtn = (p) => `<button class="face-btn" data-act="openProfile" data-id="${p.id}" data-back="1" aria-label="View ${esc(p.name)}'s profile" title="${esc(p.name)}">${avatar(p)}</button>`;
@@ -4087,7 +4233,10 @@ function historyMatch(s, m, hl, pill) {
   // faces with first names on dark pills (the winning pair ringed in the accent), the score (or "No score") and "◀ Won" / "Won ▶" on the
   // net, Invalid on a desaturated court. Team A is on the left. Faces open the player profile. Substitution lines stay under the court.
   const invalid = m.status === 'invalid', played = invalid || m.status === 'done', wl = !played || invalid ? null : m.winner === 'A';
-  const face = (pid, won) => `<button type="button" class="gm-pl${won ? ' won' : ''}${pid === hl ? ' me' : ''}" data-act="openProfile" data-id="${pid}"${hl ? ' data-back="1"' : ''} title="${esc(nm(pid))}" aria-label="${esc(nm(pid))}${pid === hl ? ' (highlighted)' : ''}. View profile">${avatar(P(pid))}<b>${esc(acctShort(pid))}</b></button>`;
+  // Owner artifact comment, November 26, 2026 (Completed / Queued games dialog): "should show skill border and game count". Each face
+  // carries the level ring and the player's games so far tonight, like the court and queue faces.
+  const face = (pid, won) => { const r = R(s, pid), g = gamesOf(s, pid);
+    return `<button type="button" class="gm-pl gm-lv lv-${r ? rvBand(r) : 'none'}${won ? ' won' : ''}${pid === hl ? ' me' : ''}" data-act="openProfile" data-id="${pid}"${hl ? ' data-back="1"' : ''} title="${esc(nm(pid))}" aria-label="${esc(nm(pid))}, ${esc(lvLabel(r ? r.level : null))}, ${g} games${pid === hl ? ' (highlighted)' : ''}. View profile"><span class="gm-av">${avatar(P(pid))}<span class="pf-g tnum" aria-hidden="true">${g}</span></span><b>${esc(acctShort(pid))}</b></button>`; };
   const side = (ids, won) => `<div class="gm-side">${ids.map((pid) => face(pid, won)).join('')}</div>`;
   const score = invalid || !played ? '' : gmScore(m, false);
   const res = !played ? '<span class="gm-who">VS</span>' : invalid ? chip('Invalid', 'bad') : wl != null ? `<span class="gm-who">${wl ? '◀' : ''} Won ${wl ? '' : '▶'}</span>` : '';
@@ -4239,7 +4388,7 @@ function histPlayersPane(s, { invalid }) {
   return `<div class="between"><h2>Players</h2><span class="small muted">${invalid ? 'Not counted' : `Minimum ${s.minimum} games · ${below} below it`}</span></div>
     ${recordHostsHtml(s)}
     <div class="pgrid2">${rows.map(({ r, p, g, x }) => `<article class="pcard2"><div class="pc-top">${avatar(p, 'xl')}${x ? `<span class="chip ${x.rank <= 3 ? 'ok' : ''}">#${x.rank}</span>` : ''}</div>
-      <div class="stack tight" style="gap:2px"><span class="pc-name">${esc(p.name)}</span><span class="small muted">${esc(lvLabel(r.level))}</span></div>
+      <div class="stack tight" style="gap:2px"><span class="pc-name">${esc(nameParts(p)[0])}</span>${subNames(p)}<span class="small muted">${esc(lvLabel(r.level))}</span></div>
       ${invalid ? '<p class="ctx">Not counted</p>' : `<div class="stats"><div><b class="tnum">${g}<span>/${s.minimum}</span></b><span>games</span></div><div><b class="tnum">${x ? x.w : 0}–${x ? x.l : 0}</b><span>W–L</span></div></div>
       ${g > s.minimum ? chip('Above minimum', 'ok') : g === s.minimum ? chip('Met minimum') : chip(`${s.minimum - g} short`, 'warn')}`}
     </article>`).join('')}</div>`;
@@ -5272,11 +5421,11 @@ function liveSettings(s, est, present, allLink) {
     return `<section class="card ls-card" aria-labelledby="ls-money-h"><div class="between"><h3 id="ls-money-h">Costs</h3></div>
       <div class="ls-stats"><div class="ls-stat"><b class="tnum">${peso(c.perHead)}</b><span>Each player pays${c.custom ? ' (custom)' : ''}</span></div><div class="ls-stat"><b class="tnum">${peso(c.total)}</b><span>Estimated total</span></div></div>
       <div class="ls-rows">${row('Break-even share', peso(c.share))}${row('Result', resultText(c))}</div>
-      <div class="row acts"><button class="btn sm" data-act="openPayments">Payments</button></div></section>`; })() : '';
+      <div class="row acts"><button class="btn sm" data-act="pane" data-k="payments">Payments</button></div></section>`; })() : '';
   const notes = `<section class="card ls-card" aria-labelledby="ls-notes-h"><div class="between"><h3 id="ls-notes-h">Notes</h3></div><p class="small${s.notes ? '' : ' muted'}" style="margin:0;white-space:pre-line">${s.notes ? esc(s.notes) : 'No notes for tonight.'}</p></section>`;
   // Owner, November 19, 2026 ("all over the place"): courts in one row, then a 2×2 grid of even-height cards
   // (Game rules | Players, Costs | Notes), labels and values in two aligned columns.
-  return `<section class="stack" aria-labelledby="ls-h"><div class="ls-head"><div><h2 id="ls-h">Setup</h2><p class="small muted">Tonight's session settings. Formats, mode, scoring, Record games and the minimum are fixed after start.</p></div>${allLink ? `<button class="btn sm" data-act="go" data-to="prepare">${I.n_gear} All session settings</button>` : ''}</div>
+  return `<section class="stack" aria-labelledby="ls-h"><div class="ls-head"><div><h2 id="ls-h">Setup</h2><p class="small muted">Tonight's session settings. Formats, mode, scoring, Record games and the minimum are fixed after start.</p></div><div class="row">${allLink ? `<button class="btn sm" data-act="go" data-to="prepare">${I.n_gear} All session settings</button>` : ''}${s.status === 'active' ? (() => { const why = backToPrepBlocker(s); return `<button class="btn sm" data-act="openBackToPrep" ${why ? `disabled title="${esc(why)}"` : ''}>${I.edit} Back to preparation…</button>`; })() : ''}</div></div>
     <div class="ls-grid">${courts}${rules}${players}${hostsCard(s)}${money}${notes}</div></section>`;
 }
 // Settings tab before start (owner artifact comment, November 19, 2026): the setup as cards, each with Edit opening that step
@@ -5452,20 +5601,23 @@ function viewConsole() {
   const att = attention(s).length;
   const pane = S.ui.pane;
   const endSt = endStatus(s);
+  // Owner artifact comment, November 26, 2026, on the header: "put the back to home here at the top" (Home left the ⋯ menu).
   return `<main class="wrap">
+    <div class="crumb"><button class="btn sm ghost" data-act="go" data-to="home">${I.back} Home</button></div>
     <div class="between">
       <div class="between" style="align-items:flex-start;gap:12px"><div class="stack tight"><div class="row"><span class="label">Live session</span>${chip(MODES[s.mode].label)}${chip(fmtFormats(s))}${chip(`Min ${s.minimum} games`)}${chip(`Scoring · ${scoringDef(s).label}`)}${recordedOf(s) ? '' : chip('Not ranked', 'warn')}</div>
         ${sessTitle(s)}<p class="muted small">${esc(s.venue)} · Started ${fmtWhen(s.startedAt, { lower: true })} · Ends ${fmtWhen(s.end, { lower: true })} · ${endSt.over ? `<span style="color:var(--warn)">${endSt.text}</span>` : endSt.text}</p></div>
         ${(() => { const n = reqCount(s), open = S.ui.courtMenu === 'live-more'; return `<div class="row live-acts" style="flex:none;justify-content:flex-end;gap:8px">
-          <button class="btn sm${n ? ' attn' : ''}" data-act="openRequests" aria-label="Match requests · ${n}${n ? ' waiting' : ''}">Match requests · ${n}</button>
-          <button class="btn sm" data-act="openAdjust">Courts and time</button>
-          <button class="btn sm" data-act="openPayments">Payments</button>
-          <div class="cmenu"><button class="btn sm ghost icon-btn" data-act="toggleCourtMenu" data-id="live-more" aria-haspopup="menu" aria-expanded="${open}" aria-label="More for this session" title="More for this session">${I.more}</button>${open ? `<div class="cmenu-list icon-menu" role="menu" aria-label="More for this session">
-            <button role="menuitem" data-act="go" data-to="public">${I.ext}<span>Public page</span></button>
-            <button role="menuitem" data-act="openPost">${I.link}<span>Copy Facebook post</span></button>
-            <button role="menuitem" data-act="go" data-to="home">${I.back}<span>Home</span></button>
-            ${(() => { const why = backToPrepBlocker(s); return `<button role="menuitem" data-act="openBackToPrep" ${why ? `aria-disabled="true" disabled title="${esc(why)}"` : ''}>${I.edit}<span>Back to preparation…${why ? `<br><span class="small muted">${esc(why)}</span>` : ''}</span></button>`; })()}
-          </div>` : ''}</div></div>`; })()}</div>
+          ${/* Owner artifact comment, same day, on the header: "put match request icon here, make it as a button in mobile". Wide screens
+            show a hand icon with the count badge; phones show it as a full button with its words. */ ''}
+          <button class="btn sm req-btn${n ? ' attn' : ''}" data-act="openRequests" aria-label="Match requests · ${n}${n ? ' waiting' : ''}" title="Match requests">${I.req}<span class="req-word">Match requests</span>${n ? `<span class="req-n tnum">${n}</span>` : ''}</button>
+          ${/* Owner artifact comment, November 26, 2026, on this header: "remove this" (Courts and time). The Session tab's Courts card
+            already holds Extend, Add court and each court's times; the overdue banner's Set end time still opens the sheet.
+            Same day, on Payments here: "remove payments here". Payments stays on the Session tab's Costs card. */ ''}
+          ${/* Owner artifact comment, November 26, 2026, on the ⋯ menu: "remove this and make this into a share button, opens a dialog,
+            shows the list, shows the social post images, shows the invite link". Public page is the title link; Back to preparation…
+            moved to the Settings tab's Setup head. */ ''}
+          <button class="btn sm" data-act="openShare" data-live="1">${I.share} Share</button></div>`; })()}</div>
     </div>
     ${!S.online ? notice('warn', 'Working offline on this device. Matches, results and roster changes save here and sync when you reconnect. Session done needs internet.') : ''}
     ${(() => {
@@ -5473,19 +5625,22 @@ function viewConsole() {
       // Main Queue and Generate Queue are their own tabs (no switch inside the queue); Settings shows the session settings in place.
       const lead = (() => { const top = s.matches.some((m) => m.status === 'done') && standGroups(standings(s))[0]; return !top ? null : top.rows.length > 1 ? `${top.rows.length} tied` : `${short(top.rows[0].pid)} leads`; })();
       const tabs = [
-        ['live', 'Courts', `${courtMatches(s).reduce((t, m) => t + m.courts.length, 0)}/${s.courts.length}`, ' courts in use'],
+        // Owner artifact comment, November 26, 2026, on the Courts view: "Vacant N" while N courts are vacant; "3/3 full" in green when none are.
+        (() => { const vac = freeCourts(s).length, used = courtMatches(s).reduce((t, m) => t + m.courts.length, 0); return ['live', 'Courts', vac ? `Vacant ${vac}` : `${used}/${s.courts.length} full`, '', vac ? 'warn' : 'ok']; })(),
         ['queue', 'Main Queue', waiting(s).length, ' waiting'],
         ['generate', 'Generate Queue', null, ''],
         ['roster', 'Players', `${s.roster.filter((r) => r.present).length}/${s.roster.length}`, ' present'],
         ['board', 'Leaderboard', lead, ''],
         // Owner artifact comment, November 19, 2026: "please add Match History".
         ['history', 'Match History', s.matches.filter((m) => m.status === 'done' || m.status === 'invalid').length, ' played'],
+        // Owner artifact comment, November 26, 2026, on these tabs: "put payments here in the tabs" (Payments left the header).
+        ['payments', 'Payments', null, ''],
         ['settings', 'Settings', null, ''],
       ].filter(Boolean);
       const on = tabs.some(([k]) => k === pane) ? pane : 'live';
-      return `${tabMenu('dd-console', 'Console view', tabs.map(([k, l, n]) => [k, l, n]), on)}
+      return `${consoleViewDrawer(tabs, on)}
     <div class="tabs has-dd" role="tablist" aria-label="Console views">
-      ${tabs.map(([k, l, n, tw]) => `<button role="tab" aria-selected="${on === k}" data-act="pane" data-k="${k}">${l}${n != null ? ` <span class="chip">${esc(n)}<span class="tw">${tw}</span></span>` : ''}${k === 'queue' && att ? ` <span class="chip warn">${att}<span class="tw"> need attention</span></span>` : ''}</button>`).join('')}
+      ${tabs.map(([k, l, n, tw, ck]) => `<button role="tab" aria-selected="${on === k}" data-act="pane" data-k="${k}">${l}${n != null ? ` <span class="chip${ck ? ` ${ck}` : ''}">${esc(n)}<span class="tw">${tw}</span></span>` : ''}${k === 'queue' && att ? ` <span class="chip warn">${att}<span class="tw"> need attention</span></span>` : ''}</button>`).join('')}
     </div>`;
     })()}
     ${pane === 'roster' ? `<section class="stack" aria-label="Players">${playersPane(s)}</section>`
@@ -5494,6 +5649,7 @@ function viewConsole() {
       : pane === 'generate' ? `<section class="stack" aria-label="Generate Queue">${autoWorkspace(s)}</section>`
       : pane === 'board' ? `<section class="stack" aria-label="Leaderboard">${boardPane(s)}</section>`
       : pane === 'history' ? `<section class="stack" aria-label="Match History">${liveHistoryPane(s)}</section>`
+      : pane === 'payments' ? `<section class="stack" aria-label="Payments">${paymentsPanel(s)}</section>`
       : pane === 'settings' ? `<section class="stack" aria-label="Settings">${liveSettings(s, sessionEstimate(s), s.roster.filter((r) => r.present).length, true)}${linkCard(s)}</section>`
       : `${endSt.over ? notice('warn', `<b>${endSt.text}.</b><div class="row" style="margin-top:8px"><button class="btn sm" data-act="openAdjust" data-k="end">Set end time</button><button class="btn sm" data-act="openSessionDone" ${!S.online ? 'disabled' : ''}>Session done</button></div>`) : ''}
       ${(() => { const short = shortOfPlayers(s); return short ? notice('warn', esc(short)) : ''; })()}
@@ -5520,12 +5676,22 @@ function courtSides(s, m) {
   const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => {
     const p = P(pid), r = R(s, pid);
     const g = gamesOf(s, pid);
-    return `<button class="pf lv-${r ? rvBand(r) : 'none'}" data-act="openProfile" data-id="${pid}" title="${esc(p.name)} · ${esc(lvLabel(r ? r.level : null))} · ${g}/${s.minimum} games" aria-label="${esc(p.name)}, Team ${team}, ${g} of ${s.minimum} games. View profile"><span class="pf-face">${avatar(p)}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${pid}" title="${esc(nm(pid))}'s games this session · tap to see them">${g}</span></span><span class="pf-n">${esc((s.status === 'finalized' ? acctShort : short)(pid))}</span></button>`;
+    return `<button class="pf lv-${r ? rvBand(r) : 'none'}" data-act="openProfile" data-id="${pid}" title="${esc(p.name)} · ${esc(lvLabel(r ? r.level : null))} · ${g}/${s.minimum} games" aria-label="${esc(p.name)}, Team ${team}, ${g} of ${s.minimum} games. View profile"><span class="pf-face">${avatar(p)}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${pid}" title="${esc(nm(pid))}'s games this session · tap to see them">${g}</span></span>${s.status === 'finalized' ? `<span class="pf-n">${esc(acctShort(pid))}</span>` : faceNames(pid, 'pf-n')}</button>`;
   }).join('')}</div>`;
   return `<div class="sides">${side(m.teamA, 'A')}${side(m.teamB, 'B')}</div>`;
 }
 // The court card's ⋯ menu. The card itself shows only the action for its state (Start anyway, or the match action).
 // Phone replacement for a tab row: a full-width button showing the current tab that opens a list of the tabs (reuses the court menu's open state and outside-click close).
+// Owner artifact comment, November 26, 2026, on the phone view picker ("Courts 3/3"): "make this into a sidebar menu, clicking on it
+// opens a sidebar on the left". Phones only (the tab row stays on wider screens): a button with the current view opens a left
+// drawer listing every console view with its count; picking one closes it.
+function consoleViewDrawer(tabs, cur) {
+  const open = !!S.ui.cvOpen, now = tabs.find(([k]) => k === cur) || tabs[0];
+  const chipOf = (n, k) => (n != null ? `<span class="chip${k ? ` ${k}` : ''}">${esc(n)}</span>` : '');
+  return `<div class="cv-dd"><button class="tabmenu-btn" data-act="toggleConsoleViews" aria-expanded="${open}" aria-controls="cv-drawer" aria-label="Console view: ${esc(now[1])}. Open the views menu"><span class="tm-cur">${I.list}<span>${esc(now[1])}</span>${chipOf(now[2], now[4])}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+    ${open ? `<div class="cv-scrim" data-act="toggleConsoleViews" aria-hidden="true"></div><nav class="cv-drawer" id="cv-drawer" aria-label="Console views"><div class="cv-head"><b>Live session</b><button class="btn sm ghost icon-btn" data-act="toggleConsoleViews" aria-label="Close the views menu">${I.x}</button></div>
+      ${tabs.map(([k, l, n, , ck]) => `<button class="cv-item${k === cur ? ' on' : ''}" data-act="pane" data-k="${k}" ${k === cur ? 'aria-current="page"' : ''}><span>${esc(l)}</span>${chipOf(n, ck)}</button>`).join('')}</nav>` : ''}</div>`;
+}
 function tabMenu(id, label, opts, cur) {
   const open = S.ui.courtMenu === id, now = opts.find(([k]) => k === cur) || opts[0];
   const text = ([, l, n]) => `<span>${l}</span>${n != null ? `<span class="chip">${n}</span>` : ''}`;
@@ -5565,6 +5731,7 @@ function shortOfPlayers(s) {
   const out = n - 4 * d - 2 * sg;
   return `${n} player${n === 1 ? '' : 's'} present: ${courts ? `enough for ${courts}.${out ? ` ${out} sit${out === 1 ? 's' : ''} out each game.` : ''}` : `not enough for a ${s.doubles ? 'doubles' : 'singles'} game.`}`;
 }
+const courtView = () => { try { return localStorage.getItem('rotra.courtView') === 'slide' ? 'slide' : 'grid'; } catch (e) { return S.ui.courtView === 'slide' ? 'slide' : 'grid'; } };
 function courtsPane(s) {
   const list = waiting(s);
   const need = s.singles ? 2 : perMatchOf(s), freeN = freePresent(s);
@@ -5578,23 +5745,32 @@ function courtsPane(s) {
       // Owner, November 25, 2026: a one-court match can be dropped onto another busy court; the two matches trade courts.
       const swapAttr = merged ? '' : ` data-swap-court="${c.id}" data-swap-match="${m.id}"`;
       const head = (label) => `<div class="ct"><div><h3>${esc(merged ? courtsOf(s, m) : c.label)}</h3>${courtTimeLine(s, c)}</div><div class="row" style="gap:6px;flex-wrap:nowrap">${label}${courtMenu(s, c, true)}</div></div>
-        <div class="pitch open-pitch ${merged ? 'tall' : ''}" role="img" data-act="openMatch" data-id="${m.id}" title="Open match" aria-label="${esc(`Team A ${listNames(m.teamA)} versus Team B ${listNames(m.teamB)}`)}">${courtSVG(merged ? 2 : 1)}${courtSides(s, m)}</div>`;
+        <div class="pitch open-pitch ${merged ? 'tall' : ''}" role="button" tabindex="0" data-act="openMatch" data-id="${m.id}" title="Open match" aria-label="${esc(`Open match: Team A ${listNames(m.teamA)} versus Team B ${listNames(m.teamB)}`)}">${courtSVG(merged ? 2 : 1)}${courtSides(s, m)}</div>`;
       if (m.status === 'oncourt') {
         // On court: placed, getting ready. Normal border; the Queue Master starts it.
         const b = blockOf(s, m);
-        return `<div class="court oncourt ${merged ? 'merged' : ''}"${swapAttr}>${head(chip(merged ? 'Merged · Getting ready' : 'Getting ready'))}
-        <p class="small muted">${matchLabel(m)} · Match ${m.seq} · waiting to start</p>
+        return `<div class="court oncourt ${merged ? 'merged' : ''}"${swapAttr}>${head(chip(merged ? 'Merged · Waiting' : 'Waiting'))}
+        <div class="ct-meta"><b class="ct-num tnum">#${m.seq}</b>${chip(matchLabel(m), 'solid')}<span class="chip">Waiting to start</span></div>
         ${b ? `<span class="status-line warn">${I.alert} ${esc(b.text)}</span>` : ''}
-        <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="startOnCourt" data-id="${m.id}" ${b ? `disabled title="${esc(b.text)}"` : ''}>Start match</button><button class="btn sm" data-act="openMatch" data-id="${m.id}">Open match</button></div></div>`;
+        <div class="row court-acts" style="margin-top:auto"><button class="btn sm primary" data-act="startOnCourt" data-id="${m.id}" ${b ? `disabled title="${esc(b.text)}"` : ''}>Start match</button></div></div>`;
       }
       const mins = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
       const subs = (m.subs || []).length;
       // D-2026-11-25-02: the Almost done switch, Playing only, under the players. Optional; the Queue Master flips it after asking the players.
-      return `<div class="court busy ${merged ? 'merged' : ''}"${swapAttr}>${head(chip(merged ? 'Merged · Playing' : 'Playing', 'ok'))}
+      // Owner artifact comment, November 26, 2026: the top-right status reads Free, Waiting, Playing, Ending, Ending soon.
+      // Playing for the first half of a typical game, Ending for the second half, Ending soon once it is Finishing soon, Almost
+      // done or Could end any time (Running long keeps Ending soon, in the warning colour). Ending and Ending soon pulse.
+      const st = (() => { const f = finishOf(s, m), typ = SCORING[scoringOf(s)].typical;
+        if (f.phase === 'mid') return f.left > typ / 2 ? null : ['Ending', 'ok'];
+        return ['Ending soon', f.phase === 'long' ? 'warn' : 'ok']; })();
+      const stChip = st ? `<span class="ct-end ${st[1]}" title="${esc(finishOf(s, m).text)}"><i aria-hidden="true"></i>${merged ? 'Merged · ' : ''}${st[0]}</span>` : chip(merged ? 'Merged · Playing' : 'Playing', 'ok');
+      return `<div class="court busy ${merged ? 'merged' : ''}"${swapAttr}>${head(stChip)}
+        ${/* Owner artifact comment, November 26, 2026, on "Genderless Doubles · Match 17 · 1 min": the format as a pill, the match
+          number as a green #17 header, the elapsed time as a time pill. */ ''}
+        <div class="ct-meta"><b class="ct-num tnum">#${m.seq}</b>${chip(matchLabel(m), 'solid')}<span class="chip ct-time tnum">${I.clock}${elapsedTime(mins)}</span>${subs ? `<span class="small muted">${subs} substitution${subs > 1 ? 's' : ''}</span>` : ''}</div>
+        ${/* Owner artifact comment, November 26, 2026: "put almost done below the #17 row". */ ''}
         <label class="between" style="flex-wrap:nowrap"><span class="small"><b>Almost done</b></span>${sw(almostDoneOf(m), 'toggleAlmostDone', `data-id="${m.id}"`, `Almost done, ${courtsOf(s, m)}`)}</label>
-        <p class="small muted">${matchLabel(m)} · Match ${m.seq} · ${elapsedTime(mins)}${subs ? ` · ${subs} substitution${subs > 1 ? 's' : ''}` : ''}</p>
-        ${(() => { const f = finishOf(s, m); return f.phase === 'soon' || f.phase === 'almost' ? `<p class="small" style="color:var(--accent)">${esc(f.text)}</p>` : f.phase === 'long' ? `<p class="small" style="color:var(--warn)">${esc(f.text)}</p>` : `<p class="small muted">${esc(f.text)}</p>`; })()}
-        <div class="row" style="margin-top:auto"><button class="btn sm primary" data-act="openMatch" data-id="${m.id}">Open match</button><button class="btn sm" data-act="pauseMatch" data-id="${m.id}" title="Back to Getting ready, for a match started by mistake">${I.q_pause} Pause match</button></div></div>`;
+        <div class="row court-acts" style="margin-top:auto">${/* Owner artifact comment, November 26, 2026: "remove open match". The court picture opens the match (tap, or Enter on it). */ ''}<button class="btn sm" data-act="pauseMatch" data-id="${m.id}" title="Back to Getting ready, for a match started by mistake">${I.q_pause} Pause match</button>${/* Owner artifact comment, same day: "during starting it should show pause and match done". */ ''}<button class="btn sm primary" data-act="openResult" data-id="${m.id}">Match done</button></div></div>`;
     }
     const notStarted = !courtOpen(s, c);
     const eligible = notStarted ? null : list.find((x) => !blockOf(s, x));
@@ -5609,19 +5785,27 @@ function courtsPane(s) {
       body = `${first && first.id !== eligible.id ? `<p class="small muted">Skipped #1: ${esc(blockOf(s, first).text)}.</p>` : ''}
         <p class="small"><span class="muted">Next eligible:</span> #${list.indexOf(eligible) + 1} · ${matchLabel(eligible)}</p>
         <p class="small ne-line">${nePair(s, eligible.teamA)}<span class="muted">vs</span>${nePair(s, eligible.teamB)}</p>
-        <div class="row" style="margin-top:auto"><button class="btn sm primary" ${put}>Put on court</button>${list.length > 1 ? `<button class="btn sm" data-act="openChooseMatch" data-court="${c.id}">Pick another</button>` : ''}</div>`;
+        <div class="row court-acts" style="margin-top:auto"><button class="btn sm primary" ${put}>Put on court</button>${list.length > 1 ? `<button class="btn sm" data-act="openChooseMatch" data-court="${c.id}">Pick another</button>` : ''}</div>`;
     } else {
       body = `<p class="small muted">${need && freeN < need ? 'Not enough free players.' : list.length ? `No waiting match can go on: ${esc(blockOf(s, first).text)}.` : 'The queue is empty.'}</p>
-        <div class="row" style="margin-top:auto"><button class="btn sm" data-act="openEditor">Add match</button></div>`;
+        <div class="row court-acts" style="margin-top:auto"><button class="btn sm" data-act="openEditor">Add match</button></div>`;
     }
-    return `<div class="court" ${notStarted ? '' : `data-free-court="${c.id}"`}><div class="ct"><div><h3>${esc(c.label)}</h3>${courtTimeLine(s, c)}</div><div class="row" style="gap:6px;flex-wrap:nowrap">${notStarted ? chip('Not open yet') : freeChip(s, c, Date.now(), Math.max(courtStart(s, c) || 0, s.startedAt || 0))}${courtMenu(s, c, false)}</div></div><div class="pitch empty">${courtSVG(1)}<span class="free-lbl">${notStarted ? 'Not open yet' : 'Free'}</span></div>${body}</div>`;
+    return `<div class="court" ${notStarted ? '' : `data-free-court="${c.id}"`}><div class="ct"><div><h3>${esc(c.label)}</h3>${courtTimeLine(s, c)}</div><div class="row" style="gap:6px;flex-wrap:nowrap">${notStarted ? chip('Not open yet') : freeChip(s, c, Date.now(), Math.max(courtStart(s, c) || 0, s.startedAt || 0))}${courtMenu(s, c, false)}</div></div>${notStarted ? `<div class="pitch empty">${courtSVG(1)}<span class="free-lbl">Not open yet</span></div>` : `<div class="pitch empty free-pitch" role="button" tabindex="0" data-act="openFreeCourt" data-court="${c.id}" title="Pick a match or generate one" aria-label="${esc(c.label)} is free. Pick a match from the queue or generate one">${courtSVG(1)}<span class="free-lbl"><span class="fp-plus" aria-hidden="true">+</span><b>Free</b><small>Tap to fill</small></span></div>`}${body}</div>`;
   }).join('');
   const closed = s.courts.filter((c) => !courtOpen(s, c));
   const fill = courtFill(s);
   return `<div class="between"><h2>Courts</h2><div class="row" style="gap:10px">${closed.length ? '<button class="btn xs" data-act="openAllEarly">Open all courts now</button>' : ''}<span class="small muted">${freeCourts(s).length} of ${s.courts.length} free</span></div></div>
-    <div class="stack tight"><div class="seg" role="group" aria-label="Court filling">${[['manual', 'Manual Queue'], ['auto', 'Auto Queue']].map(([k, l]) => `<button aria-pressed="${fill === k}" data-act="setCourtFill" data-k="${k}">${l}</button>`).join('')}</div>
+    ${/* Owner artifact comment, November 26, 2026, on this row: "add a button or switch on the right, grid or slide mode, slide mode
+      should use embla carousel". Grid is the court grid; Slide is an Embla carousel, one court card a slide (two or three on wide
+      screens), with arrows and dots. Remembered on this device. */ ''}
+    <div class="stack tight"><div class="between" style="align-items:center">${/* Owner artifact comment, November 26, 2026, on Manual / Auto Queue: "make this a switch and auto queue and add a information icon,
+        clicking on it opens a dialog". On = Auto Queue, off = Manual Queue; the (i) opens How courts get matches. */ ''}<div class="row fill-sw" style="gap:10px;flex-wrap:nowrap"><span class="fill-lbl"><b>Auto Queue</b></span>${sw(fill === 'auto', 'setCourtFill', `data-k="${fill === 'auto' ? 'manual' : 'auto'}"`, 'Auto Queue')}<button type="button" class="btn xs ghost icon-btn" data-act="openFillInfo" aria-label="How Auto Queue works" title="How Auto Queue works">${I.info}</button></div>
+      <div class="qview" role="group" aria-label="Court layout" style="margin-left:auto">${[['grid', 'Grid', I.grid], ['slide', 'Slide', I.list]].map(([k, l, ic]) => `<button aria-pressed="${courtView() === k}" data-act="setCourtView" data-k="${k}" aria-label="${l} mode" title="${l} mode">${ic}</button>`).join('')}</div></div>
       <p class="small muted" aria-live="polite">${fill === 'auto' ? 'Free courts get the next ready match. You still start each one.' : 'You put each match on a court.'}</p></div>
-    <div class="courts">${cards}<button class="court add-court" data-act="quickAddCourt" aria-label="Add Court ${s.courts.length + 1}"><span class="plus" aria-hidden="true">+</span><span>Add court</span><span class="small muted" style="font-weight:500">Set a planned court window</span></button></div>
+    ${(() => { const add = `<button class="court add-court" data-act="quickAddCourt" aria-label="Add Court ${s.courts.length + 1}"><span class="plus" aria-hidden="true">+</span><span>Add court</span><span class="small muted" style="font-weight:500">Set a planned court window</span></button>`;
+      return courtView() === 'slide'
+        ? `<div class="cs-wrap"><div class="cs-embla"><div class="courts cs-track">${cards}${add}</div></div><div class="cs-ctl"><button type="button" class="btn sm ghost icon-btn" data-cs="prev" aria-label="Previous court">${I.back}</button><div class="cs-dots" role="group" aria-label="Courts"></div><button type="button" class="btn sm ghost icon-btn cs-next" data-cs="next" aria-label="Next court">${I.back}</button></div></div>`
+        : `<div class="courts">${cards}${add}</div>`; })()}
     <p class="small muted">A match never starts by itself when a court frees up. You start each one.</p>`;
 }
 
@@ -5730,7 +5914,7 @@ function draftTile(s, m, batch, selected) {
     : `<span class="status-line muted">${I.info} ${esc(m.reason || 'Suggested by Generate matches')}</span>`;
   // Owner artifact comment, November 23, 2026: no "2 played · 2 suggested" chips. Each face has the level ring and the
   // games badge, like the Main Queue tiles; the badge opens the player's games this session (D-SESSION-GAMES).
-  const faces = (ids) => `<div class="qfaces">${ids.map((p) => `<div class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span><span class="qf-n">${esc(short(p))}</span></div>`).join('')}</div>`;
+  const faces = (ids) => `<div class="qfaces">${ids.map((p) => `<div class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span>${faceNames(p, 'qf-n')}</div>`).join('')}</div>`;
   return `<article class="qtile draft ${attention ? 'attn' : ''}" role="button" tabindex="0" aria-pressed="${pick > 0}" data-act="autoToggle" data-id="${m.draftId}" aria-label="Draft ${esc(matchLabel(m))}: ${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}${pick ? `, picked ${pick}` : ''}">
     ${pick ? `<span class="sel-badge" aria-hidden="true">${pick}</span>` : ''}
     <div class="qt-head">${chip('Draft')}${chip(matchLabel(m), 'solid')}</div>
@@ -5999,7 +6183,7 @@ function queueCard(s, m, i, n, cols, compact = false) {
   const wait = (p) => (s.status === 'active' ? statusPill(s, p, m) : '');
   const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${queueTime(restInfo(s, p).mins)}` : ''; };
   // Owner artifact comment, November 19, 2026: each picture has the level ring and the player's games so far on it.
-  let faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}${waitLabel(p)}. View profile. Left or right arrow switches sides"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span><span class="qf-n">${esc(short(p))}</span>${wait(p)}</button>`).join('')}</div>`;
+  let faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}${waitLabel(p)}. View profile. Left or right arrow switches sides"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span>${faceNames(p, 'qf-n')}${wait(p)}</button>`).join('')}</div>`;
   // Owner artifact comment, November 19, 2026 (Courts tab › Upcoming queued matches): compact cards with no wait times; each
   // team is a stack of overlapping pictures with the level ring, and the names on one line beside it.
   const stack = (ids, team) => `<div class="qstack-row"><div class="qstack">${ids.map((p, j) => `<button class="qs-f lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}" aria-label="${esc(nm(p))}, ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}. View profile">${avatar(P(p))}</button>`).join('')}</div><span class="qs-names">${ids.map((p) => esc(short(p))).join(' & ')}</span></div>`;
@@ -6031,6 +6215,10 @@ function playersPane(s) {
   const held = (pid) => heldPresence?.filter === f.show && heldPresence.ids.includes(pid) && presencePending.has(pid);
   if (f.show === 'avail') rows = rows.filter((x) => (x.r.present && !x.a) || held(x.r.pid));
   if (f.show === 'present') rows = rows.filter((x) => x.r.present || held(x.r.pid));
+  // Owner artifact comment, November 26, 2026 ("add in queue and playing"): In queue = free players in a waiting Main Queue
+  // match; Playing = players holding a court (getting ready or playing).
+  if (f.show === 'queue') rows = rows.filter((x) => (x.r.present && !x.a && x.qpos) || held(x.r.pid));
+  if (f.show === 'playing') rows = rows.filter((x) => !!x.a || held(x.r.pid));
   // Owner artifact comment, November 19, 2026: "Add Not Here and Waitlist". Not here: roster players marked away. Waitlist: the waitlist itself.
   if (f.show === 'away') rows = rows.filter((x) => !x.r.present || held(x.r.pid));
   // Owner, November 25, 2026: four sorts, each either way. Name (A–Z), Games (the card's Total: played plus queued),
@@ -6048,27 +6236,29 @@ function playersPane(s) {
   };
   rows.sort(sorters[sortKey]);
   if (heldPresence?.filter === f.show && presencePending.size) rows.sort((a,b) => { const rank = (pid) => { const i = heldPresence.ids.indexOf(pid); return i < 0 ? Infinity : i; }; return rank(a.r.pid) - rank(b.r.pid); });
-  const counts = { avail: s.roster.filter((r) => r.present && !busyOf(s, r.pid)).length, present: s.roster.filter((r) => r.present).length, away: s.roster.filter((r) => !r.present).length, waitlist: (s.waitlist || []).length, all: s.roster.length };
+  const counts = { avail: s.roster.filter((r) => r.present && !busyOf(s, r.pid)).length, queue: s.roster.filter((r) => r.present && !busyOf(s, r.pid) && w.some((m) => all(m).includes(r.pid))).length, playing: s.roster.filter((r) => busyOf(s, r.pid)).length, present: s.roster.filter((r) => r.present).length, away: s.roster.filter((r) => !r.present).length, waitlist: (s.waitlist || []).length, all: s.roster.length };
   const plan = matchPlan(s, sel);
   const draftState = S.ui.autoDraft && S.ui.autoDraft.sid === s.id ? S.ui.autoDraft : null;
   const currentDrafts = draftState?.batches[draftState.tab]?.cards || [];
   return `<div class="between"><div><h2>Players</h2><p class="small muted">Tap players to pick them, then make a match. ${counts.present} present of ${counts.all}.</p></div><div class="row" style="flex-wrap:wrap;justify-content:flex-end"><button class="btn sm" data-act="allPresent" ${counts.away ? '' : 'disabled'}>All present</button><button class="btn sm" data-act="allAway" ${counts.present ? '' : 'disabled'}>All away</button><button class="btn sm" data-act="openSetGames">Set games for all…</button><button class="btn sm" data-act="openAdd">Add late player</button></div></div>
     <div class="row pl-tools" style="gap:10px">
-      <div class="seg" role="group" aria-label="Show">${[['avail', `Available · ${counts.avail}`], ['present', `Present · ${counts.present}`], ['away', `Not here · ${counts.away}`], ['waitlist', `Waitlist · ${counts.waitlist}`], ['all', `Everyone · ${counts.all}`]].map(([k, l]) => `<button aria-pressed="${f.show === k}" data-act="plSet" data-k="show" data-v="${k}">${l}</button>`).join('')}</div>
+      <div class="seg" role="group" aria-label="Show">${[['avail', `Available · ${counts.avail}`], ['queue', `In queue · ${counts.queue}`], ['playing', `Playing · ${counts.playing}`], ['present', `Present · ${counts.present}`], ['away', `Not here · ${counts.away}`], ['waitlist', `Waitlist · ${counts.waitlist}`], ['all', `Everyone · ${counts.all}`]].map(([k, l]) => `<button aria-pressed="${f.show === k}" data-act="plSet" data-k="show" data-v="${k}">${l}</button>`).join('')}</div>
       ${f.show === 'waitlist' ? '' : `<div class="seg pl-sort-btns" role="group" aria-label="Sort players">${PL_SORTS.map(([k, l]) => { const on = sortKey === k, d = on ? sortDir : 1; return `<button aria-pressed="${on}" data-act="plSort" data-k="${k}" title="${esc(PL_SORT_DIRS[k][d === 1 ? 0 : 1])}${on ? ' · tap to flip' : ''}" aria-label="Sort by ${l.toLowerCase()}, ${esc(PL_SORT_DIRS[k][d === 1 ? 0 : 1])}">${l}${on ? `<span class="sort-dir" aria-hidden="true">${d === 1 ? (k === 'name' || k === 'games' ? I.up : I.down) : (k === 'name' || k === 'games' ? I.down : I.up)}</span>` : ''}</button>`; }).join('')}</div>
       <select class="input inline pl-sort-sel" id="pl-sort" data-act-change="plSortSel" aria-label="Sort players">${PL_SORTS.flatMap(([k]) => [1, -1].map((d) => [`${k}:${d}`, `Sort: ${PL_SORT_DIRS[k][d === 1 ? 0 : 1]}`])).map(([v, l]) => `<option value="${v}" ${v === `${sortKey}:${sortDir}` ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`}
     </div>
+    ${f.show === 'waitlist' || !rows.length ? '' : `<div class="st-legend" aria-hidden="true"><b>Status</b>${[['wait', '', 'Free, waiting'], ['queue', '', 'In queue'], ['ready', ' play', 'Getting ready'], ['play', ' play', 'Playing'], ['away', ' away', 'Away']].map(([k, c, l]) => `<span><span class="spill${c}">${ST_ICO[k]}</span>${l}</span>`).join('')}</div>`}
     ${f.show === 'waitlist' ? waitlistPanel(s) : rows.length ? `<div class="pgrid3">${rows.map((x) => {
       const i = sel.indexOf(x.r.pid);
       const st = x.a ? (x.a.status === 'oncourt' ? `On court · getting ready · ${courtsOf(s, x.a)}` : `Playing · ${courtsOf(s, x.a)}`) : !x.r.present ? 'Away' : x.qpos ? `Queued · #${x.qpos}` : 'Free';
       return `<article class="pc3 lv-${rvBand(x.r)} ${x.a && x.a.status === 'active' ? 'playing' : ''} ${x.r.present ? '' : 'away'}" role="button" tabindex="0" data-act="selPlayer" data-pid="${x.r.pid}" aria-pressed="${i >= 0}" aria-label="${esc(x.p.name)}, ${esc(lvLabel(x.r.level))}, ${x.g} games">
         ${i >= 0 ? `<span class="sel-badge" aria-hidden="true">${i + 1}</span>` : ''}
-        <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile" title="${esc(lvLabel(x.r.level))}">${avatar(x.p)}</button><div class="row" style="min-width:0;flex:1;gap:4px;flex-wrap:nowrap"><div class="pc3-name" style="min-width:0" title="${esc(x.p.name)}">${esc(clubNickOf(x.p) || x.p.nick || x.p.name)}</div>${hcOf(x.r).length ? `<span class="hc-ico" role="img" title="${esc(hcText(hcOf(x.r)))}" aria-label="${esc(hcText(hcOf(x.r)))}">${I.alert}</span>` : ''}</div><button class="btn xs ghost icon-btn" data-act="openEditLive" data-pid="${x.r.pid}" aria-label="Edit ${esc(x.p.name)}" title="Edit player">${I.edit}</button></div>
-        <div class="pc3-games"><button type="button" class="pg-played" data-act="openSetGames" data-pid="${x.r.pid}" title="Set games played" aria-label="${x.g} games played. Set games played for ${esc(x.p.name)}"><b class="tnum">${x.g}</b><span>Current</span></button><i aria-hidden="true"></i><div class="pg-total" title="Played plus queued for the night" aria-label="${x.g + queuedCount(s, x.r.pid)} for the night, played plus queued"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>Total</span></div></div>
-        <div class="between" style="flex-wrap:nowrap">${statusPill(s, x.r.pid)}${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
+        <span class="pc3-edit"><button class="btn xs ghost icon-btn" data-act="openEditLive" data-pid="${x.r.pid}" aria-label="Edit ${esc(x.p.name)}" title="Edit player">${I.edit}</button></span>
+        <div class="pc3-top"><button class="face-btn" data-act="openProfile" data-id="${x.r.pid}" aria-label="View ${esc(x.p.name)}'s profile" title="${esc(lvLabel(x.r.level))}">${avatar(x.p)}</button><div class="row" style="min-width:0;flex:1;gap:4px;flex-wrap:nowrap"><div class="pc3-name" lang="en" style="min-width:0" title="${esc(x.p.name)}"><span class="pc3-top">${esc(nameParts(x.p)[0])}</span>${subNames(x.p)}</div>${hcOf(x.r).length ? `<span class="hc-ico" role="img" title="${esc(hcText(hcOf(x.r)))}" aria-label="${esc(hcText(hcOf(x.r)))}">${I.alert}</span>` : ''}</div></div>
+        <div class="pc3-games"><button type="button" class="pg-played" data-act="openSetGames" data-pid="${x.r.pid}" title="Set games played" aria-label="${x.g} games played. Set games played for ${esc(x.p.name)}"><b class="tnum">${x.g}</b><span>Current</span></button><i aria-hidden="true"></i><button type="button" class="pg-total" data-act="openPlayerGames" data-pid="${x.r.pid}" title="See completed and queued games" aria-label="${x.g + queuedCount(s, x.r.pid)} for the night, played plus queued. See completed and queued games"><b class="tnum">${x.g + queuedCount(s, x.r.pid)}</b><span>Total</span></button></div>
+        <div class="pc3-foot">${statusPill(s, x.r.pid)}<span class="pc3-acts">${sw(x.r.present, 'togglePresent', `data-pid="${x.r.pid}"`, `${x.p.name} present`)}</span></div>${presencePending.has(x.r.pid) ? '<span class="small muted">Saving presence…</span>' : ''}${selfMark(x.r)}
         <div class="row">${!x.r.present && !x.g && !x.a ? `<button class="btn xs ghost" style="color:var(--error)" data-act="openNoShow" data-pid="${x.r.pid}" aria-label="Mark ${esc(x.p.name)} as No show (cancelled)">No show (cancelled)</button>` : ''}</div>
       </article>`;
-    }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : f.show === 'away' ? 'Everyone on the roster is here.' : 'No players yet.'}</div>`}
+    }).join('')}</div>` : `<div class="card empty">${f.show === 'avail' ? 'No one is free right now. Try Present or Everyone.' : f.show === 'away' ? 'Everyone on the roster is here.' : f.show === 'queue' ? 'No free player is in a queued match.' : f.show === 'playing' ? 'No one is on a court right now.' : 'No players yet.'}</div>`}
     ${sel.length ? `<div class="selbar" role="region" aria-label="Selected players">
       <div class="row" style="gap:6px;flex-wrap:nowrap;min-width:0"><span class="sel-faces">${sel.map((pid) => avatar(P(pid))).join('')}</span><span class="small"><b>${sel.length} selected</b> · ${esc(plan.label)}</span></div>
       <div class="row" style="flex-wrap:nowrap"><button class="btn sm ghost" data-act="selClear">Clear</button><button class="btn sm" data-act="selPresence" data-v="1" ${sel.some((pid) => !R(s, pid)?.present) ? '' : 'disabled'}>Set present</button><button class="btn sm" data-act="selPresence" data-v="0" ${sel.some((pid) => R(s, pid)?.present) ? '' : 'disabled'}>Set away</button><button class="btn sm primary" data-act="makeMatch" ${plan.ok ? '' : 'disabled'}>Make match</button></div></div>` : ''}
@@ -6610,9 +6800,11 @@ function viewPublic() {
 function playerTile(s, pid, { attrs = '', pressed = false, disabled = false, note = '' } = {}) {
   const p = P(pid), r = R(s, pid), a = busyOf(s, pid);
   const status = note || (a ? `${a.status === 'oncourt' ? 'On court' : 'Playing'} · ${courtsOf(s, a)}` : !r.present ? 'Not present' : `Resting ${restInfo(s, pid).mins} min`);
-  return `<button class="ptile ${a ? 'busy' : ''} ${r.present ? '' : 'away'} ${!a && r.present && !note ? 'fresh' : ''}" ${attrs} aria-pressed="${pressed}" ${disabled ? 'disabled' : ''}>
-    ${avatar(p, 'xl')}<span class="pt-name">${esc(p.name)}</span><span class="pt-lv">${esc(lvLabel(r.level))}</span>
-    <span class="pt-meta">${gamesOf(s, pid)}/${s.minimum} games</span><span class="pt-st">${esc(status)}</span></button>`;
+  // Owner artifact comment, November 26, 2026: "add the skill border plus games count, remove the skill label". Same face as the
+  // Replace dialog: the level ring and the games badge on the picture; the level stays in the accessible name only.
+  const g = gamesOf(s, pid);
+  return `<button class="ptile pt-ring lv-${r ? rvBand(r) : 'none'} ${a ? 'busy' : ''} ${r.present ? '' : 'away'} ${!a && r.present && !note ? 'fresh' : ''}" ${attrs} aria-pressed="${pressed}" ${disabled ? 'disabled' : ''} aria-label="${esc(p.name)}, ${esc(lvLabel(r.level))}, ${g} of ${s.minimum} games, ${esc(status)}">
+    <span class="sp-face pt-face">${avatar(p, 'xl')}<span class="pf-g tnum" aria-hidden="true">${g}</span></span>${nameStack(p)}<span class="pt-st">${esc(status)}</span></button>`;
 }
 // Owner artifact comment, November 13, 2026: Replace and Substitute use a big dialog — who's coming out (the match's players), then
 // Suggested (the eight free players with the fewest games, longest rest first on ties), then All with a search and pages of 24.
@@ -6630,7 +6822,7 @@ function swapPicker(s, m, sh, outLabel, extra = '', actions = '', title = '', sw
     // under the name drops "0/5 ·"), and a free
     // player's rest takes the wait colours: warning from 10 min, error from 16 (the text always says the time).
     const resting = !note && !a && r && r.present, tone = resting ? (mins >= 16 ? ' bad' : mins >= 10 ? ' warn' : '') : '';
-    return `<button type="button" class="ptile sm lv-${r ? rvBand(r) : 'none'}${a ? ' busy' : ''}${r && r.present ? '' : ' away'}" data-act="sheetSet" data-k="${k}" data-v="${pid}" aria-pressed="${pressed}" ${disabled ? 'disabled' : ''} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${gamesOf(s, pid)} of ${s.minimum} games, ${esc(st)}"><span class="pf-face sp-face">${avatar(p)}<span class="pf-g tnum" aria-hidden="true">${gamesOf(s, pid)}</span></span><span class="pt-name">${esc(nm(pid).split(' ')[0])}</span><span class="pt-meta"><span class="sp-rest${tone}">${esc(st)}</span></span></button>`; };
+    return `<button type="button" class="ptile sm lv-${r ? rvBand(r) : 'none'}${a ? ' busy' : ''}${r && r.present ? '' : ' away'}" data-act="sheetSet" data-k="${k}" data-v="${pid}" aria-pressed="${pressed}" ${disabled ? 'disabled' : ''} aria-label="${esc(p.name)}, ${esc(lvLabel(r ? r.level : null))}, ${gamesOf(s, pid)} of ${s.minimum} games, ${esc(st)}"><span class="pf-face sp-face">${avatar(p)}<span class="pf-g tnum" aria-hidden="true">${gamesOf(s, pid)}</span></span>${nameStack(p)}<span class="pt-meta"><span class="sp-rest${tone}">${esc(st)}</span></span></button>`; };
   const free = s.roster.filter((r) => r.present && !lineup.has(r.pid) && !busyOf(s, r.pid)).sort((a, b) => gamesOf(s, a.pid) - gamesOf(s, b.pid) || restInfo(s, b.pid).mins - restInfo(s, a.pid).mins);
   const q = (sh.q || '').trim().toLowerCase();
   // Artifact comment, same day: filter All players by skill level and sort by longest wait or fewest games.
@@ -6783,6 +6975,28 @@ const ppStatsBlock = (games, wins) => { const yr = new Date().getFullYear(), hea
   return `<div class="pp-sec pp-split"><div class="pp-wrbox"><span class="label">Win rate</span><div class="pp-wr"><span class="tnum">${rate}%</span>${ppFire(rate)}</div></div><div class="pp-right">${head}<dl class="pp-cnt"><div class="g"><dt>Games</dt><dd>${games}</dd></div><div class="w"><dt>Wins</dt><dd>${wins}</dd></div><div class="l"><dt>Losses</dt><dd>${l}</dd></div></dl></div></div>`; };
 const statsSec = (st) => ppStatsBlock(st ? st.games : 0, st ? st.wins : 0);
 const pubStats = (p) => { if (!p.prior || p.base == null) return null; const games = p.prior * 5 + (hashStr(p.id) % 6); const wins = Math.round(games * p.base); return { games, wins, rate: Math.round((wins / games) * 100) }; };
+// The Session QR share image (post or story), shared by the Session QR sheet and the live Share dialog.
+function sessionQrCard(sh) {
+    const club = sh.kind === 'club', s = club ? null : cur(), fmt = sh.fmt === 'story' ? 'story' : 'post';
+    // Owner, November 20, 2026 ("my profile pic is not shown"; "there is no share link input with copy too"): the invite card shows the
+    // inviter's own picture, and the sheet has the Invite link copy field under the card.
+    // D-2026-11-09-08 Session invite: the same card, "<name> invites you to play", with a short invite code on the link.
+    const inv = !club && sh.invite ? P(sh.invite) : null, invRow = inv ? R(s, inv.id) || (s.waitlist || []).find((w) => w.pid === inv.id) : null;
+    const invLink = club ? clubInviteLink() : inv ? `${sessionLink(s)}?invite=${invRow.inviteCode}` : sessionLink(s);
+    const full = !club && s.status !== 'active' && openSlots(s) === 0;
+    // Static placeholder QR (finder squares + sample modules); the real app encodes the public session link.
+    const sq = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="#000"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" fill="#000"/>`;
+    const dots = [[9,1],[11,2],[13,1],[10,4],[12,5],[9,7],[14,8],[1,9],[3,10],[5,9],[8,10],[10,9],[12,11],[15,10],[2,12],[4,13],[7,12],[9,14],[11,13],[14,14],[16,12],[18,9],[19,11],[17,15],[20,13],[18,18],[12,17],[14,19],[10,19],[8,16],[16,19],[20,17]];
+    const qr = `<svg viewBox="0 0 21 21" shape-rendering="crispEdges" role="img" aria-label="QR code for the ${club ? 'club invite' : 'session'} link">${sq(0, 0)}${sq(14, 0)}${sq(0, 14)}${dots.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`).join('')}</svg>`;
+    const mark = S.club.logo ? `<img src="${S.club.logo}" alt="">` : `<span>${esc(S.club.initials)}</span>`;
+    // Brand card: the same image people post to Facebook and stories. Colors are fixed brand values, so it looks the same in both themes.
+    const card = `<div class="qr-card ${fmt}" role="group" aria-label="Share image preview">
+      <div class="qc-top"><span class="qc-club">${inv ? picInner(inv) : mark}</span><div><b>${esc(inv ? inv.name : S.club.name)}</b><span>${club ? 'invites you to play' : inv ? 'invites you to play' : 'is playing badminton'}</span></div></div>
+      <div class="qc-mid">${club ? `<h3>${esc(S.club.name)} invites you to play</h3><p>Register with ROTRA and join the club</p>` : `<h3>${esc(s.title)}</h3><p>${fmtDate(s.start)}<br>${fmtRange(s.start, s.end)} · ${esc(s.venue)}${inv ? `<br>${esc(S.club.name)}` : ''}</p>`}</div>
+      <div class="qc-qr"><div class="qc-code">${qr}<span class="qc-badge">${mark}</span></div><b>${inv && full ? 'Waitlist open' : 'Scan to join'}</b><span class="mono">${esc(invLink)}</span></div>
+      <div class="qc-foot">${rotraLogoDark('qc-logo')}</div></div>`;
+  return { club, s, fmt, inv, invRow, invLink, full, card };
+}
 const SHEETS = {
   // D-2026-11-25-04: a shared podium place lists who is in it. A row opens that player's profile like a face does elsewhere
   // (none for a visitor on the public page, or for another club's player on the ROTRA board).
@@ -6955,8 +7169,58 @@ const SHEETS = {
   },
   // Owner artifact comment, November 19, 2026: one Share button on the session header opens this. Pick the photos
   // (the Session QR post or story image) or the link; the Facebook post text stays as a third, smaller option.
-  share() {
+  // Owner artifact comment, November 26, 2026: the (i) beside the Auto Queue switch explains the two ways courts get matches.
+  // Owner, November 26, 2026 (chat, with screenshots): "there is inconsistency here, the 1st screenshot should be the replace dialog".
+  // Replacing a player in a Suggested match uses the same Replace dialog as a match on court: Who's coming out?, Swap from match,
+  // Suggestion with Other, All players with search, level filter and sort. Nothing is recorded; it only changes the suggestion.
+  sgPick(sh) {
+    const s = cur(), m = sh.back.lineup;
+    const note = '<p class="small muted">This only changes the suggested lineup. Nothing is recorded until you add it to the queue.</p>';
+    return spLift(sheetShell('Replace a player in the suggested match', swapPicker(s, m, sh, "Who's coming out?", note, `<button class="btn primary" data-act="sgConfirm" ${sh.out && sh.in ? '' : 'disabled'}>${sh.from ? 'Swap players' : 'Replace player'}</button>`, 'Replace a player in the suggested match', true), '', true, sh.all && innerWidth >= 900 ? 'sp-dlg' : 'sp-dlg sp-compact'));
+  },
+  // Owner artifact comment, November 26, 2026, on a Players card's Total: "this can be clickable, should show a dialog with tabs,
+  // completed games and queued games". The two tabs reuse the player profile's N matches and Planned queue lists.
+  playerGames(sh) {
+    const s = cur(), pid = sh.pid, tab = sh.tab === 'queued' ? 'queued' : 'done', p = P(pid);
+    const nDone = playedMatchesOf(s, pid).length, nQ = plannedOf(s, pid).length;
+    const tabs = `<div class="cfilter" role="tablist" aria-label="Games">${[['done', 'Completed games', nDone], ['queued', 'Queued games', nQ]].map(([k, l, n]) => `<button type="button" role="tab" aria-selected="${tab === k}" aria-pressed="${tab === k}" data-act="sheetSet" data-k="tab" data-v="${k}"><span>${l}</span><span class="cf-n">${n}</span></button>`).join('')}</div>`;
+    return sheetShell(`${esc(nameParts(p)[0])} · ${gamesOf(s, pid) + queuedCount(s, pid)} tonight`, `<div class="stack">${tabs}${tab === 'queued' ? plannedQueueBody(s, pid) : sessionGamesBody(s, pid)}</div>`, '<button class="btn" data-act="closeSheet">Close</button>', true);
+  },
+  freeCourt(sh) {
+    const s = cur(), n = waiting(s).length, label = esc(courtLabel(s, sh.court));
+    return sheetShell(`${label} is free`, `<p class="small muted" style="margin:0">Choose how this court gets its next match.</p>
+      <div class="fc-picks">
+        <button type="button" class="fc-pick" data-act="openChooseMatch" data-court="${sh.court}" data-back="1" ${n ? '' : 'disabled'}>${I.list}<b>Pick from the queue</b><span class="small muted">${n ? `${n} match${n === 1 ? '' : 'es'} waiting. Choose one for ${label}.` : 'The Main Queue is empty.'}</span></button>
+        <button type="button" class="fc-pick" data-act="openSuggest" data-court="${sh.court}">${I.grid}<b>Generate a match</b><span class="small muted">ROTRA suggests fair teams from the players who are free right now.</span></button>
+      </div>`, '<button class="btn" data-act="closeSheet">Cancel</button>');
+  },
+  fillInfo() {
+    const s = cur(), on = courtFill(s) === 'auto';
+    const card = (k, title, art, lines) => `<div class="fi-card${(k === 'auto') === on ? ' on' : ''}">${art}<div class="stack tight"><div class="between"><b>${title}</b>${(k === 'auto') === on ? chip('On now', 'ok') : ''}</div><ul class="fi-list">${lines.map((l) => `<li>${l}</li>`).join('')}</ul></div></div>`;
+    return sheetShell('How courts get matches', `<div class="stack">
+      ${card('manual', 'Manual Queue (switch off)', '<svg class="fi-art" viewBox="0 0 220 96" role="img" aria-label="You pick the match and put it on a court"><rect x="1" y="1" width="218" height="94" rx="10" fill="var(--bg)" stroke="var(--border-strong)"/><g transform="translate(14 18)"><rect width="34" height="14" rx="4" fill="var(--elev)"/><rect y="20" width="34" height="14" rx="4" fill="var(--elev)"/><rect y="40" width="34" height="14" rx="4" fill="var(--accent-subtle)" stroke="var(--accent)"/></g><path d="M60 65 C 95 65, 100 48, 128 48" fill="none" stroke="var(--fg2)" stroke-width="2.5" stroke-dasharray="4 4" stroke-linecap="round"/><path d="M124 42 l8 6 -8 6" fill="none" stroke="var(--fg2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><g transform="translate(140 22)"><rect width="66" height="52" rx="4" fill="var(--court)"/><path d="M33 0v52M0 26h66" stroke="var(--court-line)" stroke-width="1.2"/></g><g transform="translate(80 16)" fill="var(--fg2)"><circle r="9" fill="var(--elev)"/><path d="M-3 4V-3a1.5 1.5 0 0 1 3 0v3h3a2 2 0 0 1 2 2v2" fill="none" stroke="var(--fg)" stroke-width="1.6" stroke-linecap="round"/></g></svg>', ['You choose which match goes on which court.', 'Drag a match onto a court, or use Put on court.', 'Nothing moves until you place it.'])}
+      ${card('auto', 'Auto Queue (switch on)', '<svg class="fi-art" viewBox="0 0 220 96" role="img" aria-label="A free court takes the next ready match by itself"><rect x="1" y="1" width="218" height="94" rx="10" fill="var(--bg)" stroke="var(--border-strong)"/><g transform="translate(14 18)"><rect width="34" height="14" rx="4" fill="var(--elev)"/><rect y="20" width="34" height="14" rx="4" fill="var(--elev)"/><rect y="40" width="34" height="14" rx="4" fill="var(--accent-subtle)" stroke="var(--accent)"/></g><path d="M60 65 C 95 65, 100 48, 128 48" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="0" stroke-linecap="round"/><path d="M124 42 l8 6 -8 6" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><g transform="translate(140 22)"><rect width="66" height="52" rx="4" fill="var(--court)"/><path d="M33 0v52M0 26h66" stroke="var(--court-line)" stroke-width="1.2"/></g><g transform="translate(78 14)"><circle r="9" fill="var(--accent)"/><path d="M-4 0l3 3 5-6" fill="none" stroke="var(--on-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g></svg>', ['When a court frees up, the next ready match in the Main Queue goes on it.', 'Matches that can’t start yet (a player still on court or away) are skipped until they can.', 'It only places the match. You still press Start match.'])}
+      <p class="small muted" style="margin:0">Switching doesn’t move matches that are already on a court.</p></div>`,
+      `<button class="btn" data-act="closeSheet">Close</button><button class="btn primary" data-act="setCourtFill" data-k="${on ? 'manual' : 'auto'}">${on ? 'Switch to Manual Queue' : 'Turn on Auto Queue'}</button>`);
+  },
+  share(sh) {
     const s = cur(), link = sessionLink(s);
+    // Owner artifact comment, November 26, 2026 (live header Share): the dialog shows the list (the Facebook post text with every
+    // player), the social post images (post and story) and the invite link, all on one screen.
+    if (sh && sh.live) {
+      const fmt = sh.fmt === 'story' ? 'story' : 'post', { card } = sessionQrCard({ fmt });
+      return sheetShell('Share this session', `<div class="stack share-live">
+        <section class="stack tight"><div class="between"><h3>Player list</h3><button class="btn xs" data-act="copyPost">Copy list</button></div>
+          <textarea class="input mono tpl" id="post-text" rows="9" readonly aria-label="Facebook post text with the player list">${esc(fillPost(postTemplate(), s))}</textarea>
+          <p class="small muted">${s.roster.length} player${s.roster.length === 1 ? '' : 's'} listed, from your club's post template.</p></section>
+        <section class="stack tight"><div class="between"><h3>Social post images</h3><div class="seg" role="group" aria-label="Image format">${[['post', 'Post'], ['story', 'Story']].map(([k, l]) => `<button aria-pressed="${fmt === k}" data-act="shareFmt" data-k="${k}">${l}</button>`).join('')}</div></div>
+          <div class="share-card">${card}</div>
+          <div class="row" style="justify-content:center"><button class="btn sm primary" data-act="downloadSessionQr">Download image</button></div></section>
+        <section class="stack tight"><h3>Invite link</h3>
+          <span class="invite-link"><input class="input" id="share-link-in" readonly value="${esc(link)}" aria-label="Invite link"><button class="btn sm primary" data-act="copyLink">Copy link</button></span>
+          <p class="small muted">Anyone with it sees the public page and can ask to join.</p></section>
+      </div>`, '<button class="btn" data-act="closeSheet">Done</button>', true);
+    }
     return sheetShell('Share this session', `<div class="stack">
         <button type="button" class="choice share-pick" data-act="openSessionQr">${I.qr}<span class="stack tight" style="gap:2px"><b>Share photos</b><span class="small muted">A post or story image with the session QR. Download it or share it to Facebook and Instagram.</span></span></button>
         <div class="choice share-pick" style="cursor:default">${I.link}<span class="stack tight" style="gap:8px;min-width:0;flex:1"><span class="stack tight" style="gap:2px"><b>Share the link</b><span class="small muted">Anyone with it sees the public page and can ask to join.</span></span>
@@ -6965,24 +7229,7 @@ const SHEETS = {
       </div>`, '<button class="btn" data-act="closeSheet">Close</button>');
   },
   sessionQr(sh) {
-    const club = sh.kind === 'club', s = club ? null : cur(), fmt = sh.fmt === 'story' ? 'story' : 'post';
-    // Owner, November 20, 2026 ("my profile pic is not shown"; "there is no share link input with copy too"): the invite card shows the
-    // inviter's own picture, and the sheet has the Invite link copy field under the card.
-    // D-2026-11-09-08 Session invite: the same card, "<name> invites you to play", with a short invite code on the link.
-    const inv = !club && sh.invite ? P(sh.invite) : null, invRow = inv ? R(s, inv.id) || (s.waitlist || []).find((w) => w.pid === inv.id) : null;
-    const invLink = club ? clubInviteLink() : inv ? `${sessionLink(s)}?invite=${invRow.inviteCode}` : sessionLink(s);
-    const full = !club && s.status !== 'active' && openSlots(s) === 0;
-    // Static placeholder QR (finder squares + sample modules); the real app encodes the public session link.
-    const sq = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="#000"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" fill="#000"/>`;
-    const dots = [[9,1],[11,2],[13,1],[10,4],[12,5],[9,7],[14,8],[1,9],[3,10],[5,9],[8,10],[10,9],[12,11],[15,10],[2,12],[4,13],[7,12],[9,14],[11,13],[14,14],[16,12],[18,9],[19,11],[17,15],[20,13],[18,18],[12,17],[14,19],[10,19],[8,16],[16,19],[20,17]];
-    const qr = `<svg viewBox="0 0 21 21" shape-rendering="crispEdges" role="img" aria-label="QR code for the ${club ? 'club invite' : 'session'} link">${sq(0, 0)}${sq(14, 0)}${sq(0, 14)}${dots.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`).join('')}</svg>`;
-    const mark = S.club.logo ? `<img src="${S.club.logo}" alt="">` : `<span>${esc(S.club.initials)}</span>`;
-    // Brand card: the same image people post to Facebook and stories. Colors are fixed brand values, so it looks the same in both themes.
-    const card = `<div class="qr-card ${fmt}" role="group" aria-label="Share image preview">
-      <div class="qc-top"><span class="qc-club">${inv ? picInner(inv) : mark}</span><div><b>${esc(inv ? inv.name : S.club.name)}</b><span>${club ? 'invites you to play' : inv ? 'invites you to play' : 'is playing badminton'}</span></div></div>
-      <div class="qc-mid">${club ? `<h3>${esc(S.club.name)} invites you to play</h3><p>Register with ROTRA and join the club</p>` : `<h3>${esc(s.title)}</h3><p>${fmtDate(s.start)}<br>${fmtRange(s.start, s.end)} · ${esc(s.venue)}${inv ? `<br>${esc(S.club.name)}` : ''}</p>`}</div>
-      <div class="qc-qr"><div class="qc-code">${qr}<span class="qc-badge">${mark}</span></div><b>${inv && full ? 'Waitlist open' : 'Scan to join'}</b><span class="mono">${esc(invLink)}</span></div>
-      <div class="qc-foot">${rotraLogoDark('qc-logo')}</div></div>`;
+    const { club, s, fmt, inv, invLink, full, card } = sessionQrCard(sh);
     return sheetShell(club ? 'Share club invite' : inv ? 'Session invite' : 'Session QR', `<div class="stack" style="align-items:center;text-align:center">
       <div class="seg" role="group" aria-label="Image format">${[['post', 'Post'], ['story', 'Story']].map(([k, l]) => `<button aria-pressed="${fmt === k}" data-act="qrFmt" data-k="${k}">${l}</button>`).join('')}</div>
       ${card}
@@ -7002,10 +7249,19 @@ const SHEETS = {
     const tonight = busy ? chip(`${busy.status === 'oncourt' ? 'On court' : 'Playing'} · ${esc(courtsOf(s, busy))}`, 'ok') : r.present ? chip('Present') : chip('Not here', 'warn');
     const head = `<div class="el-head lv-${rvBand(r)}">${avatar(p)}<div class="main"><span class="el-name">${esc(shown)}</span>${shown !== p.name ? `<span class="small muted">${esc(p.name)}</span>` : ''}
         <div class="row">${chip(esc(lvLabel(r.level)))}${chip(who)}${tonight}</div></div></div>`;
+    // Owner artifact comment, November 26, 2026 ("hey club nickname"): every player has a Club nickname field. Unclaimed and
+    // guest profiles have no account, so their one nickname is the club's (it edits p.nick, as Edit details does).
     const nick = p.identity === 'registered' ? `<label class="field"><span>Club nickname (optional)</span><input class="input" id="el-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick)}" maxlength="30">
-        <span class="hint">What your club calls them. Only your club sees it. Empty uses ${p.nick ? `“${esc(p.nick)}”, the nickname on their ROTRA account` : 'the name on their ROTRA account'}.</span></label>` : '';
+        <span class="hint">What your club calls them. Only your club sees it. Empty uses ${p.nick ? `“${esc(p.nick)}”, the nickname on their ROTRA account` : 'the name on their ROTRA account'}.</span></label>`
+      : `<label class="field"><span>Club nickname (optional)</span><input class="input" id="el-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick)}" maxlength="30" autocomplete="off">
+        <span class="hint">What your club calls them, shown above the full name. They have no ROTRA account yet, so this is their only nickname. Empty shows the full name.</span></label>`;
+    // Owner artifact comment, November 26, 2026 ("there should be edit name field"): the club edits the full name of the
+    // profiles it made (unclaimed, guest). A registered player's name is their own, so it shows read-only, with the club nickname as the club's label.
+    const nameF = p.identity === 'registered'
+      ? `<label class="field"><span>Full name</span><input class="input" value="${esc(p.name)}" readonly aria-describedby="el-name-h"><span class="hint" id="el-name-h">Only ${esc(short(p.id))} can change this, in the ROTRA Player app. Use Club nickname for what your club calls them.</span></label>`
+      : `<label class="field"><span>Full name</span><input class="input" id="el-name" data-bind="ui.sheet.name" value="${esc(sh.name ?? p.name)}" maxlength="60" autocomplete="off" ${sh.nameErr ? 'aria-invalid="true" aria-describedby="el-name-e"' : ''}>${sh.nameErr ? `<span class="err" id="el-name-e">${esc(sh.nameErr)}</span>` : `<span class="hint">Shown on courts, the queue and the public page. Fixes spelling for the profile your club made.</span>`}</label>`;
     const pic = p.identity === 'unclaimed' ? picEditor(p) : '';
-    const profile = nick || pic ? `<section class="el-sec" aria-labelledby="el-prof-h"><h3 id="el-prof-h">Profile</h3>${nick}${pic}</section>` : '';
+    const profile = `<section class="el-sec" aria-labelledby="el-prof-h"><h3 id="el-prof-h">Profile</h3>${nameF}${nick}${pic}</section>`;
     return sheetShell(`Edit ${esc(shown)}`, `${head}${profile}
       <section class="el-sec" aria-labelledby="el-night-h"><h3 id="el-night-h">Tonight</h3>
         <div class="el-line"><div><b id="el-games-l">Games played</b><span class="small muted">Now ${now}${sh.games !== now ? ` · will be ${sh.games}` : ''}</span></div>
@@ -7628,7 +7884,7 @@ const SHEETS = {
     const s = cur(), m = s.matches.find((x) => x.id === sh.id), n = s.matches.find((x) => x.id === sh.with);
     const at = waiting(s).indexOf(n) + 1, where = courtsOf(s, m);
     // Each face shows its games this session (badge) and minutes since the player's last game, colored like the queue cards.
-    const face = (p) => { const mins = restInfo(s, p).mins, g = gamesOf(s, p); return `<div class="qf" aria-label="${esc(nm(p))}, ${g} of ${s.minimum} games, waiting ${queueTime(mins)}"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" aria-hidden="true">${g}</span></span><span class="qf-n">${esc(short(p))}</span><span class="qf-w tnum ${mins >= 16 ? 'err' : mins >= 10 ? 'warn' : ''}">${queueTime(mins)}</span></div>`; };
+    const face = (p) => { const mins = restInfo(s, p).mins, g = gamesOf(s, p); return `<div class="qf" aria-label="${esc(nm(p))}, ${g} of ${s.minimum} games, waiting ${queueTime(mins)}"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" aria-hidden="true">${g}</span></span>${faceNames(p, 'qf-n')}<span class="qf-w tnum ${mins >= 16 ? 'err' : mins >= 10 ? 'warn' : ''}">${queueTime(mins)}</span></div>`; };
     const faces = (ids) => `<div class="qfaces">${ids.map(face).join('')}</div>`;
     const card = (x, after) => `<div class="swap-card ${after ? 'after' : ''}"><span class="small ${after ? '' : 'muted'}"><b>Match ${x.seq}</b>${after ? ' · after' : ' · now'}</span>${faces(x.teamA)}<span class="vs">VS</span>${faces(x.teamB)}</div>`;
     const row = (label, now, after) => `<div class="swap-row"><span class="label">${label}</span><div class="swap-pair">${card(now)}<span class="swap-arr" aria-hidden="true">→</span>${card(after, true)}</div></div>`;
@@ -7672,7 +7928,12 @@ const SHEETS = {
     const m = s.matches.find((x) => x.id === sh.id);
     const mins = Math.max(0, Math.round((Date.now() - m.startedAt) / 60000));
     return sheetShell(`Match ${m.seq} · ${esc(courtsOf(s, m))}`, `
-      <p class="small muted">${matchLabel(m)} · started ${fmtWhen(m.startedAt, { lower: true })}${queueTime(mins) === LONG_AGO ? '' : ` · ${queueTime(mins)} in`} · Scoring · ${scoringDef(s).label}</p>
+      ${/* Owner artifact comment, November 26, 2026, on the match dialog: "should show time and the pill labels, also the ending soon
+        switch". The same #N, format pill, time pill and status pill as the court card, then the Almost done switch. */ ''}
+      ${(() => { const f = finishOf(s, m), typ = SCORING[scoringOf(s)].typical; const st = f.phase === 'mid' ? (f.left > typ / 2 ? null : ['Ending', 'ok']) : ['Ending soon', f.phase === 'long' ? 'warn' : 'ok'];
+        return `<div class="ct-meta"><b class="ct-num tnum">#${m.seq}</b>${chip(matchLabel(m), 'solid')}<span class="chip ct-time tnum">${I.clock}${elapsedTime(mins)}</span>${st ? `<span class="ct-end ${st[1]}" title="${esc(f.text)}"><i aria-hidden="true"></i>${st[0]}</span>` : chip('Playing', 'ok')}</div>
+        <p class="small muted" style="margin:0">Started ${fmtWhen(m.startedAt, { lower: true })} · Scoring · ${scoringDef(s).label}</p>
+        <label class="between" style="flex-wrap:nowrap"><span class="small"><b>Almost done</b></span>${sw(almostDoneOf(m), 'toggleAlmostDone', `data-id="${m.id}"`, `Almost done, ${courtsOf(s, m)}`)}</label>`; })()}
       ${(() => { /* Owner artifact comment, November 13, 2026: tap a player, choose Substitute or Replace, then pick who comes in.
         November 19, 2026: the card does that; the picture opens the profile. */
         const card = (pid) => ({ attrs: `data-act="playerAction" data-mid="${m.id}" data-pid="${pid}"`, label: 'Substitute or replace' });
@@ -7764,7 +8025,7 @@ const SHEETS = {
   confirmMake(sh) {
     const s = cur();
     const lv = (pid) => (R(s, pid).level != null ? R(s, pid).level : 4), sum = (ids) => ids.reduce((x, pid) => x + lv(pid), 0);
-    const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => `<div class="pf" aria-label="${esc(nm(pid))}, ${gamesOf(s, pid)} games played"><span class="pf-face">${avatar(P(pid))}<span class="pf-g tnum" aria-hidden="true">${gamesOf(s, pid)}</span></span><span class="pf-n">${esc(short(pid))}</span><span class="pf-lv lv-${rvBand(R(s, pid)).split(' ')[0]}">${esc(lvLabel(R(s, pid).level).replace('Beginner', 'Beg').replace('Intermediate', 'Int').replace('Advanced', 'Adv'))}</span></div>`).join('')}</div>`;
+    const side = (ids, team) => `<div class="side n${Math.min(ids.length, 5)}" style="--rows:${ids.length <= 2 ? ids.length : ids.length <= 4 ? 2 : 3}" role="group" aria-label="Team ${team}">${ids.map((pid) => `<div class="pf" aria-label="${esc(nm(pid))}, ${gamesOf(s, pid)} games played"><span class="pf-face">${avatar(P(pid))}<span class="pf-g tnum" aria-hidden="true">${gamesOf(s, pid)}</span></span>${faceNames(pid, 'pf-n')}<span class="pf-lv lv-${rvBand(R(s, pid)).split(' ')[0]}">${esc(lvLabel(R(s, pid).level).replace('Beginner', 'Beg').replace('Intermediate', 'Int').replace('Advanced', 'Adv'))}</span></div>`).join('')}</div>`;
     const a = sum(sh.teamA), b = sum(sh.teamB), diff = Math.abs(a - b);
     return sheetShell('Make this match?', `<p class="small muted">${FORMAT_LABEL[sh.fmt]} · added to the end of the Main Queue. The number on each face is that player's games so far.</p>
       <div class="pitch ${FORMATS[sh.fmt][0] > 3 || FORMATS[sh.fmt][1] > 3 ? 'tall' : ''}" role="img" aria-label="Team A versus Team B">${courtSVG(1)}<div class="sides">${side(sh.teamA, 'A')}${side(sh.teamB, 'B')}</div></div>
@@ -7872,13 +8133,18 @@ const SHEETS = {
     if (sh.error || !sh.lineup) return sheetShell('Suggested match', notice('warn', esc(sh.error || 'No valid match right now.')), '<button class="btn" data-act="closeSheet">Close</button>');
     const m = sh.lineup;
     const below = all(m).filter((p) => gamesOf(s, p) < s.minimum);
-    return sheetShell('Suggested match', `<div class="row">${chip(matchLabel(m), 'solid')}${chip(MODES[s.mode].label + ' mode')}</div>
-      <div class="qteams">${faceTeam(s, m.teamA, 'Team A', 'sg')}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', 'sg')}</div>
-      <p class="small muted">Drag a player onto someone on the other team to switch sides.</p>
+    // Owner artifact comment, November 26, 2026: "add a back button, and remove edit and add, remove skip suggestion, you can click on
+    // the players and replace individually". Footer: Back · Add to queue. Each player card opens Replace player.
+    const sgCard = (pid) => ({ attrs: `data-act="sgReplace" data-pid="${pid}"`, label: 'Replace' });
+    // Owner artifact comment, November 26, 2026: "add a reshuffle button, add a animation". Reshuffle draws a different fair lineup;
+    // the faces deal back in (a short staggered flip). CSS only: the prototype has no React, so no React Motion.
+    return sheetShell('Suggested match', `<div class="between"><div class="row">${chip(matchLabel(m), 'solid')}${chip(MODES[s.mode].label + ' mode')}</div><button type="button" class="btn sm" data-act="reshuffleSuggest">${I.swap} Reshuffle</button></div>
+      <div class="qteams${sh.shuf ? ' shuffle' : ''}" ${sh.shuf ? `data-shuf="${sh.shuf}"` : ''}>${faceTeam(s, m.teamA, 'Team A', 'sg', sgCard)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', 'sg', sgCard)}</div>
+      <p class="small muted">Tap a player to replace them. Drag a player onto someone on the other team to switch sides.</p>
       <div class="card stack tight"><span class="label">Why this lineup</span>
         ${below.length ? `<p class="small">${esc(listNames(below))} ${below.length > 1 ? 'are' : 'is'} below the minimum (${below.map((p) => `${esc(short(p))} ${gamesOf(s, p)}/${s.minimum}`).join(', ')}).</p>` : '<p class="small">Everyone here has met the minimum; they have the fewest games among present players.</p>'}
         <p class="small muted">Teams are split by assigned levels to suit ${MODES[s.mode].label} mode.</p></div>`,
-      '<button class="btn" data-act="skipSuggest">Skip suggestion</button><button class="btn" data-act="editSuggest">Edit then add</button><button class="btn primary" data-act="addSuggest">Add to queue</button>');
+      `<button class="btn" data-act="sheetBack">${I.back} Back</button><button class="btn primary" data-act="addSuggest">Add to queue</button>`);
   },
   autoReview(sh) {
     const s = cur(), a = autoState(s), cards = Object.values(a.batches).flatMap((b) => b.cards), selected = sh.ids.map((id) => cards.find((m) => m.draftId === id)).filter(Boolean);
@@ -7916,11 +8182,22 @@ const SHEETS = {
   chooseMatch(sh) {
     const s = cur();
     const list = waiting(s);
-    return sheetShell(`Put a match on ${esc(courtLabel(s, sh.court))}`, `<p class="small muted">Any ready match can go next. Queue order is a suggestion, not a rule. A match only stays locked while one of its players is still on court or isn't present. It goes on court getting ready; you start it from the court.</p>
-      <div class="stack tight">${list.map((m, i) => {
-        const b = blockOf(s, m);
-        return `<div class="opt" style="cursor:default"><span class="qt-pos">#${i + 1}</span><div class="main"><b>${esc(listNames(m.teamA))} <span class="muted">vs</span> ${esc(listNames(m.teamB))}</b><div class="small ${b ? 'muted' : ''}" style="${b ? '' : 'color:var(--accent)'}">${matchLabel(m)} · ${b ? esc(b.text) : 'Ready to go on court'}</div></div><button class="btn xs ${b ? '' : 'primary'}" data-act="${courtsNeeded(m) === 2 ? 'openDispatch' : 'placeOnCourt'}" data-id="${m.id}" data-court="${sh.court}" ${b ? 'disabled' : ''}>Put on court</button></div>`;
-      }).join('')}</div>`, '<button class="btn" data-act="closeSheet">Close</button>');
+    // Owner artifact comment, November 26, 2026: "should be the same cards from the main queue and use embla carousel with linear
+    // gradient masking". The Main Queue cards, one a slide (the next peeking), arrows and dots, sides fading while there are more.
+    // Put on court puts that match on this court.
+    const cards = list.map((m, i) => { const b = blockOf(s, m), put = courtsNeeded(m) === 2 ? `data-act="openDispatch" data-id="${m.id}" data-court="${sh.court}"` : `data-act="placeOnCourt" data-id="${m.id}" data-court="${sh.court}"`;
+      // Owner, same day (chat): the cards match Upcoming queued matches (the compact Main Queue card).
+      // Owner artifact comment, same day: "do not add the dragging feature here because this is a slider". The cards lose their
+      // reorder handle and player swap-drag here; a drag anywhere on a card swipes the carousel. Taps still work.
+      const noDrag = (h) => h.replace(/<button[^>]*class="qt-grip"[^>]*>[\s\S]*?<\/button>/g, '').replace(/ data-drag-handle/g, '').replace(/ data-swap="[^"]*"/g, '').replace(/ data-qid="[^"]*"/g, '')
+        // Owner artifact comment, same day: "since we are putting a match from this dialog remove the x, it should just be put on court and edit".
+        .replace(/<button[^>]*data-act="removeWaiting"[^>]*>[\s\S]*?<\/button>/g, '').replace(/data-act="openEditor"/g, 'data-act="chEdit"')
+        // Same day, on the queue-flow arrow in the card head: "remove this for this dialog".
+        .replace(/<span class="qt-flow"[^>]*>[^<]*<\/span>/g, '');
+      return `<div class="ch-slide">${noDrag(queueCard(s, m, i, list.length, 1, true)).replace(new RegExp(`data-act="openDispatch" data-id="${m.id}"[^>]*>Put on court`), `${put} ${b ? 'disabled' : ''} aria-label="Put on ${esc(courtLabel(s, sh.court))}">Put on court`)}</div>`; }).join('');
+    return sheetShell(`Put a match on ${esc(courtLabel(s, sh.court))}`, `<p class="small muted" style="margin:0">Any ready match can go next. Queue order is a suggestion, not a rule. It goes on court getting ready; you start it from the court.</p>
+      ${list.length ? `<div class="ch-wrap"><div class="ch-embla"><div class="ch-track">${cards}</div></div><div class="cs-ctl"><button type="button" class="btn sm ghost icon-btn" data-ch="prev" aria-label="Previous match">${I.back}</button><div class="cs-dots ch-dots" role="group" aria-label="Matches"></div><button type="button" class="btn sm ghost icon-btn cs-next" data-ch="next" aria-label="Next match">${I.back}</button></div></div>` : '<div class="empty">The Main Queue is empty.</div>'}`,
+      `<button class="btn" data-act="sheetBack">${I.back} Back</button>`, true);
   },
   nextMatch(sh) {
     const s = cur(), court = esc(courtLabel(s, sh.court)), order = waiting(s);
@@ -7929,7 +8206,7 @@ const SHEETS = {
     const err = sh.err ? notice('bad', esc(sh.err)) : '';
     if (!cands.length) return sheetShell(`Next on ${court}`, `${intro}${err}${notice('', `No ready match for ${court} right now.`)}`, '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>', false, 'full');
     // Owner request, November 9, 2026: a slider with one eligible match at a time, #1 first (left), faces with their game counts.
-    const faces = (ids) => `<div class="qfaces">${ids.map((pid) => `<span class="qf"><span class="pf-face">${avatar(P(pid))}<span class="pf-g tnum" title="${gamesOf(s, pid)} games played" aria-label="${gamesOf(s, pid)} games played">${gamesOf(s, pid)}</span></span><span class="qf-n">${esc(short(pid))}</span></span>`).join('')}</div>`;
+    const faces = (ids) => `<div class="qfaces">${ids.map((pid) => `<span class="qf"><span class="pf-face">${avatar(P(pid))}<span class="pf-g tnum" title="${gamesOf(s, pid)} games played" aria-label="${gamesOf(s, pid)} games played">${gamesOf(s, pid)}</span></span>${faceNames(pid, 'qf-n')}</span>`).join('')}</div>`;
     const card = (m, i) => {
       const a = esc(listNames(m.teamA)), b = esc(listNames(m.teamB)), pos = order.indexOf(m) + 1;
       return `<article class="nm-card" data-nm-i="${i}" aria-label="Match ${i + 1} of ${cands.length}">
@@ -8151,6 +8428,9 @@ function closeSheet() {
   if (S.ui.sheet?.type === 'photo') { S.ui.sheet = S.ui.sheet.back || null; render(); return; }
   // A time picker opened from inside another dialog returns to that dialog.
   if (S.ui.sheet?.type === 'timePick') { const k = S.ui.sheet.k; S.ui.sheet = S.ui.timeBack || null; S.ui.timeBack = null; render(); document.getElementById(DT[k]?.id || `dt-${k.replace(/\W/g, '-')}`)?.focus(); return; }
+  // Owner, November 26, 2026: "the problems with stacking dialogs here is that when you click x it doesnt go back to the previous
+  // dialog". A dialog opened from another one keeps it in `back`; ×, Escape, the scrim and Close return to it, one level at a time.
+  if (S.ui.sheet?.back && typeof S.ui.sheet.back === 'object') { S.ui.sheet = S.ui.sheet.back; render(); return; }
   flushPayments(); S.ui.sheet = null; render();
 }
 function go(to, id) {
@@ -8221,7 +8501,8 @@ const ACT = {
   openSync: () => openSheet({ type: 'sync' }),
   openVenue: () => openSheet({ type: 'venue', mode: 'pick', q: '' }),
   openPost: () => openSheet({ type: 'post' }),
-  openShare: () => openSheet({ type: 'share' }),
+  openShare: (d) => { S.ui.courtMenu = null; openSheet({ type: 'share', live: !!(d && d.live) }); },
+  shareFmt: (d) => { S.ui.sheet = { ...S.ui.sheet, fmt: d.k }; render(); },
   openClubInvite: () => openSheet({ type: 'sessionQr', kind: 'club', fmt: 'post' }),
   copyClubInvite: () => { try { navigator.clipboard.writeText(clubInviteLink()); } catch (e) { /* clipboard unavailable */ } toast('Club invite link copied'); },
   openRegenClubInvite: () => openSheet({ type: 'regenClubInvite' }),
@@ -8890,7 +9171,7 @@ const ACT = {
   allAbsent: () => { cur().roster.forEach((r) => { r.present = false; r.selfCheckedIn = false; }); commit('Everyone marked absent'); render(); },
   openEditLive: (d) => {
     const s = cur(), r = s && R(s, d.pid), p = P(d.pid); if (!r || !p || s.status !== 'active') return;
-    openSheet({ type: 'editLive', pid: p.id, nick: p.clubNick || '', games: Math.min(99, Math.max(0, gamesOf(s, p.id))), present: !!r.present, hc: hcOf(r) });
+    openSheet({ type: 'editLive', pid: p.id, name: p.name, nick: (p.identity === 'registered' ? p.clubNick : p.nick) || '', games: Math.min(99, Math.max(0, gamesOf(s, p.id))), present: !!r.present, hc: hcOf(r) });
   },
   // D-2026-11-25-03: mark or clear a handicap spot in the sheet; saved with Save changes.
   hcToggle: (d) => { const sh = S.ui.sheet; if (sh?.type !== 'editLive' || !HC_SPOTS.some((x) => x.k === d.k)) return; sh.hc = sh.hc || []; sh.hc = sh.hc.includes(d.k) ? sh.hc.filter((k) => k !== d.k) : [...sh.hc, d.k]; render(); },
@@ -8900,6 +9181,14 @@ const ACT = {
     const sh = S.ui.sheet, s = cur(); if (sh?.type !== 'editLive' || !s) return;
     const r = R(s, sh.pid), p = P(sh.pid); if (!r || !p) { S.ui.sheet = null; render(); return; }
     let changed = false;
+    if (p.identity !== 'registered') {
+      const v = (sh.name ?? p.name).replace(/\s+/g, ' ').trim();
+      if (v.length < 2) { sh.nameErr = 'Enter the full name, at least 2 characters.'; render(); document.getElementById('el-name')?.focus(); return; }
+      sh.nameErr = '';
+      if (v !== p.name) { p.name = v; changed = true; }
+      const n = (sh.nick || '').replace(/\s+/g, ' ').trim();
+      if (n !== (p.nick || '')) { if (n) p.nick = n; else delete p.nick; changed = true; }
+    }
     if (p.identity === 'registered') { const v = (sh.nick || '').trim(); if (v !== (p.clubNick || '')) { p.clubNick = v; changed = true; } }
     if (sh.games !== gamesOf(s, p.id)) { r.gamesAdj = sh.games - countedGamesOf(s, p.id); changed = true; }
     const hc = HC_SPOTS.map((x) => x.k).filter((k) => (sh.hc || []).includes(k));
@@ -9162,7 +9451,9 @@ const ACT = {
     closeTransfers(s, 'expired');
     S.ui.sheet = null; S.ui.pane = 'live'; S.screen = 'console'; commit(`Session started · levels locked${newEnd ? ` · ends ${atWhen(s.end)}` : ''}${closed.length ? ` · ${closed.length} join request${closed.length === 1 ? '' : 's'} closed` : ''}`); render(); window.scrollTo(0, 0);
   },
-  pane: (d) => { S.ui.pane = d.k; render(); },
+  setCourtView: (d) => { S.ui.courtView = d.k; try { localStorage.setItem('rotra.courtView', d.k); } catch (e) { /* private mode */ } render(); },
+  pane: (d) => { S.ui.pane = d.k; S.ui.cvOpen = false; render(); },
+  toggleConsoleViews: () => { S.ui.cvOpen = !S.ui.cvOpen; render(); },
   prepTab: (d) => { S.ui.prepTab = d.k; render(); const b = document.getElementById(`ptb-${d.k}`); if (b) b.focus(); },
   rvSet: (d) => { S.ui.rv = { ...(S.ui.rv || {}), [d.k]: d.v }; render(); },
   plSet: (d) => { S.ui.pl = { ...(S.ui.pl || {}), [d.k]: d.v }; render(); },
@@ -9308,6 +9599,10 @@ const ACT = {
     S.ui.sheet = { type: playing ? 'match' : 'onCourt', id: m.id }; commit(`Match ${m.seq} moved from ${from} to ${courtsOf(s, m)} · ${playing ? 'still playing' : 'getting ready'}${autoNote(s, autoFill(s))}`); render();
   },
   // Manual Queue | Auto Queue, per session. Switching Auto on fills every free open court now, in court order.
+  openFillInfo: () => openSheet({ type: 'fillInfo' }),
+  // Owner artifact comment, November 26, 2026: "clicking on a free court opens a dialog to pick from queue or generate a match".
+  openFreeCourt: (d) => openSheet({ type: 'freeCourt', court: d.court }),
+  openPlayerGames: (d) => openSheet({ type: 'playerGames', pid: d.pid, tab: 'done' }),
   setCourtFill: (d) => {
     const s = cur();
     if (courtFill(s) === d.k) return;
@@ -9315,7 +9610,7 @@ const ACT = {
     commit(s.courtFill === 'auto' ? `Auto Queue on${autoNote(s, autoFill(s))}` : 'Manual Queue on · matches already on court stay where they are'); render();
   },
   openMatch: (d) => { const m = cur().matches.find((x) => x.id === d.id); openSheet({ type: m && m.status === 'oncourt' ? 'onCourt' : 'match', id: d.id }); },
-  openChooseMatch: (d) => openSheet({ type: 'chooseMatch', court: d.court }),
+  openChooseMatch: (d) => openSheet({ type: 'chooseMatch', court: d.court, back: S.ui.sheet || null }),
   openResult: (d) => openSheet(newResultSheet(d.id)),
   resWinner: (d) => { const sh = S.ui.sheet, sc = scoringDef(cur()); sh.winner = d.v; if (sc.games === 1) pickScoreWinner(sc.target, sh, d.v); sh.err = ''; render(); },
   resGameWin: (d) => { const sh = S.ui.sheet, o = sh.g[+d.g]; o.w = d.v; pickScoreWinner(scoringDef(cur()).target, o, d.v); sh.err = ''; syncGames(sh); render(); },
@@ -9386,7 +9681,21 @@ const ACT = {
     else addMatch(s, { format: sh.format, teamA: A, teamB: B }, 'manual', true);
     S.ui.sheet = null; S.ui.pane = 'queue'; commit(sh.id ? 'Lineup saved · protected from regeneration' : `Match added to the queue${autoNote(s, autoFill(s))}`); render();
   },
-  openSuggest: () => { const r = generate(cur(), 1); openSheet({ type: 'suggest', lineup: r.matches ? r.matches[0] : null, error: r.error }); },
+  openSuggest: (d) => { const r = generate(cur(), 1); openSheet({ type: 'suggest', lineup: r.matches ? r.matches[0] : null, error: r.error, court: (d && d.court) || null, back: S.ui.sheet || null }); },
+  sgReplace: (d) => { S.ui.sheet = { type: 'sgPick', out: d.pid, back: S.ui.sheet }; render(); },
+  sgPickBack: () => closeSheet(),
+  // Edit from Put a match on Court N: the editor returns to that dialog when closed.
+  chEdit: (d) => { const prev = S.ui.sheet; ACT.openEditor(d); if (S.ui.sheet && S.ui.sheet !== prev) { S.ui.sheet.back = prev; render(); } },
+  sheetBack: () => closeSheet(),
+  sgConfirm: () => { const sh = S.ui.sheet, back = sh.back, m = back.lineup, out = sh.out, inn = sh.in; if (!out || !inn) return;
+    const swap = (arr) => arr.map((x) => (x === out ? inn : sh.from === 'match' && x === inn ? out : x));
+    back.lineup = { ...m, teamA: swap(m.teamA), teamB: swap(m.teamB) }; back.edited = true; back.shuf = 0; S.ui.sheet = back; render();
+    toast(sh.from === 'match' ? `${short(out)} and ${short(inn)} swapped places` : `${P(inn).name} in for ${P(out).name}`); },
+  reshuffleSuggest: () => {
+    const sh = S.ui.sheet, key = (m) => (m ? [...m.teamA].sort().join() + '|' + [...m.teamB].sort().join() : ''), before = key(sh.lineup);
+    let r = null; for (let i = 0; i < 8; i++) { r = generate(cur(), 1); if (!r.matches || key(r.matches[0]) !== before) break; }
+    sh.lineup = r.matches ? r.matches[0] : null; sh.error = r.error; sh.edited = false; sh.shuf = Date.now(); render(); setTimeout(() => { sh.shuf = 0; }, 800); // animate once, not on later renders
+  },
   skipSuggest: () => { const r = generate(cur(), 1); S.ui.sheet.lineup = r.matches ? r.matches[0] : null; S.ui.sheet.error = r.error; render(); },
   editSuggest: () => { const m = S.ui.sheet.lineup; openSheet({ type: 'editor', id: null, format: m.format, teamA: m.teamA.slice(), teamB: m.teamB.slice() }); },
   addSuggest: () => { const s = cur(); addMatch(s, S.ui.sheet.lineup, 'suggested', !!S.ui.sheet.edited); S.ui.sheet = null; S.ui.pane = 'queue'; commit(`Suggestion added to the queue${autoNote(s, autoFill(s))}`); render(); },
@@ -9651,6 +9960,8 @@ document.addEventListener('click', (e) => {
 });
 // #736 (proposed): remember whether the last input was the keyboard, so a tab re-focused after a tap shows no ring.
 document.addEventListener('keydown', (e) => { if (e.key === 'Tab' || e.key.startsWith('Arrow')) document.body.classList.add('kbd-nav'); }, true);
+// The court picture is the Open match control (the button was removed November 26, 2026): Enter or Space opens it.
+document.addEventListener('keydown', (e) => { const el = e.target; if ((e.key === 'Enter' || e.key === ' ') && el.matches && el.matches('.open-pitch[tabindex], .free-pitch[tabindex]')) { e.preventDefault(); el.click(); } });
 document.addEventListener('pointerdown', () => document.body.classList.remove('kbd-nav'), true);
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && S.ui.sheet?.shv != null) { e.stopImmediatePropagation(); e.preventDefault(); S.ui.sheet.shv = null; render(); return; }
@@ -10049,7 +10360,10 @@ function cdEnd(apply) {
 }
 document.addEventListener('pointerdown', (e) => {
   if (e.pointerType === 'touch' || e.button !== 0) return;
+  // Owner artifact comment, November 26, 2026: "court dragging to another court should not work in mobile slider but grid mode it
+  // should work". In Slide mode a drag on the court picture swipes the carousel; dragging a match to another court is Grid only.
   const el = e.target.closest && e.target.closest('.open-pitch');
+  if (el && el.closest('.cs-embla')) return;
   if (el) cdrag = { el, id: el.dataset.id, x: e.clientX, y: e.clientY, on: false };
 });
 document.addEventListener('pointermove', (e) => {
@@ -10061,7 +10375,7 @@ document.addEventListener('pointerup', () => { if (cdrag && !cdrag.touch) cdEnd(
 document.addEventListener('pointercancel', () => { if (cdrag && !cdrag.touch) cdEnd(false); });
 document.addEventListener('touchstart', (e) => {
   const el = e.target.closest && e.target.closest('.open-pitch');
-  if (!el || e.touches.length > 1) return;
+  if (!el || e.touches.length > 1 || el.closest('.cs-embla')) return;
   const p = e.touches[0];
   cdrag = { el, id: el.dataset.id, x: p.clientX, y: p.clientY, on: false, touch: true };
   cdrag.timer = setTimeout(() => { if (cdrag && cdrag.el === el) cdLift(); }, 300);
@@ -10159,6 +10473,38 @@ function setupQueueSlide() {
 }
 // Settings courts on phones: an Embla carousel, one court a slide. Rebuilt after every render; remembers the slide.
 let lsEmbla = null, lsSlide = 0, lsMq = null;
+// Courts tab Slide mode (owner, November 26, 2026): an Embla carousel of court cards with arrows and dots. Rebuilt after every render.
+let csEmbla = null, csSlide = 0;
+function setupCourtSlide() {
+  if (csEmbla) { csEmbla.destroy(); csEmbla = null; }
+  const vp = document.querySelector('.cs-embla');
+  if (!vp || !window.EmblaCarousel) return;
+  const n = vp.querySelectorAll('.cs-track > .court').length;
+  csEmbla = EmblaCarousel(vp, { align: 'start', containScroll: 'trimSnaps', startIndex: Math.min(csSlide, n - 1),
+    watchDrag: (api, evt) => !(evt.target && evt.target.closest && evt.target.closest('button, input, label')) });
+  const wrap = vp.parentElement, dots = wrap.querySelector('.cs-dots'), prev = wrap.querySelector('[data-cs=prev]'), next = wrap.querySelector('[data-cs=next]');
+  dots.innerHTML = csEmbla.scrollSnapList().map((_, k) => `<button type="button" aria-label="Go to slide ${k + 1}"></button>`).join('');
+  [...dots.children].forEach((d, k) => d.addEventListener('click', () => csEmbla.scrollTo(k)));
+  prev.addEventListener('click', () => csEmbla.scrollPrev()); next.addEventListener('click', () => csEmbla.scrollNext());
+  const paint = () => { csSlide = csEmbla.selectedScrollSnap(); [...dots.children].forEach((d, k) => d.setAttribute('aria-current', String(k === csSlide))); prev.disabled = !csEmbla.canScrollPrev(); next.disabled = !csEmbla.canScrollNext(); };
+  // Owner artifact comment, November 26, 2026: "it should be gradient masked on the sides if there is more items".
+  const mask = () => { vp.classList.toggle('m-l', csEmbla.canScrollPrev()); vp.classList.toggle('m-r', csEmbla.canScrollNext()); };
+  csEmbla.on('select', () => { paint(); mask(); }); csEmbla.on('reInit', () => { paint(); mask(); }); paint(); mask();
+}
+// Put a match on Court N: Embla carousel of Main Queue cards with gradient masks (owner, November 26, 2026).
+let chEmbla = null;
+function setupChooseSlider() {
+  if (chEmbla) { chEmbla.destroy(); chEmbla = null; }
+  const vp = document.querySelector('.ch-embla');
+  if (!vp || !window.EmblaCarousel) return;
+  chEmbla = EmblaCarousel(vp, { align: 'start', containScroll: 'trimSnaps', watchDrag: (api, evt) => !(evt.target && evt.target.closest && evt.target.closest('.qt-actions, input')) });
+  const wrap = vp.parentElement, dots = wrap.querySelector('.ch-dots'), prev = wrap.querySelector('[data-ch=prev]'), next = wrap.querySelector('[data-ch=next]');
+  dots.innerHTML = chEmbla.scrollSnapList().map((_, k) => `<button type="button" aria-label="Go to match ${k + 1}"></button>`).join('');
+  [...dots.children].forEach((d, k) => d.addEventListener('click', () => chEmbla.scrollTo(k)));
+  prev.addEventListener('click', () => chEmbla.scrollPrev()); next.addEventListener('click', () => chEmbla.scrollNext());
+  const paint = () => { const i = chEmbla.selectedScrollSnap(); [...dots.children].forEach((d, k) => d.setAttribute('aria-current', String(k === i))); prev.disabled = !chEmbla.canScrollPrev(); next.disabled = !chEmbla.canScrollNext(); vp.classList.toggle('m-l', chEmbla.canScrollPrev()); vp.classList.toggle('m-r', chEmbla.canScrollNext()); };
+  chEmbla.on('select', paint); chEmbla.on('reInit', paint); paint();
+}
 function setupCourtSlider() {
   if (lsEmbla) { lsEmbla.destroy(); lsEmbla = null; }
   if (!lsMq && window.matchMedia) { lsMq = matchMedia('(max-width: 640px)'); lsMq.addEventListener('change', setupCourtSlider); }
@@ -10189,6 +10535,8 @@ function render() {
   setupHcArt();
   setupQueueSlide();
   setupCourtSlider();
+  setupCourtSlide();
+  setupChooseSlider();
   document.body.style.overflow = sh ? 'hidden' : '';
   const key = sh ? `${sh.type}|${sh.step || ''}|${sh.pick ? 'p' : ''}|${sh.tab || ''}|${sh.picking ? 'k' : ''}` : null;
   if (sh && key !== lastSheetKey) {

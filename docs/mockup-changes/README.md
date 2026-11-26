@@ -176,7 +176,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 34 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 11 · CANCELLED: 4 · MOCKUP ONLY: 4
+TICKETED: 31 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 14 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -495,7 +495,7 @@ TICKETED: 34 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 11 · CANCEL
 | [2026-11-25-queue-result-score-boxes](2026-11-25-queue-result-score-boxes.md) | Match result: two score boxes from the start, no deuce switch | match-result-sheet (score entry) | TICKETED — #1127 |
 | [2026-11-25-queue-settings-courts-arrange](2026-11-25-queue-settings-courts-arrange.md) | Queue app: the Settings tab's courts reorder by drag, rename from the label, and show how long they've been playing or free | settings-courts-box, settings-court-card, add-court-tile, court-label-form, chip | IN MOCK APP — #1105 |
 | [2026-11-25-queue-standings-image-shared-rows](2026-11-25-queue-standings-image-shared-rows.md) | Standings images: one row per position, and previews that are the images | result-slide-frame, export-images-sheet (export-frame-preview) | TICKETED — #1127 |
-| [2026-11-25-queue-status-pills](2026-11-25-queue-status-pills.md) | Players cards and Main Queue: one status pill per player | player-pool-card, match-card (queue tile faces), a new status pill | TICKETED — #1127 |
+| [2026-11-25-queue-status-pills](2026-11-25-queue-status-pills.md) | Players cards and Main Queue: one status pill per player | player-pool-card, match-card (queue tile faces), a new status pill | IN REAL MODE — #1132 |
 | [2026-11-25-queue-upcoming-side-by-side](2026-11-25-queue-upcoming-side-by-side.md) | Courts tab: pairs side by side on upcoming cards, faces on Next eligible | match-card (compact), court card (free state) | IN REAL MODE — #1121 |
 | [2026-11-26-player-dock-settings-session](2026-11-26-player-dock-settings-session.md) | Player app: Settings page and a session slot in the main navigation | top bar, mobile dock, settings list (new) | IN REAL MODE — #1149 |
 | [2026-11-26-player-match-court-vs-card](2026-11-26-player-match-court-vs-card.md) | Player app: Game page is the court beside a VS card; stats only for a tapped player | match court (unchanged), VS card (new), player stats card (new) | IN REAL MODE — #1150 |
@@ -503,10 +503,10 @@ TICKETED: 34 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 11 · CANCEL
 | [2026-11-26-player-weekly-summary-box](2026-11-26-player-weekly-summary-box.md) | Player app: Weekly Performance summary in one box | weekly performance summary | IN REAL MODE — #1146 |
 | [2026-11-26-queue-console-no-courts-and-time](2026-11-26-queue-console-no-courts-and-time.md) | Queue app: live session header trimmed; Payments becomes a console tab | live session header actions | TICKETED — #1136 |
 | [2026-11-26-queue-court-match-line](2026-11-26-queue-court-match-line.md) | Queue app: court card match line as #N header and pills | court card | IN REAL MODE — #1124 |
-| [2026-11-26-queue-edit-player-name](2026-11-26-queue-edit-player-name.md) | Queue app: Edit player has Full name and Club nickname for every player | EditLivePlayerSheet | TICKETED — #1127 |
+| [2026-11-26-queue-edit-player-name](2026-11-26-queue-edit-player-name.md) | Queue app: Edit player has Full name and Club nickname for every player | EditLivePlayerSheet | IN REAL MODE — #1132 |
 | [2026-11-26-queue-free-court-flow](2026-11-26-queue-free-court-flow.md) | Queue app: free court flow (pick or generate), Suggested match rework, stacked dialogs go back | free court card, Court N is free (new), Put a match on Court N, Suggested match, Replace player (new), How courts get matches (new) | IN REAL MODE — #1125 |
 | [2026-11-26-queue-inventory-deduct-at-session-done](2026-11-26-queue-inventory-deduct-at-session-done.md) | Session done takes the planned tubes off inventory stock | inventory-screen | IN MOCK APP — PR #1116 |
 | [2026-11-26-queue-name-hierarchy](2026-11-26-queue-name-hierarchy.md) | Queue app: player names read club nickname › nickname › full name everywhere | player name label (all face and tile variants) | TICKETED — #1127 |
-| [2026-11-26-queue-player-status-icons](2026-11-26-queue-player-status-icons.md) | Queue app: player status pill uses icons; Players card footer holds edit and Present | StatusPill, LivePlayerCard | TICKETED — #1127 |
+| [2026-11-26-queue-player-status-icons](2026-11-26-queue-player-status-icons.md) | Queue app: player status pill uses icons; Players card footer holds edit and Present | StatusPill, LivePlayerCard | IN REAL MODE — #1132 |
 | [2026-11-27-player-desktop-session-pill](2026-11-27-player-desktop-session-pill.md) | Player desktop session link returns to the green pill | player-nav | IN REAL MODE — #1156 |
 <!-- status-index:end -->

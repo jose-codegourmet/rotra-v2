@@ -1,6 +1,6 @@
 # Queue app: player status pill uses icons; Players card footer holds edit and Present
 
-Status: TICKETED — #1127
+Status: IN REAL MODE — #1132
 Date: 2026-11-26
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `ST_ICO`, `stPill`, `statusPill`, Players cards (`.pc3-foot`, `.pc3-acts`, `.pc3-edit`), `.st-legend`

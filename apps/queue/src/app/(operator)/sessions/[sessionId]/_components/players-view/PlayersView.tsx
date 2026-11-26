@@ -3,6 +3,7 @@
 import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { useRemoveClubPlayerPicture } from '@rotra/data/club-player/useRemoveClubPlayerPicture'
+import { useRenameClubPlayer } from '@rotra/data/club-player/useRenameClubPlayer'
 import { useSetClubNickname } from '@rotra/data/club-player/useSetClubNickname'
 import { useSetClubPlayerPicture } from '@rotra/data/club-player/useSetClubPlayerPicture'
 import { useUseClubPlayerPreviousPicture } from '@rotra/data/club-player/useUseClubPlayerPreviousPicture'
@@ -68,6 +69,7 @@ import { SelectionBar } from '@rotra/ui/selection-bar'
 import { SetGamesSheet, type SetGamesTarget } from '@rotra/ui/set-games-sheet'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { SlotMeter } from '@rotra/ui/slot-meter'
+import { StatusLegend } from '@rotra/ui/status-legend'
 import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
 import { useState } from 'react'
@@ -82,6 +84,8 @@ export type PlayersViewProps = ConsoleViewProps
 type PoolRow = {
   player: SessionPlayer
   playing: boolean
+  /** In a waiting Main Queue match (the Queued pill) */
+  queued: boolean
   games: number
   /** The card's Total: games played plus games queued for the night */
   total: number
@@ -144,7 +148,7 @@ const pictureMessage = (error: unknown) =>
  * footer line. Set games for all… and each card's Current button open SetGamesSheet on
  * useSetGamesPlayed (#717); games is the adjusted count (gamesPlayed). Each card's pencil opens
  * EditLivePlayerSheet (D-EDIT-LIVE-PLAYER): Save changes applies only what changed through the
- * club nickname, games played and presence hooks (the picture applies at once, as Edit details)
+ * rename (unclaimed and guest) or club nickname (registered), games played and presence hooks (the picture applies at once, as Edit details)
  * and toasts “Changes saved · NAME” or “No changes”. There is no Move to waitlist on a live card.
  * Admit player on a full roster asks OverfillConfirm first. Pictures on
  * waitlist rows open profiles through onOpenProfile; the Present switch uses a shared optimistic 800 ms presence batch, retaining pending cards in their
@@ -179,6 +183,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const setHandicap = useSetHandicap()
   const setPresenceOne = useSetPresence()
   const setClubNickname = useSetClubNickname()
+  const renameClubPlayer = useRenameClubPlayer()
   const setPicture = useSetClubPlayerPicture()
   const removePicture = useRemoveClubPlayerPicture()
   const previousPicture = useUseClubPlayerPreviousPicture()
@@ -281,6 +286,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
     return {
       player,
       playing: !!active,
+      queued: queueIndex >= 0,
       games: gamesPlayed(player, all),
       total: gamesPlayed(player, all) + queuedCount(player.id, all),
       minutes: waitMinutes(player, all, s.startedAt, now),
@@ -289,8 +295,8 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   })
   const counts = {
     available: rows.filter((r) => r.player.present && !r.playing).length,
-    // Counting In queue and Playing (and filtering by them) is Q30.5; the toolbar only gained the keys.
-    queue: 0,
+    // In queue: present players off court in a waiting Main Queue match (the cards' Queued pill).
+    queue: rows.filter((r) => r.player.present && !r.playing && r.queued).length,
     playing: rows.filter((r) => r.playing).length,
     present: rows.filter((r) => r.player.present).length,
     away: rows.filter((r) => !r.player.present).length,
@@ -303,11 +309,15 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
     .filter((r) =>
       show === 'available'
         ? (r.player.present && !r.playing) || retained(r.player.id)
-        : show === 'present'
-          ? r.player.present || retained(r.player.id)
-          : show === 'away'
-            ? !r.player.present || retained(r.player.id)
-            : true,
+        : show === 'queue'
+          ? (r.player.present && !r.playing && r.queued) || retained(r.player.id)
+          : show === 'playing'
+            ? r.playing || retained(r.player.id)
+            : show === 'present'
+              ? r.player.present || retained(r.player.id)
+              : show === 'away'
+                ? !r.player.present || retained(r.player.id)
+                : true,
     )
     .sort(SORTERS[sort.key](sort.dir))
   if (held?.filter === show && setPresence.pending.size) {
@@ -414,6 +424,11 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
         ? 'unclaimed'
         : 'guest'
   const editClubNickname = editPlayer?.clubNickname ?? editClubPlayer?.clubNickname ?? null
+  // An unclaimed or guest player has one nickname (the club's own); a registered one has a Club nickname.
+  const editNickname =
+    editKind === 'registered'
+      ? editClubNickname
+      : (editClubPlayer?.nickname ?? editPlayer?.nicknameSnapshot ?? null)
   const openEdit = (rosterId: string) => {
     setEditError(undefined)
     setPictureError(undefined)
@@ -430,7 +445,21 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
     setEditError(undefined)
     setEditPending(true)
     let changed = false
+    let savedName = editPlayer.nameSnapshot
     try {
+      if (editKind !== 'registered') {
+        const fullName = (values.fullName ?? editPlayer.nameSnapshot).replace(/\s+/g, ' ').trim()
+        const nickname = values.nickname.replace(/\s+/g, ' ').trim()
+        if (fullName !== editPlayer.nameSnapshot || nickname !== (editNickname ?? '')) {
+          const renamed = await renameClubPlayer.mutateAsync({
+            clubPlayerId: editPlayer.clubPlayerId,
+            fullName,
+            nickname,
+          })
+          savedName = renamed.data.fullName
+          changed = true
+        }
+      }
       if (editKind === 'registered' && values.nickname !== (editClubNickname ?? '')) {
         await setClubNickname.mutateAsync({
           clubPlayerId: editPlayer.clubPlayerId,
@@ -467,13 +496,17 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
         changed = true
       }
     } catch (error) {
-      setEditError(errorMessage(error))
+      setEditError(
+        error instanceof MockError
+          ? (error.fieldErrors?.fullName ?? error.message)
+          : errorMessage(error),
+      )
       setEditPending(false)
       return
     }
     setEditPending(false)
     closeEdit()
-    toast(changed ? `Changes saved · ${editPlayer.nameSnapshot}` : 'No changes')
+    toast(changed ? `Changes saved · ${savedName}` : 'No changes')
   }
   const pictureCallbacks = (message: string) => ({
     onSuccess: () => toast(`${message} · ${editPlayer?.nameSnapshot ?? ''}`),
@@ -566,57 +599,60 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
       {show === 'waitlist' ? (
         waitlistNode
       ) : shown.length ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,176px),1fr))] gap-3">
-          {shown.map((row) => {
-            const order = selection.indexOf(row.player.id)
-            // The Queue Master's last action wins; hide the mark while a presence change is saving.
-            const mark = setPresence.pending.has(row.player.id) ? null : selfCheckInMark(row.player)
-            return (
-              <PlayerPoolCard
-                key={row.player.id}
-                name={row.player.nameSnapshot}
-                nickname={row.player.nicknameSnapshot}
-                clubNickname={row.player.clubNickname}
-                photoUrl={photoFor(row.player)}
-                level={row.player.level}
-                games={row.games}
-                handicapSpots={row.player.handicapSpots}
-                forTheNight={row.games + queuedCount(row.player.id, all)}
-                waitMinutes={row.minutes}
-                status={row.status}
-                present={row.player.present}
-                presencePending={setPresence.pending.has(row.player.id)}
-                selfCheckedInAt={mark?.kind === 'checked-in' ? mark.at : null}
-                leftAt={mark?.kind === 'left' ? mark.at : null}
-                selected={order >= 0}
-                pickOrder={order >= 0 ? order + 1 : undefined}
-                onToggleSelect={() => toggle(row.player.id)}
-                onEdit={() => openEdit(row.player.id)}
-                onOpenProfile={() => onOpenProfile(row.player.clubPlayerId)}
-                onSetGames={() => {
-                  setSetGamesError(undefined)
-                  void setPresence.flush().then(() => setSetGamesFor(row.player.id))
-                }}
-                // No show (cancelled): after Start, away, no games and in no match (#839).
-                onNoShow={
-                  s.state === 'active' && !row.player.present && row.games === 0 && !row.playing
-                    ? () => {
-                        void setPresence.flush().then(() => {
-                          setNoShowError(undefined)
-                          setNoShowFor(row.player.id)
-                        })
-                      }
-                    : undefined
-                }
-                onPresentChange={(present) => {
-                  if (!setPresence.pending.size || held?.filter !== show)
-                    setHeld({ filter: show, ids: shown.map((r) => r.player.id) })
-                  setPresence.set(row.player.id, present)
-                }}
-              />
-            )
-          })}
-        </div>
+        <>
+          <StatusLegend />
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,176px),1fr))] gap-3">
+            {shown.map((row) => {
+              const order = selection.indexOf(row.player.id)
+              // The Queue Master's last action wins; hide the mark while a presence change is saving.
+              const mark = setPresence.pending.has(row.player.id) ? null : selfCheckInMark(row.player)
+              return (
+                <PlayerPoolCard
+                  key={row.player.id}
+                  name={row.player.nameSnapshot}
+                  nickname={row.player.nicknameSnapshot}
+                  clubNickname={row.player.clubNickname}
+                  photoUrl={photoFor(row.player)}
+                  level={row.player.level}
+                  games={row.games}
+                  handicapSpots={row.player.handicapSpots}
+                  forTheNight={row.games + queuedCount(row.player.id, all)}
+                  waitMinutes={row.minutes}
+                  status={row.status}
+                  present={row.player.present}
+                  presencePending={setPresence.pending.has(row.player.id)}
+                  selfCheckedInAt={mark?.kind === 'checked-in' ? mark.at : null}
+                  leftAt={mark?.kind === 'left' ? mark.at : null}
+                  selected={order >= 0}
+                  pickOrder={order >= 0 ? order + 1 : undefined}
+                  onToggleSelect={() => toggle(row.player.id)}
+                  onEdit={() => openEdit(row.player.id)}
+                  onOpenProfile={() => onOpenProfile(row.player.clubPlayerId)}
+                  onSetGames={() => {
+                    setSetGamesError(undefined)
+                    void setPresence.flush().then(() => setSetGamesFor(row.player.id))
+                  }}
+                  // No show (cancelled): after Start, away, no games and in no match (#839).
+                  onNoShow={
+                    s.state === 'active' && !row.player.present && row.games === 0 && !row.playing
+                      ? () => {
+                          void setPresence.flush().then(() => {
+                            setNoShowError(undefined)
+                            setNoShowFor(row.player.id)
+                          })
+                        }
+                      : undefined
+                  }
+                  onPresentChange={(present) => {
+                    if (!setPresence.pending.size || held?.filter !== show)
+                      setHeld({ filter: show, ids: shown.map((r) => r.player.id) })
+                    setPresence.set(row.player.id, present)
+                  }}
+                />
+              )
+            })}
+          </div>
+        </>
       ) : (
         <Card>
           <EmptyState>
@@ -624,7 +660,11 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
               ? 'No one is free right now. Try Present or Everyone.'
               : show === 'away'
                 ? 'Everyone on the roster is here.'
-                : 'No players yet.'}
+                : show === 'queue'
+                  ? 'No free player is in a queued match.'
+                  : show === 'playing'
+                    ? 'No one is on a court right now.'
+                    : 'No players yet.'}
           </EmptyState>
         </Card>
       )}
@@ -769,7 +809,7 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
           level={editPlayer.level}
           photoUrl={photoFor(editPlayer)}
           match={editMatch}
-          clubNickname={editClubNickname}
+          clubNickname={editNickname}
           accountNickname={editClubPlayer?.nickname ?? null}
           games={Math.min(99, editRowData.games)}
           present={editPlayer.present}

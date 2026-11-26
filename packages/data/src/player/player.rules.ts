@@ -1,4 +1,3 @@
-import type { MySession } from './mySessions'
 import type { PlayerRank, PlayerSessionRecord } from './player.types'
 // The rolling window applies to skill rank. Leaderboards use calendar periods.
 export const WINDOW_DAYS = 90
@@ -163,23 +162,30 @@ export function weeklyPerformance(
 const MANILA_OFFSET_MS = 8 * 3600000
 const DAY_MS = 86_400_000
 
-export type PlayerSessionSlot = {
+type SessionSlotRow = {
+  status: 'live' | 'confirmed' | 'waitlist' | 'requested'
+  startsAt?: string
+  href: string
+  title: string
+}
+
+export type PlayerSessionSlot<T extends SessionSlotRow = SessionSlotRow> = {
   kind: 'play' | 'ready' | 'next-up'
-  session: MySession
+  session: T
   showSettings: boolean
 }
 
 /** D-2026-11-26-02: a live session leads, then the next session starting today or later in Manila. */
-export function playerSessionSlot(
-  sessions: readonly MySession[],
+export function playerSessionSlot<T extends SessionSlotRow>(
+  sessions: readonly T[],
   now: Date | number,
-): PlayerSessionSlot | null {
+): PlayerSessionSlot<T> | null {
   const live = sessions.find((session) => session.status === 'live')
   if (live) return { kind: 'play', session: live, showSettings: false }
 
   const manilaNow = Number(now) + MANILA_OFFSET_MS
   const todayStart = Math.floor(manilaNow / DAY_MS) * DAY_MS - MANILA_OFFSET_MS
-  let next: MySession | undefined
+  let next: T | undefined
   let nextStart = Infinity
   for (const session of sessions) {
     const start = Date.parse(session.startsAt ?? '')

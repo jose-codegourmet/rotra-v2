@@ -15,23 +15,21 @@ const meta = {
 } satisfies Meta<typeof SettingsList>
 
 export default meta
-type Story = StoryObj<typeof meta>
+// Each rendered variant supplies one branch of SettingsList's discriminated union.
+type Story = StoryObj<{ section?: 'account' | 'device' }>
 
 export const Account: Story = {
-  args: {
-    section: 'account',
-    onEditProfile: () => {},
-    onOpenPrivacy: () => {},
-    onOpenVerification: () => {},
-  },
+  render: () => (
+    <SettingsList
+      section="account"
+      onEditProfile={() => {}}
+      onOpenPrivacy={() => {}}
+      onOpenVerification={() => {}}
+    />
+  ),
 }
 
 export const ThisDevice: Story = {
-  args: {
-    section: 'device',
-    darkMode: true,
-    onDarkModeChange: () => {},
-  },
   render: () => {
     const [globals, updateGlobals] = useGlobals()
     return (

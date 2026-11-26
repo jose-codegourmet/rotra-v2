@@ -108,13 +108,14 @@ One `Status:` line per log, always one of these:
 | `Status: TICKETED — #<n>` | A ticket (or epic) exists; no PR has merged for it yet. | The agent that writes the ticket, in the same change. |
 | `Status: IN PROGRESS — #<n> (PR #<m>)` | Being worked on: part of the work has merged, or a PR is open. | The PR that starts the work, when the change needs more than one PR (an epic). A single-PR change goes straight from `TICKETED` to `IN MOCK APP`. |
 | `Status: IN MOCK APP — #<n> (PR #<m>)` | The real app (on mock data) matches the mockup like for like (§5.2). | The PR that finishes the work, in its last commit, so it is true the moment it merges. |
+| `Status: IN REAL MODE — #<n> (PR #<m>)` | The real app in real mode matches the mockup like for like; the mock store was left as it was (owner decision, November 26, 2026). | The PR that finishes the work, in its last commit. |
 | `Status: CANCELLED — <reason>` | The owner dropped it, or a later log replaced it before it was built. Say if the mockup was reverted. | Whoever records the owner's decision, or the ticketing agent for a superseded log. |
 | `Status: MOCKUP ONLY — <reason>` | Nothing to build: prototype tooling, hosting, or the real app already behaves this way. | Whoever writes the log. |
 
 - `#<n>` is the ticket, or the epic when the change spans many tickets. `(PR #<m>)` is the last PR that
   merged for it; leave it out until there is one. A change built without a ticket writes `— PR #<m>`.
 - Only `NEW` logs are ticketed. Never ticket a log in any other status.
-- `IN MOCK APP` is the end for now: real mode, durable offline and rank math arrive through their own
+- `IN MOCK APP` is the end for now (`IN REAL MODE` is the end for batches built in real mode): real mode, durable offline and rank math arrive through their own
   epics, not through these logs.
 - When a later log replaces a change that is already `IN MOCK APP`, the old log keeps its status and gets
   `Superseded by: <new log>`; the new log starts `NEW`.
@@ -141,6 +142,7 @@ A log moves to `IN MOCK APP` only when the real app matches the mockup **like fo
   **Like for like** section. Build to the mockup; don't improve it.
 - Any difference is either fixed, or approved by the owner and written under **Known differences**.
 - The PR says what was compared and what wasn't ([ways-of-working.md §7](../ways-of-working.md#7-verification)).
+- For `IN REAL MODE`, the comparison is the mockup beside the real app in real mode.
 
 ---
 
@@ -174,7 +176,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-NEW: 13 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 275 · CANCELLED: 4 · MOCKUP ONLY: 4
+TICKETED: 44 · IN PROGRESS: 1 · IN MOCK APP: 275 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -480,20 +482,30 @@ NEW: 13 · TICKETED: 21 · IN PROGRESS: 1 · IN MOCK APP: 275 · CANCELLED: 4 ·
 | [2026-11-25-admin-bulk-set-gender](2026-11-25-admin-bulk-set-gender.md) | Admin app: Set gender for the selected players, plus a Gender filter | admin-player-bulk-bar, admin-player-filters, admin-player-gender-form (new) | IN MOCK APP — PR #1101 |
 | [2026-11-25-player-leaderboard-podium](2026-11-25-player-leaderboard-podium.md) | Player app: four leaderboard periods, shared places, an always-on podium with stacked places, full names, and a club leaderboard | top-three-podium, leaderboard-row, leaderboard-list, leaderboard-period-switch, leaderboard-search, leaderboard-rules-card, my-position-card, profile-leaderboard-chips, profile-ranking-card, club-member-profile-sheet, sheet, club-page-hero (page layout only) | IN MOCK APP — #1106 (PR #1107) |
 | [2026-11-25-player-match-page](2026-11-25-player-match-page.md) | A public match page for every game, opened from any game court and from Share game | game-row (game court), share sheet, page head / back button, profile card (reused) | IN MOCK APP — PR #1103 |
-| [2026-11-25-queue-add-player-saved-filters](2026-11-25-queue-add-player-saved-filters.md) | Add player › Saved players: account and skill filters, level on each row, debounced search | add-player-sheet (saved players tab), segmented-control, select, skeleton | NEW |
-| [2026-11-25-queue-almost-done-switch](2026-11-25-queue-almost-done-switch.md) | Queue app: an Almost done switch on the Playing court card | court-card, switch, match-card | NEW |
-| [2026-11-25-queue-back-to-preparation](2026-11-25-queue-back-to-preparation.md) | Back to preparation: undo Start before any game begins | the console's More menu, ConfirmSheet | NEW |
-| [2026-11-25-queue-drag-court-swap](2026-11-25-queue-drag-court-swap.md) | Courts: drag a busy court onto another busy court to trade courts | court card (drag source and drop target) | NEW |
-| [2026-11-25-queue-early-day-start](2026-11-25-queue-early-day-start.md) | Start session on an earlier day than planned moves the planned start to now | start-session-sheet | NEW |
-| [2026-11-25-queue-handicap-tonight](2026-11-25-queue-handicap-tonight.md) | Queue app: Handicap · tonight in the live Edit player sheet | edit-live-player-sheet, player-pool-card, chip | NEW |
+| [2026-11-25-queue-add-player-saved-filters](2026-11-25-queue-add-player-saved-filters.md) | Add player › Saved players: account and skill filters, level on each row, debounced search | add-player-sheet (saved players tab), segmented-control, select, skeleton | TICKETED — #1127 |
+| [2026-11-25-queue-almost-done-switch](2026-11-25-queue-almost-done-switch.md) | Queue app: an Almost done switch on the Playing court card | court-card, switch, match-card | TICKETED — #1118 |
+| [2026-11-25-queue-back-to-preparation](2026-11-25-queue-back-to-preparation.md) | Back to preparation: undo Start before any game begins | the console's More menu, ConfirmSheet | TICKETED — #1136 |
+| [2026-11-25-queue-drag-court-swap](2026-11-25-queue-drag-court-swap.md) | Courts: drag a busy court onto another busy court to trade courts | court card (drag source and drop target) | TICKETED — #1118 |
+| [2026-11-25-queue-early-day-start](2026-11-25-queue-early-day-start.md) | Start session on an earlier day than planned moves the planned start to now | start-session-sheet | TICKETED — #1136 |
+| [2026-11-25-queue-handicap-tonight](2026-11-25-queue-handicap-tonight.md) | Queue app: Handicap · tonight in the live Edit player sheet | edit-live-player-sheet, player-pool-card, chip | TICKETED — #1127 |
 | [2026-11-25-queue-leaderboard-podium](2026-11-25-queue-leaderboard-podium.md) | Queue leaderboards get the ROTRA Player podium, and a Leaderboards page joins the left nav | top-three-podium, live-leaderboard, session-standings, standings-faces, leaderboard-list, leaderboard-row, leaderboard-move, leaderboard-period-switch, leaderboard-rules-card | IN MOCK APP — #1106 (PR #1107) |
-| [2026-11-25-queue-match-making-factors](2026-11-25-queue-match-making-factors.md) | Queue app: Generate matches picks drafts by Whose turn, Fresh faces and Even game | auto-queue-workspace, match-card | NEW |
-| [2026-11-25-queue-picker-level-games-rest](2026-11-25-queue-picker-level-games-rest.md) | Replace and Substitute pickers: level ring, games badge, rest colours | the picker's player tile (Who's coming out, Swap from match, Suggestion, All players) | NEW |
-| [2026-11-25-queue-players-sort-presence-bulk](2026-11-25-queue-players-sort-presence-bulk.md) | Players tab: sort buttons, All present / All away, and presence from the selection bar | segmented-control, select, selection-bar, the Players view container | NEW |
-| [2026-11-25-queue-result-score-boxes](2026-11-25-queue-result-score-boxes.md) | Match result: two score boxes from the start, no deuce switch | match-result-sheet (score entry) | NEW |
+| [2026-11-25-queue-match-making-factors](2026-11-25-queue-match-making-factors.md) | Queue app: Generate matches picks drafts by Whose turn, Fresh faces and Even game | auto-queue-workspace, match-card | TICKETED — #1118 |
+| [2026-11-25-queue-picker-level-games-rest](2026-11-25-queue-picker-level-games-rest.md) | Replace and Substitute pickers: level ring, games badge, rest colours | the picker's player tile (Who's coming out, Swap from match, Suggestion, All players) | TICKETED — #1127 |
+| [2026-11-25-queue-players-sort-presence-bulk](2026-11-25-queue-players-sort-presence-bulk.md) | Players tab: sort buttons, All present / All away, and presence from the selection bar | segmented-control, select, selection-bar, the Players view container | TICKETED — #1127 |
+| [2026-11-25-queue-result-score-boxes](2026-11-25-queue-result-score-boxes.md) | Match result: two score boxes from the start, no deuce switch | match-result-sheet (score entry) | TICKETED — #1127 |
 | [2026-11-25-queue-settings-courts-arrange](2026-11-25-queue-settings-courts-arrange.md) | Queue app: the Settings tab's courts reorder by drag, rename from the label, and show how long they've been playing or free | settings-courts-box, settings-court-card, add-court-tile, court-label-form, chip | IN MOCK APP — #1105 |
-| [2026-11-25-queue-standings-image-shared-rows](2026-11-25-queue-standings-image-shared-rows.md) | Standings images: one row per position, and previews that are the images | result-slide-frame, export-images-sheet (export-frame-preview) | NEW |
-| [2026-11-25-queue-status-pills](2026-11-25-queue-status-pills.md) | Players cards and Main Queue: one status pill per player | player-pool-card, match-card (queue tile faces), a new status pill | NEW |
-| [2026-11-25-queue-upcoming-side-by-side](2026-11-25-queue-upcoming-side-by-side.md) | Courts tab: pairs side by side on upcoming cards, faces on Next eligible | match-card (compact), court card (free state) | NEW |
+| [2026-11-25-queue-standings-image-shared-rows](2026-11-25-queue-standings-image-shared-rows.md) | Standings images: one row per position, and previews that are the images | result-slide-frame, export-images-sheet (export-frame-preview) | TICKETED — #1127 |
+| [2026-11-25-queue-status-pills](2026-11-25-queue-status-pills.md) | Players cards and Main Queue: one status pill per player | player-pool-card, match-card (queue tile faces), a new status pill | TICKETED — #1127 |
+| [2026-11-25-queue-upcoming-side-by-side](2026-11-25-queue-upcoming-side-by-side.md) | Courts tab: pairs side by side on upcoming cards, faces on Next eligible | match-card (compact), court card (free state) | TICKETED — #1118 |
+| [2026-11-26-player-dock-settings-session](2026-11-26-player-dock-settings-session.md) | Player app: Settings page and a session slot in the main navigation | top bar, mobile dock, settings list (new) | TICKETED — #1142 |
+| [2026-11-26-player-match-court-vs-card](2026-11-26-player-match-court-vs-card.md) | Player app: Game page is the court beside a VS card; stats only for a tapped player | match court (unchanged), VS card (new), player stats card (new) | TICKETED — #1142 |
+| [2026-11-26-player-session-button-options](2026-11-26-player-session-button-options.md) | Player app: four style options for the dock's session button | mobile dock | TICKETED — #1142 |
+| [2026-11-26-player-weekly-summary-box](2026-11-26-player-weekly-summary-box.md) | Player app: Weekly Performance summary in one box | weekly performance summary | TICKETED — #1142 |
+| [2026-11-26-queue-console-no-courts-and-time](2026-11-26-queue-console-no-courts-and-time.md) | Queue app: live session header trimmed; Payments becomes a console tab | live session header actions | TICKETED — #1136 |
+| [2026-11-26-queue-court-match-line](2026-11-26-queue-court-match-line.md) | Queue app: court card match line as #N header and pills | court card | TICKETED — #1118 |
+| [2026-11-26-queue-edit-player-name](2026-11-26-queue-edit-player-name.md) | Queue app: Edit player has Full name and Club nickname for every player | EditLivePlayerSheet | TICKETED — #1127 |
+| [2026-11-26-queue-free-court-flow](2026-11-26-queue-free-court-flow.md) | Queue app: free court flow (pick or generate), Suggested match rework, stacked dialogs go back | free court card, Court N is free (new), Put a match on Court N, Suggested match, Replace player (new), How courts get matches (new) | TICKETED — #1118 |
 | [2026-11-26-queue-inventory-deduct-at-session-done](2026-11-26-queue-inventory-deduct-at-session-done.md) | Session done takes the planned tubes off inventory stock | inventory-screen | IN MOCK APP — PR #1116 |
+| [2026-11-26-queue-name-hierarchy](2026-11-26-queue-name-hierarchy.md) | Queue app: player names read club nickname › nickname › full name everywhere | player name label (all face and tile variants) | TICKETED — #1127 |
+| [2026-11-26-queue-player-status-icons](2026-11-26-queue-player-status-icons.md) | Queue app: player status pill uses icons; Players card footer holds edit and Present | StatusPill, LivePlayerCard | TICKETED — #1127 |
 <!-- status-index:end -->

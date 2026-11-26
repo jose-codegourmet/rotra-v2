@@ -1,6 +1,6 @@
 # Queue app: Generate matches picks drafts by Whose turn, Fresh faces and Even game
 
-Status: NEW
+Status: TICKETED — #1118
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › Generate Queue (all five tabs) › draft tile reason line; helpers `streakOf`, `nightGames`, `restAfter`, `tonightLevel`, `freshPick`, `cmpKeys` and the loop in `generateDrafts`; `splitTeams` (new optional level function)

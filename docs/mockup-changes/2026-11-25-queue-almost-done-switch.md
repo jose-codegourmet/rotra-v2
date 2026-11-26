@@ -1,6 +1,6 @@
 # Queue app: an Almost done switch on the Playing court card
 
-Status: NEW
+Status: TICKETED — #1118
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console Courts (Playing court card, `courtsPane`); `almostDoneOf`, `finishOf` (phase `almost`), `endingSoon`; action `toggleAlmostDone`; cleared in `confirmResult`, `confirmInvalid`, `pauseMatch`

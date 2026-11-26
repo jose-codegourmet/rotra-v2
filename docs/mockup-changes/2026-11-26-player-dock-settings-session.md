@@ -1,6 +1,6 @@
 # Player app: Settings page and a session slot in the main navigation
 
-Status: NEW
+Status: TICKETED — #1142
 Date: 2026-11-26
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `navSession`, `navItems`, `topBar`, `viewSettings`, `mySessions`, `NI.gear`, `.dock a.nav-ses`, `.set-list` styles, Prototype › "Migs's sessions"

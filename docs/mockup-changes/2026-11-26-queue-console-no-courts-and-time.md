@@ -1,6 +1,6 @@
 # Queue app: live session header trimmed; Payments becomes a console tab
 
-Status: NEW
+Status: TICKETED — #1136
 Date: 2026-11-26
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `viewConsole` (header `.live-acts`)

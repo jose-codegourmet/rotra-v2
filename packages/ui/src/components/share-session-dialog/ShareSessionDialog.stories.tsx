@@ -34,7 +34,7 @@ const meta = {
 } satisfies Meta<typeof ShareSessionDialog>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof ShareSessionDialog>
 
 /** Exactly three tiles: Share photos, Share the link, Facebook post. */
 export const Default: Story = { globals: { theme: 'dark' } }

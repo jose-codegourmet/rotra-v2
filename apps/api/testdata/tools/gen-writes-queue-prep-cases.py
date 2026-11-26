@@ -448,7 +448,7 @@ SCEN.update({
     's1_formats_and_no_record': [upd('queue_sessions', "request_formats = '{fun_3v3,singles}', record_games = false", f"id = '{S[1]}'")],
     's2_waiter_without_a_level': [upd('session_waitlist', 'skill_level_id = NULL', "id = 'a3300000-0000-4000-8000-000000000001'")],
     # Prep Full with two courts and four players (Hal, Ivy, Ben (registered), Gus) and Ann waiting.
-    's2_four_courts_players': [f"INSERT INTO session_courts (id, club_id, session_id, label, created_at, updated_at) VALUES ('{CT(12)}', '{CLUB1}', '{S[2]}', 'Court 2', {NOW}, {NOW})",
+    's2_four_courts_players': [f"INSERT INTO session_courts (id, club_id, session_id, label, position, created_at, updated_at) VALUES ('{CT(12)}', '{CLUB1}', '{S[2]}', 'Court 2', 2, {NOW}, {NOW})",
                                 *with_assessment(21, 10, 2, 4, 'Ben Santos'), *with_assessment(22, 11, 2, 1, 'Gus Guest')],
     's3_completed': [S3_DONE],
     's1_today': s1_today,
@@ -464,7 +464,7 @@ SCEN.update({
     'late_s1_court_opens_late': [YESTERDAY, S3_GONE, upd('session_courts', "starts_at = TIMESTAMPTZ '2026-11-18 12:00:00+00'", f"id = '{CT(1)}'")],
     'late_s1_court_booked_long': [YESTERDAY, S3_GONE, upd('session_courts', "open_until = TIMESTAMPTZ '2026-11-18 20:00:00+00'", f"id = '{CT(1)}'")],
     's5_today': [S3_GONE, upd('queue_sessions', TODAY, f"id = '{S[5]}'")],
-    's1_two_courts': [f"INSERT INTO session_courts (id, club_id, session_id, label, created_at, updated_at) VALUES ('{CT(11)}', '{CLUB1}', '{S[1]}', 'Court 2', TIMESTAMPTZ '2026-11-10 00:00:01+00', TIMESTAMPTZ '2026-11-10 00:00:01+00')"],
+    's1_two_courts': [f"INSERT INTO session_courts (id, club_id, session_id, label, position, created_at, updated_at) VALUES ('{CT(11)}', '{CLUB1}', '{S[1]}', 'Court 2', 2, TIMESTAMPTZ '2026-11-10 00:00:01+00', TIMESTAMPTZ '2026-11-10 00:00:01+00')"],
     's6_with_waitlist_and_request': [f"INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, created_at, updated_at) VALUES ('a3300000-0000-4000-8000-000000000009', '{CLUB1}', '{S[6]}', 'c6000000-0000-4000-8000-000000000001', 3, {NOW}, {NOW}, {NOW})",
                                      f"INSERT INTO session_join_requests (id, club_id, session_id, name, stated_band, placement, status, requested_at, created_at, updated_at, revision) VALUES ('a3400000-0000-4000-8000-000000000020', '{CLUB1}', '{S[6]}', 'Noon Nell', 'unsure', 'slot', 'pending', {NOW}, {NOW}, {NOW}, 1)"],
     'court3_starts_late': [upd('session_courts', "starts_at = TIMESTAMPTZ '2026-11-19 02:00:00+00'", f"id = '{CT(3)}'")],

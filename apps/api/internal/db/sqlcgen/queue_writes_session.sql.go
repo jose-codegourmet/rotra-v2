@@ -209,13 +209,14 @@ func (q *Queries) DropSessionCourt(ctx context.Context, arg DropSessionCourtPara
 }
 
 const editSessionCourt = `-- name: EditSessionCourt :one
-UPDATE session_courts SET label = $1, starts_at = $2, open_until = $3, revision = revision + 1, updated_at = $4
-WHERE club_id = $5 AND session_id = $6 AND id = $7
-RETURNING id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at
+UPDATE session_courts SET label = $1, position = COALESCE($2::int4, position), starts_at = $3, open_until = $4, revision = revision + 1, updated_at = $5
+WHERE club_id = $6 AND session_id = $7 AND id = $8
+RETURNING id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at, position
 `
 
 type EditSessionCourtParams struct {
 	Label     string
+	Position  pgtype.Int4
 	StartsAt  pgtype.Timestamptz
 	OpenUntil pgtype.Timestamptz
 	Now       pgtype.Timestamptz
@@ -228,6 +229,7 @@ type EditSessionCourtParams struct {
 func (q *Queries) EditSessionCourt(ctx context.Context, arg EditSessionCourtParams) (SessionCourt, error) {
 	row := q.db.QueryRow(ctx, editSessionCourt,
 		arg.Label,
+		arg.Position,
 		arg.StartsAt,
 		arg.OpenUntil,
 		arg.Now,
@@ -248,6 +250,7 @@ func (q *Queries) EditSessionCourt(ctx context.Context, arg EditSessionCourtPara
 		&i.Revision,
 		&i.OpenedEarlyAt,
 		&i.StartsAt,
+		&i.Position,
 	)
 	return i, err
 }
@@ -328,7 +331,7 @@ func (q *Queries) GetQueueSessionBySourceCommand(ctx context.Context, sourceComm
 }
 
 const getSessionCourt = `-- name: GetSessionCourt :one
-SELECT id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at FROM session_courts WHERE id = $1
+SELECT id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at, position FROM session_courts WHERE id = $1
 `
 
 func (q *Queries) GetSessionCourt(ctx context.Context, id pgtype.UUID) (SessionCourt, error) {
@@ -346,6 +349,7 @@ func (q *Queries) GetSessionCourt(ctx context.Context, id pgtype.UUID) (SessionC
 		&i.Revision,
 		&i.OpenedEarlyAt,
 		&i.StartsAt,
+		&i.Position,
 	)
 	return i, err
 }
@@ -415,9 +419,9 @@ func (q *Queries) InsertQueueSession(ctx context.Context, arg InsertQueueSession
 }
 
 const insertSessionCourt = `-- name: InsertSessionCourt :one
-INSERT INTO session_courts (id, club_id, session_id, label, starts_at, open_until, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $7)
-RETURNING id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at
+INSERT INTO session_courts (id, club_id, session_id, label, position, starts_at, open_until, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8)
+RETURNING id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at, position
 `
 
 type InsertSessionCourtParams struct {
@@ -425,6 +429,7 @@ type InsertSessionCourtParams struct {
 	ClubID    pgtype.UUID
 	SessionID pgtype.UUID
 	Label     string
+	Position  int32
 	StartsAt  pgtype.Timestamptz
 	OpenUntil pgtype.Timestamptz
 	Now       pgtype.Timestamptz
@@ -436,6 +441,7 @@ func (q *Queries) InsertSessionCourt(ctx context.Context, arg InsertSessionCourt
 		arg.ClubID,
 		arg.SessionID,
 		arg.Label,
+		arg.Position,
 		arg.StartsAt,
 		arg.OpenUntil,
 		arg.Now,
@@ -453,6 +459,7 @@ func (q *Queries) InsertSessionCourt(ctx context.Context, arg InsertSessionCourt
 		&i.Revision,
 		&i.OpenedEarlyAt,
 		&i.StartsAt,
+		&i.Position,
 	)
 	return i, err
 }
@@ -531,10 +538,10 @@ func (q *Queries) ListClubPlayerAccounts(ctx context.Context, ids []pgtype.UUID)
 }
 
 const listQueueSessionCourts = `-- name: ListQueueSessionCourts :many
-SELECT id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at FROM session_courts WHERE session_id = $1 AND removed_at IS NULL ORDER BY created_at ASC, id ASC
+SELECT id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at, position FROM session_courts WHERE session_id = $1 AND removed_at IS NULL ORDER BY position ASC, created_at ASC, id ASC
 `
 
-// liveCourts: the session's courts that were not removed, oldest first.
+// liveCourts: the session's courts that were not removed, in court order (position, then creation time and id).
 func (q *Queries) ListQueueSessionCourts(ctx context.Context, sessionID pgtype.UUID) ([]SessionCourt, error) {
 	rows, err := q.db.Query(ctx, listQueueSessionCourts, sessionID)
 	if err != nil {
@@ -556,6 +563,7 @@ func (q *Queries) ListQueueSessionCourts(ctx context.Context, sessionID pgtype.U
 			&i.Revision,
 			&i.OpenedEarlyAt,
 			&i.StartsAt,
+			&i.Position,
 		); err != nil {
 			return nil, err
 		}
@@ -583,6 +591,18 @@ type LockSessionPlayerLevelAtStartParams struct {
 func (q *Queries) LockSessionPlayerLevelAtStart(ctx context.Context, arg LockSessionPlayerLevelAtStartParams) error {
 	_, err := q.db.Exec(ctx, lockSessionPlayerLevelAtStart, arg.Now, arg.ID)
 	return err
+}
+
+const nextSessionCourtPosition = `-- name: NextSessionCourtPosition :one
+SELECT (COALESCE(max(position), 0) + 1)::int4 FROM session_courts WHERE session_id = $1
+`
+
+// nextCourtPosition: a new court goes after every court of the session, removed ones included.
+func (q *Queries) NextSessionCourtPosition(ctx context.Context, sessionID pgtype.UUID) (int32, error) {
+	row := q.db.QueryRow(ctx, nextSessionCourtPosition, sessionID)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
 }
 
 const removeSessionCourt = `-- name: RemoveSessionCourt :exec
@@ -627,7 +647,7 @@ func (q *Queries) SetQueueSessionJoinSwitches(ctx context.Context, arg SetQueueS
 
 const setSessionCourtEarlyOpen = `-- name: SetSessionCourtEarlyOpen :one
 UPDATE session_courts SET opened_early_at = $1, revision = revision + 1, updated_at = $2 WHERE id = $3
-RETURNING id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at
+RETURNING id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at, position
 `
 
 type SetSessionCourtEarlyOpenParams struct {
@@ -652,6 +672,7 @@ func (q *Queries) SetSessionCourtEarlyOpen(ctx context.Context, arg SetSessionCo
 		&i.Revision,
 		&i.OpenedEarlyAt,
 		&i.StartsAt,
+		&i.Position,
 	)
 	return i, err
 }

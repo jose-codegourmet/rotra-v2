@@ -94,6 +94,7 @@ type queueCourtDTO struct {
 	ID            string  `json:"id"`
 	SessionID     string  `json:"sessionId"`
 	Label         string  `json:"label"`
+	Position      int32   `json:"position"` // court order in the session, from 1
 	StartsAt      *string `json:"startsAt"`
 	OpenedEarlyAt *string `json:"openedEarlyAt"`
 	OpenUntil     *string `json:"openUntil"`
@@ -127,7 +128,7 @@ func queueSummaryOf(r sqlcgen.ListQueueSessionsRow, courts []sqlcgen.ListQueueLi
 		}
 		n++
 		d.Courts = append(d.Courts, queueCourtDTO{
-			ID: c.ID.String(), SessionID: c.SessionID.String(), Label: c.Label, StartsAt: isoPtr(c.StartsAt),
+			ID: c.ID.String(), SessionID: c.SessionID.String(), Label: c.Label, Position: c.Position, StartsAt: isoPtr(c.StartsAt),
 			OpenedEarlyAt: isoPtr(c.OpenedEarlyAt), OpenUntil: isoPtr(c.OpenUntil), RemovedAt: isoPtr(c.RemovedAt),
 		})
 	}

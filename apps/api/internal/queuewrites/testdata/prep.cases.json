@@ -43,7 +43,7 @@
    "UPDATE session_waitlist SET skill_level_id = NULL WHERE id = 'a3300000-0000-4000-8000-000000000001'"
   ],
   "s2_four_courts_players": [
-   "INSERT INTO session_courts (id, club_id, session_id, label, created_at, updated_at) VALUES ('a2c00000-0000-4000-8000-000000000012', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000002', 'Court 2', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO session_courts (id, club_id, session_id, label, position, created_at, updated_at) VALUES ('a2c00000-0000-4000-8000-000000000012', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000002', 'Court 2', 2, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
    "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000010', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000002', 'c6000000-0000-4000-8000-000000000004', 'Ben Santos', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
    "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) VALUES ('a0300000-0000-4000-8000-000000000221', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000004', 'a3000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000010', 3, 'a0300000-0000-4000-8000-000000000321', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1, 'c9000000-0000-4000-8000-000000000001')",
    "UPDATE session_players SET assessment_id = 'a0300000-0000-4000-8000-000000000221' WHERE id = 'a7000000-0000-4000-8000-000000000010'",
@@ -107,7 +107,7 @@
    "UPDATE queue_sessions SET scheduled_start_at = TIMESTAMPTZ '2026-11-19 03:00:00+00', scheduled_end_at = TIMESTAMPTZ '2026-11-19 07:00:00+00' WHERE id = 'a3000000-0000-4000-8000-000000000005'"
   ],
   "s1_two_courts": [
-   "INSERT INTO session_courts (id, club_id, session_id, label, created_at, updated_at) VALUES ('a2c00000-0000-4000-8000-000000000011', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'Court 2', TIMESTAMPTZ '2026-11-10 00:00:01+00', TIMESTAMPTZ '2026-11-10 00:00:01+00')"
+   "INSERT INTO session_courts (id, club_id, session_id, label, position, created_at, updated_at) VALUES ('a2c00000-0000-4000-8000-000000000011', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'Court 2', 2, TIMESTAMPTZ '2026-11-10 00:00:01+00', TIMESTAMPTZ '2026-11-10 00:00:01+00')"
   ],
   "s6_with_waitlist_and_request": [
    "INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, created_at, updated_at) VALUES ('a3300000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000006', 'c6000000-0000-4000-8000-000000000001', 3, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",

@@ -703,6 +703,50 @@ func (ns NullJoinRequestStatus) Value() (driver.Value, error) {
 	return string(ns.JoinRequestStatus), nil
 }
 
+type LevelRestriction string
+
+const (
+	LevelRestrictionAll                   LevelRestriction = "all"
+	LevelRestrictionBeginners             LevelRestriction = "beginners"
+	LevelRestrictionBeginnersIntermediate LevelRestriction = "beginners_intermediate"
+	LevelRestrictionSlotsPerBand          LevelRestriction = "slots_per_band"
+)
+
+func (e *LevelRestriction) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = LevelRestriction(s)
+	case string:
+		*e = LevelRestriction(s)
+	default:
+		return fmt.Errorf("unsupported scan type for LevelRestriction: %T", src)
+	}
+	return nil
+}
+
+type NullLevelRestriction struct {
+	LevelRestriction LevelRestriction
+	Valid            bool // Valid is true if LevelRestriction is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullLevelRestriction) Scan(value interface{}) error {
+	if value == nil {
+		ns.LevelRestriction, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.LevelRestriction.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullLevelRestriction) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.LevelRestriction), nil
+}
+
 type LicensePlan string
 
 const (
@@ -1261,6 +1305,48 @@ func (ns NullPlayerContactSyncStatus) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.PlayerContactSyncStatus), nil
+}
+
+type PlayerGender string
+
+const (
+	PlayerGenderMale   PlayerGender = "male"
+	PlayerGenderFemale PlayerGender = "female"
+)
+
+func (e *PlayerGender) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = PlayerGender(s)
+	case string:
+		*e = PlayerGender(s)
+	default:
+		return fmt.Errorf("unsupported scan type for PlayerGender: %T", src)
+	}
+	return nil
+}
+
+type NullPlayerGender struct {
+	PlayerGender PlayerGender
+	Valid        bool // Valid is true if PlayerGender is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPlayerGender) Scan(value interface{}) error {
+	if value == nil {
+		ns.PlayerGender, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.PlayerGender.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPlayerGender) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.PlayerGender), nil
 }
 
 type PlayerNotificationKind string
@@ -2500,6 +2586,8 @@ type ClubPlayer struct {
 	SharedEntryID        pgtype.UUID
 	AvatarRef            pgtype.Text
 	AvatarPreviousRef    pgtype.Text
+	SavedLevelAt         pgtype.Timestamptz
+	SavedSkillLevelID    pgtype.Int2
 }
 
 type ClubPlayerClaimLink struct {
@@ -2747,6 +2835,7 @@ type Player struct {
 	VerificationOverride   NullPlayerVerificationOverride
 	VerificationOverrideBy pgtype.UUID
 	VerificationOverrideAt pgtype.Timestamptz
+	Gender                 NullPlayerGender
 }
 
 type PlayerAccount struct {
@@ -2978,42 +3067,48 @@ type ProjectionJob struct {
 }
 
 type QueueSession struct {
-	ID                   pgtype.UUID
-	ClubID               pgtype.UUID
-	Title                string
-	Notes                pgtype.Text
-	ScheduledStartAt     pgtype.Timestamptz
-	ScheduledEndAt       pgtype.Timestamptz
-	VenueID              pgtype.UUID
-	VenueName            pgtype.Text
-	VenueAddress         pgtype.Text
-	State                QueueSessionState
-	InvalidReason        pgtype.Text
-	SessionMode          SessionMode
-	AllowSingles         bool
-	AllowDoubles         bool
-	MinimumGames         int32
-	MinimumIsCalculated  bool
-	PlayersPerCourt      int16
-	ExpectedPlayers      pgtype.Int4
-	QueueRevision        int64
-	StartedAt            pgtype.Timestamptz
-	FinalizedAt          pgtype.Timestamptz
-	SeriesID             pgtype.UUID
-	StartLicenseTermID   pgtype.UUID
-	PublicSlug           string
-	AcceptJoinRequests   bool
-	SourceCommandID      pgtype.UUID
-	CreatedAt            pgtype.Timestamptz
-	UpdatedAt            pgtype.Timestamptz
-	Revision             int64
-	CancelReason         pgtype.Text
-	CancelledAt          pgtype.Timestamptz
-	CourtFillMode        CourtFillMode
-	AlwaysRequireRequest bool
-	RequestFormats       []MatchFormat
-	RecordGames          bool
-	LatestEventID        pgtype.Int8
+	ID                        pgtype.UUID
+	ClubID                    pgtype.UUID
+	Title                     string
+	Notes                     pgtype.Text
+	ScheduledStartAt          pgtype.Timestamptz
+	ScheduledEndAt            pgtype.Timestamptz
+	VenueID                   pgtype.UUID
+	VenueName                 pgtype.Text
+	VenueAddress              pgtype.Text
+	State                     QueueSessionState
+	InvalidReason             pgtype.Text
+	SessionMode               SessionMode
+	AllowSingles              bool
+	AllowDoubles              bool
+	MinimumGames              int32
+	MinimumIsCalculated       bool
+	PlayersPerCourt           int16
+	ExpectedPlayers           pgtype.Int4
+	QueueRevision             int64
+	StartedAt                 pgtype.Timestamptz
+	FinalizedAt               pgtype.Timestamptz
+	SeriesID                  pgtype.UUID
+	StartLicenseTermID        pgtype.UUID
+	PublicSlug                string
+	AcceptJoinRequests        bool
+	SourceCommandID           pgtype.UUID
+	CreatedAt                 pgtype.Timestamptz
+	UpdatedAt                 pgtype.Timestamptz
+	Revision                  int64
+	CancelReason              pgtype.Text
+	CancelledAt               pgtype.Timestamptz
+	CourtFillMode             CourtFillMode
+	AlwaysRequireRequest      bool
+	RequestFormats            []MatchFormat
+	RecordGames               bool
+	LatestEventID             pgtype.Int8
+	LevelRestriction          LevelRestriction
+	BeginnerSlots             pgtype.Int4
+	IntermediateSlots         pgtype.Int4
+	AdvancedSlots             pgtype.Int4
+	PlannedStartBeforeStartAt pgtype.Timestamptz
+	PlannedEndBeforeStartAt   pgtype.Timestamptz
 }
 
 type RankingPolicyVersion struct {
@@ -3089,6 +3184,7 @@ type SessionCourt struct {
 	Revision      int64
 	OpenedEarlyAt pgtype.Timestamptz
 	StartsAt      pgtype.Timestamptz
+	Position      int32
 }
 
 type SessionDropOutNotice struct {
@@ -3241,6 +3337,7 @@ type SessionPlayer struct {
 	NoShowAt         pgtype.Timestamptz
 	SelfCheckedInAt  pgtype.Timestamptz
 	LeftAt           pgtype.Timestamptz
+	HandicapSpots    []string
 }
 
 type SessionPublication struct {

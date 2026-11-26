@@ -37,12 +37,12 @@ FROM session_players
 WHERE session_id = @session_id
 ORDER BY confirmed_at ASC, id ASC;
 
--- All courts of a session in creation order, removed ones too (liveCourts is the ones with no removed_at).
+-- All courts of a session in court order, removed ones too (liveCourts is the ones with no removed_at).
 -- name: ListSessionCourtRows :many
-SELECT id, label, starts_at, opened_early_at, open_until, removed_at
+SELECT id, label, position, starts_at, opened_early_at, open_until, removed_at
 FROM session_courts
 WHERE session_id = @session_id
-ORDER BY created_at ASC, id ASC;
+ORDER BY position ASC, created_at ASC, id ASC;
 
 -- The session's matches that were not discarded, with their decision.
 -- name: ListSessionMatchRows :many

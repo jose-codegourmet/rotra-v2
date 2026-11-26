@@ -732,8 +732,10 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             const p = rosterList.find((player) => player.id === id)
             return {
               id,
-              name: p ? queueMasterName(p) : 'Player',
+              name: p?.nameSnapshot ?? 'Player',
               shortName: p ? queueMasterName(p) : 'Player',
+              nickname: p?.nicknameSnapshot ?? null,
+              clubNickname: p?.clubNickname ?? null,
               level: p?.level ?? null,
               photoUrl: photoFor(p),
               games: p ? gamesPlayed(p, all) : countedGames(id, all),
@@ -743,8 +745,10 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
             const p = rosterList.find((player) => player.id === id)
             return {
               id,
-              name: p ? queueMasterName(p) : 'Player',
+              name: p?.nameSnapshot ?? 'Player',
               shortName: p ? queueMasterName(p) : 'Player',
+              nickname: p?.nicknameSnapshot ?? null,
+              clubNickname: p?.clubNickname ?? null,
               level: p?.level ?? null,
               photoUrl: photoFor(p),
               games: p ? gamesPlayed(p, all) : countedGames(id, all),

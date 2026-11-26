@@ -266,6 +266,8 @@ function OpenActiveMatch({
       id,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       level: p?.level ?? null,
       games: countedGames(id, matches),
       photoUrl: photoOf(p),
@@ -274,6 +276,9 @@ function OpenActiveMatch({
   const substitutionPlayer = (p: SessionPlayer): SubstitutionPlayer => ({
     id: p.id,
     name: queueMasterName(p),
+    fullName: p.nameSnapshot,
+    nickname: p.nicknameSnapshot ?? null,
+    clubNickname: p.clubNickname ?? null,
     photoUrl: photoOf(p),
     level: p.level,
     games: countedGames(p.id, matches),

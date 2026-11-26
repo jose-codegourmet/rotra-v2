@@ -149,6 +149,8 @@ export function QueueView({
         : undefined,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       level: p?.level ?? null,
       games: gamesPlayedFor(id, ctx),
     }

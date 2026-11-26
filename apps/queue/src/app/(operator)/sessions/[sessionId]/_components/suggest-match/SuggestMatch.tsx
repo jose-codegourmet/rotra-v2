@@ -136,6 +136,8 @@ function OpenSuggestMatch({
       id,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       level: p?.level ?? null,
       games: countedGames(id, matches),
       photoUrl: photoOf(p),
@@ -204,6 +206,8 @@ function OpenSuggestMatch({
       games: countedGames(id, matches),
       restMinutes: p ? waitMinutes(p, matches, session.startedAt, now) : 0,
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       photoUrl: photoOf(p),
     }
   }

@@ -260,6 +260,8 @@ export function SessionView({
       id,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       level: p?.level ?? null,
       photoUrl: clubPlayer
         ? profilePictureSrc(

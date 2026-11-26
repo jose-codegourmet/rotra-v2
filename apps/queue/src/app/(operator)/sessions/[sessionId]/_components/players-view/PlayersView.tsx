@@ -99,10 +99,10 @@ const levelIndex = (p: SessionPlayer) => (p.level ? PLAYING_LEVELS.indexOf(p.lev
  * By the name the card shows (owner, November 25, 2026): club nickname, then nickname, then full
  * name, ignoring case ("andong" sits with "Ali", not after "Zed").
  */
+const sortName = (p: SessionPlayer) =>
+  p.clubNickname?.trim() || p.nicknameSnapshot || p.nameSnapshot
 const byName = (a: PoolRow, b: PoolRow) =>
-  queueMasterName(a.player).localeCompare(queueMasterName(b.player), undefined, {
-    sensitivity: 'base',
-  })
+  sortName(a.player).localeCompare(sortName(b.player), undefined, { sensitivity: 'base' })
 
 /**
  * The prototype's sorters (owner, November 25, 2026), each in its first direction times `dir`:

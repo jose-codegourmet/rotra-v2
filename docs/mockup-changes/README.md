@@ -176,7 +176,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 30 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 15 · CANCELLED: 4 · MOCKUP ONLY: 4
+TICKETED: 27 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 18 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -487,11 +487,11 @@ TICKETED: 30 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 15 · CANCEL
 | [2026-11-25-queue-back-to-preparation](2026-11-25-queue-back-to-preparation.md) | Back to preparation: undo Start before any game begins | the console's More menu, ConfirmSheet | TICKETED — #1136 |
 | [2026-11-25-queue-drag-court-swap](2026-11-25-queue-drag-court-swap.md) | Courts: drag a busy court onto another busy court to trade courts | court card (drag source and drop target) | IN REAL MODE — #1124 |
 | [2026-11-25-queue-early-day-start](2026-11-25-queue-early-day-start.md) | Start session on an earlier day than planned moves the planned start to now | start-session-sheet | TICKETED — #1136 |
-| [2026-11-25-queue-handicap-tonight](2026-11-25-queue-handicap-tonight.md) | Queue app: Handicap · tonight in the live Edit player sheet | edit-live-player-sheet, player-pool-card, chip | TICKETED — #1127 |
+| [2026-11-25-queue-handicap-tonight](2026-11-25-queue-handicap-tonight.md) | Queue app: Handicap · tonight in the live Edit player sheet | edit-live-player-sheet, player-pool-card, chip | IN REAL MODE — #1134 |
 | [2026-11-25-queue-leaderboard-podium](2026-11-25-queue-leaderboard-podium.md) | Queue leaderboards get the ROTRA Player podium, and a Leaderboards page joins the left nav | top-three-podium, live-leaderboard, session-standings, standings-faces, leaderboard-list, leaderboard-row, leaderboard-move, leaderboard-period-switch, leaderboard-rules-card | IN MOCK APP — #1106 (PR #1107) |
 | [2026-11-25-queue-match-making-factors](2026-11-25-queue-match-making-factors.md) | Queue app: Generate matches picks drafts by Whose turn, Fresh faces and Even game | auto-queue-workspace, match-card | IN REAL MODE — #1123 |
-| [2026-11-25-queue-picker-level-games-rest](2026-11-25-queue-picker-level-games-rest.md) | Replace and Substitute pickers: level ring, games badge, rest colours | the picker's player tile (Who's coming out, Swap from match, Suggestion, All players) | TICKETED — #1127 |
-| [2026-11-25-queue-players-sort-presence-bulk](2026-11-25-queue-players-sort-presence-bulk.md) | Players tab: sort buttons, All present / All away, and presence from the selection bar | segmented-control, select, selection-bar, the Players view container | TICKETED — #1127 |
+| [2026-11-25-queue-picker-level-games-rest](2026-11-25-queue-picker-level-games-rest.md) | Replace and Substitute pickers: level ring, games badge, rest colours | the picker's player tile (Who's coming out, Swap from match, Suggestion, All players) | IN REAL MODE — #1134 |
+| [2026-11-25-queue-players-sort-presence-bulk](2026-11-25-queue-players-sort-presence-bulk.md) | Players tab: sort buttons, All present / All away, and presence from the selection bar | segmented-control, select, selection-bar, the Players view container | IN REAL MODE — #1134 |
 | [2026-11-25-queue-result-score-boxes](2026-11-25-queue-result-score-boxes.md) | Match result: two score boxes from the start, no deuce switch | match-result-sheet (score entry) | TICKETED — #1127 |
 | [2026-11-25-queue-settings-courts-arrange](2026-11-25-queue-settings-courts-arrange.md) | Queue app: the Settings tab's courts reorder by drag, rename from the label, and show how long they've been playing or free | settings-courts-box, settings-court-card, add-court-tile, court-label-form, chip | IN MOCK APP — #1105 |
 | [2026-11-25-queue-standings-image-shared-rows](2026-11-25-queue-standings-image-shared-rows.md) | Standings images: one row per position, and previews that are the images | result-slide-frame, export-images-sheet (export-frame-preview) | TICKETED — #1127 |

@@ -187,7 +187,7 @@ function Tile({
       aria-pressed={pressed}
       disabled={disabled}
       onClick={onClick}
-      aria-label={`${player.name}, ${levelLabel(player.level)}, ${player.games} of ${minimumGames} games, ${status}`}
+      aria-label={`${player.name}, ${player.level ? levelLabel(player.level) : 'No level'}, ${player.games} of ${minimumGames} games, ${status}`}
       className={cn(
         playerTileVariants({ state: player.status === 'away' ? 'away' : busy ? 'busy' : 'note' }),
         'gap-0.5 px-1 pt-2.5 pb-2',

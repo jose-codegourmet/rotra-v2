@@ -37,8 +37,8 @@ export function InventoryScreen({
       />
       {children}
       <p className="m-0 text-sm text-fg2">
-        Shuttlecock prices here fill in the session cost estimate. Stock isn't deducted
-        automatically yet; adjust it with − and + after a session.
+        Shuttlecock prices here fill in the session cost estimate. Session done takes the planned
+        tubes off stock; adjust it with − and + if a night used a different amount.
       </p>
     </main>
   )

@@ -269,6 +269,7 @@ function SessionAddPlayer({
     id: p.id,
     name: p.fullName,
     nickname: p.nickname,
+    clubNickname: p.clubNickname,
     photoUrl: profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName),
     rtrId: p.rtrId,
     identity: p.identity,

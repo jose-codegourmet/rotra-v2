@@ -176,7 +176,7 @@ Regenerate with `node docs/mockup-changes/status-index.mjs`. It fails on a missi
 `--check` only reports whether the index is stale.
 
 <!-- status-index:start -->
-TICKETED: 27 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 18 · CANCELLED: 4 · MOCKUP ONLY: 4
+TICKETED: 24 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 21 · CANCELLED: 4 · MOCKUP ONLY: 4
 
 | Log | Change | Components | Status |
 |---|---|---|---|
@@ -482,7 +482,7 @@ TICKETED: 27 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 18 · CANCEL
 | [2026-11-25-admin-bulk-set-gender](2026-11-25-admin-bulk-set-gender.md) | Admin app: Set gender for the selected players, plus a Gender filter | admin-player-bulk-bar, admin-player-filters, admin-player-gender-form (new) | IN MOCK APP — PR #1101 |
 | [2026-11-25-player-leaderboard-podium](2026-11-25-player-leaderboard-podium.md) | Player app: four leaderboard periods, shared places, an always-on podium with stacked places, full names, and a club leaderboard | top-three-podium, leaderboard-row, leaderboard-list, leaderboard-period-switch, leaderboard-search, leaderboard-rules-card, my-position-card, profile-leaderboard-chips, profile-ranking-card, club-member-profile-sheet, sheet, club-page-hero (page layout only) | IN MOCK APP — #1106 (PR #1107) |
 | [2026-11-25-player-match-page](2026-11-25-player-match-page.md) | A public match page for every game, opened from any game court and from Share game | game-row (game court), share sheet, page head / back button, profile card (reused) | IN MOCK APP — PR #1103 (superseded by 2026-11-26-player-match-court-vs-card.md (the Before this game card only)) |
-| [2026-11-25-queue-add-player-saved-filters](2026-11-25-queue-add-player-saved-filters.md) | Add player › Saved players: account and skill filters, level on each row, debounced search | add-player-sheet (saved players tab), segmented-control, select, skeleton | TICKETED — #1127 |
+| [2026-11-25-queue-add-player-saved-filters](2026-11-25-queue-add-player-saved-filters.md) | Add player › Saved players: account and skill filters, level on each row, debounced search | add-player-sheet (saved players tab), segmented-control, select, skeleton | IN REAL MODE — #1135 |
 | [2026-11-25-queue-almost-done-switch](2026-11-25-queue-almost-done-switch.md) | Queue app: an Almost done switch on the Playing court card | court-card, switch, match-card | IN REAL MODE — #1124 |
 | [2026-11-25-queue-back-to-preparation](2026-11-25-queue-back-to-preparation.md) | Back to preparation: undo Start before any game begins | the console's More menu, ConfirmSheet | TICKETED — #1136 |
 | [2026-11-25-queue-drag-court-swap](2026-11-25-queue-drag-court-swap.md) | Courts: drag a busy court onto another busy court to trade courts | court card (drag source and drop target) | IN REAL MODE — #1124 |
@@ -492,9 +492,9 @@ TICKETED: 27 · IN PROGRESS: 1 · IN MOCK APP: 275 · IN REAL MODE: 18 · CANCEL
 | [2026-11-25-queue-match-making-factors](2026-11-25-queue-match-making-factors.md) | Queue app: Generate matches picks drafts by Whose turn, Fresh faces and Even game | auto-queue-workspace, match-card | IN REAL MODE — #1123 |
 | [2026-11-25-queue-picker-level-games-rest](2026-11-25-queue-picker-level-games-rest.md) | Replace and Substitute pickers: level ring, games badge, rest colours | the picker's player tile (Who's coming out, Swap from match, Suggestion, All players) | IN REAL MODE — #1134 |
 | [2026-11-25-queue-players-sort-presence-bulk](2026-11-25-queue-players-sort-presence-bulk.md) | Players tab: sort buttons, All present / All away, and presence from the selection bar | segmented-control, select, selection-bar, the Players view container | IN REAL MODE — #1134 |
-| [2026-11-25-queue-result-score-boxes](2026-11-25-queue-result-score-boxes.md) | Match result: two score boxes from the start, no deuce switch | match-result-sheet (score entry) | TICKETED — #1127 |
+| [2026-11-25-queue-result-score-boxes](2026-11-25-queue-result-score-boxes.md) | Match result: two score boxes from the start, no deuce switch | match-result-sheet (score entry) | IN REAL MODE — #1135 |
 | [2026-11-25-queue-settings-courts-arrange](2026-11-25-queue-settings-courts-arrange.md) | Queue app: the Settings tab's courts reorder by drag, rename from the label, and show how long they've been playing or free | settings-courts-box, settings-court-card, add-court-tile, court-label-form, chip | IN MOCK APP — #1105 |
-| [2026-11-25-queue-standings-image-shared-rows](2026-11-25-queue-standings-image-shared-rows.md) | Standings images: one row per position, and previews that are the images | result-slide-frame, export-images-sheet (export-frame-preview) | TICKETED — #1127 |
+| [2026-11-25-queue-standings-image-shared-rows](2026-11-25-queue-standings-image-shared-rows.md) | Standings images: one row per position, and previews that are the images | result-slide-frame, export-images-sheet (export-frame-preview) | IN REAL MODE — #1135 |
 | [2026-11-25-queue-status-pills](2026-11-25-queue-status-pills.md) | Players cards and Main Queue: one status pill per player | player-pool-card, match-card (queue tile faces), a new status pill | IN REAL MODE — #1132 |
 | [2026-11-25-queue-upcoming-side-by-side](2026-11-25-queue-upcoming-side-by-side.md) | Courts tab: pairs side by side on upcoming cards, faces on Next eligible | match-card (compact), court card (free state) | IN REAL MODE — #1121 |
 | [2026-11-26-player-dock-settings-session](2026-11-26-player-dock-settings-session.md) | Player app: Settings page and a session slot in the main navigation | top bar, mobile dock, settings list (new) | IN REAL MODE — #1149 |

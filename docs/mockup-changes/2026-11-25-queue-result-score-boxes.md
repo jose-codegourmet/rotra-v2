@@ -1,6 +1,6 @@
 # Match result: two score boxes from the start, no deuce switch
 
-Status: TICKETED — #1127
+Status: IN REAL MODE — #1135
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › SHEETS.result, scoreEntry(), gameOutcome(), syncScores(), pickScoreWinner()

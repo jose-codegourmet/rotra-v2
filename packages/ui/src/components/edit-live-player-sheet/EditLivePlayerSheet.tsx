@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import type { ClubPlayerPictureState } from '@rotra/data/club-player/types'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import type { HandicapSpot } from '@rotra/data/session-roster/handicap'
+import { FULL_NAME_MAX } from '@rotra/schema/name'
 import { NICKNAME_MAX } from '@rotra/schema/personal-details'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
@@ -56,7 +57,11 @@ export type EditLivePlayerSheetProps = {
   photoUrl?: string
   /** Tonight's state chip: in a match (Playing / On court) or off court (Present / Not here follows `present`) */
   match?: { status: 'playing' | 'oncourt'; courtLabel: string } | null
-  /** Registered players: their current club nickname (prefill) and the nickname on their ROTRA account */
+  /**
+   * The club nickname (prefill). Registered players: the club's label for them, with
+   * `accountNickname` (the nickname on their ROTRA account) in the hint. Unclaimed and guest
+   * players have no account, so this is their one nickname.
+   */
   clubNickname?: string | null
   accountNickname?: string | null
   /** The games played the card shows now ("Now N") */
@@ -105,9 +110,9 @@ function Section({ id, title, children }: { id: string; title: string; children:
 /**
  * D-EDIT-LIVE-PLAYER (owner comments, November 19, 2026): **Edit NAME** from the pencil on a live
  * Players card. A header (picture in its level ring, the shown name, the full name when it
- * differs, chips for level, account kind and tonight's state), a **Profile** section (club
- * nickname for registered players, the picture editor for unclaimed players; left out for a guest)
- * , a **Tonight** section (Games played with "Now N", Availability Present · Not here) and a
+ * differs, chips for level, account kind and tonight's state), a **Profile** section that always
+ * shows (Full name: editable for unclaimed and guest, read-only for registered; Club nickname for
+ * everyone; the picture editor for unclaimed players), a **Tonight** section (Games played with "Now N", Availability Present · Not here) and a
  * **Handicap · tonight** section (D-2026-11-25-03: HandicapPicker).
  * Cancel / Save changes; no confirmation step.
  */
@@ -131,6 +136,8 @@ export function EditLivePlayerSheet({
   error,
 }: EditLivePlayerSheetProps) {
   const formId = useId()
+  // The club edits the full name of the profiles it made; a registered player's name is their own.
+  const editableName = kind !== 'registered'
   const profileId = useId()
   const nightId = useId()
   const handicapId = useId()
@@ -138,6 +145,7 @@ export function EditLivePlayerSheet({
   const form = useForm<EditLivePlayerFormInput, unknown, EditLivePlayerFormValues>({
     resolver: zodResolver(editLivePlayerSchema),
     defaultValues: editLivePlayerDefaultValues({
+      fullName: editableName ? fullName : undefined,
       clubNickname,
       games,
       present,
@@ -148,12 +156,19 @@ export function EditLivePlayerSheet({
   useEffect(() => {
     if (open)
       form.reset(
-        editLivePlayerDefaultValues({ clubNickname, games, present, spots: handicapSpots }),
+        editLivePlayerDefaultValues({
+          fullName: editableName ? fullName : undefined,
+          clubNickname,
+          games,
+          present,
+          spots: handicapSpots,
+        }),
       )
-  }, [open, clubNickname, games, present, handicapSpots, form.reset])
+  }, [open, editableName, fullName, clubNickname, games, present, handicapSpots, form.reset])
 
   const band = level ? (level.split('_')[0] as 'beginner' | 'intermediate' | 'advanced') : 'none'
   const watched = form.watch()
+  const fullNameError = form.formState.errors.fullName?.message
   const nicknameError = form.formState.errors.nickname?.message
   const tonight = match ? (
     <Chip tone="accent">
@@ -164,7 +179,6 @@ export function EditLivePlayerSheet({
   ) : (
     <Chip tone="warn">Not here</Chip>
   )
-  const showProfile = kind === 'registered' || (kind === 'unclaimed' && picture)
 
   return (
     <Sheet
@@ -191,7 +205,9 @@ export function EditLivePlayerSheet({
         noValidate
         className="flex min-w-0 flex-col gap-3.5"
         onSubmit={form.handleSubmit((values) => {
-          if (!isPending) onSave(values)
+          if (isPending) return
+          // A registered player's name is read-only: it is never part of the saved values.
+          onSave(editableName ? values : { ...values, fullName: undefined })
         })}
       >
         <div className={cn('flex min-w-0 items-center gap-3.5', RING[band])}>
@@ -218,49 +234,80 @@ export function EditLivePlayerSheet({
 
         {error ? <Notice tone="error">{error}</Notice> : null}
 
-        {showProfile ? (
-          <Section id={profileId} title="Profile">
-            {kind === 'registered' ? (
-              <Field
-                label="Club nickname (optional)"
-                error={nicknameError}
-                hint={
-                  nicknameError
-                    ? undefined
-                    : `What your club calls them. Only your club sees it. Empty uses ${
-                        accountNickname
-                          ? `“${accountNickname}”, the nickname on their ROTRA account`
-                          : 'the name on their ROTRA account'
-                      }.`
-                }
-              >
-                <Controller
-                  control={form.control}
-                  name="nickname"
-                  render={({ field }) => (
-                    <TextInput
-                      {...field}
-                      disabled={isPending}
-                      maxLength={NICKNAME_MAX}
-                      autoComplete="off"
-                    />
-                  )}
-                />
-              </Field>
-            ) : picture ? (
-              <ClubPictureField
-                playerId={picture.playerId}
-                name={fullName}
-                picture={picture.picture}
-                onChange={picture.onChange}
-                onRemove={picture.onRemove}
-                onUsePrevious={picture.onUsePrevious}
-                pending={picture.pending || isPending}
-                error={picture.error}
+        <Section id={profileId} title="Profile">
+          {editableName ? (
+            <Field
+              label="Full name"
+              error={fullNameError}
+              hint={
+                fullNameError
+                  ? undefined
+                  : 'Shown on courts, the queue and the public page. Fixes spelling for the profile your club made.'
+              }
+            >
+              <Controller
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                  <TextInput
+                    {...field}
+                    value={field.value ?? ''}
+                    disabled={isPending}
+                    maxLength={FULL_NAME_MAX}
+                    autoComplete="off"
+                  />
+                )}
               />
-            ) : null}
-          </Section>
-        ) : null}
+            </Field>
+          ) : (
+            <Field
+              label="Full name"
+              hint={`Only ${shownName} can change this, in the ROTRA Player app. Use Club nickname for what your club calls them.`}
+            >
+              <TextInput value={fullName} readOnly />
+            </Field>
+          )}
+          <Field
+            label="Club nickname (optional)"
+            error={nicknameError}
+            hint={
+              nicknameError
+                ? undefined
+                : kind === 'registered'
+                  ? `What your club calls them. Only your club sees it. Empty uses ${
+                      accountNickname
+                        ? `“${accountNickname}”, the nickname on their ROTRA account`
+                        : 'the name on their ROTRA account'
+                    }.`
+                  : 'What your club calls them, shown above the full name. They have no ROTRA account yet, so this is their only nickname. Empty shows the full name.'
+            }
+          >
+            <Controller
+              control={form.control}
+              name="nickname"
+              render={({ field }) => (
+                <TextInput
+                  {...field}
+                  disabled={isPending}
+                  maxLength={NICKNAME_MAX}
+                  autoComplete="off"
+                />
+              )}
+            />
+          </Field>
+          {kind === 'unclaimed' && picture ? (
+            <ClubPictureField
+              playerId={picture.playerId}
+              name={fullName}
+              picture={picture.picture}
+              onChange={picture.onChange}
+              onRemove={picture.onRemove}
+              onUsePrevious={picture.onUsePrevious}
+              pending={picture.pending || isPending}
+              error={picture.error}
+            />
+          ) : null}
+        </Section>
 
         <Section id={nightId} title="Tonight">
           <div className="flex flex-wrap items-center justify-between gap-3">

@@ -33,6 +33,7 @@ const propsFor = (
   present: p.present,
   onToggleSelect: fn(),
   onPresentChange: fn(),
+  onEdit: fn(),
 })
 
 // Fixture roles: 0–3 are on Court 1 (match 1), 4 waits in match 2 (queue #1), 5 is away, 10 is free.
@@ -88,6 +89,20 @@ export const SelectedWithOrder: Story = { args: { selected: true, pickOrder: 2 }
 export const NoLevel: Story = { args: { level: null } }
 /** The live console passes onSetGames: Current is a button (dashed underline, hover tint) that opens Set games played */
 export const WithSetGames: Story = { args: { onSetGames: fn() } }
+/** The Edit player pencil is a 28 px accent circle on the top-right corner, over the border */
+export const CornerPencil: Story = { args: { onEdit: fn() } }
+export const CornerPencilLight: Story = { ...CornerPencil, globals: { theme: 'light' } }
+/** Selected: the pick badge on the left corner, the pencil on the right */
+export const SelectedWithPencil: Story = { args: { selected: true, pickOrder: 1, onEdit: fn() } }
+export const SelectedWithPencilLight: Story = {
+  ...SelectedWithPencil,
+  globals: { theme: 'light' },
+}
+/** A full name uses almost the whole card width now the pencil has left the name row */
+export const FullNameWidth: Story = {
+  args: { name: 'Ysa Fernandez', onEdit: fn() },
+}
+
 /** The picture opens the profile card; the rest of the card still selects. */
 export const WithProfileButton: Story = { args: { onOpenProfile: fn(), onSetGames: fn() } }
 /** Clamped at two lines with an ellipsis */

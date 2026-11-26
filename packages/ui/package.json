@@ -328,6 +328,7 @@
     "./results-header": "./src/components/results-header/ResultsHeader.tsx",
     "./standings-faces": "./src/components/standings-faces/StandingsFaces.tsx",
     "./standings-slide": "./src/components/standings-slide/StandingsSlide.tsx",
+    "./status-legend": "./src/components/status-legend/StatusLegend.tsx",
     "./status-pill": "./src/components/status-pill/StatusPill.tsx",
     "./record-tab-header": "./src/components/record-tab-header/RecordTabHeader.tsx",
     "./record-court-columns": "./src/components/record-court-columns/RecordCourtColumns.tsx",

@@ -7,10 +7,18 @@ import { Select } from '@rotra/ui/select'
 import { tabFocusClass } from '@rotra/ui/tabs'
 
 /**
- * Which players the grid shows: present and off court, present, away (Not here), the waitlist
+ * Which players the grid shows: present and off court (Available), free players in a queued match
+ * (In queue), players on a court (Playing), present, away (Not here), the waitlist
  * panel instead of cards, or the whole roster
  */
-export type PlayerPoolShow = 'available' | 'present' | 'away' | 'waitlist' | 'everyone'
+export type PlayerPoolShow =
+  | 'available'
+  | 'queue'
+  | 'playing'
+  | 'present'
+  | 'away'
+  | 'waitlist'
+  | 'everyone'
 /** The four sorts (owner, November 25, 2026) */
 export type PlayerPoolSortKey = 'name' | 'games' | 'wait' | 'level'
 /**
@@ -24,8 +32,16 @@ export const DEFAULT_PLAYER_POOL_SORT: PlayerPoolSort = { key: 'wait', dir: 1 }
 export type PlayerPoolToolbarProps = {
   show: PlayerPoolShow
   onShowChange: (show: PlayerPoolShow) => void
-  /** Live counts for the five filters */
-  counts: { available: number; present: number; away: number; waitlist: number; everyone: number }
+  /** Live counts for the seven filters */
+  counts: {
+    available: number
+    queue: number
+    playing: number
+    present: number
+    away: number
+    waitlist: number
+    everyone: number
+  }
   sort: PlayerPoolSort
   onSortChange: (sort: PlayerPoolSort) => void
   className?: string
@@ -62,7 +78,7 @@ const SORT_OPTIONS = SORT_KEYS.flatMap(({ key }) =>
 )
 
 /**
- * The Players view filter and sort row: Available · N (default), Present · N, Not here · N,
+ * The Players view filter and sort row: Available · N (default), In queue · N, Playing · N, Present · N, Not here · N,
  * Waitlist · N, Everyone · N; then the sort (hidden while Waitlist is shown). On desktop the sort is
  * a row of buttons at the right, Name · Games · Wait · Level: the active one shows its direction
  * arrow and tapping it again flips it; another starts in its first direction. At 760 px and
@@ -84,6 +100,8 @@ export function PlayerPoolToolbar({
         onChange={(value) => onShowChange(value as PlayerPoolShow)}
         options={[
           { value: 'available', label: `Available · ${counts.available}` },
+          { value: 'queue', label: `In queue · ${counts.queue}` },
+          { value: 'playing', label: `Playing · ${counts.playing}` },
           { value: 'present', label: `Present · ${counts.present}` },
           { value: 'away', label: `Not here · ${counts.away}` },
           { value: 'waitlist', label: `Waitlist · ${counts.waitlist}` },

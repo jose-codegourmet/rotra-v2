@@ -1,4 +1,5 @@
 import {
+  almostDoneText,
   movedCourtText,
   pausedText,
   swappedPartnersText,
@@ -35,11 +36,12 @@ const sessionPath = (sessionId: string) => `/api/sessions/${encodeURIComponent(s
 
 export type WireMatch = Omit<
   Match,
-  'placedAt' | 'startedAt' | 'endedAt' | 'substitutions' | 'decision'
+  'placedAt' | 'startedAt' | 'endedAt' | 'almostDoneAt' | 'substitutions' | 'decision'
 > & {
   placedAt?: string | null
   startedAt: string | null
   endedAt: string | null
+  almostDoneAt?: string | null
   substitutions: (Omit<Match['substitutions'][number], 'at'> & { at: string })[]
   decision: (Omit<NonNullable<Match['decision']>, 'confirmedAt'> & { confirmedAt: string }) | null
   revision: string
@@ -60,6 +62,7 @@ export const matchOf = (m: WireMatch): Match => ({
   placedAt: msOrNull(m.placedAt ?? null),
   startedAt: msOrNull(m.startedAt),
   endedAt: msOrNull(m.endedAt),
+  almostDoneAt: msOrNull(m.almostDoneAt ?? null),
   substitutions: m.substitutions.map((s) => ({ ...s, at: msOf(s.at) })),
   decision: m.decision && { ...m.decision, confirmedAt: msOf(m.decision.confirmedAt) },
 })
@@ -474,6 +477,29 @@ export async function realPauseMatch(input: { matchId: string; operationId: stri
     }),
   )
   return accepted(null, pausedText(match.matchNo, courtNames(match, courts)))
+}
+
+/**
+ * Almost done: the switch on a Playing match, on or off. The server refuses a match that left
+ * Playing meanwhile ("Something changed. Review the match again."). Online only.
+ */
+export async function realSetAlmostDone(input: {
+  matchId: string
+  on: boolean
+  operationId: string
+}) {
+  requireOperationId(input.operationId)
+  const { sessionId, courts } = await controlContext(input.matchId)
+  const match = matchOf(
+    await onCourtCommand<WireMatch>(sessionId, input.matchId, 'almost-done', {
+      operationId: input.operationId,
+      on: input.on,
+    }),
+  )
+  return accepted(
+    null,
+    almostDoneText(match.matchNo, courtNames(match, courts), match.almostDoneAt != null),
+  )
 }
 
 /**

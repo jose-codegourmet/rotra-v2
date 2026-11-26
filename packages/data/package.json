@@ -252,6 +252,7 @@
     "./match/useInvalidateMatch": "./src/match/useInvalidateMatch.ts",
     "./match/useSubstitutePlayer": "./src/match/useSubstitutePlayer.ts",
     "./match/usePauseMatch": "./src/match/usePauseMatch.ts",
+    "./match/useSetAlmostDone": "./src/match/useSetAlmostDone.ts",
     "./match/useTradeCourts": "./src/match/useTradeCourts.ts",
     "./match/useSwapFromMatch": "./src/match/useSwapFromMatch.ts",
     "./match/liveMatch.rules": "./src/match/liveMatch.rules.ts",

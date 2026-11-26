@@ -7,6 +7,7 @@ import {
   AVAILABLE_PLAYERS_EMPTY,
   autoQueueEmptyText,
   draftWaitStatus,
+  endsSoon,
   matchExpectedFinish,
   minutesPlayed,
   PLAN_AHEAD_EMPTY,
@@ -148,5 +149,82 @@ describe('draft status: the court a draft waits for', () => {
     const status = draftWaitStatus(draft([match?.teamA[0] as string], []), merged, '31', now)
     expect(status?.text).toBe('Waits for Court 1 + Court 2 · running long')
     expect(status?.phase).toBe('long')
+  })
+})
+
+describe('Almost done (D-2026-11-25-02)', () => {
+  /** The scenario with Court 2 (mid-game, "Ends in about 10 min") switched to Almost done. */
+  const switched = () => {
+    const s = scenario()
+    const midGame = { ...s.midGame, almostDoneAt: now - 60000 }
+    return { ...s, midGame, matches: [s.finishingSoon, midGame, s.gettingReady] }
+  }
+  it('reads a Playing match as Almost done with 0 minutes left, whatever the time says', () => {
+    const s = switched()
+    for (const at of [now, now + 7 * 60000, now + 40 * 60000]) {
+      const finish = matchExpectedFinish(s.midGame, '31', at)
+      expect(finish).toEqual({
+        phase: 'almost',
+        minutesLeft: 0,
+        text: 'Almost done',
+        tag: 'almost done',
+      })
+      expect(endsSoon(finish)).toBe(true)
+    }
+    expect(endsSoon(matchExpectedFinish(scenario().midGame, '31', now))).toBe(false)
+  })
+  it('puts those players in the Plan Ahead pool at the top of the tie order', () => {
+    const s = switched()
+    const pool = planAheadPool(s.session, s, now).map((p) => p.id)
+    for (const id of allPlayers(s.midGame)) expect(pool).toContain(id)
+    for (const id of allPlayers(s.gettingReady)) expect(pool).not.toContain(id)
+    const [almost, soon] = [s.midGame.teamA[0] as string, s.finishingSoon.teamA[0] as string]
+    expect(planAheadMinutesLeft(almost, s.matches, '31', now)).toBe(0)
+    expect(planAheadMinutesLeft(soon, s.matches, '31', now)).toBe(2)
+    // Same load: Almost done (0 minutes left) goes before Finishing soon (2 minutes left).
+    expect(
+      rankPlanAhead([{ id: soon }, { id: almost }], () => 1, s, '31', now).map((p) => p.id),
+    ).toEqual([almost, soon])
+  })
+  it('names the court in the draft line: "Waits for Court N · almost done"', () => {
+    const s = switched()
+    const status = draftWaitStatus(
+      { format: 'doubles', teamA: [s.midGame.teamA[0] as string], teamB: [] },
+      s,
+      '31',
+      now,
+    )
+    expect(status?.text).toBe('Waits for Court 2 · almost done')
+    expect(status?.phase).toBe('almost')
+    // With a second court, the one that finishes last is named: Court 1 has 2 minutes left.
+    expect(
+      draftWaitStatus(
+        {
+          format: 'doubles',
+          teamA: [s.midGame.teamA[0] as string],
+          teamB: [s.finishingSoon.teamA[0] as string],
+        },
+        s,
+        '31',
+        now,
+      )?.text,
+    ).toBe('Waits for Court 2 and Court 1 · Court 1 finishing soon')
+  })
+  it('ignores the switch on a match that is not Playing', () => {
+    const s = scenario()
+    const gettingReady = { ...s.gettingReady, almostDoneAt: now }
+    expect(matchExpectedFinish(gettingReady, '31', now)).toMatchObject({
+      phase: 'notStarted',
+      minutesLeft: 15,
+    })
+    const ctx = { ...s, matches: [s.finishingSoon, s.midGame, gettingReady] }
+    const pool = planAheadPool(s.session, ctx, now).map((p) => p.id)
+    for (const id of allPlayers(gettingReady)) expect(pool).not.toContain(id)
+    const ended = { ...s.midGame, state: 'completed' as const, endedAt: now, almostDoneAt: now }
+    expect(matchExpectedFinish(ended, '31', now).phase).toBe('notStarted')
+    // Off (null) reads the time estimate as before.
+    expect(matchExpectedFinish({ ...s.midGame, almostDoneAt: null }, '31', now).text).toBe(
+      'Ends in about 10 min',
+    )
   })
 })

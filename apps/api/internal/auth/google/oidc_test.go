@@ -228,7 +228,9 @@ func TestASlowKeyFetchDoesNotBlockATokenWhoseKeyIsCached(t *testing.T) {
 		t.Fatal("a verification with a cached key waited for the slow key fetch")
 	}
 	open()
-	<-done
+	if err := <-done; err != nil {
+		t.Logf("the exchange that waited for the key fetch ended with: %v", err)
+	}
 }
 
 func TestAKeyFetchSurvivesTheCancellationOfTheRequestThatStartedIt(t *testing.T) {

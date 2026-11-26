@@ -44,7 +44,7 @@ type decision struct {
 }
 
 func (d decision) with(v Verified) decision {
-	d.google = Held{Email: v.Email, Name: v.Name}
+	d.google = Held(v)
 	return d
 }
 

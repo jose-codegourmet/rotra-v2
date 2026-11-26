@@ -21,6 +21,8 @@ export type PlayerPickerCandidate = {
   id: string
   name: string
   nickname: string | null
+  /** The club nickname (registered players only); the tile's top name when present */
+  clubNickname?: string | null
   photoUrl?: string
   /** The level locked for this session; null when none was set */
   level: PlayingLevel | null
@@ -216,6 +218,8 @@ function LineupPicker({
               <PlayerTile
                 key={p.id}
                 name={p.name}
+                nickname={p.nickname}
+                clubNickname={p.clubNickname}
                 photoUrl={p.photoUrl}
                 level={p.level}
                 games={p.games}

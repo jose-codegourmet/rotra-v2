@@ -3,6 +3,7 @@ import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import type { Ref } from 'react'
 
 export type MatchPlayerCardTeam = 'A' | 'B'
@@ -12,6 +13,10 @@ export type MatchPlayerCardProps = {
   id: string
   /** Full name */
   name: string
+  /** The player's own nickname; with `clubNickname` it turns on the name stack (D-2026-11-26-09) */
+  nickname?: string | null
+  /** The club nickname (registered players only) */
+  clubNickname?: string | null
   level: PlayingLevel | null
   photoUrl?: string
   /** Counted games so far this session */
@@ -66,6 +71,8 @@ function levelRingClass(level: PlayingLevel | null) {
 export function MatchPlayerCard({
   id,
   name,
+  nickname,
+  clubNickname,
   level,
   photoUrl,
   games,
@@ -91,7 +98,17 @@ export function MatchPlayerCard({
   )
   const facts = (
     <span className="flex min-w-0 max-w-full flex-col">
-      <b className="truncate max-[480px]:whitespace-normal">{name}</b>
+      {nickname !== undefined || clubNickname !== undefined ? (
+        <PlayerNameBlock
+          layout="stack"
+          fullName={name}
+          nickname={nickname}
+          clubNickname={clubNickname}
+          labelClassName="font-bold"
+        />
+      ) : (
+        <b className="truncate max-[480px]:whitespace-normal">{name}</b>
+      )}
       <span
         className={cn(
           'text-[13px] leading-[1.35] tabular-nums',

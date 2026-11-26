@@ -7,6 +7,7 @@ import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import { StatusPill, type StatusPillValue } from '@rotra/ui/status-pill'
 import { Switch } from '@rotra/ui/switch'
 import type { KeyboardEvent } from 'react'
@@ -28,9 +29,9 @@ export type PlayerPoolCardStatus =
 export type PlayerPoolCardProps = {
   /** The full name: the screen-reader label and the hover text */
   name: string
-  /** The player's own nickname; shown when there is no club nickname */
+  /** The player's own nickname; shown under the club nickname, or on top when there is none */
   nickname?: string | null
-  /** The club nickname (registered players only); shown first */
+  /** The club nickname (registered players only); the top name */
   clubNickname?: string | null
   photoUrl?: string
   /** The level locked for this session; null when none was set. Shown as the picture's ring, not as text */
@@ -110,7 +111,7 @@ const RING = {
 
 /**
  * One player in the live Players view (the prototype's .pc3): a role=button card with the picture in
- * a level-band ring, one name (club nickname, nickname, full name; two lines at most), the
+ * a level-band ring, the name stack (club nickname, nickname, full name: the first present on top, the others in smaller lines), the
  * Current | Total games strip, the footer (StatusPill icon and time, then the Present switch). The
  * Edit player pencil is a 28 px circle on the top-right corner, over the border. Tapping, Enter or Space
  * toggles selection; selected cards show their pick order in a badge. No Move to waitlist: the
@@ -141,7 +142,6 @@ export function PlayerPoolCard({
   onOpenProfile,
   className,
 }: PlayerPoolCardProps) {
-  const shownName = clubNickname?.trim() || nickname?.trim() || name
   const band = level ? (level.split('_')[0] as keyof typeof RING) : 'none'
   const state = status.kind === 'playing' ? 'playing' : present ? 'available' : 'away'
   const presenceCaption =
@@ -232,12 +232,15 @@ export function PlayerPoolCard({
           </span>
         )}
         <div className="flex min-w-0 flex-1 items-center gap-1">
-          {/* One name; the full name is the hover text and the card's screen-reader label keeps it. */}
-          <div
-            title={name}
-            className="line-clamp-2 min-w-0 overflow-hidden text-[13px] leading-tight font-bold [overflow-wrap:anywhere]"
-          >
-            {shownName}
+          {/* The name stack (D-2026-11-26-09): the top name on one line, the others in smaller lines; the full name is the hover text. */}
+          <div title={name} className="min-w-0">
+            <PlayerNameBlock
+              layout="stack"
+              fullName={name}
+              nickname={nickname}
+              clubNickname={clubNickname}
+              labelClassName="text-[13px] leading-tight"
+            />
           </div>
           {handicapSpots?.length ? (
             <span

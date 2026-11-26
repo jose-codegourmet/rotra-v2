@@ -2,6 +2,7 @@ import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { cn } from '@rotra/ui/cn'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import { StatusPill } from '@rotra/ui/status-pill'
 import type { KeyboardEvent } from 'react'
 import { labelWithWait, type PlayerWait, waitPill } from './PlayerFaceButton.helpers'
@@ -11,8 +12,16 @@ export type { PlayerWait }
 export type PlayerFaceButtonProps = {
   /** Full name, for the title and the picture's description */
   name: string
-  /** Nickname or first name, shown under the picture */
+  /** Nickname or first name, shown under the picture when no nickname fields are given (inline text keeps it) */
   shortName: string
+  /**
+   * The player's own nickname. Giving `nickname` or `clubNickname` (null counts) turns on the
+   * club-facing face layout (D-2026-11-26-09): the label is the club nickname, else the nickname,
+   * else the first name, with the other names (the full name is `name`) in smaller lines under it.
+   */
+  nickname?: string | null
+  /** The club nickname (registered players only) */
+  clubNickname?: string | null
   level: PlayingLevel | null
   photoUrl?: string
   /** Accessible name, e.g. "Mikee Abellana, Team A. View profile" */
@@ -54,6 +63,8 @@ const PICTURE = {
 export function PlayerFaceButton({
   name,
   shortName,
+  nickname,
+  clubNickname,
   level,
   photoUrl,
   label,
@@ -99,16 +110,36 @@ export function PlayerFaceButton({
           picture.className,
         )}
       />
-      <span
-        className={cn(
-          'max-w-16 truncate rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo',
-          compact && 'max-w-[46px]',
-          size === 'queue' &&
-            'max-w-[88px] bg-transparent px-0 text-[15px] leading-normal font-semibold text-fg',
-        )}
-      >
-        {shortName}
-      </span>
+      {nickname !== undefined || clubNickname !== undefined ? (
+        <PlayerNameBlock
+          layout="face"
+          tone={size === 'queue' ? 'plain' : 'photo'}
+          fullName={name}
+          nickname={nickname}
+          clubNickname={clubNickname}
+          className={cn(
+            size !== 'queue' && 'max-w-16',
+            size !== 'queue' && compact && 'max-w-[46px]',
+          )}
+          labelClassName={cn(
+            size === 'queue'
+              ? 'max-w-[88px] text-[15px] leading-normal font-semibold text-fg'
+              : 'rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo',
+          )}
+          lineClassName={size === 'queue' ? 'max-w-[88px]' : undefined}
+        />
+      ) : (
+        <span
+          className={cn(
+            'max-w-16 truncate rounded-full bg-photo-label px-[5px] text-[10px] leading-[1.3] font-bold text-on-photo',
+            compact && 'max-w-[46px]',
+            size === 'queue' &&
+              'max-w-[88px] bg-transparent px-0 text-[15px] leading-normal font-semibold text-fg',
+          )}
+        >
+          {shortName}
+        </span>
+      )}
       {wait ? <StatusPill status={waitPill(wait)} size="sm" /> : null}
     </button>
   )

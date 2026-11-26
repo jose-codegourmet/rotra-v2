@@ -13,6 +13,7 @@ export const courtDrawingMeta = {
     'Every picture has a 3 px ring in its level band colour (Beginner blue, Intermediate yellow, Advanced red, the same tokens as the level ring elsewhere); a player with no level keeps the white edge.',
     'Pass onOpenMatch on Getting ready and Playing courts: the drawing becomes a button (pointer or grab cursor, slight brighten on hover, tooltip "Open match"). Faces still open the profile; the card keeps its Open match button for keyboards and screen readers. Free courts are never a button.',
     'Pass onDragMove to make the drawing draggable (mouse after 6 px, touch after press and hold, using the same ghost as the swap drag). It reports the id of the free court it is dropped on (a CourtCard with dropCourtId); a drop on a busy court or on nothing does nothing, and a tap still opens the match.',
+    'Face names (D-2026-11-26-09): give each player nickname and clubNickname (null counts; name is the full name) and the label under the picture is the club nickname, else the nickname, else the first name, with the other names (the full name when there are no nicknames) in smaller lines in the dark pill. The lines hide when the drawing is 240 px or narrower; this component is the @container they read. Without them the label is shortName.',
     'Do not use for the queue card; it lists faces in a row, not on a court.',
   ],
   prototype: {
@@ -24,6 +25,7 @@ export const courtDrawingMeta = {
     'docs/screens/product/modules/queue/session-console.md',
     'docs/business_logic/product/queue/modules/matches/README.md',
     'docs/mockup-changes/2026-11-19-queue-court-faces-ring.md',
+    'docs/mockup-changes/2026-11-26-queue-name-hierarchy.md',
     'docs/mockup-changes/2026-11-19-queue-court-tap-opens-match.md',
     'docs/mockup-changes/2026-11-19-queue-drag-court-to-free.md',
   ],

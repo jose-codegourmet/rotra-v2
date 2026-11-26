@@ -212,3 +212,32 @@ export const OpenMatchAndDraggable: Story = {
     ),
   ],
 }
+
+// Club-facing face names (D-2026-11-26-09): club nickname, nickname, full name; the smaller lines hide at 240 px or narrower.
+const named = (
+  p: CourtPlayer,
+  name: string,
+  nickname: string | null,
+  clubNickname: string | null,
+) => ({
+  ...p,
+  name,
+  nickname,
+  clubNickname,
+})
+const faceNames: Pick<ComponentProps<typeof CourtDrawing>, 'teamA' | 'teamB'> = {
+  teamA: [
+    named(doubles.teamA[0] as CourtPlayer, 'Miguel Santos', 'Migs', 'Kuya Migs'),
+    named(doubles.teamA[1] as CourtPlayer, 'Paulo Garcia', 'Pau', null),
+  ],
+  teamB: [
+    named(doubles.teamB[0] as CourtPlayer, 'Ysa Fernandez', null, null),
+    named(doubles.teamB[1] as CourtPlayer, 'Dexter Ramos', 'Dex', null),
+  ],
+}
+/** Face names at 222 px (smaller lines hidden), 360 px and 560 px */
+export const FaceNames: Story = {
+  args: faceNames,
+  render: (args) => <AtWidths {...args} />,
+}
+export const FaceNamesLight: Story = { ...FaceNames, globals: { theme: 'light' } }

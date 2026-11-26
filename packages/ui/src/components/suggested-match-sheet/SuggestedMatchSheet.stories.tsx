@@ -68,3 +68,22 @@ export const PhoneLight: Story = {
   globals: { viewport: { value: 'phone' }, theme: 'light' },
 }
 export const DesktopLight: Story = { globals: { viewport: { value: 'desktop' }, theme: 'light' } }
+
+// Name stacks on the player cards (D-2026-11-26-09): club nickname, nickname, full name, then "N/M games".
+const withStacks = (): SuggestedMatchSheetProps => {
+  const base = propsFor(matchLineupFixtures.someBelow)
+  const lineup = base.lineup
+  if (!lineup) return base
+  const stack = (p: (typeof lineup.teamA)[number], i: number) =>
+    i % 3 === 0
+      ? { ...p, name: 'Miguel Santos', nickname: 'Migs', clubNickname: 'Kuya Migs' }
+      : i % 3 === 1
+        ? { ...p, name: 'Paulo Garcia', nickname: 'Pau', clubNickname: null }
+        : { ...p, name: 'Ysa Fernandez', nickname: null, clubNickname: null }
+  return {
+    ...base,
+    lineup: { ...lineup, teamA: lineup.teamA.map(stack), teamB: lineup.teamB.map(stack) },
+  }
+}
+export const NameStacks: Story = { args: withStacks() }
+export const NameStacksLight: Story = { args: withStacks(), globals: { theme: 'light' } }

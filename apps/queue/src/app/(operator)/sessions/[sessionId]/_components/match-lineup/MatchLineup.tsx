@@ -97,6 +97,7 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
       games: countedGames(p.id, all),
       present: p.present,
       playingOn: active ? courtNames(active, s.courts) : null,
+      gettingReady: active?.state === 'on_court',
       restMinutes: waitMinutes(p, all, s.startedAt, now),
     }
   })

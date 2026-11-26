@@ -114,6 +114,25 @@ export async function dropUnstarted(tx: Tx, sessionId: string, now: Date) {
   })
 }
 
+/**
+ * D-2026-11-26-01: Session done takes each shuttle plan line's planned tubes off its inventory
+ * item, never below zero. Removed items are skipped; no estimate means no lines. Runs inside the
+ * one Session done transaction, so a retry or another device never deducts twice.
+ */
+async function deductPlannedShuttles(tx: Tx, clubId: string, sessionId: string) {
+  // One statement: a − / + tap racing Session done is never lost (same pattern as the stock step).
+  await tx.$executeRaw`
+    UPDATE "inventory_items" AS i
+    SET "stock" = GREATEST(i."stock" - p."tubes", 0), "revision" = i."revision" + 1, "updated_at" = now()
+    FROM (
+      SELECT "inventory_item_id", SUM("tubes")::int AS "tubes"
+      FROM "session_shuttle_plan_lines"
+      WHERE "club_id" = ${clubId}::uuid AND "session_id" = ${sessionId}::uuid
+      GROUP BY "inventory_item_id"
+    ) AS p
+    WHERE i."id" = p."inventory_item_id" AND i."club_id" = ${clubId}::uuid AND i."removed_at" IS NULL`
+}
+
 /** Q-DONE review: what would block, plus the minimum-games shortfall warning (never a blocker). */
 export async function reviewSessionDone(context: ClubContext, sessionId: string) {
   const session = await prisma.queueSession.findUnique({
@@ -489,6 +508,7 @@ export async function finalizeSession(
         // #1008: the hosts current at the end are this session's hosts from now on (name refreshed).
         await freezeSessionHostsIn(tx, sessionId, now)
         await tx.clubSessionReservation.deleteMany({ where: { clubId: context.clubId, sessionId } })
+        await deductPlannedShuttles(tx, context.clubId, sessionId)
         await tx.projectionJob.create({
           data: {
             kind: 'club_session_summaries',

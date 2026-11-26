@@ -99,7 +99,7 @@ The club keeps one inventory list shared by all its sessions.
 - An item with **2 or fewer** in stock shows **Running low**.
 - The inventory screen shows the total stock value (sum of stock × cost per unit).
 - Only **Shuttlecocks** items can be chosen in a session's shuttle plan. Their cost per unit fills the estimate.
-- Stock is **not deducted automatically** when a session uses shuttles. The operator adjusts stock by hand after a session. Automatic deduction is a possible later feature, not v1 behavior.
+- **Session done deducts the planned tubes** (owner decision, November 26, 2026, [D-2026-11-26-01](../../../../../mvp/decisions/2026-11-26.md#d-2026-11-26-01)). When a Session is done, each shuttle plan line's tubes come off that item's stock, in the same step that finishes the Session, so it happens exactly once. Stock stops at zero and never goes below; planning more than is in stock never blocks Session done. A removed item is skipped. A session with no estimate, or an invalid session, deducts nothing. The planned count is the only number ROTRA has, so the Queue Master corrects stock by hand in Inventory when the night used a different amount.
 
 Inventory is club data behind the license gate: an expired club cannot open it.
 

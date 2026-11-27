@@ -16,7 +16,7 @@ Superseded by: none
 - A roster player can be marked **Free** from their card: tap the card, then the **Plays free** switch in **Payment from <name>**. Switch it off to make them pay again.
 - A free player owes ₱0 and leaves the head count of the **break-even share** (total cost ÷ paying players, rounded up). A custom amount per player is unchanged. Costs, including the entrance fee, stay the same.
 - The card gets a dashed border, a **Free** chip, "Not counted in the split" and no paid switch.
-- A new **Free · N** filter tab appears beside Not paid and Paid while anyone is free. Not paid and Paid count paying players only.
+- A new **Free · N** filter tab appears beside Not paid and Paid (always shown since November 27, 2026; see the [Free tab log](2026-11-27-queue-free-tab-always.md)). Not paid and Paid count paying players only.
 - Totals: **Paid** reads X/payers with "N free" under it; **Still due** and **to reimburse** skip free players; **Mark all paid** skips them. The intro line says "N free not counted". The payment status share leaves free players out.
 - Setting a player with cash recorded to free clears the amount received; nothing goes to reimburse, since payments are a guide only (owner, November 27, 2026). A slot paid on a transfer can't be set free. Recording cash for a free player makes them a payer again.
 

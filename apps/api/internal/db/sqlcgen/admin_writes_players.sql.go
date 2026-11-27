@@ -871,7 +871,9 @@ UPDATE players
 SET full_name = $1, nickname = $2,
     avatar_ref = CASE WHEN $3::bool THEN $4::text ELSE avatar_ref END,
     avatar_previous_ref = CASE WHEN $3::bool THEN $5::text ELSE avatar_previous_ref END,
-    personal_details = CASE WHEN $6::bool THEN $7::jsonb ELSE personal_details END,
+    -- mergeDetails: the playing style laid over the stored details (an object; anything else reads as empty), so the getting-to-know
+    -- answers kept beside it survive.
+    personal_details = CASE WHEN $6::bool THEN (CASE WHEN jsonb_typeof(personal_details) = 'object' THEN personal_details ELSE '{}'::jsonb END) || $7::jsonb ELSE personal_details END,
     details_version = CASE WHEN $6::bool THEN 1 ELSE details_version END,
     experience_months = CASE WHEN $8::bool THEN $9::int ELSE experience_months END,
     experience_recorded_at = CASE WHEN $8::bool THEN $10::timestamptz ELSE experience_recorded_at END,

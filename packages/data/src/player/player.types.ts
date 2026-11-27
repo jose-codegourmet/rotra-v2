@@ -97,6 +97,14 @@ export type PlayerGame = {
    * log): 1 for their first game that night. Set by both the mock and the real read.
    */
   sessionGameNumber?: number
+  /**
+   * Win chance (D-2026-11-27-03): each side's chance as the court is drawn, `a` = the left side
+   * (the profile owner's), from the lasting signals only (`gameWinChance.rules`). Missing on a
+   * partial game, on a game without two sides, and on reads outside ROTRA Player.
+   */
+  winChance?: import('../match/winChance.rules').WinChance
+  /** With `winChance`: the Favored side (65% or more) lost this game. */
+  upset?: boolean
 }
 /**
  * One person on a game court: the picture follows the profile privacy rules (null when masked);
@@ -194,8 +202,7 @@ export type PlayerProfile = {
   gender?: Gender | null
   /**
    * Getting-to-know answers (D-2026-11-19-11), all public and skippable; unset reads as nothing
-   * answered. Real mode leaves them unset until their storage is decided (`players.personal_details`
-   * JSONB or columns, D-2026-11-19-11).
+   * answered. Real mode reads them from `players.personal_details` (D-2026-11-19-11).
    */
   /** Where you play: front, back or all-round. */
   playStyle?: CourtPosition | null

@@ -7,13 +7,20 @@ import { queueMutation } from '../mock/transaction'
 import { dispatch } from '../outbox/dispatch'
 import { autoFillCourts, autoFillNote, putOnCourt } from '../queue-session/courtFill'
 import { sessionScoring } from '../queue-session/queueSession.types'
-import { realPauseMatch, realSwapFromMatch, realTradeCourts } from '../real/match'
+import {
+  realPauseMatch,
+  realSetAlmostDone,
+  realSwapFromMatch,
+  realTradeCourts,
+} from '../real/match'
 import { isRealDataMode } from '../real/mode'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
 import type { SyncArea } from '../sync/sync.types'
 import {
+  almostDoneText,
   canMovePlaying,
   canPauseMatch,
+  canSetAlmostDone,
   canSwapFromMatch,
   canTradeCourts,
   movedCourtText,
@@ -158,8 +165,23 @@ export async function pauseMatch(input: { matchId: string; operationId: string }
     if (!canPauseMatch(m)) throw changed()
     m.state = 'on_court'
     m.startedAt = null
+    if (m.almostDoneAt != null) m.almostDoneAt = null
     m.placedAt = m.placedAt ?? Date.now()
     return pausedText(m.matchNo, courtNames(m, s.courts))
+  })
+}
+/**
+ * Almost done (Q-CONSOLE court card, Q-ACTIVE-MATCH; D-2026-11-25-02): the Queue Master's switch on
+ * a Playing match. Plan Ahead then counts its players as free soon with 0 minutes left. A match
+ * that left Playing meanwhile is refused. Real mode (November 26, 2026): online only, like Pause
+ * match. Match done, Pause match and Mark invalid turn it off.
+ */
+export async function setAlmostDone(input: { matchId: string; on: boolean; operationId: string }) {
+  if (isRealDataMode()) return realOnline('Switching Almost done', () => realSetAlmostDone(input))
+  return control(input, 'almost-done', (s, m) => {
+    if (!canSetAlmostDone(m)) throw changed()
+    m.almostDoneAt = input.on ? Date.now() : null
+    return almostDoneText(m.matchNo, courtNames(m, s.courts), input.on)
   })
 }
 /**
@@ -338,6 +360,7 @@ export function completeMatch(input: {
       const won = games ? gamesWon(games).wins : null
       m.state = 'completed'
       m.endedAt = Date.now()
+      if (m.almostDoneAt != null) m.almostDoneAt = null
       m.decision = {
         kind: 'completed',
         winningTeam: result.winner,
@@ -358,6 +381,7 @@ export function invalidateMatch(input: { matchId: string; operationId: string })
       requireActive(m)
       m.state = 'invalid'
       m.endedAt = Date.now()
+      if (m.almostDoneAt != null) m.almostDoneAt = null
       m.decision = {
         kind: 'invalid',
         winningTeam: null,

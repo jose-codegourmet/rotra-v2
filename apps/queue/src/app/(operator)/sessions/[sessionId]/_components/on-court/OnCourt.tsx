@@ -25,6 +25,7 @@ import { useStartMatch } from '@rotra/data/match/useStartMatch'
 import { useSwapFromMatch } from '@rotra/data/match/useSwapFromMatch'
 import { useSwapPlayers } from '@rotra/data/match/useSwapPlayers'
 import { useSwapWithQueue } from '@rotra/data/match/useSwapWithQueue'
+import { winChance } from '@rotra/data/match/win-chance'
 import { MockError } from '@rotra/data/mock/errors'
 import type { QueueSession } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -42,6 +43,7 @@ import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
 import { useEffect, useRef, useState } from 'react'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 
 export type OnCourtProps = {
   sessionId: string
@@ -178,6 +180,7 @@ function OpenOnCourt({
   const swapWithQueue = useSwapWithQueue()
   const swapPlayers = useSwapPlayers()
   const swapFromMatch = useSwapFromMatch()
+  const winChanceDialog = useWinChanceDialog(ctx.roster, ctx.matches)
   const [view, setView] = useState<View>(swapFirst ? 'swap' : moveFirst ? 'move' : 'match')
   const [moveIds, setMoveIds] = useState<string[]>(moveFirst?.courtId ? [moveFirst.courtId] : [])
   const [outId, setOutId] = useState<string | null>(null)
@@ -216,6 +219,8 @@ function OpenOnCourt({
       id,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       level: p?.level ?? null,
       games: countedGames(id, ctx.matches),
       photoUrl: photoOf(p),
@@ -390,6 +395,8 @@ function OpenOnCourt({
       games: countedGames(id, ctx.matches),
       restMinutes: p ? waitMinutes(p, ctx.matches, session.startedAt, now) : 0,
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       photoUrl: photoOf(p),
     }
   }
@@ -446,6 +453,8 @@ function OpenOnCourt({
           teamA={match.teamA.map(player)}
           teamB={match.teamB.map(player)}
           minimumGames={session.minimumGames}
+          winChance={winChance(match, ctx.roster, ctx.matches)}
+          onOpenWinChance={() => winChanceDialog.open((all) => all.find((x) => x.id === match.id))}
           blockReason={status.kind === 'ready' ? undefined : status.reason}
           swapTarget={
             swap
@@ -573,6 +582,7 @@ function OpenOnCourt({
         backLabel="match"
         onBack={() => setProfileId(null)}
       />
+      {winChanceDialog.dialog}
     </>
   )
 }

@@ -21,6 +21,8 @@ export type PlayerPickerCandidate = {
   id: string
   name: string
   nickname: string | null
+  /** The club nickname (registered players only); the tile's top name when present */
+  clubNickname?: string | null
   photoUrl?: string
   /** The level locked for this session; null when none was set */
   level: PlayingLevel | null
@@ -29,6 +31,8 @@ export type PlayerPickerCandidate = {
   present: boolean
   /** The court label ("Court 1", "Court 1 + Court 2") while playing; null when off court */
   playingOn: string | null
+  /** On a court but the match has not started yet: the tile reads "On court · Court N" */
+  gettingReady?: boolean
   /** Minutes since their last game ended (or since arriving); shown for present, off-court players */
   restMinutes: number
 }
@@ -153,7 +157,8 @@ function matchesFilter(p: PlayerPickerCandidate, filter: PlayerPickerFilter) {
 }
 
 function statusOf(p: PlayerPickerCandidate): PlayerTileStatus {
-  if (p.playingOn !== null) return { kind: 'playing', courtLabel: p.playingOn }
+  if (p.playingOn !== null)
+    return { kind: 'playing', courtLabel: p.playingOn, gettingReady: p.gettingReady }
   if (!p.present) return { kind: 'away' }
   return { kind: 'resting', minutes: p.restMinutes }
 }
@@ -216,6 +221,8 @@ function LineupPicker({
               <PlayerTile
                 key={p.id}
                 name={p.name}
+                nickname={p.nickname}
+                clubNickname={p.clubNickname}
                 photoUrl={p.photoUrl}
                 level={p.level}
                 games={p.games}

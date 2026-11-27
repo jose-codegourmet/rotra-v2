@@ -1,6 +1,8 @@
 import type { PlayerGame, PlayerGamePlayer } from '@rotra/data/player/types'
+import { cn } from '@rotra/ui/cn'
 import { Icon } from '@rotra/ui/icon'
-import { MatchCourt, type MatchCourtPlayer } from '@rotra/ui/match-court'
+import { MatchCourt, type MatchCourtPlayer, type MatchCourtProps } from '@rotra/ui/match-court'
+import { winChanceText, winChanceTitle } from '@rotra/ui/win-chance-chip'
 
 /** One face on the court; `playerId` null is a guest or someone with no ROTRA profile. */
 export type GameRowPlayer = PlayerGamePlayer
@@ -34,9 +36,17 @@ export type GameRowProps = {
    * earlier games drawn from that player's side).
    */
   viewerPlayerId?: string | null
+  /** The taller court on the Game page. Other game rows use the default size. */
+  size?: MatchCourtProps['size']
+  /**
+   * Game page only (D-2026-11-27-03): the win chance pill and the Upset pill become buttons that
+   * open the Win chance dialog. Without it the pills are display only and the court still opens
+   * the Game page. The pills themselves come from `game.winChance` / `game.upset`.
+   */
+  onOpenWinChance?: () => void
 }
 
-const FORMATS = {
+export const MATCH_FORMAT_LABELS = {
   singles: 'Singles',
   doubles: 'Doubles',
   fun_1v2: '1v2 fun',
@@ -46,6 +56,11 @@ const FORMATS = {
 }
 
 const firstName = (name: string) => name.split(/\s+/)[0] ?? name
+
+/** The session matches dialog and the Game page label an unlabelled fun game. */
+export function withFunGameNote(game: PlayerGame): PlayerGame {
+  return game.counting === 'fun' && !game.note ? { ...game, note: 'Fun game' } : game
+}
 
 /** Under every game of a not ranked session (Record games off, D-2026-11-20-02) */
 export const NOT_RANKED_NOTE =
@@ -57,7 +72,9 @@ export const NOT_RANKED_NOTE =
  * the left, opponents on the right; the format is the corner pill and, on your own games, a share
  * icon sits top-right. Faces open the profile card and carry the games badge (how many games that
  * person had played in the session, this one included; 2026-11-14 log). A game of a not ranked
- * session keeps its Won / Lost and carries the not ranked note, without “· not counted”.
+ * session keeps its Won / Lost and carries the not ranked note, without “· not counted”. A game
+ * with `winChance` shows “41% · 59%” after the format, left side first, then Upset when the
+ * Favored side lost (D-2026-11-27-03); a partial game never does.
  */
 export function GameRow({
   game,
@@ -68,6 +85,8 @@ export function GameRow({
   onOpen,
   skillRings,
   viewerPlayerId,
+  size,
+  onOpenWinChance,
 }: GameRowProps) {
   const partial = game.counting === 'partial'
   const notRanked = game.counting === 'not_ranked'
@@ -113,8 +132,18 @@ export function GameRow({
 
   return (
     <MatchCourt
-      cornerLabel={FORMATS[game.format]}
-      ariaLabel={`${FORMATS[game.format]}: ${meLabel}${partners.length ? ` and ${partners.map((p) => p.name).join(' and ')}` : ''} versus ${opponents.map((p) => p.name).join(' and ')}`}
+      cornerLabel={MATCH_FORMAT_LABELS[game.format]}
+      winChance={
+        game.winChance && !partial
+          ? {
+              text: winChanceText(game.winChance),
+              title: winChanceTitle(game.winChance),
+              upset: !!game.upset,
+              onOpen: onOpenWinChance,
+            }
+          : undefined
+      }
+      ariaLabel={`${MATCH_FORMAT_LABELS[game.format]}: ${meLabel}${partners.length ? ` and ${partners.map((p) => p.name).join(' and ')}` : ''} versus ${opponents.map((p) => p.name).join(' and ')}`}
       left={left}
       right={right}
       winner={won ? 'left' : 'right'}
@@ -140,7 +169,11 @@ export function GameRow({
           </button>
         ) : undefined
       }
-      className="gap-1.5 border-t border-border py-3 first:border-t-0"
+      size={size}
+      className={cn(
+        'gap-1.5',
+        size === 'match-page' ? 'flex-1' : 'border-t border-border py-3 first:border-t-0',
+      )}
     />
   )
 }

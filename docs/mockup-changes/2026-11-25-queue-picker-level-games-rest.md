@@ -1,6 +1,6 @@
 # Replace and Substitute pickers: level ring, games badge, rest colours
 
-Status: NEW
+Status: IN REAL MODE — #1134
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › swapPicker() tile (`.ptile.sm`, `.sp-face`, `.sp-rest`)

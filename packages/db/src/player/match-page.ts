@@ -1,5 +1,6 @@
 import 'server-only'
 import {
+  beforeGameRecord,
   type MatchFaceIdentity,
   matchCounting,
   matchFaceAccess,
@@ -7,12 +8,16 @@ import {
   sideScore,
 } from '@rotra/data/match-page/rules'
 import type { MatchPage, MatchPagePlayer } from '@rotra/data/match-page/types'
+import { gameWinChanceBreakdown, gameWinChanceFields } from '@rotra/data/player/game-win-chance'
+import { countYearCountedWins } from '@rotra/data/player/rules'
 import type { PlayerGame, PlayerGamePlayer, ProfileVisibility } from '@rotra/data/player/types'
 import { publicLevel } from '@rotra/data/public-session/rules'
 import { prisma } from '../client/prisma'
 import { levelCodeFor } from '../queue/session-store'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
+import { readPlayerMatchHistory } from './projections'
+import { readClubForms, winChanceFace } from './win-chance'
 
 /** Public reads take an ID from the URL; anything that is not a UUID is simply not found. */
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -20,15 +25,24 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 /**
  * The public match page (`/matches/[matchId]`, public match page rules of November 25, 2026): the
  * match's own facts for the court, and the same session's earlier facts per participant for
- * Before this game. Only a match with facts in a valid finalized (`completed`) session has a page,
+ * Before this game. Visible registered players also get their counted-game win rate this year.
+ * Only a match with facts in a valid finalized (`completed`) session has a page,
  * the same matches profile games show (`readPlayerMatchHistory`); anything else is not found.
  * Faces follow the profile rules for the viewer (`matchFaceAccess`), applied here, so a masked
  * name never leaves the server. No costs, levels beyond the skill group, Off Day or private
  * identity. No new table: `player_match_facts.match_id` is the shared id.
+ *
+ * Win chance (D-2026-11-27-03): the match and every earlier game carry it, from each face's level
+ * in this session and its club form before it, the inputs `readPlayerMatchHistory` uses, so the
+ * games list and this page agree. The breakdown's rows show each face's level and club win rate as
+ * the Win chance dialog draws them; names stay masked through `teamA` / `teamB`.
  */
 export async function readMatchPage(matchId: string, viewerId: string | null): Promise<MatchPage> {
   if (!UUID.test(matchId)) throw new ServiceError('not_found')
-  return prisma.$transaction(async (tx) => {
+  const { page, yearPlayerIds } = await prisma.$transaction<{
+    page: MatchPage
+    yearPlayerIds: Set<string>
+  }>(async (tx) => {
     const any = await tx.playerMatchFact.findFirst({
       where: { matchId },
       select: { clubId: true, sessionId: true },
@@ -42,6 +56,7 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
         finalizedAt: true,
         publicSlug: true,
         recordGames: true,
+        scheduledStartAt: true,
         club: { select: { name: true } },
         publication: { select: { publishedAt: true } },
       },
@@ -71,6 +86,7 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
         where: { clubId: any.clubId, sessionId: session.id },
         select: {
           id: true,
+          clubPlayerId: true,
           nameSnapshot: true,
           playerAtEntry: {
             select: {
@@ -93,6 +109,18 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
     // That entry's games in the session up to and including the match (the games badge).
     const gameNumber = (entryId: string, ofMatch: string) =>
       (factsOf.get(entryId)?.findIndex((f) => f.matchId === ofMatch) ?? -1) + 1
+    // Win chance inputs: the level an entry played the session at (its first fact) and its club
+    // form before this session; one query for everyone with a game in the session.
+    const formOf = await readClubForms(
+      tx,
+      [any.clubId],
+      entries.flatMap((e) => (factsOf.has(e.id) ? [e.clubPlayerId] : [])),
+    )
+    const chanceFace = (entryId: string) =>
+      winChanceFace(
+        factsOf.get(entryId)?.[0]?.skillLevelSnapshotId,
+        formOf(byEntry.get(entryId)?.clubPlayerId, session),
+      )
 
     /**
      * As profile games: a ROTRA player has a profile with an RTR ID, anyone else is a guest. An
@@ -126,17 +154,25 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
     const gameOf = (f: Fact): PlayerGame => {
       const partnerPlayers = f.partnerEntryIds.map((id) => courtFace(id, f.matchId))
       const opponentPlayers = f.opponentEntryIds.map((id) => courtFace(id, f.matchId))
+      const drawn = {
+        format: f.format,
+        counting: countingOf(f),
+        result: f.team === f.winningTeam ? ('won' as const) : ('lost' as const),
+      }
       return {
         id: f.matchId,
-        format: f.format,
         sessionGameNumber: gameNumber(f.sessionPlayerId, f.matchId),
         partners: partnerPlayers.map((p) => p.name),
         opponents: opponentPlayers.map((p) => p.name),
         partnerPlayers,
         opponentPlayers,
-        counting: countingOf(f),
-        result: f.team === f.winningTeam ? 'won' : 'lost',
+        ...drawn,
         score: sideScore(f.teamAScore, f.teamBScore, f.team === 'A' ? 'a' : 'b'),
+        ...gameWinChanceFields(
+          drawn,
+          [f.sessionPlayerId, ...f.partnerEntryIds].map(chanceFace),
+          f.opponentEntryIds.map(chanceFace),
+        ),
       }
     }
 
@@ -151,11 +187,21 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
     const side = (team: 'A' | 'B') =>
       matchFacts.find((f) => f.team !== team)?.opponentEntryIds ??
       matchFacts.filter((f) => f.team === team).map((f) => f.sessionPlayerId)
+    const yearPlayerIds = new Set<string>()
     const player = (entryId: string): MatchPagePlayer => {
-      const access = matchFaceAccess(identity(entryId), viewerId)
+      const who = identity(entryId)
+      const access = matchFaceAccess(who, viewerId)
+      if (
+        !access.gamesHidden &&
+        who.kind === 'player' &&
+        byEntry.get(entryId)?.playerAtEntry?.profileState === 'claimed'
+      ) {
+        yearPlayerIds.add(who.playerId)
+      }
       const own = matchFacts.find((f) => f.sessionPlayerId === entryId)
       const all = factsOf.get(entryId) ?? []
       const at = all.findIndex((f) => f.matchId === matchId)
+      const earlierGames = access.gamesHidden || at < 0 ? [] : all.slice(0, at).map(gameOf)
       return {
         ...face(entryId),
         skillGroup: access.levelHidden
@@ -163,26 +209,56 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
           : publicLevel(levelCodeFor(own?.skillLevelSnapshotId ?? null)).skillGroup,
         sessionGameNumber: at + 1,
         counting: own ? countingOf(own) : matchCounting(first.standardMatch, ranked),
-        earlierGames: access.gamesHidden || at < 0 ? [] : all.slice(0, at).map(gameOf),
+        earlierGames,
+        beforeGame: access.gamesHidden ? null : beforeGameRecord(earlierGames),
       }
     }
+    const winChance = gameWinChanceBreakdown(
+      first.format,
+      side('A').map(chanceFace),
+      side('B').map(chanceFace),
+      first.winningTeam === 'A' ? 'left' : 'right',
+    )
     return {
-      matchId,
-      format: first.format,
-      counting: matchCounting(first.standardMatch, ranked),
-      score: sideScore(first.teamAScore, first.teamBScore, 'a'),
-      winner: first.winningTeam === 'A' ? 'a' : 'b',
-      session: {
-        id: session.id,
-        title: session.title,
-        clubName: session.club.name,
-        finishedAt: toIso(session.finalizedAt),
-        sessionPageUrl: session.publication?.publishedAt ? `/s/${session.publicSlug}` : null,
-        ranked,
+      page: {
+        matchId,
+        format: first.format,
+        counting: matchCounting(first.standardMatch, ranked),
+        score: sideScore(first.teamAScore, first.teamBScore, 'a'),
+        winner: first.winningTeam === 'A' ? 'a' : 'b',
+        session: {
+          id: session.id,
+          title: session.title,
+          clubName: session.club.name,
+          finishedAt: toIso(session.finalizedAt),
+          sessionPageUrl: session.publication?.publishedAt ? `/s/${session.publicSlug}` : null,
+          ranked,
+        },
+        teamA: side('A').map(player),
+        teamB: side('B').map(player),
+        viewerPlayerId: viewerId,
+        ...(winChance ? { winChance } : {}),
       },
-      teamA: side('A').map(player),
-      teamB: side('B').map(player),
-      viewerPlayerId: viewerId,
+      yearPlayerIds,
     }
   })
+
+  // Official history includes confirmed guest attributions and opens its own transaction.
+  // The court read has already released its connection, including on a one-connection pool.
+  const now = Date.now()
+  const yearRates = new Map(
+    await Promise.all(
+      [...yearPlayerIds].map(async (playerId) => {
+        const history = await readPlayerMatchHistory(playerId)
+        const { games, wins } = countYearCountedWins(history, now)
+        return [playerId, games ? Math.round((wins / games) * 100) : null] as const
+      }),
+    ),
+  )
+  const addYearRate = (player: MatchPagePlayer): MatchPagePlayer => ({
+    ...player,
+    yearWinRate:
+      player.playerId && player.beforeGame ? (yearRates.get(player.playerId) ?? null) : null,
+  })
+  return { ...page, teamA: page.teamA.map(addYearRate), teamB: page.teamB.map(addYearRate) }
 }

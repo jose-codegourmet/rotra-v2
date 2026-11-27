@@ -46,6 +46,12 @@ Owner decision, November 6, 2026 ([business rule](../../business_logic/product/q
 - Keep field errors next to fields and an actionable summary for multi-field failures. Do not erase entered data after a retryable failure.
 - Destructive confirmation is not preselected, and repeated taps cannot create duplicate actions.
 
+- **Stacked dialogs go back one level** (owner, November 26, 2026, Queue: "when you click x it doesnt go back to the previous
+  dialog"): a dialog opened from another dialog remembers it. Its ×, Escape, the scrim and Close/Back return to that dialog,
+  one level at a time; only the first dialog's × closes everything. Finishing the task (Put on court, Add to queue, Confirm)
+  closes the whole stack. Queue mockup: Court N is free › Put a match on Court N, Suggested match › Replace player, and the
+  Payments sub-dialogs.
+
 ## Save and sync language
 
 | State | Proposed user-facing meaning |

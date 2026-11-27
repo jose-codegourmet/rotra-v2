@@ -2764,6 +2764,7 @@ type Match struct {
 	UpdatedAt         pgtype.Timestamptz
 	Revision          int64
 	PlacedAt          pgtype.Timestamptz
+	AlmostDoneAt      pgtype.Timestamptz
 }
 
 type MatchCourtUsage struct {
@@ -3338,6 +3339,7 @@ type SessionPlayer struct {
 	SelfCheckedInAt  pgtype.Timestamptz
 	LeftAt           pgtype.Timestamptz
 	HandicapSpots    []string
+	IsFree           bool
 }
 
 type SessionPublication struct {

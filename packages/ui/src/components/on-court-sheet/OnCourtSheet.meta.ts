@@ -5,6 +5,7 @@ export const onCourtSheetMeta = {
   description:
     'Q-ON-COURT: a match On court but not started. "Match N · Court X · Getting ready" with the format chip (plus Fun game) and the Getting ready chip, Team A VS Team B with switch sides, Replace player, Move to another court, Swap with #P with the line naming the incoming match, and Send back to queue / Start match.',
   usage: [
+    'Pass winChance for the pair chips beside TEAM A / TEAM B and onOpenWinChance to open WinChanceDialog; no chip without winChance.',
     'Open it from Open match on a court card showing Getting ready. The card’s own Start match starts the match without this sheet.',
     'Pass blockReason from matchStatus (e.g. "Migs is not present") when the match cannot start: it shows with "Replace the player or send the match back to the queue." and disables Start match.',
     'Pass swapTarget with the next waiting match that is ready for this court (same number of courts, counting this match’s players as free) and its queue position; null disables Swap with the queue and the line says no other match is ready. onSwapWithQueue opens SwapMatchSheet with fromMatch.',

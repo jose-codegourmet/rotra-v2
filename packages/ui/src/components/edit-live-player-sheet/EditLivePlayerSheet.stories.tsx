@@ -1,14 +1,6 @@
-import type { ClubPlayerPictureState } from '@rotra/data/club-player/types'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { EditLivePlayerSheet } from './EditLivePlayerSheet'
-
-const noPicture: ClubPlayerPictureState = {
-  kind: 'initials',
-  reference: null,
-  characterId: null,
-  previousSrc: null,
-}
 
 const meta = {
   title: 'Queue/EditLivePlayerSheet',
@@ -31,33 +23,31 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Registered: Club nickname field, no picture editor */
+/** Registered: Club nickname (their club's label), Tonight and Handicap */
 export const Registered: Story = {}
 
-/** Unclaimed: the picture editor, no nickname field */
+/** Unclaimed: Club nickname is their only nickname */
 export const Unclaimed: Story = {
   args: {
-    shownName: 'Dani Reyes',
-    fullName: 'Dani Reyes',
+    shownName: 'Jom',
+    fullName: 'Jomar Dela Cruz',
     kind: 'unclaimed',
     level: 'beginner_high',
-    clubNickname: null,
+    clubNickname: 'Jom',
     accountNickname: null,
-    picture: {
-      playerId: 'cp-dani',
-      picture: noPicture,
-      onChange: fn(),
-      onRemove: fn(),
-      onUsePrevious: fn(),
-    },
   },
 }
 
-/** Guest: no Profile section, only Tonight */
+export const UnclaimedLight: Story = {
+  ...Unclaimed,
+  globals: { theme: 'light' },
+}
+
+/** Guest: Club nickname, not present */
 export const Guest: Story = {
   args: {
-    shownName: 'Ken Villar',
-    fullName: 'Ken Villar',
+    shownName: 'Lia Bautista',
+    fullName: 'Lia Bautista',
     kind: 'guest',
     level: null,
     clubNickname: null,
@@ -66,6 +56,14 @@ export const Guest: Story = {
     present: false,
   },
 }
+
+export const RegisteredLight: Story = { globals: { theme: 'light' } }
+
+/** Preparing (Roster and levels pencil): Club nickname and Handicap only */
+export const Preparing: Story = {
+  args: { mode: 'preparing', handicapSpots: ['right_knee'] },
+}
+export const PreparingLight: Story = { ...Preparing, globals: { theme: 'light' } }
 
 /** Not here picked for a player in a match: the hint says it does not take them off the match */
 export const NotHereInAMatch: Story = {
@@ -81,6 +79,10 @@ export const OnCourt: Story = {
 
 /** Handicap · tonight (D-2026-11-25-03): left knee and lower back marked */
 export const WithHandicap: Story = { args: { handicapSpots: ['left_knee', 'lower_back'] } }
+/** Three spots marked: the chips wrap under the figure */
+export const WithHandicapSeveral: Story = {
+  args: { handicapSpots: ['left_knee', 'lower_back', 'right_shoulder'] },
+}
 export const WithHandicapLight: Story = {
   args: { handicapSpots: ['left_knee', 'lower_back'] },
   globals: { theme: 'light' },

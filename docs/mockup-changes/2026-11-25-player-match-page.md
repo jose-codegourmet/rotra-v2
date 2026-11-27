@@ -9,7 +9,7 @@ Screen ID: P-MATCH-PAGE
 Artifact: none
 Components: game-row (game court), share sheet, page head / back button, profile card (reused)
 Supersedes: none
-Superseded by: none
+Superseded by: 2026-11-26-player-match-court-vs-card.md (the Before this game card only)
 
 ## What changed
 - **New page `/matches/<matchId>`**, public (signed out too), one per match. Top to bottom:

@@ -1123,7 +1123,7 @@
   },
   {
    "name": "matches",
-   "sql": "SELECT id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, removed_at, created_at, updated_at, revision::text AS revision FROM matches ORDER BY session_id, match_no, id"
+   "sql": "SELECT id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, removed_at, almost_done_at, created_at, updated_at, revision::text AS revision FROM matches ORDER BY session_id, match_no, id"
   },
   {
    "name": "match_participations",
@@ -9938,6 +9938,483 @@
      "goExpects": {
       "status": 404,
       "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_signed_out",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": null,
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000294",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000295",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_off_after_on",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000001",
+      "on": true
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000002",
+      "on": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on_twice_keeps_the_first_time",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000003",
+      "on": true
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000004",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_off_when_already_off",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000296",
+      "on": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on_a_playing_doubles_match",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000297",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on_one_of_two_playing_matches",
+   "scenario": "play2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000002/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000298",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on_a_getting_ready_match",
+   "scenario": "onc",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000299",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on_a_waiting_match",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000002/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000300",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on_a_finished_match",
+   "scenario": "done",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000301",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_unknown_match",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-0000000000ff/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000302",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_malformed_match_id",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/m/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000303",
+      "on": true
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_a_removed_draft",
+   "scenario": "removed",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000002/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000304",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on_that_is_not_a_boolean",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000305",
+      "on": "yes"
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_without_on",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000306"
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_not_a_boolean_is_checked_before_the_match",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-0000000000ff/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000307",
+      "on": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_without_an_operation_id",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_with_a_blank_operation_id",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "  ",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_blank_operation_is_checked_before_the_match",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-0000000000ff/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": " ",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_pause_clears_it",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000005",
+      "on": true
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000006"
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_then_pause_then_start_again_is_off",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000007",
+      "on": true
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000008"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/start",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000009"
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_match_done_clears_it",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000010",
+      "on": true
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/result",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000011",
+      "winningTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_mark_invalid_clears_it",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000012",
+      "on": true
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/invalid",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000013"
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_survives_a_substitution",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000014",
+      "on": true
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/substitution",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000015",
+      "outId": "a7000000-0000-4000-8000-000000000020",
+      "inId": "a7000000-0000-4000-8000-000000000004"
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on_a_prepared_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000308",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on_another_clubs_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000309",
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "almost_done_on_a_lapsed_clubs_live_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/matches/a4000000-0000-4000-8000-000000000001/almost-done",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000310",
+      "on": true
      }
     }
    ]

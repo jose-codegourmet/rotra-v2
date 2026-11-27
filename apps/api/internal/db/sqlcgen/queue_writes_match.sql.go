@@ -191,7 +191,7 @@ func (q *Queries) DeleteMatchPlayerHolds(ctx context.Context, matchID pgtype.UUI
 }
 
 const endMatch = `-- name: EndMatch :exec
-UPDATE matches SET state = $1::match_state, ended_at = $2, revision = revision + 1, updated_at = $2 WHERE id = $3
+UPDATE matches SET state = $1::match_state, ended_at = $2, almost_done_at = NULL, revision = revision + 1, updated_at = $2 WHERE id = $3
 `
 
 type EndMatchParams struct {
@@ -336,7 +336,7 @@ func (q *Queries) GetPublicationOfSession(ctx context.Context, sessionID pgtype.
 
 const getQueueMatch = `-- name: GetQueueMatch :one
 
-SELECT id, club_id, session_id, match_no, state, format, queue_position, removed_at, origin, manual_protected, generation_id, source_operation_id, started_at, ended_at, created_at, updated_at, revision, placed_at FROM matches WHERE id = $1 AND session_id = $2
+SELECT id, club_id, session_id, match_no, state, format, queue_position, removed_at, origin, manual_protected, generation_id, source_operation_id, started_at, ended_at, created_at, updated_at, revision, placed_at, almost_done_at FROM matches WHERE id = $1 AND session_id = $2
 `
 
 type GetQueueMatchParams struct {
@@ -369,6 +369,7 @@ func (q *Queries) GetQueueMatch(ctx context.Context, arg GetQueueMatchParams) (M
 		&i.UpdatedAt,
 		&i.Revision,
 		&i.PlacedAt,
+		&i.AlmostDoneAt,
 	)
 	return i, err
 }
@@ -944,7 +945,7 @@ func (q *Queries) MarkMatchSegmentsStarted(ctx context.Context, arg MarkMatchSeg
 }
 
 const pauseMatch = `-- name: PauseMatch :exec
-UPDATE matches SET state = 'on_court', started_at = NULL, placed_at = COALESCE(placed_at, $1), revision = revision + 1, updated_at = $1 WHERE id = $2
+UPDATE matches SET state = 'on_court', started_at = NULL, almost_done_at = NULL, placed_at = COALESCE(placed_at, $1), revision = revision + 1, updated_at = $1 WHERE id = $2
 `
 
 type PauseMatchParams struct {
@@ -1043,6 +1044,22 @@ type RemoveWaitingMatchesParams struct {
 // A removed draft keeps its number and leaves the queue.
 func (q *Queries) RemoveWaitingMatches(ctx context.Context, arg RemoveWaitingMatchesParams) error {
 	_, err := q.db.Exec(ctx, removeWaitingMatches, arg.Now, arg.Ids)
+	return err
+}
+
+const setMatchAlmostDone = `-- name: SetMatchAlmostDone :exec
+UPDATE matches SET almost_done_at = $1::timestamptz, revision = revision + 1, updated_at = $2 WHERE id = $3
+`
+
+type SetMatchAlmostDoneParams struct {
+	AlmostDoneAt pgtype.Timestamptz
+	Now          pgtype.Timestamptz
+	ID           pgtype.UUID
+}
+
+// Almost done: the Queue Master's switch on a Playing match. A time turns it on, null turns it off.
+func (q *Queries) SetMatchAlmostDone(ctx context.Context, arg SetMatchAlmostDoneParams) error {
+	_, err := q.db.Exec(ctx, setMatchAlmostDone, arg.AlmostDoneAt, arg.Now, arg.ID)
 	return err
 }
 

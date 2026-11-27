@@ -1,6 +1,6 @@
 # Players tab: sort buttons, All present / All away, and presence from the selection bar
 
-Status: NEW
+Status: IN REAL MODE — #1134
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › live session › Players (Q-POOL), its selection bar

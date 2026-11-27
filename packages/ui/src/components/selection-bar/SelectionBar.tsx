@@ -63,7 +63,7 @@ export function SelectionBar({
     >
       <div className="flex min-w-0 flex-nowrap items-center gap-1.5">
         <span className="flex flex-none">
-          {players.slice(0, 5).map((p, i) => (
+          {players.map((p, i) => (
             <Avatar
               key={p.id}
               name={p.name}

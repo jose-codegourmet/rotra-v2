@@ -1,6 +1,6 @@
 # Start session on an earlier day than planned moves the planned start to now
 
-Status: NEW
+Status: TICKETED — #1136
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › SHEETS.start (Start session?) and ACT.confirmStart

@@ -11,6 +11,12 @@ export type QueueViewMode = 'slide' | 'grid'
 export type QueueViewSwitchProps = {
   value: QueueViewMode
   onChange: (mode: QueueViewMode) => void
+  /** Accessible name of the group: "Main Queue view" (default) or "Court layout" */
+  label?: string
+  /** Grid mode first, Slide mode second (the Courts layout); the Main Queue puts Slide first */
+  gridFirst?: boolean
+  /** The Slide icon: the Main Queue's one-card-with-neighbours `slide` (default) or the Courts' `list` */
+  slideIcon?: 'slide' | 'list'
   className?: string
 }
 
@@ -35,20 +41,37 @@ function SlideIcon() {
 }
 
 /**
- * The Main Queue's view switch (prototype .qview): two icon segments, Slide mode and Grid mode, with
- * tooltips and screen-reader names. Built on SegmentedControl, so arrow keys move between them.
+ * The view switch (prototype .qview): two icon segments, Slide mode and Grid mode, with tooltips and
+ * screen-reader names. Built on SegmentedControl, so arrow keys move between them. The Main Queue uses
+ * the defaults; the Courts header passes label "Court layout", gridFirst and slideIcon "list".
  */
-export function QueueViewSwitch({ value, onChange, className }: QueueViewSwitchProps) {
+export function QueueViewSwitch({
+  value,
+  onChange,
+  label = 'Main Queue view',
+  gridFirst = false,
+  slideIcon = 'slide',
+  className,
+}: QueueViewSwitchProps) {
+  const slide = {
+    value: 'slide',
+    label: slideIcon === 'list' ? <Icon name="list" /> : <SlideIcon />,
+    iconOnly: true,
+    ariaLabel: 'Slide mode',
+  }
+  const grid = {
+    value: 'grid',
+    label: <Icon name="grid" />,
+    iconOnly: true,
+    ariaLabel: 'Grid mode',
+  }
   return (
     <SegmentedControl
-      aria-label="Main Queue view"
+      aria-label={label}
       value={value}
       onChange={(next) => onChange(next === 'grid' ? 'grid' : 'slide')}
       className={cn('self-center', className)}
-      options={[
-        { value: 'slide', label: <SlideIcon />, iconOnly: true, ariaLabel: 'Slide mode' },
-        { value: 'grid', label: <Icon name="grid" />, iconOnly: true, ariaLabel: 'Grid mode' },
-      ]}
+      options={gridFirst ? [grid, slide] : [slide, grid]}
     />
   )
 }

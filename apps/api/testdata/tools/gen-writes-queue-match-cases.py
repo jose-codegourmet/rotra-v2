@@ -736,11 +736,47 @@ case('order_on_another_clubs_session', order([CT(9)], S[9]))
 case('order_on_a_lapsed_clubs_live_session', order([CT(8)], S[8], who=LAPSED))
 case('order_malformed_session_id', req('PATCH', '/api/sessions/m/courts/order', {'courtIds': [C3]}), 's3_full_house', **MALFORMED)
 
+# ------------------------------------------------------------------ Almost done (task 2.6)
+def almost(m, on, op=None, **kw):
+    body = {'operationId': op or op_id()}
+    if on is not None:
+        body['on'] = on
+    return post(f'/matches/{m}/almost-done', body, **kw)
+
+
+case('almost_done_signed_out', almost(M(1), True, who=None), 'play')
+case('almost_done_on', almost(M(1), True), 'play')
+case('almost_done_off_after_on', [almost(M(1), True, op_id(1)), almost(M(1), False, op_id(2))], 'play')
+case('almost_done_on_twice_keeps_the_first_time', [almost(M(1), True, op_id(3)), almost(M(1), True, op_id(4))], 'play')
+case('almost_done_off_when_already_off', almost(M(1), False), 'play')
+case('almost_done_on_a_playing_doubles_match', almost(M(1), True), 'play_doubles')
+case('almost_done_on_one_of_two_playing_matches', almost(M(2), True), 'play2')
+case('almost_done_on_a_getting_ready_match', almost(M(1), True), 'onc')
+case('almost_done_on_a_waiting_match', almost(M(2), True), 'play')
+case('almost_done_on_a_finished_match', almost(M(1), True), 'done')
+case('almost_done_unknown_match', almost(UNKNOWN, True), 'play')
+case('almost_done_malformed_match_id', almost('m', True), 'play', **MALFORMED)
+case('almost_done_a_removed_draft', almost(M(2), True), 'removed')
+case('almost_done_on_that_is_not_a_boolean', post(f'/matches/{M(1)}/almost-done', {'operationId': op_id(), 'on': 'yes'}), 'play')
+case('almost_done_without_on', almost(M(1), None), 'play')
+case('almost_done_not_a_boolean_is_checked_before_the_match', post(f'/matches/{UNKNOWN}/almost-done', {'operationId': op_id(), 'on': 1}), 'play')
+case('almost_done_without_an_operation_id', post(f'/matches/{M(1)}/almost-done', {'on': True}), 'play')
+case('almost_done_with_a_blank_operation_id', post(f'/matches/{M(1)}/almost-done', {'operationId': '  ', 'on': True}), 'play')
+case('almost_done_blank_operation_is_checked_before_the_match', post(f'/matches/{UNKNOWN}/almost-done', {'operationId': ' ', 'on': True}), 'play')
+case('almost_done_pause_clears_it', [almost(M(1), True, op_id(5)), pause(M(1), op_id(6))], 'play')
+case('almost_done_then_pause_then_start_again_is_off', [almost(M(1), True, op_id(7)), pause(M(1), op_id(8)), start(M(1), op=op_id(9))], 'play')
+case('almost_done_match_done_clears_it', [almost(M(1), True, op_id(10)), result(M(1), 'A', op=op_id(11))], 'play')
+case('almost_done_mark_invalid_clears_it', [almost(M(1), True, op_id(12)), post(f'/matches/{M(1)}/invalid', {'operationId': op_id(13)})], 'play')
+case('almost_done_survives_a_substitution', [almost(M(1), True, op_id(14)), sub(M(1), 20, 4, None, op_id(15))], 'play_doubles')
+case('almost_done_on_a_prepared_session', req('POST', f'/api/sessions/{S[1]}/matches/{M(1)}/almost-done', {'operationId': op_id(), 'on': True}))
+case('almost_done_on_another_clubs_session', req('POST', f'/api/sessions/{S[9]}/matches/{M(1)}/almost-done', {'operationId': op_id(), 'on': True}))
+case('almost_done_on_a_lapsed_clubs_live_session', req('POST', f'/api/sessions/{S[8]}/matches/{M(1)}/almost-done', {'operationId': op_id(), 'on': True}, who=LAPSED))
+
 SNAPSHOT = []
 for s in BASE['snapshot']:
     s = dict(s)
     if s['name'] == 'matches':
-        s['sql'] = s['sql'].replace('ORDER BY session_id, match_no, id', 'ORDER BY session_id, match_no, id')
+        s['sql'] = s['sql'].replace('removed_at, created_at', 'removed_at, almost_done_at, created_at')
     SNAPSHOT.append(s)
 SNAPSHOT += [
     {'name': 'match_decisions', 'sql': "SELECT match_id, kind, winning_team, team_a_score, team_b_score, source_operation_id, confirmed_at, accepted_at, actor_club_id FROM match_decisions ORDER BY match_id", 'redact': ['accepted_at']},

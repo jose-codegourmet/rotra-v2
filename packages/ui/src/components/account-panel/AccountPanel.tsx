@@ -11,6 +11,7 @@ export type AccountPanelProps = {
   phoneHidden: boolean
   /** P04 places the open contact-change request chip here */
   requestSlot?: ReactNode
+  onOpenSettings?: () => void
   onOpenPrivacy: () => void
   onOpenVerification?: () => void
   onSignOut: () => void
@@ -21,6 +22,7 @@ export function AccountPanel({
   email,
   phoneHidden,
   requestSlot,
+  onOpenSettings,
   onOpenPrivacy,
   onOpenVerification,
   onSignOut,
@@ -49,6 +51,12 @@ export function AccountPanel({
         />
         {requestSlot ? <div className="text-sm">{requestSlot}</div> : null}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,140px),1fr))] gap-2">
+          {onOpenSettings ? (
+            <Button size="sm" onClick={onOpenSettings}>
+              <Icon name="nav-gear" />
+              Settings
+            </Button>
+          ) : null}
           <Button size="sm" onClick={onOpenPrivacy}>
             Privacy and contact
           </Button>

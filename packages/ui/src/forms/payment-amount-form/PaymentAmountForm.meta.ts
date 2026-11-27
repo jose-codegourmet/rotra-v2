@@ -18,6 +18,6 @@ export const paymentAmountFormMeta = {
     'docs/screens/product/modules/queue/financials-inventory.md#q-payments--payments-checklist',
     'docs/business_logic/product/queue/modules/financials/README.md#payments-checklist',
   ],
-  variants: ['paid', 'partial', 'reimburse', 'no fee', 'pending', 'server error'],
+  variants: ['paid', 'partial', 'reimburse', 'no fee', 'pending', 'server error', 'plays free'],
   related: ['PaymentCard', 'PaymentStatusChip', 'Sheet'],
 } satisfies ComponentMeta

@@ -48,3 +48,11 @@ export const Pending: Story = { args: { isPending: true } }
 export const ServerError: Story = {
   args: { serverError: 'Payments are not available for this session.' },
 }
+/** D-2026-11-27-01: the Plays free row; a paid player's row says it clears the amount. */
+export const PlaysFree: Story = {
+  args: {
+    defaultValues: paymentAmountInputFrom(70000, due),
+    free: { checked: false, hasCash: true, onChange: fn(), name: 'Bea Castillo' },
+  },
+}
+export const PlaysFreeLight: Story = { ...PlaysFree, globals: { theme: 'light' } }

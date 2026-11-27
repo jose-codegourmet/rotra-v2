@@ -1,5 +1,10 @@
 import 'server-only'
 import { deriveAccountVerification } from '@rotra/data/account-verification/rules'
+import {
+  normalizeOnboardingAnswers,
+  type OnboardingAnswers,
+} from '@rotra/data/player/onboarding-answers'
+import { COURT_POSITIONS, FAVORITE_PLAYER_IDS, SHOT_IDS } from '@rotra/data/player/types'
 import { PROFILE_BANNER_NOT_PICKABLE } from '@rotra/data/profile-banner/rules'
 import { maskPublicName } from '@rotra/data/public-session/rules'
 import { isProfileBannerPickable, resolvePlayerBanner } from '../admin/profile-banners'
@@ -57,6 +62,54 @@ export function playingStyle(details: Prisma.JsonValue | null): string {
     if (typeof style === 'string') return style
   }
   return ''
+}
+
+/** `personal_details` as an object; anything else reads as empty. */
+function detailsObject(details: Prisma.JsonValue | null): Record<string, unknown> {
+  return details && typeof details === 'object' && !Array.isArray(details)
+    ? (details as Record<string, unknown>)
+    : {}
+}
+
+/** `personal_details` with `changes` laid over it, so keys saved by other screens survive. */
+export function mergeDetails(
+  details: Prisma.JsonValue | null,
+  changes: Prisma.InputJsonObject,
+): Prisma.InputJsonObject {
+  return { ...(detailsObject(details) as Prisma.InputJsonObject), ...changes }
+}
+
+const strings = (value: unknown) =>
+  Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : []
+
+/**
+ * The getting-to-know answers (D-2026-11-19-11) kept in `personal_details`: `court_position`,
+ * `skills`, `skills_other`, `favorite_player`, `favorite_player_other`, using the app's ids. Unknown
+ * ids read as not answered.
+ */
+export function gettingToKnowAnswers(details: Prisma.JsonValue | null): OnboardingAnswers {
+  const stored = detailsObject(details)
+  const position = COURT_POSITIONS.find((id) => id === stored.court_position) ?? null
+  const favorite = FAVORITE_PLAYER_IDS.find((id) => id === stored.favorite_player) ?? null
+  const skills = strings(stored.skills)
+  return {
+    playStyle: position,
+    shots: SHOT_IDS.filter((id) => skills.includes(id)),
+    shotsOther: strings(stored.skills_other),
+    favoritePlayer: favorite,
+    favoritePlayerOther:
+      favorite === 'other' && typeof stored.favorite_player_other === 'string'
+        ? stored.favorite_player_other
+        : '',
+  }
+}
+
+const EMPTY_ANSWERS: OnboardingAnswers = {
+  playStyle: null,
+  shots: [],
+  shotsOther: [],
+  favoritePlayer: null,
+  favoritePlayerOther: '',
 }
 
 /**
@@ -134,6 +187,8 @@ function publicProfileDto(row: PublicPlayerRow, viewerId: string | null = null) 
     showProfileStats: row.showProfileStats,
     showWeeklyPerformance: row.showWeeklyPerformance,
     playingStyle: masked ? '' : playingStyle(row.personalDetails),
+    // Public answers (D-2026-11-19-11); an always-private profile hides them with the details.
+    ...(masked ? EMPTY_ANSWERS : gettingToKnowAnswers(row.personalDetails)),
     experienceYears: masked || months == null ? null : Math.floor(months / 12),
     experienceMonths: masked || months == null ? null : months % 12,
     socialLinks: masked
@@ -281,6 +336,8 @@ async function readEntryProfile(entryId: string, viewerId: string | null) {
     showProfileStats: true,
     showWeeklyPerformance: true,
     playingStyle: own.playingStyle,
+    // A club-saved entry has no getting-to-know answers; only a registered player gives them.
+    ...EMPTY_ANSWERS,
     experienceYears: months == null ? null : Math.floor(months / 12),
     experienceMonths: months == null ? null : months % 12,
     socialLinks: own.socialLinks,
@@ -407,7 +464,10 @@ export async function updateMyProfile(
           currentExperienceMonths(player.experienceMonths, player.experienceRecordedAt),
           now,
         ),
-        personalDetails: { playingStyle: input.playingStyle.trim() },
+        // Merged so the getting-to-know answers kept beside it survive.
+        personalDetails: mergeDetails(player.personalDetails, {
+          playingStyle: input.playingStyle.trim(),
+        }),
         detailsVersion: PERSONAL_DETAILS_VERSION,
         revision: { increment: 1 },
       },
@@ -566,6 +626,51 @@ export async function setMyGender(
       await tx.player.update({
         where: { id: player.id },
         data: { gender: input.gender, revision: { increment: 1 } },
+      })
+    }
+    const row = await tx.player.findUniqueOrThrow({
+      where: { id: player.id },
+      select: PUBLIC_PLAYER_SELECT,
+    })
+    return ownProfile(tx, await profileWithBanner(tx, row, row.id))
+  })
+}
+
+/**
+ * Edit profile › Playing style and the onboarding steps 2 to 4 (D-2026-11-19-11): the player's own
+ * getting-to-know answers, checked like the mock and merged into `personal_details` (other keys such
+ * as `playingStyle` stay). Saved answers that are unchanged are not a write. Returns the saved own
+ * profile.
+ */
+export async function saveMyGettingToKnowAnswers(
+  context: PlayerContext,
+  input: { answers: OnboardingAnswers; expectedRevision: string },
+) {
+  const checked = normalizeOnboardingAnswers(input.answers)
+  if (checked.error !== undefined) throw new ServiceError('invalid', { answers: checked.error })
+  const next = checked.answers
+  return prisma.$transaction(async (tx) => {
+    const rows = await tx.$queryRaw<{ id: string }[]>`
+      SELECT "id" FROM "players" WHERE "id" = ${context.playerId}::uuid FOR UPDATE`
+    if (!rows.length) throw new ServiceError('not_found')
+    const player = await tx.player.findUniqueOrThrow({ where: { id: context.playerId } })
+    const current = gettingToKnowAnswers(player.personalDetails)
+    if (JSON.stringify(current) !== JSON.stringify(next)) {
+      requireRevision(player.revision, input.expectedRevision)
+      const details = mergeDetails(player.personalDetails, {
+        court_position: next.playStyle,
+        skills: next.shots,
+        skills_other: next.shotsOther,
+        favorite_player: next.favoritePlayer,
+        favorite_player_other: next.favoritePlayerOther,
+      })
+      await tx.player.update({
+        where: { id: player.id },
+        data: {
+          personalDetails: details,
+          detailsVersion: PERSONAL_DETAILS_VERSION,
+          revision: { increment: 1 },
+        },
       })
     }
     const row = await tx.player.findUniqueOrThrow({

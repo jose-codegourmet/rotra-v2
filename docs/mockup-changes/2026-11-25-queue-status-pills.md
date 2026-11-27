@@ -1,6 +1,6 @@
 # Players cards and Main Queue: one status pill per player
 
-Status: NEW
+Status: IN REAL MODE — #1132
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › live session › Players cards (`pc3`) and Main Queue tiles (`qtile`, the line under each face); helper `statusPill()`

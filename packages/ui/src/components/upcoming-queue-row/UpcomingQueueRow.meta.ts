@@ -7,6 +7,7 @@ export const upcomingQueueRowMeta = {
   usage: [
     'Use once on the Session view (Q-COURTS), under the courts. Pass the whole waiting queue; the row shows the first (columns − 1) cards.',
     'Columns follow the grid width: as many 300 px+ tiles as fit, with no upper limit, so wider pages show more queued matches before More queues; pass columns to fix them.',
+    'The faces use the club-facing face names (D-2026-11-26-09) when each MatchCardPlayer carries nickname and clubNickname: the label, then the other names in smaller plain lines.',
     'Do not use for the full queue grid; that is QueueGrid in Queue › Match queue.',
   ],
   prototype: {
@@ -14,6 +15,7 @@ export const upcomingQueueRowMeta = {
     screen: 'Q-COURTS › upcomingPane() (.qgrid, .qtile.qmore)',
   },
   docs: [
+    'docs/mockup-changes/2026-11-26-queue-name-hierarchy.md',
     'docs/screens/product/modules/queue/session-console.md',
     'docs/business_logic/product/queue/modules/queueing/README.md',
   ],

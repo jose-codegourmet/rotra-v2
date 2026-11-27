@@ -37,6 +37,7 @@ import { handicapSpotsOf } from '../session-roster/handicap.rules'
 import { levelLabel, queueMasterName } from '../session-roster/sessionRoster.rules'
 import type {
   DirectoryPlayer,
+  PlayerForm,
   PlayerLookup,
   SessionJoinRequest,
   SessionNoShow,
@@ -541,6 +542,8 @@ export type WireRosterEntry = {
   confirmedAt: string
   /** Present on the roster GET; mutations still use the stored entry DTO. */
   hasPlayedAtClubBefore?: boolean
+  /** Win chance inputs (D-2026-11-27-02); roster GET only, missing on older servers and for guests */
+  form?: PlayerForm
   /** A registered player's club nickname (D-2026-11-18-03); Queue Master reads only */
   clubNickname?: string | null
   /** Set games played adjustment (#717); missing on older servers means 0 */
@@ -858,6 +861,30 @@ export async function realSetClubNickname(input: { clubPlayerId: string; clubNic
   })
   return accepted(
     { clubPlayerId: saved.clubPlayerId, clubNickname: saved.clubNickname },
+    saved.message,
+  )
+}
+
+/**
+ * Edit player › Save changes for a guest or unclaimed player (D-2026-11-26-07): renames the saved
+ * player and their live roster entries; an empty nickname removes it. The server words the message.
+ */
+export async function realRenameClubPlayer(input: {
+  clubPlayerId: string
+  fullName: string
+  nickname: string
+}) {
+  const saved = await realRequest<{
+    clubPlayerId: string
+    fullName: string
+    nickname: string | null
+    message: string
+  }>(`/api/club/players/${encodeURIComponent(input.clubPlayerId)}/name`, {
+    method: 'PATCH',
+    body: { fullName: input.fullName, nickname: input.nickname },
+  })
+  return accepted(
+    { clubPlayerId: saved.clubPlayerId, fullName: saved.fullName, nickname: saved.nickname },
     saved.message,
   )
 }

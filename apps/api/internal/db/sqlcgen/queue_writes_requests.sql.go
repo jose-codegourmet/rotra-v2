@@ -127,7 +127,7 @@ func (q *Queries) GetDropOutNoticeInSession(ctx context.Context, arg GetDropOutN
 }
 
 const getMatchBySourceOperation = `-- name: GetMatchBySourceOperation :one
-SELECT id, club_id, session_id, match_no, state, format, queue_position, removed_at, origin, manual_protected, generation_id, source_operation_id, started_at, ended_at, created_at, updated_at, revision, placed_at FROM matches WHERE source_operation_id = $1
+SELECT id, club_id, session_id, match_no, state, format, queue_position, removed_at, origin, manual_protected, generation_id, source_operation_id, started_at, ended_at, created_at, updated_at, revision, placed_at, almost_done_at FROM matches WHERE source_operation_id = $1
 `
 
 func (q *Queries) GetMatchBySourceOperation(ctx context.Context, sourceOperationID pgtype.UUID) (Match, error) {
@@ -152,6 +152,7 @@ func (q *Queries) GetMatchBySourceOperation(ctx context.Context, sourceOperation
 		&i.UpdatedAt,
 		&i.Revision,
 		&i.PlacedAt,
+		&i.AlmostDoneAt,
 	)
 	return i, err
 }

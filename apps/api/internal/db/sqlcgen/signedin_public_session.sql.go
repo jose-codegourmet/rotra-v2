@@ -491,6 +491,7 @@ SELECT m.id,
        m.placed_at,
        m.started_at,
        m.ended_at,
+       m.almost_done_at,
        d.kind AS decision_kind,
        d.winning_team AS decision_winning_team,
        d.team_a_score AS decision_team_a_score,
@@ -516,6 +517,7 @@ type ListSessionMatchRowsRow struct {
 	PlacedAt                  pgtype.Timestamptz
 	StartedAt                 pgtype.Timestamptz
 	EndedAt                   pgtype.Timestamptz
+	AlmostDoneAt              pgtype.Timestamptz
 	DecisionKind              NullMatchDecisionKind
 	DecisionWinningTeam       NullTeamSide
 	DecisionTeamAScore        pgtype.Int4
@@ -546,6 +548,7 @@ func (q *Queries) ListSessionMatchRows(ctx context.Context, sessionID pgtype.UUI
 			&i.PlacedAt,
 			&i.StartedAt,
 			&i.EndedAt,
+			&i.AlmostDoneAt,
 			&i.DecisionKind,
 			&i.DecisionWinningTeam,
 			&i.DecisionTeamAScore,

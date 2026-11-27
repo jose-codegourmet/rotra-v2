@@ -16,6 +16,7 @@ import { useGenerateAutoQueueDrafts } from '@rotra/data/match/useGenerateAutoQue
 import { useSaveExemptionList } from '@rotra/data/match/useSaveExemptionList'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useTransferAutoQueueDrafts } from '@rotra/data/match/useTransferAutoQueueDrafts'
+import { winChance } from '@rotra/data/match/win-chance'
 import { sessionScoring } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { levelLabel } from '@rotra/data/session-roster/sessionRoster.rules'
@@ -36,6 +37,7 @@ import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { usePlayerGames } from '@/app/(operator)/sessions/[sessionId]/_components/player-games/PlayerGames'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 
 export type AutoQueueProps = {
   sessionId: string
@@ -80,6 +82,7 @@ export function AutoQueue({ sessionId, now, onAddedToMainQueue }: AutoQueueProps
   const exemptionList = useExemptionList(sessionId),
     saveExemption = useSaveExemptionList()
   const playerGames = usePlayerGames()
+  const winChanceDialog = useWinChanceDialog(roster.data?.roster, matches.data)
   const edit = useEditAutoQueueDrafts(),
     generate = useGenerateAutoQueueDrafts(),
     transfer = useTransferAutoQueueDrafts()
@@ -128,6 +131,7 @@ export function AutoQueue({ sessionId, now, onAddedToMainQueue }: AutoQueueProps
           statusTone: wait?.phase === 'long' ? ('warn' as const) : ('muted' as const),
           teamA: draft.teamA.map(player),
           teamB: draft.teamB.map(player),
+          winChance: winChance(draft, ctx.roster, ctx.matches),
           attentionReason: autoQueueDraftConflict(draft, s, ctx) ?? undefined,
         }
       }),
@@ -259,49 +263,58 @@ export function AutoQueue({ sessionId, now, onAddedToMainQueue }: AutoQueueProps
     }
   }
   return (
-    <AutoQueueWorkspace
-      mode={mode}
-      onModeChange={setMode}
-      count={count}
-      onCountChange={setCount}
-      minimumGames={s.minimumGames}
-      noEligibleText={autoQueueEmptyText(mode, s, ctx, now)}
-      catchUpTarget={target}
-      onCatchUpTargetChange={setTarget}
-      batches={batches}
-      selectedIds={state.selectedIds}
-      isPending={
-        edit.isPending || generate.isPending || transfer.isPending || saveExemption.isPending
-      }
-      transferError={transferError}
-      pendingMessage={
-        generate.isPending
-          ? 'Generating drafts…'
-          : transfer.isPending
-            ? 'Adding reviewed drafts…'
-            : 'Updating drafts…'
-      }
-      onSelect={(draftId, selected) => {
-        void onEdit({ sessionId, action: 'select', draftId, selected })
-      }}
-      onUnselectAll={() => {
-        void onEdit({ sessionId, action: 'unselect-all' })
-      }}
-      onGenerate={onGenerate}
-      onRegenerate={onGenerate}
-      onRegenerateUnselected={(nextMode, nextCount, nextTarget) => {
-        void onGenerate(nextMode, nextCount, nextTarget, true)
-      }}
-      onClear={(nextMode) => {
-        void onEdit({ sessionId, action: 'clear', mode: nextMode, unselectedOnly: false })
-      }}
-      onClearUnselected={(nextMode) => {
-        void onEdit({ sessionId, action: 'clear', mode: nextMode, unselectedOnly: true })
-      }}
-      onAddToMainQueue={onTransfer}
-      bagging={bagging}
-      exemption={exemption}
-      onOpenGames={playerGames.open}
-    />
+    <>
+      <AutoQueueWorkspace
+        mode={mode}
+        onModeChange={setMode}
+        count={count}
+        onCountChange={setCount}
+        minimumGames={s.minimumGames}
+        noEligibleText={autoQueueEmptyText(mode, s, ctx, now)}
+        catchUpTarget={target}
+        onCatchUpTargetChange={setTarget}
+        batches={batches}
+        selectedIds={state.selectedIds}
+        isPending={
+          edit.isPending || generate.isPending || transfer.isPending || saveExemption.isPending
+        }
+        transferError={transferError}
+        pendingMessage={
+          generate.isPending
+            ? 'Generating drafts…'
+            : transfer.isPending
+              ? 'Adding reviewed drafts…'
+              : 'Updating drafts…'
+        }
+        onSelect={(draftId, selected) => {
+          void onEdit({ sessionId, action: 'select', draftId, selected })
+        }}
+        onUnselectAll={() => {
+          void onEdit({ sessionId, action: 'unselect-all' })
+        }}
+        onGenerate={onGenerate}
+        onRegenerate={onGenerate}
+        onRegenerateUnselected={(nextMode, nextCount, nextTarget) => {
+          void onGenerate(nextMode, nextCount, nextTarget, true)
+        }}
+        onClear={(nextMode) => {
+          void onEdit({ sessionId, action: 'clear', mode: nextMode, unselectedOnly: false })
+        }}
+        onClearUnselected={(nextMode) => {
+          void onEdit({ sessionId, action: 'clear', mode: nextMode, unselectedOnly: true })
+        }}
+        onAddToMainQueue={onTransfer}
+        bagging={bagging}
+        exemption={exemption}
+        onOpenGames={playerGames.open}
+        onOpenWinChance={(draftId) => {
+          const draft = AUTO_QUEUE_MODES.flatMap((m) => state.batches[m]?.drafts ?? []).find(
+            (d) => d.id === draftId,
+          )
+          if (draft) winChanceDialog.open(draft)
+        }}
+      />
+      {winChanceDialog.dialog}
+    </>
   )
 }

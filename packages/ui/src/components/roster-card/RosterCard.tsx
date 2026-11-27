@@ -5,6 +5,7 @@ import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { cn } from '@rotra/ui/cn'
+import { EditPencilButton } from '@rotra/ui/edit-pencil-button'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
 import { IdentityChip } from '@rotra/ui/identity-chip'
@@ -52,6 +53,11 @@ export type RosterCardProps = {
   onLevelChange: (level: PlayingLevel) => void
   onPresentChange: (present: boolean) => void
   onRemove: () => void
+  /**
+   * Edit player (mockup change 2026-11-27): the pencil beside the remove × before Start. It opens
+   * EditLivePlayerSheet in the preparing mode (Club nickname and Handicap). Omit to hide it.
+   */
+  onEdit?: () => void
   /**
    * Move to waitlist (#735): a secondary button on the card's last row, before and after Start
    * (also in the read-only summary). Omit to hide it.
@@ -108,6 +114,7 @@ export function RosterCard({
   onLevelChange,
   onPresentChange,
   onRemove,
+  onEdit,
   onStepDown,
   hideStepDown = false,
   compactOnPhone = false,
@@ -135,15 +142,17 @@ export function RosterCard({
             <PlayerNameBlock fullName={name} nickname={nickname} clubNickname={clubNickname} />
           </div>
           {!afterStart ? (
-            <IconButton
-              size="xs"
-              variant="ghost"
-              label={`Remove ${name} from roster`}
-              onClick={onRemove}
-              className={compact('remove')}
-            >
-              <Icon name="x" />
-            </IconButton>
+            <div className={cn('flex flex-none items-center gap-1', compact('remove'))}>
+              {onEdit ? <EditPencilButton name={name} onClick={onEdit} /> : null}
+              <IconButton
+                size="xs"
+                variant="ghost"
+                label={`Remove ${name} from roster`}
+                onClick={onRemove}
+              >
+                <Icon name="x" />
+              </IconButton>
+            </div>
           ) : null}
         </div>
         {showPresence ? (

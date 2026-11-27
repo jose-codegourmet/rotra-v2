@@ -5,8 +5,10 @@ import { type HandicapSpot, handicapText } from '@rotra/data/session-roster/hand
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
+import { EditPencilButton } from '@rotra/ui/edit-pencil-button'
 import { Icon } from '@rotra/ui/icon'
 import { levelLabel } from '@rotra/ui/level-pill'
+import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import { StatusPill, type StatusPillValue } from '@rotra/ui/status-pill'
 import { Switch } from '@rotra/ui/switch'
 import type { KeyboardEvent } from 'react'
@@ -28,9 +30,9 @@ export type PlayerPoolCardStatus =
 export type PlayerPoolCardProps = {
   /** The full name: the screen-reader label and the hover text */
   name: string
-  /** The player's own nickname; shown when there is no club nickname */
+  /** The player's own nickname; shown under the club nickname, or on top when there is none */
   nickname?: string | null
-  /** The club nickname (registered players only); shown first */
+  /** The club nickname (registered players only); the top name */
   clubNickname?: string | null
   photoUrl?: string
   /** The level locked for this session; null when none was set. Shown as the picture's ring, not as text */
@@ -65,8 +67,8 @@ export type PlayerPoolCardProps = {
    */
   onSetGames?: () => void
   /**
-   * Edit player (D-EDIT-LIVE-PLAYER): a ghost pencil button at the card's top right named
-   * “Edit NAME”. Pressing it never selects the card.
+   * Edit player (D-EDIT-LIVE-PLAYER): a 28 px accent circle with a pencil on the card's top-right
+   * corner, over the border, named “Edit NAME”. Pressing it never selects the card.
    */
   onEdit?: () => void
   /**
@@ -83,8 +85,8 @@ export type PlayerPoolCardProps = {
 }
 
 /**
- * The card's status pill (owner, November 25, 2026): Wait / In queue with the wait minutes, Playing
- * with the minutes since the match began (Getting ready before it starts), or Away.
+ * The card's status pill (owner, November 25, 2026): an icon with the wait minutes (free, in queue), the minutes
+ * since the match began (playing), Ready (getting ready) or Away (owner, November 26, 2026).
  */
 function pillOf(status: PlayerPoolCardStatus, waitMinutes: number): StatusPillValue {
   switch (status.kind) {
@@ -110,9 +112,9 @@ const RING = {
 
 /**
  * One player in the live Players view (the prototype's .pc3): a role=button card with the picture in
- * a level-band ring, one name (club nickname, nickname, full name; two lines at most), the
- * Current | Total games strip, the status pill (StatusPill: Wait / In queue / Playing / Getting
- * ready / Away) and the Present switch. Tapping, Enter or Space
+ * a level-band ring, the name stack (club nickname, nickname, full name: the first present on top, the others in smaller lines), the
+ * Current | Total games strip, the footer (StatusPill icon and time, then the Present switch). The
+ * Edit player pencil is a 28 px circle on the top-right corner, over the border. Tapping, Enter or Space
  * toggles selection; selected cards show their pick order in a badge. No Move to waitlist: the
  * session is already running.
  */
@@ -141,7 +143,6 @@ export function PlayerPoolCard({
   onOpenProfile,
   className,
 }: PlayerPoolCardProps) {
-  const shownName = clubNickname?.trim() || nickname?.trim() || name
   const band = level ? (level.split('_')[0] as keyof typeof RING) : 'none'
   const state = status.kind === 'playing' ? 'playing' : present ? 'available' : 'away'
   const presenceCaption =
@@ -163,7 +164,7 @@ export function PlayerPoolCard({
       role="button"
       tabIndex={0}
       aria-pressed={selected}
-      aria-label={`${name}, ${levelLabel(level)}, ${games} games played, ${forTheNight} for the night${presenceCaption ? `, ${presenceCaption}` : ''}`}
+      aria-label={`${name}, ${level ? levelLabel(level) : 'No level'}, ${games} games played, ${forTheNight} for the night${presenceCaption ? `, ${presenceCaption}` : ''}`}
       onClick={onToggleSelect}
       onKeyDown={onKeyDown}
       className={cn(playerPoolCardVariants({ state }), RING[band], className)}
@@ -174,6 +175,18 @@ export function PlayerPoolCard({
           className="absolute -top-1.5 -left-1.5 grid size-[22px] place-items-center rounded-full bg-accent text-[11px] font-extrabold text-on-accent"
         >
           {pickOrder}
+        </span>
+      ) : null}
+      {onEdit ? (
+        // The pencil sits on the card's top-right corner, over the border (.pc3-edit): stop its
+        // clicks and keys from selecting the card.
+        // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
+        <span
+          className="absolute -top-[9px] -right-[9px] z-[2]"
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
+          <EditPencilButton name={name} onClick={onEdit} floating />
         </span>
       ) : null}
       <div className="flex min-w-0 items-center gap-2">
@@ -190,7 +203,7 @@ export function PlayerPoolCard({
               name={name}
               src={photoUrl}
               size={40}
-              title={levelLabel(level)}
+              title={level ? levelLabel(level) : 'No level'}
               onClick={onOpenProfile}
               className={cn(
                 'outline-[3px] outline-offset-2 outline-(--ring)',
@@ -199,7 +212,7 @@ export function PlayerPoolCard({
             />
           </span>
         ) : (
-          <span className="flex-none" title={levelLabel(level)}>
+          <span className="flex-none" title={level ? levelLabel(level) : 'No level'}>
             <Avatar
               name={name}
               src={photoUrl}
@@ -212,12 +225,15 @@ export function PlayerPoolCard({
           </span>
         )}
         <div className="flex min-w-0 flex-1 items-center gap-1">
-          {/* One name; the full name is the hover text and the card's screen-reader label keeps it. */}
-          <div
-            title={name}
-            className="line-clamp-2 min-w-0 overflow-hidden text-[13px] leading-tight font-bold [overflow-wrap:anywhere]"
-          >
-            {shownName}
+          {/* The name stack (D-2026-11-26-09): the top name on one line, the others in smaller lines; the full name is the hover text. */}
+          <div title={name} className="min-w-0">
+            <PlayerNameBlock
+              layout="stack"
+              fullName={name}
+              nickname={nickname}
+              clubNickname={clubNickname}
+              labelClassName="text-[13px] leading-tight"
+            />
           </div>
           {handicapSpots?.length ? (
             <span
@@ -230,25 +246,6 @@ export function PlayerPoolCard({
             </span>
           ) : null}
         </div>
-        {onEdit ? (
-          // The pencil sits inside the card: stop its clicks and keys from selecting the card.
-          // biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the button
-          <span
-            className="flex-none self-start"
-            onClick={(event) => event.stopPropagation()}
-            onKeyDown={(event) => event.stopPropagation()}
-          >
-            <Button
-              size="xs"
-              variant="ghost"
-              aria-label={`Edit ${name}`}
-              title="Edit player"
-              onClick={onEdit}
-            >
-              <Icon name="edit" size={16} />
-            </Button>
-          </span>
-        ) : null}
       </div>
       {/* biome-ignore lint/a11y/useSemanticElements: a group/region div; a fieldset or section would change the drawn layout */}
       <div
@@ -301,7 +298,7 @@ export function PlayerPoolCard({
           </span>
         </div>
       </div>
-      <div className="flex flex-nowrap items-center justify-between gap-3">
+      <div className="flex min-w-0 flex-nowrap items-center justify-between gap-1.5">
         <StatusPill status={pillOf(status, waitMinutes ?? 0)} />
         {/* The switch sits inside the card: stop its clicks and keys from reaching the card's selection. */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: a plain stop-propagation boundary around the Switch */}

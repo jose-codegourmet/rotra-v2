@@ -8,7 +8,7 @@ export const onboardingFlowMeta = {
     'Claim and the invite pages render it in place of the form once registering succeeded, then show the done page from onFinish.',
     'Answers are held across steps and saved once with useSaveMyOnboardingAnswers on Finish (or Skip on the last question); Skip clears that step.',
     'Back on step 2 opens YourDetailsForm prefilled; Continue saves with useUpdateMyProfile and useSetMyGender, toasts "Details saved" and returns; Cancel returns.',
-    'Mock mode only. In real mode the answers are not stored yet (D-2026-11-19-11), so Finish goes on to the done page.',
+    'Mock and real mode save the answers (D-2026-11-19-11); a failed save shows a toast and stays on the step.',
   ],
   prototype: {
     file: 'apps/mockup/player-app/rotra-player.html',

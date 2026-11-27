@@ -1,3 +1,4 @@
+import type { WinChance } from '@rotra/data/match/win-chance'
 import { elapsedTime, queueTime } from '@rotra/schema/queue-time'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
@@ -6,8 +7,11 @@ import { CourtDrawing, type CourtPlayer } from '@rotra/ui/court-drawing'
 import { Icon } from '@rotra/ui/icon'
 import { OverflowMenu, type OverflowMenuItem } from '@rotra/ui/overflow-menu'
 import { PairFaces, type PairFacesPlayer } from '@rotra/ui/pair-faces'
+import { Switch } from '@rotra/ui/switch'
+import { WinChanceChip } from '@rotra/ui/win-chance-chip'
 import type { ReactNode } from 'react'
-import { courtCardVariants, freeCourtDropClass } from './CourtCard.variants'
+import './CourtCard.css'
+import { courtActsClass, courtCardVariants, freeCourtDropClass } from './CourtCard.variants'
 
 type CourtCardBase = {
   /** "Court 1", or "Court 1 + Court 2" for a merged 5v5 */
@@ -33,10 +37,17 @@ type CourtCardBase = {
 
 /** A match on the court: Getting ready (On court) or Playing */
 type CourtCardMatchBase = CourtCardBase & {
-  /** A 5v5 on two courts: two stacked courts, "Merged · Getting ready" / "Merged · Playing" */
+  /** A 5v5 on two courts: two stacked courts, "Merged · Waiting" / "Merged · Playing" (Ending, Ending soon) */
   merged?: boolean
   teamA: CourtPlayer[]
   teamB: CourtPlayer[]
+  /**
+   * Win chance (D-2026-11-27-02): one chip before the status, "39% · 61%", left pair first. Queue
+   * Master only; the read-only card never shows it.
+   */
+  winChance?: WinChance
+  /** Makes the win chance chip a button that opens WinChanceDialog */
+  onOpenWinChance?: () => void
   onOpenProfile?: (playerId: string) => void
   /**
    * Opens the player's games this session (D-SESSION-GAMES). Makes the games badge on each face its own
@@ -47,8 +58,8 @@ type CourtCardMatchBase = CourtCardBase & {
   formatLabel: string
   matchNo: number
   /**
-   * Renders "Open match" when given (primary on Playing, secondary on Getting ready). It also makes
-   * the court drawing a button (tooltip "Open match"); faces still open the profile.
+   * Makes the court drawing the Open match button (`role="button"`, Enter or Space, tooltip "Open match");
+   * faces still open the profile. There is no Open match button on the card any more (owner, November 26, 2026).
    */
   onOpenMatch?: () => void
   /**
@@ -65,30 +76,42 @@ type CourtCardMatchBase = CourtCardBase & {
   onRemove?: () => void
 }
 
-export type CourtCardExpectedFinish = {
-  text: string
-  /** Finishing soon is accent, Running long is warn, the rest are muted */
-  tone: 'muted' | 'accent' | 'warn'
+/**
+ * The top-right status of a Playing court (owner, November 26, 2026): Playing for the first half of a
+ * typical game, Ending for the second half, Ending soon from Finishing soon on or while Almost done is
+ * on. Ending and Ending soon are pills with a pulsing dot; Running long keeps Ending soon in warn.
+ * The container decides all three; the card only draws them.
+ */
+export type CourtCardStatus = {
+  label: 'Playing' | 'Ending' | 'Ending soon'
+  tone: 'accent' | 'warn'
+  /** The estimate on hover: "Ends in about 4 min", "Almost done" */
+  title?: string
 }
 
-/** Playing: a started match. Steady accent glow, chip "Playing", the minutes in the match line. */
+/** Playing: a started match. Steady accent glow, the status top right, the match line with the elapsed time. */
 export type CourtCardInGameProps = CourtCardMatchBase & {
   variant: 'in-game'
   /** Minutes since Start match */
   minutes: number
   substitutions?: number
-  /** Renders the secondary "Pause match" button (pause icon) beside Open match: back to Getting ready */
+  /** Renders the secondary "Pause match" button (pause icon) above Match done: back to Getting ready */
   onPause?: () => void
+  /** Renders the primary "Match done" button; opens the result */
+  onMatchDone?: () => void
+  /** Top-right status beside the ⋯ menu; omitted reads Playing (accent) */
+  status?: CourtCardStatus
+  /** Almost done is on: the switch is checked (the container also sets `status` to Ending soon) */
+  almostDone?: boolean
+  /**
+   * The Almost done row (label left, switch right) under the match line. The row renders only with this
+   * callback; the Queue Master flips it after asking the players.
+   */
+  onAlmostDoneChange?: (on: boolean) => void
   /** ⋯ menu: "Move to a free court"; the item shows only when this is given */
   onMoveToFree?: () => void
   /** No free court can take the match (a two-court match needs two): the item is disabled with "No court is free" */
   noFreeCourt?: boolean
-  /**
-   * One small line under "FORMAT · Match N · M min" (Playing and merged 5v5), plain text from the caller:
-   * "Ends in about 6 min", "Finishing soon", "Could end any time", "Running long".
-   * Words always carry the meaning; the tone only colours them.
-   */
-  expectedFinish?: CourtCardExpectedFinish
 }
 
 /** The next ready waiting match the ⋯ menu's Swap would put on this court */
@@ -103,7 +126,7 @@ export type CourtCardOnCourtProps = CourtCardMatchBase & {
   variant: 'on-court'
   /** Why it can't start yet ("Mikee is not present"): shown in warn and disables Start match */
   blockedReason?: string
-  /** Renders "Start match" (primary) when given */
+  /** Renders "Start match" (primary), the only button on the card, when given */
   onStartMatch?: () => void
   /** ⋯ menu: "Swap with #P · Match N"; the item shows only when this is given */
   onSwap?: () => void
@@ -155,6 +178,12 @@ export type CourtCardFreeProps = CourtCardBase & {
   onRemove?: () => void
   /** Not open yet: renders "Start anyway" (the owner confirms, then opens the court early) */
   onStartAnyway?: () => void
+  /**
+   * A free open court: the picture is a button (Enter or Space) with a dashed + disc over FREE and
+   * "Tap to fill", named "COURT is free. Pick a match from the queue or generate one". Opens the
+   * Court N is free sheet. Not open yet and removed courts keep the plain picture.
+   */
+  onFill?: () => void
   /** A ready match; when missing the body says why none can go on, or that the queue is empty */
   next?: CourtCardNextMatch | null
   /** Fewer free players than the smallest standard match needs: "Not enough free players." (wins over blockedReason and the empty queue) */
@@ -299,9 +328,118 @@ function listNames(names: string[]) {
 }
 
 /**
+ * The status pill beside a court's ⋯ menu (the mockup's .ct-end): Playing is a plain accent chip;
+ * Ending and Ending soon add a pulsing dot (accent, or warn for Running long). The pulse stops under
+ * reduced motion. `title` carries the estimate text; a merged court prefixes "Merged · ".
+ */
+export function CourtStatusPill({
+  status,
+  merged = false,
+}: {
+  status: CourtCardStatus
+  merged?: boolean
+}) {
+  const label = merged ? `Merged · ${status.label}` : status.label
+  if (status.label === 'Playing')
+    return (
+      <Chip tone={status.tone} title={status.title}>
+        {label}
+      </Chip>
+    )
+  return (
+    <span
+      title={status.title}
+      className={cn(
+        'inline-flex items-center gap-[7px] self-start rounded-full border py-[3px] pr-2.5 pl-2 text-xs font-bold whitespace-nowrap',
+        status.tone === 'warn'
+          ? 'border-warn/45 bg-warn-subtle text-warn'
+          : 'border-accent/45 bg-accent-subtle text-accent',
+      )}
+    >
+      <i
+        aria-hidden
+        className={cn(
+          'court-status-dot relative size-2 flex-none rounded-full',
+          status.tone === 'warn' ? 'bg-warn' : 'bg-accent',
+        )}
+      />
+      {label}
+    </span>
+  )
+}
+
+/**
+ * The match line under a court's picture (the mockup's .ct-meta): a green #N in the mono font, the
+ * format as a pill, then the elapsed-time pill with its clock (Playing) or "Waiting to start"
+ * (Getting ready), then "N substitution(s)" as muted text. `trailing` adds the status pill in the
+ * match dialog's head.
+ */
+export function CourtMatchLine({
+  matchNo,
+  formatLabel,
+  minutes,
+  substitutions = 0,
+  trailing,
+}: {
+  matchNo: number
+  formatLabel: string
+  /** Minutes since Start match; omit for a Getting ready match (shows "Waiting to start") */
+  minutes?: number
+  substitutions?: number
+  trailing?: ReactNode
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+      <b className="font-mono text-xl leading-none font-extrabold text-accent tabular-nums">
+        #{matchNo}
+      </b>
+      <Chip tone="solid">{formatLabel}</Chip>
+      {minutes === undefined ? (
+        <Chip>Waiting to start</Chip>
+      ) : (
+        <Chip className="tabular-nums">
+          <Icon name="clock" size={12} />
+          {elapsedTime(minutes)}
+        </Chip>
+      )}
+      {substitutions > 0 ? (
+        <span className="text-[13px] text-fg2">
+          {substitutions} substitution{substitutions > 1 ? 's' : ''}
+        </span>
+      ) : null}
+      {trailing}
+    </div>
+  )
+}
+
+/**
+ * The Almost done row (D-2026-11-25-02): the label left, the switch right. The Queue Master flips it
+ * after asking the players; the card and the match dialog share it.
+ */
+export function AlmostDoneRow({
+  courtLabel,
+  checked,
+  onChange,
+}: {
+  /** "Court 1", or "Court 1 + Court 2": names the switch "Almost done, Court 1" */
+  courtLabel: string
+  checked: boolean
+  onChange: (on: boolean) => void
+}) {
+  return (
+    // biome-ignore lint/a11y/noLabelWithoutControl: the label wraps the switch button
+    <label className="flex flex-nowrap items-center justify-between gap-2">
+      <span className="text-[13px] font-bold">Almost done</span>
+      <Switch checked={checked} onChange={onChange} aria-label={`Almost done, ${courtLabel}`} />
+    </label>
+  )
+}
+
+/**
  * One court in the live console, in one of three states, always written as a chip: Free (empty
- * drawing, the next eligible match or why none can go on), Getting ready (a match On court: Start
- * match, Open match) or Playing (steady accent glow, Open match). The prototypes' .court,
+ * drawing, the next eligible match or why none can go on), Getting ready (a match On court, status
+ * Waiting: Start match) or Playing (steady accent glow, status Playing / Ending / Ending soon, Almost
+ * done row, Pause match and Match done). The court picture opens the match. The prototypes' .court,
  * .court.oncourt and .court.busy.
  */
 export function CourtCard(props: CourtCardProps) {
@@ -372,6 +510,8 @@ function MatchCourtHead({
   onOpenGames,
   onOpenMatch,
   onDragMove,
+  winChance,
+  onOpenWinChance,
   chip,
   menu,
 }: Pick<
@@ -388,6 +528,8 @@ function MatchCourtHead({
   | 'onOpenGames'
   | 'onOpenMatch'
   | 'onDragMove'
+  | 'winChance'
+  | 'onOpenWinChance'
 > & { chip: ReactNode; menu: ReactNode }) {
   return (
     <>
@@ -397,6 +539,16 @@ function MatchCourtHead({
           <TimeLine {...{ startLabel, untilLabel, bookingEnded, openedEarly }} />
         </div>
         <div className="flex flex-nowrap items-center gap-1.5">
+          {winChance ? (
+            <WinChanceChip
+              chance={winChance}
+              onOpen={onOpenWinChance}
+              teamNames={{
+                a: listNames(teamA.map((p) => p.shortName)),
+                b: listNames(teamB.map((p) => p.shortName)),
+              }}
+            />
+          ) : null}
           {chip}
           {menu}
         </div>
@@ -428,14 +580,19 @@ function PlayingCourtCard({
   matchNo,
   minutes,
   substitutions = 0,
+  status = { label: 'Playing', tone: 'accent' },
+  almostDone = false,
+  onAlmostDoneChange,
   onOpenMatch,
   onDragMove,
+  winChance,
+  onOpenWinChance,
   dropCourtId,
   onPause,
+  onMatchDone,
   onMoveToFree,
   noFreeCourt = false,
   openedEarly = false,
-  expectedFinish,
   onChangeLabel,
   onEdit,
   onUndoEarlyOpen,
@@ -454,8 +611,17 @@ function PlayingCourtCard({
     >
       <MatchCourtHead
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
-        {...{ teamA, teamB, onOpenProfile, onOpenGames, onOpenMatch, onDragMove }}
-        chip={<Chip tone="accent">{merged ? 'Merged · Playing' : 'Playing'}</Chip>}
+        {...{
+          teamA,
+          teamB,
+          onOpenProfile,
+          onOpenGames,
+          onOpenMatch,
+          onDragMove,
+          winChance,
+          onOpenWinChance,
+        }}
+        chip={<CourtStatusPill status={status} merged={merged} />}
         menu={
           <CourtMenu
             busy
@@ -471,33 +637,12 @@ function PlayingCourtCard({
           />
         }
       />
-      <p className="text-[13px] text-fg2">
-        {formatLabel} · Match {matchNo} · {elapsedTime(minutes)}
-        {substitutions > 0
-          ? ` · ${substitutions} substitution${substitutions > 1 ? 's' : ''}`
-          : null}
-      </p>
-      {expectedFinish ? (
-        <p
-          className={cn(
-            'text-xs',
-            expectedFinish.tone === 'accent'
-              ? 'text-accent'
-              : expectedFinish.tone === 'warn'
-                ? 'text-warn'
-                : 'text-fg2',
-          )}
-        >
-          {expectedFinish.text}
-        </p>
+      <CourtMatchLine {...{ matchNo, formatLabel, minutes, substitutions }} />
+      {onAlmostDoneChange ? (
+        <AlmostDoneRow courtLabel={label} checked={almostDone} onChange={onAlmostDoneChange} />
       ) : null}
-      {onOpenMatch || onPause ? (
-        <div className="mt-auto flex flex-wrap items-center gap-2">
-          {onOpenMatch ? (
-            <Button size="sm" variant="primary" onClick={onOpenMatch}>
-              Open match
-            </Button>
-          ) : null}
+      {onPause || onMatchDone ? (
+        <div className={courtActsClass}>
           {onPause ? (
             <Button
               size="sm"
@@ -506,6 +651,11 @@ function PlayingCourtCard({
             >
               <Icon name="pause" size={14} />
               Pause match
+            </Button>
+          ) : null}
+          {onMatchDone ? (
+            <Button size="sm" variant="primary" onClick={onMatchDone}>
+              Match done
             </Button>
           ) : null}
         </div>
@@ -530,6 +680,8 @@ function GettingReadyCourtCard({
   onStartMatch,
   onOpenMatch,
   onDragMove,
+  winChance,
+  onOpenWinChance,
   dropCourtId,
   onSwap,
   swapWith,
@@ -552,8 +704,17 @@ function GettingReadyCourtCard({
     >
       <MatchCourtHead
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
-        {...{ teamA, teamB, onOpenProfile, onOpenGames, onOpenMatch, onDragMove }}
-        chip={<Chip>{merged ? 'Merged · Getting ready' : 'Getting ready'}</Chip>}
+        {...{
+          teamA,
+          teamB,
+          onOpenProfile,
+          onOpenGames,
+          onOpenMatch,
+          onDragMove,
+          winChance,
+          onOpenWinChance,
+        }}
+        chip={<Chip>{merged ? 'Merged · Waiting' : 'Waiting'}</Chip>}
         menu={
           <CourtMenu
             busy
@@ -561,33 +722,24 @@ function GettingReadyCourtCard({
           />
         }
       />
-      <p className="text-[13px] text-fg2">
-        {formatLabel} · Match {matchNo} · waiting to start
-      </p>
+      <CourtMatchLine {...{ matchNo, formatLabel }} />
       {blockedReason ? (
         <span className="flex items-start gap-1.5 text-[13px] text-warn">
           <Icon name="alert" className="mt-0.5 flex-none" />
           {blockedReason}
         </span>
       ) : null}
-      {onStartMatch || onOpenMatch ? (
-        <div className="mt-auto flex flex-wrap items-center gap-2">
-          {onStartMatch ? (
-            <Button
-              size="sm"
-              variant="primary"
-              onClick={onStartMatch}
-              disabled={!!blockedReason}
-              title={blockedReason}
-            >
-              Start match
-            </Button>
-          ) : null}
-          {onOpenMatch ? (
-            <Button size="sm" onClick={onOpenMatch}>
-              Open match
-            </Button>
-          ) : null}
+      {onStartMatch ? (
+        <div className={courtActsClass}>
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={onStartMatch}
+            disabled={!!blockedReason}
+            title={blockedReason}
+          >
+            Start match
+          </Button>
         </div>
       ) : null}
     </article>
@@ -605,6 +757,7 @@ function FreeCourtCard({
   isLastCourt = false,
   onRemove,
   onStartAnyway,
+  onFill,
   dropCourtId,
   dragging = false,
   dragOver = false,
@@ -651,7 +804,12 @@ function FreeCourtCard({
           )}
         </div>
       </div>
-      <CourtDrawing free freeLabel={removed ? 'Removed' : notOpen ? 'Not open yet' : 'Free'} />
+      <CourtDrawing
+        free
+        freeLabel={removed ? 'Removed' : notOpen ? 'Not open yet' : 'Free'}
+        onFill={removed || notOpen ? undefined : onFill}
+        fillLabel={`${label} is free. Pick a match from the queue or generate one`}
+      />
       {removed ? (
         <p className="text-[13px] text-fg2">Manually removed from this session.</p>
       ) : notOpen ? (
@@ -660,7 +818,7 @@ function FreeCourtCard({
             Opens at {startLabel}. The court is unavailable before this time.
           </p>
           {onStartAnyway ? (
-            <div className="mt-auto flex flex-wrap items-center gap-2">
+            <div className={courtActsClass}>
               <Button size="sm" variant="primary" onClick={onStartAnyway}>
                 Start anyway
               </Button>
@@ -689,7 +847,7 @@ function FreeCourtCard({
             )}
           </p>
           {onPlace || onPickAnother ? (
-            <div className="mt-auto flex flex-wrap items-center gap-2">
+            <div className={courtActsClass}>
               {onPlace ? (
                 <Button size="sm" variant="primary" onClick={onPlace}>
                   {onPutOnCourt ? 'Put on court' : 'Review and start'}
@@ -713,7 +871,7 @@ function FreeCourtCard({
                 : 'The queue is empty.'}
           </p>
           {onAddMatch ? (
-            <div className="mt-auto flex flex-wrap items-center gap-2">
+            <div className={courtActsClass}>
               <Button size="sm" onClick={onAddMatch}>
                 Add match
               </Button>

@@ -269,6 +269,7 @@ function SessionAddPlayer({
     id: p.id,
     name: p.fullName,
     nickname: p.nickname,
+    clubNickname: p.clubNickname,
     photoUrl: profilePictureSrc(p.picture, p.playerId ?? p.id, p.pictureName ?? p.fullName),
     rtrId: p.rtrId,
     identity: p.identity,
@@ -396,6 +397,8 @@ function SessionAddPlayer({
         openSlots={Math.max(0, capacity - rosterList.length)}
         waitlistCount={waitlist.length}
         savedPlayers={savedPlayers}
+        onSavedSearch={() => void clubPlayers.refetch()}
+        savedSearching={clubPlayers.isRefetching}
         inSessionIds={inSessionIds}
         onConfirm={confirm}
         onSubmitNewPlayer={submitNewPlayer}

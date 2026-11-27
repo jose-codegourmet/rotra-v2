@@ -77,6 +77,9 @@ password recovery through Admin-reviewed requests (#491).
 - [D-2026-11-20-01](../decisions/2026-11-20.md#d-2026-11-20-01) — Google sign-in in real mode: registration from the Admin link (picked city, no club), the inviting player on a session invite, one accepted risk; migration `20261120000100_admin_link_registration` written, not applied.
 - [D-2026-11-22-01](../decisions/2026-11-22.md#d-2026-11-22-01) — trusted club hosts: a **Host** badge in the profile Clubs section (built in #1007: mock and real mode, `isHost` on the Clubs read).
 - [D-2026-11-25-04](../decisions/2026-11-25.md#d-2026-11-25-04) — four leaderboard periods (quarterly added) for ROTRA and a new club leaderboard on the club page, shared places (1, 1, 2), an always-on podium with stacked shared places and a dialog, full names and pictures on every leaderboard (mockup only).
+- [D-2026-11-26-02](../decisions/2026-11-26.md#d-2026-11-26-02) — signed-in navigation gets a pixel-style session button (Play, Ready, Next up) and a new Settings page (mockup only).
+- [D-2026-11-26-03](../decisions/2026-11-26.md#d-2026-11-26-03) — the Game page is the court beside a VS card; stats show only for a tapped player (mockup only).
+- [D-2026-11-26-04](../decisions/2026-11-26.md#d-2026-11-26-04) — the Weekly Performance summary sits in one box with a won/lost bar (mockup only).
 
 ## Blocking open decisions
 

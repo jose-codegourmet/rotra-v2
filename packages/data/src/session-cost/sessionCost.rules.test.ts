@@ -53,6 +53,7 @@ describe('session cost estimates in centavos', () => {
   it('matches tonight: courts + shuttles + entrance, custom fee and profit', () => {
     expect(estimateSessionCost(input, context)).toEqual({
       players: 14,
+      payers: 14,
       court: 315000,
       shuttle: 810000,
       entrance: 84000,
@@ -64,6 +65,27 @@ describe('session cost estimates in centavos', () => {
       collect: 1260000,
       result: { kind: 'profit', amount: 51000 },
     })
+  })
+  it('leaves free players out of the break-even head count, keeping every cost (D-2026-11-27-01)', () => {
+    // 14 players, 2 free: ₱12,090 total (entrance still for 14) over 12 payers → ₱1,008 each.
+    expect(
+      estimateSessionCost({ ...input, paymentMode: 'break_even' }, { ...context, freePlayers: 2 }),
+    ).toMatchObject({
+      players: 14,
+      payers: 12,
+      entrance: 84000,
+      total: 1209000,
+      breakEven: 100800,
+      perHead: 100800,
+      collect: 1209600,
+    })
+    // A custom amount is unchanged; only the payers pay it. Everyone free still leaves one payer.
+    expect(estimateSessionCost(input, { ...context, freePlayers: 2 })).toMatchObject({
+      perHead: 90000,
+      collect: 1080000,
+      result: { kind: 'loss', amount: 129000 },
+    })
+    expect(estimateSessionCost(input, { ...context, freePlayers: 99 }).payers).toBe(1)
   })
   it('matches Thursday Open Play with the custom 700 fee', () => {
     expect(

@@ -54,6 +54,24 @@ export function matchCounting(standard: boolean, ranked: boolean): MatchPage['co
   return ranked ? 'counted' : 'not_ranked'
 }
 
+/** Every earlier game is played; only full games have a win or loss in this session record. */
+export function beforeGameRecord(games: readonly Pick<PlayerGame, 'counting' | 'result'>[]) {
+  let wins = 0
+  let losses = 0
+  for (const game of games) {
+    if (game.counting === 'partial') continue
+    if (game.result === 'won') wins += 1
+    else losses += 1
+  }
+  const decided = wins + losses
+  return {
+    played: games.length,
+    wins,
+    losses,
+    winRate: decided ? Math.round((wins / decided) * 100) : null,
+  }
+}
+
 /** A score read from one side ("21–18"), as profile games show it; null without both scores. */
 export function sideScore(
   teamAScore: number | null,

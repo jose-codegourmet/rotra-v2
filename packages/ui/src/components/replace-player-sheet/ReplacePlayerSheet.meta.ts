@@ -9,6 +9,7 @@ export const replacePlayerSheetMeta = {
     'inMatch lists everyone in the match, Team A first, each with the team and whether they are present. candidates are present players not in the match and not busy; others are the rest of the roster (away, on court, playing), greyed out in All players.',
     'The × ("Back to match N") and the backdrop call onBack. Replace player needs both players. The owner rechecks; when the recheck fails keep the sheet open and pass message "Something changed. Review the match again." Set isPending while it saves.',
     'Swap from match: pass onPickSwap, swapId and onSwapFromMatch to show the row. It lists the opponents of the player coming out (derived from inMatch), each marked "Team B · opponent"; before anyone is coming out it says "Choose who\'s coming out to see who they can swap with." When swapId is set the primary button reads Swap players and calls onSwapFromMatch(outId, opponentId); the note "Nina and Theo swap places: each joins the other\'s partner." shows. Picking from Suggestion or All players is a plain replace: the owner clears swapId (and a swap pick clears inId). Omit onPickSwap and the row does not render (Substitute never has it).',
+    'In the suggested match (opened by tapping a player in SuggestedMatchSheet): pass title "Replace a player in the suggested match", note "This only changes the suggested lineup. Nothing is recorded until you add it to the queue.", backLabel "Back to the suggested match" and omit matchNo; the tapped player is outId. Primary Replace player / Swap players. The container applies the change to the shown lineup only.',
     'No credit question and no substitution record. Use SubstitutionSheet when a player really has to leave mid-game.',
   ],
   prototype: {
@@ -21,6 +22,13 @@ export const replacePlayerSheetMeta = {
     'docs/business_logic/product/queue/modules/matches/README.md',
     'docs/mockup-changes/2026-11-13-queue-replace-during-play.md',
     'docs/mockup-changes/2026-11-19-queue-replace-swap-from-match.md',
+    'docs/mockup-changes/2026-11-26-queue-free-court-flow.md',
   ],
-  related: ['SwapPickerSheet', 'PlayerActionSheet', 'OnCourtSheet', 'SubstitutionSheet'],
+  related: [
+    'SuggestedMatchSheet',
+    'SwapPickerSheet',
+    'PlayerActionSheet',
+    'OnCourtSheet',
+    'SubstitutionSheet',
+  ],
 } satisfies ComponentMeta

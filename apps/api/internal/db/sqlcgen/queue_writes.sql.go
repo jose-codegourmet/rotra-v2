@@ -551,7 +551,7 @@ func (q *Queries) GetSavedRecordForPerson(ctx context.Context, arg GetSavedRecor
 }
 
 const getSessionPlayer = `-- name: GetSessionPlayer :one
-SELECT id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, created_at, updated_at, revision, games_adjustment, no_show_at, self_checked_in_at, left_at, handicap_spots FROM session_players WHERE id = $1
+SELECT id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, created_at, updated_at, revision, games_adjustment, no_show_at, self_checked_in_at, left_at, handicap_spots, is_free FROM session_players WHERE id = $1
 `
 
 func (q *Queries) GetSessionPlayer(ctx context.Context, id pgtype.UUID) (SessionPlayer, error) {
@@ -582,12 +582,13 @@ func (q *Queries) GetSessionPlayer(ctx context.Context, id pgtype.UUID) (Session
 		&i.SelfCheckedInAt,
 		&i.LeftAt,
 		&i.HandicapSpots,
+		&i.IsFree,
 	)
 	return i, err
 }
 
 const getSessionPlayerOfClubPlayer = `-- name: GetSessionPlayerOfClubPlayer :one
-SELECT id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, created_at, updated_at, revision, games_adjustment, no_show_at, self_checked_in_at, left_at, handicap_spots FROM session_players WHERE session_id = $1 AND club_player_id = $2
+SELECT id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, created_at, updated_at, revision, games_adjustment, no_show_at, self_checked_in_at, left_at, handicap_spots, is_free FROM session_players WHERE session_id = $1 AND club_player_id = $2
 `
 
 type GetSessionPlayerOfClubPlayerParams struct {
@@ -623,6 +624,7 @@ func (q *Queries) GetSessionPlayerOfClubPlayer(ctx context.Context, arg GetSessi
 		&i.SelfCheckedInAt,
 		&i.LeftAt,
 		&i.HandicapSpots,
+		&i.IsFree,
 	)
 	return i, err
 }
@@ -827,7 +829,7 @@ INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_
                              confirmed_at, joined_at, over_budget_at, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8,
         $8, $8, $9, $8, $8)
-RETURNING id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, created_at, updated_at, revision, games_adjustment, no_show_at, self_checked_in_at, left_at, handicap_spots
+RETURNING id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, created_at, updated_at, revision, games_adjustment, no_show_at, self_checked_in_at, left_at, handicap_spots, is_free
 `
 
 type InsertSessionPlayerParams struct {
@@ -881,6 +883,7 @@ func (q *Queries) InsertSessionPlayer(ctx context.Context, arg InsertSessionPlay
 		&i.SelfCheckedInAt,
 		&i.LeftAt,
 		&i.HandicapSpots,
+		&i.IsFree,
 	)
 	return i, err
 }
@@ -1120,7 +1123,7 @@ const reactivateSessionPlayer = `-- name: ReactivateSessionPlayer :one
 UPDATE session_players
 SET released_at = NULL, release_reason = NULL, confirmed_at = $1, present = $2, present_changed_at = $1,
     over_budget_at = $3, revision = revision + 1, updated_at = $1
-WHERE id = $4 RETURNING id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, created_at, updated_at, revision, games_adjustment, no_show_at, self_checked_in_at, left_at, handicap_spots
+WHERE id = $4 RETURNING id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, created_at, updated_at, revision, games_adjustment, no_show_at, self_checked_in_at, left_at, handicap_spots, is_free
 `
 
 type ReactivateSessionPlayerParams struct {
@@ -1164,6 +1167,7 @@ func (q *Queries) ReactivateSessionPlayer(ctx context.Context, arg ReactivateSes
 		&i.SelfCheckedInAt,
 		&i.LeftAt,
 		&i.HandicapSpots,
+		&i.IsFree,
 	)
 	return i, err
 }

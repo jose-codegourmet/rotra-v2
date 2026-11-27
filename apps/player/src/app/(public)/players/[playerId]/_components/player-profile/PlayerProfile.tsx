@@ -273,6 +273,7 @@ export function PlayerProfile({ playerId }: { playerId: string }) {
                     <ContactRequestStatus request={contactRequest.data} variant="compact" />
                   ) : null
                 }
+                onOpenSettings={() => router.push('/settings')}
                 onOpenPrivacy={() => router.push('/profile/privacy-and-contact')}
                 onOpenVerification={googleSignIn ? openVerification : undefined}
                 onSignOut={leaveSignedOut}

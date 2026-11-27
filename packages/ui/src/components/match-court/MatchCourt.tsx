@@ -29,7 +29,7 @@ export type MatchCourtPlayer = {
 }
 
 /** The public session tiles' skill-group colours, as the ring under the winner ring. */
-const SKILL_RINGS = {
+export const MATCH_COURT_SKILL_RINGS = {
   beginner: '[--ring:var(--lv-beg)]',
   intermediate: '[--ring:var(--lv-int)]',
   advanced: '[--ring:var(--lv-adv)]',
@@ -41,6 +41,13 @@ export type MatchCourtProps = {
   number?: number
   /** “7:10–7:30 PM” */
   timeLabel?: string
+  /**
+   * Win chance (D-2026-11-27-02): a corner pill after the label, “39% · 61%”, left pair first, and an
+   * “Upset” pill when the Favored pair lost. Queue Master only (the Player variant shows it too, in
+   * the label's size). With `onOpen` both pills are buttons that open WinChanceDialog; they sit above
+   * the `onOpen` court overlay.
+   */
+  winChance?: { text: string; title: string; upset: boolean; onOpen?: () => void }
   /** Player variant: the whole corner pill text instead of “#N · time”, drawn small caps (“Doubles”) */
   cornerLabel?: string
   /** Accessible name of the court; defaults to “Match N: A versus B” */
@@ -98,6 +105,8 @@ export type MatchCourtProps = {
    * 2 px dark gap and a 3 px accent outer ring; hover and focus swap the accent for a light ring.
    */
   skillRings?: boolean
+  /** Fills the Game page's court card, with larger faces and vertical teams on wide screens. */
+  size?: 'match-page'
   className?: string
 }
 
@@ -134,6 +143,51 @@ export function MatchCourtArt() {
   )
 }
 
+/** A corner pill; a button above the court overlay when it opens something. */
+function CornerPill({
+  title,
+  onOpen,
+  label,
+  className,
+  children,
+}: {
+  title: string
+  onOpen?: () => void
+  label: string
+  className?: string
+  children: ReactNode
+}) {
+  const base = 'rounded-full bg-court-level-label px-2 font-bold whitespace-nowrap'
+  if (!onOpen)
+    return (
+      <span title={title} className={cn(base, 'text-on-photo/90', className)}>
+        {children}
+      </span>
+    )
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={label}
+      aria-haspopup="dialog"
+      onClick={(e) => {
+        e.stopPropagation()
+        onOpen()
+      }}
+      onKeyDown={(e) => e.stopPropagation()}
+      className={cn(
+        base,
+        'pointer-events-auto relative cursor-pointer border-0 text-on-photo/90 hover:bg-on-photo/25',
+        'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent',
+        'touch:before:absolute touch:before:-inset-2 touch:before:content-[""]',
+        className,
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
 /**
  * One match of a finished session's Match history drawn as a small court (2026-11-13 match history
  * courts log; the prototype's pubHistoryMatch, `.gm*`), the same design as ROTRA Player's game rows:
@@ -145,6 +199,7 @@ export function MatchCourtArt() {
 export function MatchCourt({
   number,
   timeLabel,
+  winChance,
   cornerLabel,
   ariaLabel,
   action,
@@ -165,8 +220,10 @@ export function MatchCourt({
   versus = false,
   onOpen,
   skillRings = false,
+  size,
   className,
 }: MatchCourtProps) {
+  const tall = size === 'match-page'
   const face = (player: MatchCourtPlayer, won: boolean) => {
     const games = player.badge ? `, game ${player.badge} of that session` : ''
     const highlighted = highlightedPlayerKey !== undefined && player.key === highlightedPlayerKey
@@ -181,7 +238,7 @@ export function MatchCourt({
               'size-[46px] text-sm max-[480px]:size-9 max-[480px]:text-xs',
               skillRings
                 ? [
-                    SKILL_RINGS[player.skillGroup ?? 'none'],
+                    MATCH_COURT_SKILL_RINGS[player.skillGroup ?? 'none'],
                     won
                       ? 'shadow-[0_0_0_3px_var(--ring),0_0_0_5px_var(--court-level-label),0_0_0_8px_var(--accent)]'
                       : 'shadow-[0_0_0_3px_var(--ring)]',
@@ -193,6 +250,7 @@ export function MatchCourt({
                     player.onOpen &&
                       'group-hover/face:ring-3 group-hover/face:ring-accent group-focus-visible/face:ring-3 group-focus-visible/face:ring-accent',
                   ],
+              tall && 'min-[900px]:size-[60px] min-[900px]:text-lg',
               highlighted && 'outline-3 outline-offset-2 outline-warn',
             )}
           />
@@ -243,6 +301,7 @@ export function MatchCourt({
     'relative z-1 flex min-w-0 items-center justify-evenly gap-1.5',
     skillRings ? 'px-1.5 py-4' : 'px-1 py-3',
     onOpen && 'pointer-events-none',
+    tall && 'min-[900px]:flex-col min-[900px]:px-2 min-[900px]:pt-10 min-[900px]:pb-4',
   )
   const names = (players: MatchCourtPlayer[]) => players.map((p) => p.name).join(' and ')
   const leftWon = winner === 'left'
@@ -250,6 +309,7 @@ export function MatchCourt({
   const playerVariant = cornerLabel !== undefined
   const games = invalid || versus || !score ? [] : (gameScores ?? [])
   const hasGames = games.length > 0
+  const pillSize = playerVariant ? 'text-[10px]' : 'text-[11px] max-[480px]:text-[10px]'
   const courtLabel = ariaLabel ?? `Match ${number}: ${names(left)} versus ${names(right)}`
   return (
     <article
@@ -266,6 +326,8 @@ export function MatchCourt({
             : playerVariant
               ? 'pt-2.5 max-[480px]:min-h-[100px]'
               : 'pt-3 max-[480px]:min-h-[112px]',
+          tall &&
+            'min-h-[220px] flex-1 min-[900px]:min-h-[280px] min-[900px]:items-stretch max-[480px]:min-h-[220px]',
           now &&
             'shadow-[0_0_0_3px_var(--accent),0_0_18px_2px_color-mix(in_srgb,var(--accent)_35%,transparent)]',
         )}
@@ -280,16 +342,39 @@ export function MatchCourt({
           />
         ) : null}
         <div className="pointer-events-none absolute top-2 right-2 left-2 z-2 flex flex-col items-start gap-1">
-          {playerVariant ? (
-            <span className="rounded-full bg-court-level-label px-2 text-[10px] font-extrabold tracking-[0.5px] whitespace-nowrap text-on-photo/85 uppercase">
-              {cornerLabel}
-            </span>
-          ) : (
-            <span className="rounded-full bg-court-level-label px-2 text-[11px] font-bold whitespace-nowrap text-on-photo/90 max-[480px]:text-[10px]">
-              #{number} · {timeLabel}
-              {fun ? ' · Fun' : ''}
-            </span>
-          )}
+          <span className="flex flex-wrap items-center gap-1">
+            {playerVariant ? (
+              <span className="rounded-full bg-court-level-label px-2 text-[10px] font-extrabold tracking-[0.5px] whitespace-nowrap text-on-photo/85 uppercase">
+                {cornerLabel}
+              </span>
+            ) : (
+              <span className="rounded-full bg-court-level-label px-2 text-[11px] font-bold whitespace-nowrap text-on-photo/90 max-[480px]:text-[10px]">
+                #{number} · {timeLabel}
+                {fun ? ' · Fun' : ''}
+              </span>
+            )}
+            {winChance && !invalid ? (
+              <CornerPill
+                title={winChance.title}
+                onOpen={winChance.onOpen}
+                label={`Win chance ${winChance.text}. Explain`}
+                className={cn('tabular-nums', pillSize)}
+              >
+                <span className="sr-only">Win chance </span>
+                {winChance.text}
+              </CornerPill>
+            ) : null}
+            {winChance?.upset && !invalid ? (
+              <CornerPill
+                title="The favored team lost"
+                onOpen={winChance.onOpen}
+                label="Upset. Explain"
+                className={cn('text-warn', pillSize)}
+              >
+                Upset
+              </CornerPill>
+            ) : null}
+          </span>
           {hasGames ? (
             <span
               title="Game scores"
@@ -306,12 +391,18 @@ export function MatchCourt({
           className={cn(
             'relative z-1 mx-1 flex min-w-24 flex-col items-center justify-center gap-1.5 rounded-xl bg-court-level-label px-3.5 py-2.5 text-center text-on-photo max-[480px]:mx-0.5 max-[480px]:min-w-0 max-[480px]:px-2 max-[480px]:py-2',
             onOpen && 'pointer-events-none',
+            tall && 'min-[900px]:self-center',
           )}
         >
           {versus ? (
             <span className="text-[13px] font-extrabold tracking-[1px] text-on-photo/80">VS</span>
           ) : invalid ? null : score ? (
-            <span className="font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]">
+            <span
+              className={cn(
+                'font-mono text-[22px] leading-none font-bold whitespace-nowrap tabular-nums max-[480px]:text-[17px]',
+                tall && 'min-[900px]:text-[30px]',
+              )}
+            >
               <span className="sr-only">Score </span>
               {score}
             </span>

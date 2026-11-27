@@ -5,14 +5,13 @@ import {
   countedGames,
   courtOpen,
   courtsNeeded,
-  FORMAT_LABELS,
   freeCourts,
-  listNames,
   type MatchContext,
   matchStatus,
   queueMasterName,
   waitingMatches,
 } from '@rotra/data/match/match.rules'
+import { matchCategoryFor } from '@rotra/data/match/matchCategory.rules'
 import type { Match } from '@rotra/data/match/types'
 import { usePlaceOnCourt } from '@rotra/data/match/usePlaceOnCourt'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
@@ -23,7 +22,8 @@ import { useOpenCourtEarly } from '@rotra/data/queue-session/useOpenCourtEarly'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
-import { type ChooseMatchRow, ChooseMatchSheet } from '@rotra/ui/choose-match-sheet'
+import { type ChooseMatchItem, ChooseMatchSheet } from '@rotra/ui/choose-match-sheet'
+import type { MatchCardPlayer } from '@rotra/ui/match-card'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { StartMatchSheet } from '@rotra/ui/start-match-sheet'
@@ -47,9 +47,14 @@ export type StartMatchProps = {
   sessionId: string
   /** The open request; null keeps both sheets closed */
   request: StartMatchRequest | null
-  /** Start here on a 5v5 in Pick another: the shell replaces the request with the Put on court one */
+  /** Put on court on a 5v5 in Put a match on Court N: the shell replaces the request with the Put on court one */
   onRequestChange: (request: StartMatchRequest) => void
+  /** Edit on a card in Put a match on Court N: the shell opens the lineup editor for that match */
+  onEditMatch: (matchId: string) => void
+  /** ×, Escape, the scrim and ← Back: one level back (Court N is free), or closed when first */
   onClose: () => void
+  /** The match was put on court: the shell closes the whole stack */
+  onDone: () => void
 }
 
 const CHANGED = 'Something changed. Review the match again.'
@@ -78,7 +83,14 @@ const isRecheckFailure = (error: unknown) => error instanceof MockError && error
  * view); a player card opens PlayerProfile with Back to match, which returns to the same sheet.
  * No match is ever put on court without this confirmation or an explicit Put on court tap.
  */
-export function StartMatch({ sessionId, request, onRequestChange, onClose }: StartMatchProps) {
+export function StartMatch({
+  sessionId,
+  request,
+  onRequestChange,
+  onEditMatch,
+  onClose,
+  onDone,
+}: StartMatchProps) {
   const now = useNow(1000, false, true)
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
@@ -105,9 +117,11 @@ export function StartMatch({ sessionId, request, onRequestChange, onClose }: Sta
         courtId={request.courtId}
         ctx={ctx}
         onClose={onClose}
+        onDone={onDone}
         onOpenPutOnCourt={(matchId) =>
           onRequestChange({ mode: 'start', matchId, courtId: request.courtId })
         }
+        onEditMatch={onEditMatch}
       />
     )
 
@@ -125,6 +139,7 @@ export function StartMatch({ sessionId, request, onRequestChange, onClose }: Sta
       courtId={request.courtId}
       ctx={ctx}
       onClose={onClose}
+      onDone={onDone}
       onRefresh={refresh}
     />
   )
@@ -134,21 +149,35 @@ type ChooseMatchProps = {
   courtId: string
   ctx: MatchContext
   onClose: () => void
+  onDone: () => void
   /** A 5v5 needs a second court, so it goes through the Put on court sheet */
   onOpenPutOnCourt: (matchId: string) => void
+  /** Edit: the shell opens the lineup editor for that waiting match */
+  onEditMatch: (matchId: string) => void
 }
 
 /**
- * Q-CHOOSE-MATCH: every waiting match in queue order, Start here on the ready ones. A one-court
- * match goes straight on this court (usePlaceOnCourt, "Match N on Court X · getting ready"); a 5v5
- * opens the Put on court sheet for its second court.
+ * Q-CHOOSE-MATCH, Put a match on Court N: every waiting match as a compact MatchCard in a carousel,
+ * Put on Court N on the ready ones and Edit. A one-court match goes straight on this court
+ * (usePlaceOnCourt, "Match N on Court X · getting ready"); a 5v5 opens the Put on court sheet for
+ * its second court. Putting one on court closes the whole stack; ×, Escape, the scrim and ← Back
+ * call onClose (one level back to Court N is free, or closed when Pick another opened this).
  */
-function ChooseMatch({ courtId, ctx, onClose, onOpenPutOnCourt }: ChooseMatchProps) {
+function ChooseMatch({
+  courtId,
+  ctx,
+  onClose,
+  onDone,
+  onOpenPutOnCourt,
+  onEditMatch,
+}: ChooseMatchProps) {
   const placeOnCourt = usePlaceOnCourt()
+  const clubPlayers = useClubPlayers()
+  const [profileId, setProfileId] = useState<string | null>(null)
   // One placement per tap: a second tap can land before isPending reaches this render.
   const placing = useRef(false)
   const court = ctx.courts.find((c) => c.id === courtId)
-  const onStartHere = (matchId: string) => {
+  const onPutOnCourt = (matchId: string) => {
     const match = ctx.matches.find((m) => m.id === matchId)
     if (!match) return
     if (courtsNeeded(match) === 2) return onOpenPutOnCourt(matchId)
@@ -159,7 +188,7 @@ function ChooseMatch({ courtId, ctx, onClose, onOpenPutOnCourt }: ChooseMatchPro
       {
         onSuccess: (result) => {
           toast(result.message)
-          onClose()
+          onDone()
         },
         onError: (failure) => toast.error(errorMessage(failure)),
         onSettled: () => {
@@ -168,31 +197,63 @@ function ChooseMatch({ courtId, ctx, onClose, onOpenPutOnCourt }: ChooseMatchPro
       },
     )
   }
-  const names = (ids: string[]) =>
-    listNames(
-      ids.map((id) => {
-        const p = ctx.roster.find((p) => p.id === id)
-        return p ? queueMasterName(p) : 'Player'
-      }),
-    )
-  const rows: ChooseMatchRow[] = waitingMatches(ctx.matches).map((m, i) => ({
+  const player = (id: string): MatchCardPlayer => {
+    const p = ctx.roster.find((item) => item.id === id)
+    const clubPlayer = p && clubPlayers.data?.players.find((item) => item.id === p.clubPlayerId)
+    return {
+      id,
+      name: p?.nameSnapshot ?? 'Player',
+      shortName: p ? queueMasterName(p) : 'Player',
+      level: p?.level ?? null,
+      photoUrl: clubPlayer
+        ? profilePictureSrc(
+            clubPlayer.picture,
+            clubPlayer.playerId ?? clubPlayer.id,
+            clubPlayer.pictureName ?? clubPlayer.fullName,
+          )
+        : undefined,
+    }
+  }
+  // Start anyway in the Put on court sheet can open a court that is not open yet.
+  const canOpenCourt = ctx.courts.some((c) => !c.removedAt && !courtOpen(c, ctx.now))
+  const openProfile = (rosterId: string) => {
+    const clubPlayerId = ctx.roster.find((p) => p.id === rosterId)?.clubPlayerId
+    if (clubPlayerId) setProfileId(clubPlayerId)
+  }
+  const matches: ChooseMatchItem[] = waitingMatches(ctx.matches).map((m, i) => ({
     matchId: m.id,
     position: i + 1,
-    teamA: names(m.teamA),
-    teamB: names(m.teamB),
-    formatLabel: FORMAT_LABELS[m.format],
+    matchNo: m.matchNo,
+    format: m.format,
+    categoryPrefix: matchCategoryFor(m, ctx.roster),
+    origin: m.origin,
+    manualProtected: m.manualProtected,
     status: matchStatus(m, ctx),
+    teamA: m.teamA.map(player),
+    teamB: m.teamB.map(player),
+    canOpenCourt,
+    onSelectPlayer: openProfile,
   }))
   return (
-    <ChooseMatchSheet
-      open
-      onOpenChange={(open) => {
-        if (!open) onClose()
-      }}
-      courtLabel={court?.label ?? 'Court'}
-      rows={rows}
-      onStartHere={onStartHere}
-    />
+    <>
+      <ChooseMatchSheet
+        open
+        onOpenChange={(open) => {
+          if (!open) onClose()
+        }}
+        courtLabel={court?.label ?? 'Court'}
+        matches={matches}
+        onPutOnCourt={onPutOnCourt}
+        onEdit={onEditMatch}
+        onBack={onClose}
+      />
+      <PlayerProfile
+        clubPlayerId={profileId}
+        onClose={() => setProfileId(null)}
+        backLabel="match"
+        onBack={() => setProfileId(null)}
+      />
+    </>
   )
 }
 
@@ -204,6 +265,7 @@ type OpenStartMatchProps = {
   courtId?: string
   ctx: MatchContext
   onClose: () => void
+  onDone: () => void
   /** The recheck refused the start: refetch so the sheet shows the current players and courts */
   onRefresh: () => void
 }
@@ -226,6 +288,7 @@ function OpenStartMatch({
   courtId,
   ctx,
   onClose,
+  onDone,
   onRefresh,
 }: OpenStartMatchProps) {
   const placeOnCourt = usePlaceOnCourt()
@@ -319,7 +382,7 @@ function OpenStartMatch({
       {
         onSuccess: (result) => {
           toast(result.message)
-          onClose()
+          onDone()
         },
         onError: (failure) => {
           toast.error(errorMessage(failure))

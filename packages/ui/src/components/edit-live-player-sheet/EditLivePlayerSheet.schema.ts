@@ -6,9 +6,11 @@ export const EDIT_LIVE_GAMES_MIN = 0
 export const EDIT_LIVE_GAMES_MAX = 99
 
 /**
- * Edit player during a session (D-EDIT-LIVE-PLAYER): the club nickname (the same rule as Saved
- * players › Club nickname; only registered players have the field), the games played shown for
- * tonight (0–99) and whether the player is present.
+ * Edit player during a session (D-EDIT-LIVE-PLAYER; mockup change 2026-11-27: the Queue Master
+ * edits only these): the club nickname (the same rule as Saved players › Club nickname; every
+ * player has it), the games played shown for tonight (0–99), whether the player is present and the
+ * handicap spots. In the preparing mode the sheet shows only the nickname and the handicap; games
+ * and presence keep their current values.
  */
 export const editLivePlayerSchema = z.object({
   nickname: clubNicknameSchema.shape.nickname,

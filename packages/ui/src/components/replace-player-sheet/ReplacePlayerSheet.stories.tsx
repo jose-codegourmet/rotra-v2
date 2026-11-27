@@ -120,3 +120,24 @@ export const SwapRowPlainReplace: Story = {
 export const SwapPlaying: Story = {
   args: { playing: true, outId: inMatch[0]?.id ?? null },
 }
+
+/** Replace a player in the suggested match: the tapped player is already coming out, no match number. */
+export const SuggestedMatch: Story = {
+  args: {
+    matchNo: undefined,
+    title: 'Replace a player in the suggested match',
+    note: 'This only changes the suggested lineup. Nothing is recorded until you add it to the queue.',
+    backLabel: 'Back to the suggested match',
+    outId: inMatch[0]?.id ?? null,
+  },
+}
+
+export const SuggestedMatchLight: Story = {
+  ...SuggestedMatch,
+  globals: { theme: 'light' },
+}
+
+export const SuggestedMatchPhone: Story = {
+  ...SuggestedMatch,
+  globals: { viewport: { value: 'phone' } },
+}

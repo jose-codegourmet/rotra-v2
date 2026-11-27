@@ -89,7 +89,7 @@ INSERT INTO match_decisions (match_id, club_id, session_id, kind, winning_team, 
 VALUES (@match_id, @club_id, @session_id, @kind::match_decision_kind, sqlc.narg('winning_team')::team_side, @team_a_score, @team_b_score, @source_operation_id, @now, @now, @actor_club_id);
 
 -- name: EndMatch :exec
-UPDATE matches SET state = @state::match_state, ended_at = @now, revision = revision + 1, updated_at = @now WHERE id = @id;
+UPDATE matches SET state = @state::match_state, ended_at = @now, almost_done_at = NULL, revision = revision + 1, updated_at = @now WHERE id = @id;
 
 -- name: InsertSyncConflict :exec
 INSERT INTO sync_conflicts (id, club_id, session_id, category, evidence, detected_at, created_at, updated_at)
@@ -216,8 +216,12 @@ UPDATE matches SET removed_at = @now, queue_position = NULL, revision = revision
 
 -- name: PauseMatch :exec
 -- Pause match: a Playing match goes back to Getting ready on its court(s). The start time clears; placed_at is kept when it has one.
-UPDATE matches SET state = 'on_court', started_at = NULL, placed_at = COALESCE(placed_at, @now), revision = revision + 1, updated_at = @now WHERE id = @id;
+UPDATE matches SET state = 'on_court', started_at = NULL, almost_done_at = NULL, placed_at = COALESCE(placed_at, @now), revision = revision + 1, updated_at = @now WHERE id = @id;
 
 -- name: SetParticipationTeam :exec
 -- Switch sides and Swap from match: one open segment changes team in place.
 UPDATE match_participations SET team = @team, updated_at = @now WHERE id = @id;
+
+-- name: SetMatchAlmostDone :exec
+-- Almost done: the Queue Master's switch on a Playing match. A time turns it on, null turns it off.
+UPDATE matches SET almost_done_at = sqlc.narg('almost_done_at')::timestamptz, revision = revision + 1, updated_at = @now WHERE id = @id;

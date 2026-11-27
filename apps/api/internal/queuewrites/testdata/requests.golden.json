@@ -5779,6 +5779,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -5989,6 +5990,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -6169,6 +6171,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -6381,6 +6384,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -6593,6 +6597,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -6805,6 +6810,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -7017,6 +7023,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -7225,6 +7232,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -7439,6 +7447,7 @@
                 "placedAt": null,
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "1"
@@ -7476,6 +7485,7 @@
                 "placedAt": null,
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "1"
@@ -7690,6 +7700,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -7719,6 +7730,7 @@
               "placedAt": "2026-11-19T04:00:00.000Z",
               "startedAt": null,
               "endedAt": null,
+              "almostDoneAt": null,
               "substitutions": [],
               "decision": null,
               "revision": "2"
@@ -7976,6 +7988,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -8188,6 +8201,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -8217,6 +8231,7 @@
               "placedAt": "2026-11-19T04:00:00.000Z",
               "startedAt": null,
               "endedAt": null,
+              "almostDoneAt": null,
               "substitutions": [],
               "decision": null,
               "revision": "2"
@@ -8474,6 +8489,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -8503,6 +8519,7 @@
               "placedAt": "2026-11-19T04:00:00.000Z",
               "startedAt": null,
               "endedAt": null,
+              "almostDoneAt": null,
               "substitutions": [],
               "decision": null,
               "revision": "2"
@@ -8758,6 +8775,7 @@
             "placedAt": "2026-11-19T04:00:00.000Z",
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "2"
@@ -9016,6 +9034,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -9472,6 +9491,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -10044,6 +10064,7 @@
             "placedAt": null,
             "startedAt": null,
             "endedAt": null,
+            "almostDoneAt": null,
             "substitutions": [],
             "decision": null,
             "revision": "1"
@@ -12096,6 +12117,7 @@
                 "placedAt": "2026-11-19T04:00:00.000Z",
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "2"
@@ -12121,6 +12143,7 @@
                 "placedAt": "2026-11-19T04:00:00.000Z",
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "2"
@@ -12523,6 +12546,7 @@
                 "placedAt": "2026-11-19T04:00:00.000Z",
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "2"
@@ -12700,6 +12724,7 @@
                 "placedAt": "2026-11-19T04:00:00.000Z",
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "2"
@@ -12877,6 +12902,7 @@
                 "placedAt": "2026-11-19T04:00:00.000Z",
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "2"
@@ -12902,6 +12928,7 @@
                 "placedAt": "2026-11-19T04:00:00.000Z",
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "2"
@@ -13523,6 +13550,7 @@
                     "placedAt": "2026-11-19T04:00:00.000Z",
                     "startedAt": null,
                     "endedAt": null,
+                    "almostDoneAt": null,
                     "substitutions": [],
                     "decision": null,
                     "revision": "2"
@@ -13548,6 +13576,7 @@
                     "placedAt": "2026-11-19T04:00:00.000Z",
                     "startedAt": null,
                     "endedAt": null,
+                    "almostDoneAt": null,
                     "substitutions": [],
                     "decision": null,
                     "revision": "2"
@@ -13946,6 +13975,7 @@
                 "placedAt": "2026-11-19T04:00:00.000Z",
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "2"
@@ -14123,6 +14153,7 @@
                 "placedAt": "2026-11-19T04:00:00.000Z",
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "2"
@@ -14148,6 +14179,7 @@
                 "placedAt": "2026-11-19T04:00:00.000Z",
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "2"
@@ -14471,6 +14503,7 @@
                 "placedAt": "2026-11-19T04:00:00.000Z",
                 "startedAt": null,
                 "endedAt": null,
+                "almostDoneAt": null,
                 "substitutions": [],
                 "decision": null,
                 "revision": "2"
@@ -15201,6 +15234,7 @@
                     "placedAt": "2026-11-19T04:00:00.000Z",
                     "startedAt": null,
                     "endedAt": null,
+                    "almostDoneAt": null,
                     "substitutions": [],
                     "decision": null,
                     "revision": "2"
@@ -15226,6 +15260,7 @@
                     "placedAt": "2026-11-19T04:00:00.000Z",
                     "startedAt": null,
                     "endedAt": null,
+                    "almostDoneAt": null,
                     "substitutions": [],
                     "decision": null,
                     "revision": "2"

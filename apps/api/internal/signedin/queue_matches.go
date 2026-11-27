@@ -47,6 +47,7 @@ type queueMatchDTO struct {
 	PlacedAt        *string                `json:"placedAt"`
 	StartedAt       *string                `json:"startedAt"`
 	EndedAt         *string                `json:"endedAt"`
+	AlmostDoneAt    *string                `json:"almostDoneAt"`
 	Substitutions   []queueSubstitutionDTO `json:"substitutions"`
 	Decision        *queueDecisionDTO      `json:"decision"`
 	Revision        string                 `json:"revision"`
@@ -123,6 +124,10 @@ func matchesIn(ctx context.Context, q *sqlcgen.Queries, sessionID pgtype.UUID) (
 			Origin: m.Origin, ManualProtected: m.ManualProtected, TeamA: m.TeamA, TeamB: m.TeamB, CourtIDs: m.CourtIDs,
 			PlacedAt: isoPtr(row.PlacedAt), StartedAt: isoPtr(row.StartedAt), EndedAt: isoPtr(row.EndedAt),
 			Substitutions: []queueSubstitutionDTO{}, Revision: httpapi.ToDecimalString(revision[row.ID]),
+		}
+		// Only a Playing match carries it (the commands that leave Playing clear it).
+		if row.State == sqlcgen.MatchStateActive {
+			d.AlmostDoneAt = isoPtr(row.AlmostDoneAt)
 		}
 		for _, sub := range m.Substitutions {
 			credit, _ := sub.CreditTo.Value()

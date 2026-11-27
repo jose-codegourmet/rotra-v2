@@ -3,6 +3,7 @@ package queuewrites
 import (
 	"net/http"
 	"slices"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
@@ -23,6 +24,7 @@ func (s *server) registerMatchArrange(rt *signedin.Router) {
 	rt.Handle("POST "+matches+"/{matchId}/switch-sides", store.AudienceClub, s.club(s.switchSides))
 	rt.Handle("POST "+matches+"/{matchId}/swap-from-match", store.AudienceClub, s.club(s.swapFromMatch))
 	rt.Handle("POST "+matches+"/{matchId}/pause", store.AudienceClub, s.club(s.pauseMatch))
+	rt.Handle("POST "+matches+"/{matchId}/almost-done", store.AudienceClub, s.club(s.setAlmostDone))
 	rt.Handle("PATCH /api/sessions/{sessionId}/courts/order", store.AudienceClub, s.club(s.reorderCourts))
 }
 
@@ -180,7 +182,7 @@ func (s *server) tradeTeams(r *http.Request, club pgtype.UUID, protectAlways boo
 }
 
 // pauseMatch is POST pause: a Playing match goes back to Getting ready on its court(s). Pausing a match that is already Getting ready
-// answers it unchanged. Almost done (task 2.6) clears here once its column exists.
+// answers it unchanged.  The Almost done time clears with the state change.
 func (s *server) pauseMatch(r *http.Request, club pgtype.UUID) (writes.Result, error) {
 	done, err := s.matchCommand(matchRequestOf(r, club), func(t *txn) (any, error) {
 		row, err := t.activeMatch(r.PathValue("matchId"))
@@ -194,6 +196,45 @@ func (s *server) pauseMatch(r *http.Request, club pgtype.UUID) (writes.Result, e
 			return nil, conflictMatch()
 		}
 		if err := t.q.PauseMatch(t.ctx, sqlcgen.PauseMatchParams{Now: t.stamp(), ID: row.m.ID}); err != nil {
+			return nil, err
+		}
+		return t.matchOf(row.m.ID)
+	})
+	return writes.Result{Body: done}, err
+}
+
+// setAlmostDone is POST almost-done: the Queue Master's switch on a Playing match (D-2026-11-25-02). On stores the time, off clears
+// it. Only a Playing match can change; the same switch again answers the match. Online only: there is no sync replay for it.
+func (s *server) setAlmostDone(r *http.Request, club pgtype.UUID) (writes.Result, error) {
+	body, err := writes.ReadBody(r)
+	if err != nil {
+		return writes.Result{}, err
+	}
+	on, ok := body["on"].(bool)
+	if !ok {
+		return writes.Result{}, writes.Fail(httpapi.ErrInvalid, nil)
+	}
+	op := body.Text("operationId")
+	if strings.TrimSpace(op) == "" {
+		return writes.Result{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"operationId": "A confirmation ID is required."})
+	}
+	done, err := s.matchCommand(matchRequestOf(r, club), func(t *txn) (any, error) {
+		row, err := t.activeMatch(r.PathValue("matchId"))
+		if err != nil {
+			return nil, err
+		}
+		if row.m.State != sqlcgen.MatchStateActive || row.decision != nil {
+			return nil, conflictMatch()
+		}
+		if row.m.AlmostDoneAt.Valid == on {
+			return t.matchOf(row.m.ID)
+		}
+		at := pgtype.Timestamptz{}
+		now := t.stamp()
+		if on {
+			at = now
+		}
+		if err := t.q.SetMatchAlmostDone(t.ctx, sqlcgen.SetMatchAlmostDoneParams{AlmostDoneAt: at, Now: now, ID: row.m.ID}); err != nil {
 			return nil, err
 		}
 		return t.matchOf(row.m.ID)

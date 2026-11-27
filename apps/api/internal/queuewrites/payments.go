@@ -1,6 +1,7 @@
 package queuewrites
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -11,7 +12,9 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/sessioncost"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/slotledger"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/slotmoney"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
 )
 
@@ -28,6 +31,8 @@ func (s *server) registerPayments(rt *signedin.Router) {
 	rt.Handle("POST /api/sessions/{sessionId}/payments", club, s.club(s.setPaymentMarks))
 	rt.Handle("POST /api/sessions/{sessionId}/payments/amount", club, s.club(s.setPaymentAmount))
 	rt.Handle("POST /api/sessions/{sessionId}/payments/mark-all", club, s.club(s.markAllPaid))
+	rt.Handle("POST /api/sessions/{sessionId}/payments/free", club, s.club(s.setPlayerFree))
+	rt.Handle("POST /api/sessions/{sessionId}/payments/refunds", club, s.club(s.recordSessionRefund))
 }
 
 // noFeeTick is what a paid tick with no fee set is refused with (#245): it is not recorded as a null or zero amount.
@@ -73,12 +78,31 @@ func offRoster(e moneyEntry) bool { return e.ReleasedAt.Valid || e.NoShowAt.Vali
 
 // applyMark is applyMark: one tick or untick inside the transaction. A tick records the amount due now as the amount received, under
 // the operation id; a mark that exists is answered as it is (so a duplicate applies once, and a later fee change never rewrites it).
-// Unticking deletes the mark. Checks run in this order: the mark that exists, the player off the roster, no fee set.
+// Unticking deletes the mark. Checks run in this order: a refunded entry, a slot that came by transfer (#1013) or whose mark is frozen
+// into one, the mark that exists, the player off the roster, no fee set.
 func (t *txn) applyMark(entry moneyEntry, operation pgtype.UUID, paid bool, amount *int64) (paidResult, error) {
 	mark, err := t.q.GetPaymentMark(t.ctx, sqlcgen.GetPaymentMarkParams{SessionID: entry.SessionID, SessionPlayerID: entry.ID})
 	has := err == nil
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return paidResult{}, err
+	}
+	// #1013: a slot paid through a transfer is already Paid (a tick is a no-op, never a second payment); unticking it, or a mark frozen
+	// into a transfer, is refused. #1014: a refunded entry's payment is history (its marks are frozen): never changed or re-paid.
+	ledger, err := slotmoney.Load(t.ctx, t.q, entry.SessionID)
+	if err != nil {
+		return paidResult{}, err
+	}
+	if ledger.IsRefunded(entry.ID) {
+		return paidResult{}, writes.Fail(httpapi.ErrConflict, map[string]string{"payment": slotledger.PaymentRefundedLocked})
+	}
+	if ledger.IsLocked(entry.ID) {
+		if paid && ledger.IsCarried(entry.ID) {
+			if has {
+				return paidResult{Paid: true, Amount: moneyOf(mark.AmountMinor, mark.Currency)}, nil
+			}
+			return paidResult{Paid: true}, nil
+		}
+		return paidResult{}, writes.Fail(httpapi.ErrConflict, map[string]string{"payment": slotledger.TransferPaymentLocked})
 	}
 	if !paid {
 		if has {
@@ -110,6 +134,12 @@ func (t *txn) insertMark(entry moneyEntry, operation pgtype.UUID, amount int64) 
 		MarkedAt: t.stamp(), SourceOperationID: operation,
 	}); err != nil {
 		return paidResult{}, err
+	}
+	// D-2026-11-27-01: recording cash for a free player makes them a payer again.
+	if entry.IsFree {
+		if err := t.q.SetSessionPlayerFree(t.ctx, sqlcgen.SetSessionPlayerFreeParams{Free: false, Now: t.stamp(), ID: entry.ID}); err != nil {
+			return paidResult{}, err
+		}
 	}
 	return paidResult{Paid: true, Amount: &httpapi.Money{AmountMinor: amount, Currency: "PHP"}}, nil
 }
@@ -233,6 +263,11 @@ func (s *server) setPaymentAmount(r *http.Request, club pgtype.UUID) (writes.Res
 		if offRoster(entry) {
 			return nil, writes.Fail(httpapi.ErrInvalid, map[string]string{"player": "Player not in this session."})
 		}
+		if locked, err := t.paymentLockError(entry); err != nil {
+			return nil, err
+		} else if locked != "" {
+			return nil, writes.Fail(httpapi.ErrConflict, map[string]string{"payment": locked})
+		}
 		if has {
 			if err := t.q.DeletePaymentMark(t.ctx, sqlcgen.DeletePaymentMarkParams{SessionID: entry.SessionID, SessionPlayerID: entry.ID}); err != nil {
 				return nil, err
@@ -269,6 +304,10 @@ func (s *server) markAllPaid(r *http.Request, club pgtype.UUID) (writes.Result, 
 		if err != nil {
 			return nil, err
 		}
+		ledger, err := slotmoney.Load(t.ctx, t.q, t.sess.ID)
+		if err != nil {
+			return nil, err
+		}
 		count := 0
 		for _, e := range roster {
 			_, err := t.q.GetPaymentMark(t.ctx, sqlcgen.GetPaymentMarkParams{SessionID: t.sess.ID, SessionPlayerID: e.ID})
@@ -277,6 +316,10 @@ func (s *server) markAllPaid(r *http.Request, club pgtype.UUID) (writes.Result, 
 			}
 			if !errors.Is(err, pgx.ErrNoRows) {
 				return nil, err
+			}
+			// #1013: a slot paid through a transfer is already Paid; never a second payment. D-2026-11-27-01: a free player owes nothing.
+			if ledger.IsLocked(e.ID) || e.IsFree {
+				continue
 			}
 			entry := moneyEntry(e)
 			if _, err := t.applyMark(entry, derivedID(operation, e.ID.String()), true, amount); err != nil {
@@ -287,6 +330,157 @@ func (s *server) markAllPaid(r *http.Request, club pgtype.UUID) (writes.Result, 
 		return struct {
 			Count int `json:"count"`
 		}{count}, nil
+	})
+	return writes.Result{Body: out}, err
+}
+
+// paymentLockError is paymentLockError: the entry's payment is part of a slot transfer's history (see slotmoney), or it was refunded
+// (#1014). It answers the refusal to send, or "".
+func (t *txn) paymentLockError(entry moneyEntry) (string, error) {
+	ledger, err := slotmoney.Load(t.ctx, t.q, entry.SessionID)
+	if err != nil {
+		return "", err
+	}
+	switch {
+	case ledger.IsRefunded(entry.ID):
+		return slotledger.PaymentRefundedLocked, nil
+	case ledger.IsLocked(entry.ID):
+		return slotledger.TransferPaymentLocked, nil
+	}
+	return "", nil
+}
+
+// setPlayerFree is POST .../payments/free, setPlayerFree (D-2026-11-27-01): plays free on one roster entry, keyed by club player. A free
+// entry owes nothing and leaves the break-even head count. Payments are a guide only, so setting a paid entry free deletes its own
+// payment mark (nothing to reimburse). Refused for a slot paid through a slot transfer or refunded: that payment is history. Setting the
+// current value is a no-op.
+func (s *server) setPlayerFree(r *http.Request, club pgtype.UUID) (writes.Result, error) {
+	body, err := writes.ReadBody(r)
+	if err != nil {
+		return writes.Result{}, err
+	}
+	operation, player := body.Text("operationId"), body.Text("clubPlayerId")
+	if !hyphenatedUUID.MatchString(operation) {
+		return writes.Result{}, writes.Fail(httpapi.ErrInvalid, nil)
+	}
+	if !hyphenatedUUID.MatchString(player) {
+		return writes.Result{}, writes.Fail(httpapi.ErrNotFound, nil)
+	}
+	free, isBool := body.Bool("free")
+	if !isBool {
+		return writes.Result{}, writes.Fail(httpapi.ErrInvalid, nil)
+	}
+	playerID, _ := writes.ParseUUID(player)
+	out, err := s.inSession(r.Context(), club, r.PathValue("sessionId"), func(t *txn) (any, error) {
+		if err := t.paymentOpen(); err != nil {
+			return nil, err
+		}
+		entry, err := t.entryOf(playerID)
+		if err != nil {
+			return nil, err
+		}
+		if offRoster(entry) {
+			return nil, writes.Fail(httpapi.ErrInvalid, map[string]string{"player": "Player not in this session."})
+		}
+		type result struct {
+			Free    bool `json:"free"`
+			Cleared bool `json:"cleared"`
+		}
+		if free == entry.IsFree {
+			return result{entry.IsFree, false}, nil
+		}
+		cleared := false
+		if free {
+			locked, err := t.paymentLockError(entry)
+			if err != nil {
+				return nil, err
+			}
+			if locked != "" {
+				return nil, writes.Fail(httpapi.ErrConflict, map[string]string{"payment": slotledger.FreePaymentLocked})
+			}
+			n, err := t.q.DeletePaymentMarksOfEntry(t.ctx, sqlcgen.DeletePaymentMarksOfEntryParams{SessionID: t.sess.ID, SessionPlayerID: entry.ID})
+			if err != nil {
+				return nil, err
+			}
+			cleared = n > 0
+		}
+		if err := t.q.SetSessionPlayerFree(t.ctx, sqlcgen.SetSessionPlayerFreeParams{Free: free, Now: t.stamp(), ID: entry.ID}); err != nil {
+			return nil, err
+		}
+		return result{free, cleared}, nil
+	})
+	return writes.Result{Body: out}, err
+}
+
+// recordSessionRefund is POST .../payments/refunds, recordSessionRefund (#1014): one append-only manual full refund per player of a
+// cancelled session. ROTRA moves no money: the row records that the Queue Master handed the player's whole cash back outside ROTRA
+// (own cash plus cash carried in by transfers; never a waiver). A retry, or a second tap, answers the refund already recorded. Refused
+// unless the session is cancelled, when there is no cash to refund, and when the amount differs from the one the Queue Master was shown.
+func (s *server) recordSessionRefund(r *http.Request, club pgtype.UUID) (writes.Result, error) {
+	body, err := writes.ReadBody(r)
+	if err != nil {
+		return writes.Result{}, err
+	}
+	// The ids are read as they are sent: a value that is no text is not found, and an amount that is no whole number of centavos is invalid.
+	text, isText := body["sessionPlayerId"].(string)
+	if !isText || !hyphenatedUUID.MatchString(text) {
+		return writes.Result{}, writes.Fail(httpapi.ErrNotFound, nil)
+	}
+	_, isNumber := body["expectedAmountMinor"].(json.Number)
+	var want float64
+	if isNumber {
+		want = body.Number("expectedAmountMinor")
+	}
+	if !isNumber || !safeInteger(want) || want < 0 {
+		return writes.Result{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"expectedAmountMinor": "Enter the refund in centavos."})
+	}
+	playerID, _ := writes.ParseUUID(text)
+	out, err := s.inSession(r.Context(), club, r.PathValue("sessionId"), func(t *txn) (any, error) {
+		if t.sess.State != sqlcgen.QueueSessionStateCancelled {
+			return nil, writes.Fail(httpapi.ErrConflict, map[string]string{"refund": slotledger.RefundNotCancelled})
+		}
+		entry, err := t.q.GetSessionPlayerForTransfer(t.ctx, playerID)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, writes.Fail(httpapi.ErrNotFound, nil)
+		}
+		if err != nil {
+			return nil, err
+		}
+		if entry.SessionID != t.sess.ID || entry.ClubID != t.club {
+			return nil, writes.Fail(httpapi.ErrNotFound, nil)
+		}
+		type result struct {
+			Message string `json:"message"`
+		}
+		ledger, err := slotmoney.Load(t.ctx, t.q, t.sess.ID)
+		if err != nil {
+			return nil, err
+		}
+		if done, ok := ledger.RefundOf(entry.ID); ok {
+			return result{slotledger.SessionRefundToast(entry.NameSnapshot, done.Amount)}, nil
+		}
+		// The cancelled roster is the list (released entries and no-shows are not on it).
+		if entry.ReleasedAt.Valid || entry.NoShowAt.Valid {
+			return nil, writes.Fail(httpapi.ErrInvalid, map[string]string{"player": "Player not in this session."})
+		}
+		due, err := t.amountDue()
+		if err != nil {
+			return nil, err
+		}
+		amount := slotledger.FullRefund(ledger.PaymentOf(entry.ID, due).Received(due))
+		if amount <= 0 {
+			return nil, writes.Fail(httpapi.ErrConflict, map[string]string{"refund": slotledger.RefundNothingToRefund})
+		}
+		if int64(want) != amount {
+			return nil, writes.Fail(httpapi.ErrConflict, map[string]string{"refund": slotledger.RefundChanged(amount)})
+		}
+		if err := t.q.InsertPaymentRefund(t.ctx, sqlcgen.InsertPaymentRefundParams{
+			ID: derivedID(entry.ID.String(), "refund"), ClubID: t.club, SessionID: t.sess.ID, SessionPlayerID: entry.ID, Reason: sqlcgen.PaymentRefundReasonSessionCancelled,
+			AmountMinor: int32(amount), RefundedAt: t.stamp(),
+		}); err != nil {
+			return nil, err
+		}
+		return result{slotledger.SessionRefundToast(entry.NameSnapshot, amount)}, nil
 	})
 	return writes.Result{Body: out}, err
 }

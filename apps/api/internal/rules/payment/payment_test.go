@@ -102,7 +102,7 @@ func TestStatusForReceived(t *testing.T) {
 
 // 'uses the received amounts while calculating remaining dues at the current fee'
 func TestTotalsUseReceivedAmounts(t *testing.T) {
-	got := payment.ComputeTotals([]payment.Mark{*mark(70000), *mark(65000)}, 3, ptr(70000), ptr(200000))
+	got := payment.ComputeTotals([]payment.Mark{*mark(70000), *mark(65000)}, 3, ptr(70000), ptr(200000), 0)
 	want := payment.Totals{Paid: 1, Partial: 1, Total: 3, Collected: 135000, StillDue: ptr(75000), ToReimburse: 0, AgainstCosts: ptr(-65000), Cost: ptr(200000)}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("%+v, want %+v", got, want)
@@ -111,7 +111,7 @@ func TestTotalsUseReceivedAmounts(t *testing.T) {
 
 // 'counts overpayments as paid and totals what to reimburse'
 func TestTotalsCountOverpaymentsAsPaid(t *testing.T) {
-	got := payment.ComputeTotals([]payment.Mark{*mark(80000), {}}, 2, ptr(70000), nil)
+	got := payment.ComputeTotals([]payment.Mark{*mark(80000), {}}, 2, ptr(70000), nil, 0)
 	if got.Paid != 2 || got.Partial != 0 || got.Collected != 150000 || *got.StillDue != 0 || got.ToReimburse != 10000 {
 		t.Errorf("%+v", got)
 	}
@@ -119,7 +119,7 @@ func TestTotalsCountOverpaymentsAsPaid(t *testing.T) {
 
 // 'keeps no-fee and no-estimate totals unknown'
 func TestTotalsWithNoFeeStayUnknown(t *testing.T) {
-	got := payment.ComputeTotals(nil, 3, nil, nil)
+	got := payment.ComputeTotals(nil, 3, nil, nil, 0)
 	if want := (payment.Totals{Total: 3}); !reflect.DeepEqual(got, want) {
 		t.Errorf("%+v, want %+v", got, want)
 	}
@@ -127,7 +127,7 @@ func TestTotalsWithNoFeeStayUnknown(t *testing.T) {
 
 // 'handles all paid and a collection surplus'
 func TestTotalsAllPaidWithASurplus(t *testing.T) {
-	got := payment.ComputeTotals([]payment.Mark{*mark(70000)}, 1, ptr(70000), ptr(65000))
+	got := payment.ComputeTotals([]payment.Mark{*mark(70000)}, 1, ptr(70000), ptr(65000), 0)
 	if *got.StillDue != 0 || *got.AgainstCosts != 5000 {
 		t.Errorf("%+v", got)
 	}

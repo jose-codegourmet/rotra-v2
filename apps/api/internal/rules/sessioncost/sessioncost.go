@@ -26,7 +26,9 @@ type Item struct {
 // Context is what the estimate is worked out for: the live courts, the scheduled minutes, the players and the club's items.
 type Context struct {
 	Courts, DurationMinutes, Players int64
-	Items                            []Item
+	// FreePlayers are the roster players who play free (D-2026-11-27-01): they leave the head count of the split, never the costs.
+	FreePlayers int64
+	Items       []Item
 }
 
 // Outcome is whether the fees cover the costs: kind is "profit", "loss", "breaks_even" or "no_costs".
@@ -37,10 +39,10 @@ type Outcome struct {
 
 // Result is the derived estimate.
 type Result struct {
-	Players, Court, Shuttle, Entrance, EntranceFeePerHead, Total, BreakEven, PerHead int64
-	IsCustom                                                                         bool
-	Collect                                                                          int64
-	Outcome                                                                          Outcome
+	Players, Payers, Court, Shuttle, Entrance, EntranceFeePerHead, Total, BreakEven, PerHead int64
+	IsCustom                                                                                 bool
+	Collect                                                                                  int64
+	Outcome                                                                                  Outcome
 }
 
 // Estimate is estimateSessionCost. At least one player is counted. The court fee is the fee per court hour times courts and minutes
@@ -62,14 +64,16 @@ func Estimate(in Input, c Context) Result {
 	entranceFee := value(in.EntranceFeePerHead)
 	entrance := entranceFee * players
 	total := court + shuttle + entrance
-	per := players * 100
+	// Free players leave the head count of the split (at least one payer); the entrance fee and every cost stay for everyone.
+	payers := players - min(max(0, c.FreePlayers), players-1)
+	per := payers * 100
 	breakEven := (total + per - 1) / per * 100
 	isCustom := in.PaymentMode == "custom"
 	perHead := breakEven
 	if isCustom {
 		perHead = value(in.CustomFeePerHead)
 	}
-	collect := perHead * players
+	collect := perHead * payers
 	diff := collect - total
 	kind := "loss"
 	switch {
@@ -84,7 +88,7 @@ func Estimate(in Input, c Context) Result {
 		diff = -diff
 	}
 	return Result{
-		Players: players, Court: court, Shuttle: shuttle, Entrance: entrance, EntranceFeePerHead: entranceFee, Total: total,
+		Players: players, Payers: payers, Court: court, Shuttle: shuttle, Entrance: entrance, EntranceFeePerHead: entranceFee, Total: total,
 		BreakEven: breakEven, PerHead: perHead, IsCustom: isCustom, Collect: collect, Outcome: Outcome{Kind: kind, Amount: diff},
 	}
 }

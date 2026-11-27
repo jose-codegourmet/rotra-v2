@@ -122,7 +122,7 @@ func (q *Queries) GetInventoryItem(ctx context.Context, id pgtype.UUID) (Invento
 }
 
 const getMoneySessionPlayer = `-- name: GetMoneySessionPlayer :one
-SELECT id, club_id, session_id, released_at, no_show_at
+SELECT id, club_id, session_id, released_at, no_show_at, is_free, name_snapshot, club_player_id
 FROM session_players
 WHERE session_id = $1 AND club_player_id = $2
 `
@@ -133,11 +133,14 @@ type GetMoneySessionPlayerParams struct {
 }
 
 type GetMoneySessionPlayerRow struct {
-	ID         pgtype.UUID
-	ClubID     pgtype.UUID
-	SessionID  pgtype.UUID
-	ReleasedAt pgtype.Timestamptz
-	NoShowAt   pgtype.Timestamptz
+	ID           pgtype.UUID
+	ClubID       pgtype.UUID
+	SessionID    pgtype.UUID
+	ReleasedAt   pgtype.Timestamptz
+	NoShowAt     pgtype.Timestamptz
+	IsFree       bool
+	NameSnapshot string
+	ClubPlayerID pgtype.UUID
 }
 
 // The roster entry of a club player in a session (released ones too).
@@ -150,6 +153,9 @@ func (q *Queries) GetMoneySessionPlayer(ctx context.Context, arg GetMoneySession
 		&i.SessionID,
 		&i.ReleasedAt,
 		&i.NoShowAt,
+		&i.IsFree,
+		&i.NameSnapshot,
+		&i.ClubPlayerID,
 	)
 	return i, err
 }
@@ -314,18 +320,21 @@ func (q *Queries) InsertSessionShuttlePlanLine(ctx context.Context, arg InsertSe
 }
 
 const listMoneyLiveRoster = `-- name: ListMoneyLiveRoster :many
-SELECT id, club_id, session_id, released_at, no_show_at
+SELECT id, club_id, session_id, released_at, no_show_at, is_free, name_snapshot, club_player_id
 FROM session_players
 WHERE session_id = $1 AND released_at IS NULL AND no_show_at IS NULL
 ORDER BY confirmed_at ASC, id ASC
 `
 
 type ListMoneyLiveRosterRow struct {
-	ID         pgtype.UUID
-	ClubID     pgtype.UUID
-	SessionID  pgtype.UUID
-	ReleasedAt pgtype.Timestamptz
-	NoShowAt   pgtype.Timestamptz
+	ID           pgtype.UUID
+	ClubID       pgtype.UUID
+	SessionID    pgtype.UUID
+	ReleasedAt   pgtype.Timestamptz
+	NoShowAt     pgtype.Timestamptz
+	IsFree       bool
+	NameSnapshot string
+	ClubPlayerID pgtype.UUID
 }
 
 // liveRoster: the entries not released and not marked No show, in slot order.
@@ -344,6 +353,9 @@ func (q *Queries) ListMoneyLiveRoster(ctx context.Context, sessionID pgtype.UUID
 			&i.SessionID,
 			&i.ReleasedAt,
 			&i.NoShowAt,
+			&i.IsFree,
+			&i.NameSnapshot,
+			&i.ClubPlayerID,
 		); err != nil {
 			return nil, err
 		}

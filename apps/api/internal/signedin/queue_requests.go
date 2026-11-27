@@ -62,6 +62,7 @@ type requestCounts struct {
 	Join         int `json:"join"`
 	JoinRequests int `json:"joinRequests"`
 	DropOuts     int `json:"dropOuts"`
+	Transfers    int `json:"transfers"`
 	Match        int `json:"match"`
 }
 
@@ -76,10 +77,11 @@ func (s *server) queueRequests(r *http.Request, q *sqlcgen.Queries, club pgtype.
 		Minimum     int32                  `json:"minimum"`
 		Join        []struct{}             `json:"join"`
 		DropOuts    []dropOutNoticeDTO     `json:"dropOuts"`
+		Transfers   []slotTransferView     `json:"transfers"`
 		SelfCheckIn map[string]struct{}    `json:"selfCheckIn"`
 		Counts      requestCounts          `json:"counts"`
 		Match       []queueMatchRequestDTO `json:"match"`
-	}{SessionID: sess.ID.String(), Minimum: sess.MinimumGames, Join: []struct{}{}, DropOuts: []dropOutNoticeDTO{}, SelfCheckIn: map[string]struct{}{}, Match: []queueMatchRequestDTO{}}
+	}{SessionID: sess.ID.String(), Minimum: sess.MinimumGames, Join: []struct{}{}, DropOuts: []dropOutNoticeDTO{}, Transfers: []slotTransferView{}, SelfCheckIn: map[string]struct{}{}, Match: []queueMatchRequestDTO{}}
 	// Finished, invalid and cancelled sessions take no requests.
 	if sess.State != sqlcgen.QueueSessionStatePrepared && sess.State != sqlcgen.QueueSessionStateActive && sess.State != sqlcgen.QueueSessionStateFinalizing {
 		return out, nil
@@ -202,7 +204,14 @@ func (s *server) queueRequests(r *http.Request, q *sqlcgen.Queries, club pgtype.
 			At: httpapi.ToIso(n.CreatedAt.Time), Status: "open", Name: n.NameSnapshot, Nickname: nick,
 		})
 	}
-	out.Counts = requestCounts{Total: len(out.Match) + len(out.DropOuts), Join: len(out.DropOuts), DropOuts: len(out.DropOuts), Match: len(out.Match)}
+	// #1011: pending slot transfers, listed beside the drop-out notices before Start.
+	if out.Transfers, err = s.pendingSlotTransferViews(ctx, q, sess); err != nil {
+		return nil, err
+	}
+	out.Counts = requestCounts{
+		Total: len(out.Match) + len(out.DropOuts) + len(out.Transfers), Join: len(out.DropOuts) + len(out.Transfers), DropOuts: len(out.DropOuts),
+		Transfers: len(out.Transfers), Match: len(out.Match),
+	}
 	return out, nil
 }
 

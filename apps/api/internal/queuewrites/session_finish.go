@@ -162,6 +162,10 @@ func (s *server) cancelSession(r *http.Request, club pgtype.UUID) (writes.Result
 		if err := t.closeSessionMatchRequests(now); err != nil {
 			return nil, err
 		}
+		// #1011: pending slot transfers are cancelled with the session; slots and payments stay.
+		if err := t.q.CloseOpenSlotTransfers(t.ctx, sqlcgen.CloseOpenSlotTransfersParams{Status: sqlcgen.SlotTransferStatusCancelled, Now: now, SessionID: t.sess.ID}); err != nil {
+			return nil, err
+		}
 		if err := t.q.DeleteQueueSessionReservations(t.ctx, sqlcgen.DeleteQueueSessionReservationsParams{ClubID: t.club, SessionID: t.sess.ID}); err != nil {
 			return nil, err
 		}

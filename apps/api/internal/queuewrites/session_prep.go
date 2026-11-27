@@ -892,6 +892,10 @@ func (t *txn) start(expectedRevision string, term pgtype.UUID, newEnd *int64) (a
 	if err != nil {
 		return nil, err
 	}
+	// #1011: pending slot transfers expire at Start; every slot stays with its holder.
+	if err := t.q.CloseOpenSlotTransfers(t.ctx, sqlcgen.CloseOpenSlotTransfersParams{Status: sqlcgen.SlotTransferStatusExpired, Now: t.stamp(), SessionID: session.ID}); err != nil {
+		return nil, err
+	}
 	return startResult{Session: signedin.SessionOf(session), JoinRequestsClosed: closed}, nil
 }
 

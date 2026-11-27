@@ -73,6 +73,7 @@ func Register(d Deps) func(*http.ServeMux) {
 	ps := &publicSessions{pool: d.Pool, log: d.Logger, cache: snaps.cache}
 	return func(mux *http.ServeMux) {
 		mux.Handle("GET /api/public-sessions/{slug}", limited(ps.page))
+		mux.Handle("GET /api/public-sessions/{slug}/payment-status", limited(ps.paymentStatus))
 		mux.Handle("GET /api/players/{playerId}/clubs", limited(pl.clubs))
 		mux.Handle("GET /api/profile-banners/shown", limited(lib.shownBanners))
 		mux.Handle("GET /api/profile-characters/shown", limited(lib.shownCharacters))

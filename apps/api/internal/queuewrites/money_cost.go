@@ -380,9 +380,18 @@ func (t *txn) costFor() (*sessioncost.Result, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Before anyone joins: the expected count, else the slots (the form's "follows your slots"), never 1 player.
 	players := int64(roster)
 	if players == 0 && t.sess.ExpectedPlayers.Valid {
 		players = int64(t.sess.ExpectedPlayers.Int32)
+	}
+	if players == 0 {
+		players = t.slotCapacity(int64(courts), t.sess.PlayersPerCourt)
+	}
+	// D-2026-11-27-01: free roster players leave the break-even head count.
+	free, err := t.q.CountQueueFreeRoster(t.ctx, t.sess.ID)
+	if err != nil {
+		return nil, err
 	}
 	in := sessioncost.Input{PaymentMode: string(est.PaymentMode)}
 	in.CourtFeePerCourtHour, in.EntranceFeePerHead, in.CustomFeePerHead = optInt(est.CourtFeePerCourtHourMinor), optInt(est.EntranceFeePerHeadMinor), optInt(est.CustomFeePerHeadMinor)
@@ -394,7 +403,7 @@ func (t *txn) costFor() (*sessioncost.Result, error) {
 		items[i] = sessioncost.Item{ID: p.ID.String(), UnitCostMinor: int64(p.UnitCostMinor)}
 	}
 	minutes := max(0, int64(math.Floor(float64(t.sess.ScheduledEndAt.Time.UnixMilli()-t.sess.ScheduledStartAt.Time.UnixMilli())/60000+0.5)))
-	r := sessioncost.Estimate(in, sessioncost.Context{Courts: int64(courts), DurationMinutes: minutes, Players: players, Items: items})
+	r := sessioncost.Estimate(in, sessioncost.Context{Courts: int64(courts), DurationMinutes: minutes, Players: players, FreePlayers: int64(free), Items: items})
 	return &r, nil
 }
 

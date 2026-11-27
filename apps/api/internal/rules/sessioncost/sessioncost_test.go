@@ -38,7 +38,7 @@ func result(kind string, amount int64) sessioncost.Outcome {
 // 'matches tonight: courts + shuttles + entrance, custom fee and profit'
 func TestMatchesTonight(t *testing.T) {
 	want := sessioncost.Result{
-		Players: 14, Court: 315000, Shuttle: 810000, Entrance: 84000, EntranceFeePerHead: 6000, Total: 1209000, BreakEven: 86400,
+		Players: 14, Payers: 14, Court: 315000, Shuttle: 810000, Entrance: 84000, EntranceFeePerHead: 6000, Total: 1209000, BreakEven: 86400,
 		PerHead: 90000, IsCustom: true, Collect: 1260000, Outcome: result("profit", 51000),
 	}
 	if got := sessioncost.Estimate(input(), ctx(3, 180, 14)); got != want {
@@ -179,3 +179,33 @@ func TestNormalize(t *testing.T) {
 }
 
 func ptrIn(in sessioncost.Input) *sessioncost.Input { return &in }
+
+// 'leaves free players out of the break-even head count, keeping every cost (D-2026-11-27-01)': the values are the Vitest test's.
+func TestFreePlayersLeaveTheHeadCount(t *testing.T) {
+	c := ctx(3, 180, 14)
+	c.FreePlayers = 2
+	got := sessioncost.Estimate(empty2(), c)
+	if got.Players != 14 || got.Payers != 12 || got.Entrance != 84000 || got.Total != 1209000 || got.BreakEven != 100800 || got.PerHead != 100800 || got.Collect != 1209600 {
+		t.Errorf("break even: %+v", got)
+	}
+	// A custom amount is unchanged; only the payers pay it.
+	got = sessioncost.Estimate(input(), c)
+	if got.PerHead != 90000 || got.Collect != 1080000 || got.Outcome != result("loss", 129000) {
+		t.Errorf("custom: %+v", got)
+	}
+	// Everyone free still leaves one payer, and a negative count is none.
+	c.FreePlayers = 99
+	if got := sessioncost.Estimate(input(), c); got.Payers != 1 {
+		t.Errorf("payers %d, want 1", got.Payers)
+	}
+	c.FreePlayers = -3
+	if got := sessioncost.Estimate(input(), c); got.Payers != 14 {
+		t.Errorf("payers %d, want 14", got.Payers)
+	}
+}
+
+func empty2() sessioncost.Input {
+	in := input()
+	in.PaymentMode = "break_even"
+	return in
+}

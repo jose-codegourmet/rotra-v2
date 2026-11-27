@@ -60,3 +60,10 @@ WHERE club_id = @club_id AND id = @id;
 -- name: GetOpenSharedEntryBySocialKey :one
 -- openEntryBySocialKey: the open (unclaimed, not retired) shared entry whose link key it is.
 SELECT id, email, rtr_id FROM shared_player_entries WHERE social_key = @key AND claimed_player_id IS NULL AND retired_at IS NULL LIMIT 1;
+
+-- name: RenameLiveEntries :exec
+-- Rename club player: the new name on the player's live roster entries (not released, not a no show) in this club's prepared or active
+-- sessions. Finished sessions keep the name they finished with.
+UPDATE session_players sp SET name_snapshot = @name, revision = sp.revision + 1, updated_at = @now
+WHERE sp.club_id = @club_id AND sp.club_player_id = @club_player_id AND sp.released_at IS NULL AND sp.no_show_at IS NULL
+  AND sp.session_id IN (SELECT id FROM queue_sessions WHERE state IN ('prepared', 'active'));

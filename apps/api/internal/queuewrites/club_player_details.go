@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -35,6 +36,7 @@ var socialProviders = []string{"facebook", "instagram", "youtube", "linkedin"}
 
 func (s *server) registerClubPlayerDetails(rt *signedin.Router) {
 	rt.Handle("PATCH /api/club/players/{clubPlayerId}", store.AudienceClub, s.club(s.editClubPlayerDetails))
+	rt.Handle("PATCH /api/club/players/{clubPlayerId}/name", store.AudienceClub, s.club(s.renameClubPlayer))
 }
 
 // detailsAnswer is what Edit details answers: the message for the toast, and who the typed email turned out to be already.
@@ -321,4 +323,81 @@ func (t *txn) saveLevel(id pgtype.UUID, level string) error {
 		return nil
 	}
 	return t.setSavedLevel(id, level, t.stamp())
+}
+
+const (
+	fullNameTooShort = "Enter the full name, at least 2 characters."
+	fullNameTooLong  = "Keep the full name to 60 characters or fewer."
+	nicknameMax      = 24
+)
+
+// collapseSpaces is normalizeFullName: runs of whitespace become one space and the ends are trimmed (JavaScript's whitespace).
+func collapseSpaces(value string) string {
+	var b strings.Builder
+	space := false
+	for _, r := range value {
+		if fields.IsJSSpace(r) {
+			space = true
+			continue
+		}
+		if space && b.Len() > 0 {
+			b.WriteByte(' ')
+		}
+		space = false
+		b.WriteRune(r)
+	}
+	return b.String()
+}
+
+// renameClubPlayer is PATCH /api/club/players/{id}/name, Edit player Save changes (D-2026-11-26-07): the club renames a guest or
+// unclaimed player it made and sets its one nickname (empty removes it). A registered player's name is their own. The saved player and
+// the name on their live roster entries change together.
+func (s *server) renameClubPlayer(r *http.Request, club pgtype.UUID) (writes.Result, error) {
+	body, err := writes.ReadBody(r)
+	if err != nil {
+		return writes.Result{}, err
+	}
+	if err := s.entitled(r.Context(), club); err != nil {
+		return writes.Result{}, err
+	}
+	id, err := parseRowID(r.PathValue("clubPlayerId"))
+	if err != nil {
+		return writes.Result{}, err
+	}
+	fullName := collapseSpaces(body.Text("fullName"))
+	if n := utf16Len(fullName); n < 2 {
+		return writes.Result{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"fullName": fullNameTooShort})
+	} else if n > 60 {
+		return writes.Result{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"fullName": fullNameTooLong})
+	}
+	nickname := collapseSpaces(body.Text("nickname"))
+	if utf16Len(nickname) > nicknameMax {
+		return writes.Result{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"nickname": "Use 24 characters or fewer."})
+	}
+	out, err := s.inClub(r.Context(), club, func(t *txn) (any, error) {
+		row, err := t.q.GetQueueClubPlayerEditable(t.ctx, sqlcgen.GetQueueClubPlayerEditableParams{ClubID: t.club, ClubPlayerID: id})
+		if errors.Is(err, pgx.ErrNoRows) || (err == nil && row.RemovedAt.Valid) {
+			return nil, writes.Fail(httpapi.ErrNotFound, nil)
+		}
+		if err != nil {
+			return nil, err
+		}
+		if row.ProfileState.Valid && row.ProfileState.PlayerProfileState == sqlcgen.PlayerProfileStateClaimed {
+			return nil, writes.Fail(httpapi.ErrForbidden, map[string]string{"player": detailsNotEditable})
+		}
+		now := t.stamp()
+		nick := pgtype.Text{String: nickname, Valid: nickname != ""}
+		if err := t.q.UpdateClubPlayerDetails(t.ctx, sqlcgen.UpdateClubPlayerDetailsParams{DisplayName: fullName, Nickname: nick, Now: now, ClubID: t.club, ID: row.ID}); err != nil {
+			return nil, err
+		}
+		if err := t.q.RenameLiveEntries(t.ctx, sqlcgen.RenameLiveEntriesParams{Name: fullName, Now: now, ClubID: t.club, ClubPlayerID: row.ID}); err != nil {
+			return nil, err
+		}
+		var nickOut *string
+		if nickname != "" {
+			nickOut = &nickname
+		}
+		return map[string]any{"clubPlayerId": row.ID.String(), "fullName": fullName, "nickname": nickOut, "message": "Details saved · " + fullName}, nil
+	})
+	return writes.Result{Body: out}, err
 }

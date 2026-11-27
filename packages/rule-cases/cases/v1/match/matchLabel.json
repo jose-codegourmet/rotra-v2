@@ -1,0 +1,379 @@
+{
+  "kind": "rule",
+  "rule": "matchLabel",
+  "version": 1,
+  "cases": [
+    {
+      "name": "mixed doubles",
+      "input": {
+        "lineup": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "roster": [
+          {
+            "id": "a",
+            "gender": "male"
+          },
+          {
+            "id": "b",
+            "gender": "female"
+          },
+          {
+            "id": "c",
+            "gender": "male"
+          },
+          {
+            "id": "d",
+            "gender": "female"
+          },
+          {
+            "id": "e",
+            "gender": null
+          },
+          {
+            "id": "f"
+          }
+        ]
+      },
+      "expected": "Mixed Doubles"
+    },
+    {
+      "name": "men doubles",
+      "input": {
+        "lineup": {
+          "format": "doubles",
+          "teamA": ["a", "c"],
+          "teamB": ["a", "c"]
+        },
+        "roster": [
+          {
+            "id": "a",
+            "gender": "male"
+          },
+          {
+            "id": "b",
+            "gender": "female"
+          },
+          {
+            "id": "c",
+            "gender": "male"
+          },
+          {
+            "id": "d",
+            "gender": "female"
+          },
+          {
+            "id": "e",
+            "gender": null
+          },
+          {
+            "id": "f"
+          }
+        ]
+      },
+      "expected": "Men's Doubles"
+    },
+    {
+      "name": "women singles",
+      "input": {
+        "lineup": {
+          "format": "singles",
+          "teamA": ["b"],
+          "teamB": ["d"]
+        },
+        "roster": [
+          {
+            "id": "a",
+            "gender": "male"
+          },
+          {
+            "id": "b",
+            "gender": "female"
+          },
+          {
+            "id": "c",
+            "gender": "male"
+          },
+          {
+            "id": "d",
+            "gender": "female"
+          },
+          {
+            "id": "e",
+            "gender": null
+          },
+          {
+            "id": "f"
+          }
+        ]
+      },
+      "expected": "Women's Singles"
+    },
+    {
+      "name": "a player not on the roster is not given",
+      "input": {
+        "lineup": {
+          "format": "doubles",
+          "teamA": ["a", "zz"],
+          "teamB": ["c", "a"]
+        },
+        "roster": [
+          {
+            "id": "a",
+            "gender": "male"
+          },
+          {
+            "id": "b",
+            "gender": "female"
+          },
+          {
+            "id": "c",
+            "gender": "male"
+          },
+          {
+            "id": "d",
+            "gender": "female"
+          },
+          {
+            "id": "e",
+            "gender": null
+          },
+          {
+            "id": "f"
+          }
+        ]
+      },
+      "expected": "Genderless Doubles"
+    },
+    {
+      "name": "a null gender",
+      "input": {
+        "lineup": {
+          "format": "singles",
+          "teamA": ["a"],
+          "teamB": ["e"]
+        },
+        "roster": [
+          {
+            "id": "a",
+            "gender": "male"
+          },
+          {
+            "id": "b",
+            "gender": "female"
+          },
+          {
+            "id": "c",
+            "gender": "male"
+          },
+          {
+            "id": "d",
+            "gender": "female"
+          },
+          {
+            "id": "e",
+            "gender": null
+          },
+          {
+            "id": "f"
+          }
+        ]
+      },
+      "expected": "Genderless Singles"
+    },
+    {
+      "name": "a gender left out",
+      "input": {
+        "lineup": {
+          "format": "singles",
+          "teamA": ["a"],
+          "teamB": ["f"]
+        },
+        "roster": [
+          {
+            "id": "a",
+            "gender": "male"
+          },
+          {
+            "id": "b",
+            "gender": "female"
+          },
+          {
+            "id": "c",
+            "gender": "male"
+          },
+          {
+            "id": "d",
+            "gender": "female"
+          },
+          {
+            "id": "e",
+            "gender": null
+          },
+          {
+            "id": "f"
+          }
+        ]
+      },
+      "expected": "Genderless Singles"
+    },
+    {
+      "name": "1v2 fun",
+      "input": {
+        "lineup": {
+          "format": "fun_1v2",
+          "teamA": ["a"],
+          "teamB": ["c", "a"]
+        },
+        "roster": [
+          {
+            "id": "a",
+            "gender": "male"
+          },
+          {
+            "id": "b",
+            "gender": "female"
+          },
+          {
+            "id": "c",
+            "gender": "male"
+          },
+          {
+            "id": "d",
+            "gender": "female"
+          },
+          {
+            "id": "e",
+            "gender": null
+          },
+          {
+            "id": "f"
+          }
+        ]
+      },
+      "expected": "Men's 1v2 fun"
+    },
+    {
+      "name": "3v3 fun",
+      "input": {
+        "lineup": {
+          "format": "fun_3v3",
+          "teamA": ["a", "b", "a"],
+          "teamB": ["c", "d", "c"]
+        },
+        "roster": [
+          {
+            "id": "a",
+            "gender": "male"
+          },
+          {
+            "id": "b",
+            "gender": "female"
+          },
+          {
+            "id": "c",
+            "gender": "male"
+          },
+          {
+            "id": "d",
+            "gender": "female"
+          },
+          {
+            "id": "e",
+            "gender": null
+          },
+          {
+            "id": "f"
+          }
+        ]
+      },
+      "expected": "Mixed 3v3 fun"
+    },
+    {
+      "name": "4v4 fun",
+      "input": {
+        "lineup": {
+          "format": "fun_4v4",
+          "teamA": ["a", "a", "a", "a"],
+          "teamB": ["c", "c", "c", "c"]
+        },
+        "roster": [
+          {
+            "id": "a",
+            "gender": "male"
+          },
+          {
+            "id": "b",
+            "gender": "female"
+          },
+          {
+            "id": "c",
+            "gender": "male"
+          },
+          {
+            "id": "d",
+            "gender": "female"
+          },
+          {
+            "id": "e",
+            "gender": null
+          },
+          {
+            "id": "f"
+          }
+        ]
+      },
+      "expected": "Men's 4v4 fun"
+    },
+    {
+      "name": "5v5 fun, genderless",
+      "input": {
+        "lineup": {
+          "format": "fun_5v5",
+          "teamA": ["a", "b", "e", "a", "b"],
+          "teamB": ["c", "d", "c", "d", "a"]
+        },
+        "roster": [
+          {
+            "id": "a",
+            "gender": "male"
+          },
+          {
+            "id": "b",
+            "gender": "female"
+          },
+          {
+            "id": "c",
+            "gender": "male"
+          },
+          {
+            "id": "d",
+            "gender": "female"
+          },
+          {
+            "id": "e",
+            "gender": null
+          },
+          {
+            "id": "f"
+          }
+        ]
+      },
+      "expected": "Genderless 5v5 fun"
+    },
+    {
+      "name": "an empty roster",
+      "input": {
+        "lineup": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "roster": []
+      },
+      "expected": "Genderless Doubles"
+    }
+  ]
+}

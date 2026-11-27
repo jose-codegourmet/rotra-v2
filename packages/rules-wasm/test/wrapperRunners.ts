@@ -17,6 +17,8 @@ import {
   courtsNeeded,
   creditedPlayers,
   formatTeamSizes,
+  formFromHistory,
+  formRating,
   freeCourts,
   gamesAdjustmentOf,
   gamesPlayed,
@@ -25,6 +27,9 @@ import {
   inUnfinishedMatch,
   isBookingEnded,
   isPartial,
+  isUpset,
+  matchCategory,
+  matchLabel,
   matchStatus,
   nextEligibleForCourt,
   nextMatchCandidates,
@@ -41,6 +46,8 @@ import {
   swapTarget,
   validateResult,
   waitMinutes,
+  winChance,
+  winChanceBreakdown,
 } from '../src/rules'
 import type {
   CourtFillMode,
@@ -52,11 +59,13 @@ import type {
   SessionCourt,
   SessionPlayer,
   SessionSettings,
+  WinChancePlayer,
 } from '../src/types'
 
 type Runner = (input: unknown, now?: number) => unknown
 type World = { roster: SessionPlayer[]; matches: Match[]; courts: SessionCourt[] }
 type Session = SessionSettings
+type WinInput = { match: Match; players: WinChancePlayer[]; matches: Match[] }
 
 const rule = <I>(fn: (input: I, now?: number) => unknown): Runner => {
   return (input, now) => fn(input as I, now)
@@ -127,6 +136,27 @@ export const WRAPPER_RUNNERS: Record<string, Runner> = {
     (i, now) => waitMinutes(i.player, i.matches, i.startedAt, now),
   ),
   'match/queuedCount': rule<{ id: string; matches: Match[] }>((i) => queuedCount(i.id, i.matches)),
+  'match/matchCategory': rule<Parameters<typeof matchCategory>[0]>((i) => matchCategory(i)),
+  'match/matchLabel': rule<{
+    lineup: Parameters<typeof matchLabel>[0]
+    roster: Parameters<typeof matchLabel>[1]
+  }>((i) => matchLabel(i.lineup, i.roster)),
+  'match/winChance': rule<WinInput>((i) => winChance(i.match, i.players, i.matches)),
+  'match/winChanceBreakdown': rule<WinInput>((i) =>
+    winChanceBreakdown(i.match, i.players, i.matches),
+  ),
+  'match/formRating': rule<{
+    player: WinChancePlayer
+    players: WinChancePlayer[]
+    matches: Match[]
+  }>((i) => formRating(i.player, i.players, i.matches)),
+  'match/isUpset': rule<{ match: Match; players: WinChancePlayer[] }>((i) =>
+    isUpset(i.match, i.players),
+  ),
+  'match/formFromHistory': rule<{
+    sessions: Parameters<typeof formFromHistory>[0]
+    tonightWeekday: number
+  }>((i) => formFromHistory(i.sessions, i.tonightWeekday)),
   'match/computeStandings': rule<{ roster: SessionPlayer[]; matches: Match[] }>((i) =>
     computeStandings(i.roster, i.matches),
   ),

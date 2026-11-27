@@ -1,0 +1,4626 @@
+{
+  "kind": "rule",
+  "rule": "winChanceBreakdown",
+  "version": 1,
+  "cases": [
+    {
+      "name": "level matched, no record",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 50,
+          "b": 50,
+          "favored": null,
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a one-level gap",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 76,
+          "b": 24,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            }
+          ],
+          "average": 4
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a gap of four levels is capped",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "advanced_high"
+          },
+          {
+            "id": "b",
+            "level": "advanced_high"
+          },
+          {
+            "id": "c",
+            "level": "beginner_low"
+          },
+          {
+            "id": "d",
+            "level": "beginner_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 95,
+          "b": 5,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Advanced High",
+                  "value": 8
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 8
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Advanced High",
+                  "value": 8
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 8
+            }
+          ],
+          "average": 8
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Beginner Low",
+                  "value": 0
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 0
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Beginner Low",
+                  "value": 0
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 0
+            }
+          ],
+          "average": 0
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a player who left the roster counts as mid",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 64,
+          "b": 36,
+          "favored": "A",
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "No level · counts as mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3.5
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a guest with a level and no record",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 50,
+          "b": 50,
+          "favored": null,
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "every signal for a full player, one game tonight",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid",
+            "handicapSpots": ["left_knee"],
+            "form": {
+              "clubWinRate": 0.62,
+              "bestDay": true,
+              "place": 1,
+              "trend": -1
+            }
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m1",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 76,
+          "b": 24,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "62%",
+                  "value": 0.24
+                },
+                {
+                  "key": "best_day",
+                  "label": "Best day",
+                  "detail": "Plays best on this weekday",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_place",
+                  "label": "Club leaderboard",
+                  "detail": "Top quarter",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_trend",
+                  "label": "Leaderboard direction",
+                  "detail": "Falling",
+                  "value": -0.25
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                },
+                {
+                  "key": "handicap",
+                  "label": "Handicap tonight",
+                  "detail": "left knee",
+                  "value": -0.5
+                }
+              ],
+              "rating": 3.99
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3.495
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.5
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.5
+            }
+          ],
+          "average": 2.5
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a waiting match",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "state": "waiting"
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid",
+            "handicapSpots": ["left_knee"],
+            "form": {
+              "clubWinRate": 0.62,
+              "bestDay": true,
+              "place": 1,
+              "trend": -1
+            }
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m1",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 76,
+          "b": 24,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "62%",
+                  "value": 0.24
+                },
+                {
+                  "key": "best_day",
+                  "label": "Best day",
+                  "detail": "Plays best on this weekday",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_place",
+                  "label": "Club leaderboard",
+                  "detail": "Top quarter",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_trend",
+                  "label": "Leaderboard direction",
+                  "detail": "Falling",
+                  "value": -0.25
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                },
+                {
+                  "key": "handicap",
+                  "label": "Handicap tonight",
+                  "detail": "left knee",
+                  "value": -0.5
+                }
+              ],
+              "rating": 3.99
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3.495
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.5
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.5
+            }
+          ],
+          "average": 2.5
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "an on court match is not one of the games before it",
+      "input": {
+        "match": {
+          "id": "m3",
+          "sessionId": "s",
+          "matchNo": 3,
+          "state": "on_court",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 1200000,
+          "startedAt": 1200000,
+          "endedAt": null,
+          "substitutions": [],
+          "decision": null
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid",
+            "handicapSpots": ["left_knee"],
+            "form": {
+              "clubWinRate": 0.62,
+              "bestDay": true,
+              "place": 1,
+              "trend": -1
+            }
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m1",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 76,
+          "b": 24,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "62%",
+                  "value": 0.24
+                },
+                {
+                  "key": "best_day",
+                  "label": "Best day",
+                  "detail": "Plays best on this weekday",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_place",
+                  "label": "Club leaderboard",
+                  "detail": "Top quarter",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_trend",
+                  "label": "Leaderboard direction",
+                  "detail": "Falling",
+                  "value": -0.25
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "handicap",
+                  "label": "Handicap tonight",
+                  "detail": "left knee",
+                  "value": -0.5
+                }
+              ],
+              "rating": 4.24
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                }
+              ],
+              "rating": 3.25
+            }
+          ],
+          "average": 3.745
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.75
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.75
+            }
+          ],
+          "average": 2.75
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a playing match counts the games before it",
+      "input": {
+        "match": {
+          "id": "m4",
+          "sessionId": "s",
+          "matchNo": 4,
+          "state": "active",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 2400000,
+          "startedAt": 2400000,
+          "endedAt": null,
+          "substitutions": [],
+          "decision": null
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid",
+            "handicapSpots": ["left_knee"],
+            "form": {
+              "clubWinRate": 0.62,
+              "bestDay": true,
+              "place": 1,
+              "trend": -1
+            }
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m1",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          },
+          {
+            "id": "m5",
+            "sessionId": "s",
+            "matchNo": 5,
+            "state": "active",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 2400000,
+            "startedAt": 2400000,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 76,
+          "b": 24,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "62%",
+                  "value": 0.24
+                },
+                {
+                  "key": "best_day",
+                  "label": "Best day",
+                  "detail": "Plays best on this weekday",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_place",
+                  "label": "Club leaderboard",
+                  "detail": "Top quarter",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_trend",
+                  "label": "Leaderboard direction",
+                  "detail": "Falling",
+                  "value": -0.25
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                },
+                {
+                  "key": "handicap",
+                  "label": "Handicap tonight",
+                  "detail": "left knee",
+                  "value": -0.5
+                }
+              ],
+              "rating": 3.99
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3.495
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.5
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.5
+            }
+          ],
+          "average": 2.5
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a completed match reads the lasting rows only",
+      "input": {
+        "match": {
+          "id": "m1",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 0,
+          "startedAt": 0,
+          "endedAt": 900000,
+          "substitutions": [],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 900000
+          }
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid",
+            "handicapSpots": ["left_knee"],
+            "form": {
+              "clubWinRate": 0.62,
+              "bestDay": true,
+              "place": 1,
+              "trend": -1
+            }
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m1",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 70,
+          "b": 30,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "62%",
+                  "value": 0.24
+                },
+                {
+                  "key": "best_day",
+                  "label": "Best day",
+                  "detail": "Plays best on this weekday",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_place",
+                  "label": "Club leaderboard",
+                  "detail": "Top quarter",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_trend",
+                  "label": "Leaderboard direction",
+                  "detail": "Falling",
+                  "value": -0.25
+                }
+              ],
+              "rating": 4.49
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3.745
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": true,
+        "upset": false
+      }
+    },
+    {
+      "name": "an invalid match reads the lasting rows only",
+      "input": {
+        "match": {
+          "id": "m6",
+          "sessionId": "s",
+          "matchNo": 6,
+          "state": "invalid",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 0,
+          "startedAt": 0,
+          "endedAt": null,
+          "substitutions": [],
+          "decision": {
+            "kind": "invalid",
+            "winningTeam": null,
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 0
+          }
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid",
+            "handicapSpots": ["left_knee"],
+            "form": {
+              "clubWinRate": 0.62,
+              "bestDay": true,
+              "place": 1,
+              "trend": -1
+            }
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m1",
+            "sessionId": "s",
+            "matchNo": 1,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 70,
+          "b": 30,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "62%",
+                  "value": 0.24
+                },
+                {
+                  "key": "best_day",
+                  "label": "Best day",
+                  "detail": "Plays best on this weekday",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_place",
+                  "label": "Club leaderboard",
+                  "detail": "Top quarter",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_trend",
+                  "label": "Leaderboard direction",
+                  "detail": "Falling",
+                  "value": -0.25
+                }
+              ],
+              "rating": 4.49
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3.745
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": true,
+        "upset": false
+      }
+    },
+    {
+      "name": "the favored pair lost",
+      "input": {
+        "match": {
+          "id": "m2",
+          "sessionId": "s",
+          "matchNo": 2,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 0,
+          "startedAt": 0,
+          "endedAt": 900000,
+          "substitutions": [],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "B",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 900000
+          }
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 76,
+          "b": 24,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            }
+          ],
+          "average": 4
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": true,
+        "upset": true
+      }
+    },
+    {
+      "name": "the favored pair won",
+      "input": {
+        "match": {
+          "id": "m1",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 0,
+          "startedAt": 0,
+          "endedAt": 900000,
+          "substitutions": [],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 900000
+          }
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 76,
+          "b": 24,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            }
+          ],
+          "average": 4
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": true,
+        "upset": false
+      }
+    },
+    {
+      "name": "upset win and upset loss tonight",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m7",
+            "sessionId": "s",
+            "matchNo": 7,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "B",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 50,
+          "b": 50,
+          "favored": null,
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "upsets",
+                  "label": "Upsets tonight",
+                  "detail": "1 upset loss",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3.25
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "upsets",
+                  "label": "Upsets tonight",
+                  "detail": "1 upset loss",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3.25
+            }
+          ],
+          "average": 3.25
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "upsets",
+                  "label": "Upsets tonight",
+                  "detail": "1 upset win",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3.25
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "upsets",
+                  "label": "Upsets tonight",
+                  "detail": "1 upset win",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3.25
+            }
+          ],
+          "average": 3.25
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "two upset losses reach the cap",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m8",
+            "sessionId": "s",
+            "matchNo": 8,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "B",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          },
+          {
+            "id": "m9",
+            "sessionId": "s",
+            "matchNo": 9,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 1200000,
+            "startedAt": 1200000,
+            "endedAt": 2100000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "B",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 2100000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 24,
+          "b": 76,
+          "favored": "B",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 2 lost",
+                  "value": -0.5
+                },
+                {
+                  "key": "upsets",
+                  "label": "Upsets tonight",
+                  "detail": "2 upset losses",
+                  "value": -0.5
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "2 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 2.5
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 2 lost",
+                  "value": -0.5
+                },
+                {
+                  "key": "upsets",
+                  "label": "Upsets tonight",
+                  "detail": "2 upset losses",
+                  "value": -0.5
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "2 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 2.5
+            }
+          ],
+          "average": 2.5
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "2 won · 0 lost",
+                  "value": 0.5
+                },
+                {
+                  "key": "upsets",
+                  "label": "Upsets tonight",
+                  "detail": "2 upset wins",
+                  "value": 0.5
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "2 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 3.5
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "2 won · 0 lost",
+                  "value": 0.5
+                },
+                {
+                  "key": "upsets",
+                  "label": "Upsets tonight",
+                  "detail": "2 upset wins",
+                  "value": 0.5
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "2 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 3.5
+            }
+          ],
+          "average": 3.5
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "wins and losses are capped at one level",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m10",
+            "sessionId": "s",
+            "matchNo": 10,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 1200000,
+            "startedAt": 1200000,
+            "endedAt": 2100000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 2100000
+            }
+          },
+          {
+            "id": "m11",
+            "sessionId": "s",
+            "matchNo": 11,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 2400000,
+            "startedAt": 2400000,
+            "endedAt": 3300000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 3300000
+            }
+          },
+          {
+            "id": "m12",
+            "sessionId": "s",
+            "matchNo": 12,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 3600000,
+            "startedAt": 3600000,
+            "endedAt": 4500000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 4500000
+            }
+          },
+          {
+            "id": "m13",
+            "sessionId": "s",
+            "matchNo": 13,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 4800000,
+            "startedAt": 4800000,
+            "endedAt": 5700000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 5700000
+            }
+          },
+          {
+            "id": "m14",
+            "sessionId": "s",
+            "matchNo": 14,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 6000000,
+            "startedAt": 6000000,
+            "endedAt": 6900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 6900000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 91,
+          "b": 9,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "5 won · 0 lost",
+                  "value": 1
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "5 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 3.5
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "5 won · 0 lost",
+                  "value": 1
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "5 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 3.5
+            }
+          ],
+          "average": 3.5
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 5 lost",
+                  "value": -1
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "5 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 1.5
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 5 lost",
+                  "value": -1
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "5 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 1.5
+            }
+          ],
+          "average": 1.5
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "three games in a row cost two steps at most",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m15",
+            "sessionId": "s",
+            "matchNo": 15,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          },
+          {
+            "id": "m16",
+            "sessionId": "s",
+            "matchNo": 16,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 1200000,
+            "startedAt": 1200000,
+            "endedAt": 2100000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 2100000
+            }
+          },
+          {
+            "id": "m17",
+            "sessionId": "s",
+            "matchNo": 17,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 2400000,
+            "startedAt": 2400000,
+            "endedAt": 3300000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 3300000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 85,
+          "b": 15,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "3 won · 0 lost",
+                  "value": 0.75
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "3 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 3.25
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "3 won · 0 lost",
+                  "value": 0.75
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "3 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 3.25
+            }
+          ],
+          "average": 3.25
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 3 lost",
+                  "value": -0.75
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "3 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 1.75
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 3 lost",
+                  "value": -0.75
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "3 before this match",
+                  "value": -0.5
+                }
+              ],
+              "rating": 1.75
+            }
+          ],
+          "average": 1.75
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "sitting a match out resets the streak",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m18",
+            "sessionId": "s",
+            "matchNo": 18,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          },
+          {
+            "id": "m19",
+            "sessionId": "s",
+            "matchNo": 19,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["e", "f"],
+            "teamB": ["g", "h"],
+            "courtIds": ["c1"],
+            "placedAt": 1200000,
+            "startedAt": 1200000,
+            "endedAt": 2100000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 2100000
+            }
+          },
+          {
+            "id": "m20",
+            "sessionId": "s",
+            "matchNo": 20,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 2400000,
+            "startedAt": 2400000,
+            "endedAt": 3300000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 3300000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 76,
+          "b": 24,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "2 won · 0 lost",
+                  "value": 0.5
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3.25
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "2 won · 0 lost",
+                  "value": 0.5
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3.25
+            }
+          ],
+          "average": 3.25
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 2 lost",
+                  "value": -0.5
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.25
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 2 lost",
+                  "value": -0.5
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.25
+            }
+          ],
+          "average": 2.25
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a match on court at the same time does not reset",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m21",
+            "sessionId": "s",
+            "matchNo": 21,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          },
+          {
+            "id": "m22",
+            "sessionId": "s",
+            "matchNo": 22,
+            "state": "active",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["e", "f"],
+            "teamB": ["g", "h"],
+            "courtIds": ["c1"],
+            "placedAt": 600000,
+            "startedAt": 600000,
+            "endedAt": null,
+            "substitutions": [],
+            "decision": null
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 64,
+          "b": 36,
+          "favored": "A",
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.5
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.5
+            }
+          ],
+          "average": 2.5
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "handicap spots are listed in figure order",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low",
+            "handicapSpots": ["right_knee", "lower_back", "nonsense"]
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 43,
+          "b": 57,
+          "favored": "B",
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "handicap",
+                  "label": "Handicap tonight",
+                  "detail": "lower back, right knee",
+                  "value": -0.5
+                }
+              ],
+              "rating": 2.5
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 2.75
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "only unknown handicap spots still count as a handicap",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low",
+            "handicapSpots": ["nonsense"]
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 43,
+          "b": 57,
+          "favored": "B",
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "handicap",
+                  "label": "Handicap tonight",
+                  "detail": "",
+                  "value": -0.5
+                }
+              ],
+              "rating": 2.5
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 2.75
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a match with a decision of kind invalid has no winner",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m23",
+            "sessionId": "s",
+            "matchNo": 23,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [],
+            "decision": {
+              "kind": "invalid",
+              "winningTeam": null,
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 50,
+          "b": 50,
+          "favored": null,
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.75
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.75
+            }
+          ],
+          "average": 2.75
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.75
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.75
+            }
+          ],
+          "average": 2.75
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a substitute is credited to the side they played for",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": [
+          {
+            "id": "m24",
+            "sessionId": "s",
+            "matchNo": 24,
+            "state": "completed",
+            "format": "doubles",
+            "queuePosition": 0,
+            "origin": "auto",
+            "manualProtected": false,
+            "teamA": ["a", "b"],
+            "teamB": ["c", "d"],
+            "courtIds": ["c1"],
+            "placedAt": 0,
+            "startedAt": 0,
+            "endedAt": 900000,
+            "substitutions": [
+              {
+                "outId": "a",
+                "inId": "e",
+                "team": "A",
+                "creditTo": "incoming",
+                "at": 300000
+              }
+            ],
+            "decision": {
+              "kind": "completed",
+              "winningTeam": "A",
+              "teamAScore": null,
+              "teamBScore": null,
+              "confirmedAt": 900000
+            }
+          }
+        ]
+      },
+      "expected": {
+        "chance": {
+          "a": 61,
+          "b": 39,
+          "favored": "A",
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.75
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "1 won · 0 lost",
+                  "value": 0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 2.875
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.5
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                },
+                {
+                  "key": "tonight",
+                  "label": "Tonight",
+                  "detail": "0 won · 1 lost",
+                  "value": -0.25
+                },
+                {
+                  "key": "in_row",
+                  "label": "Games in a row",
+                  "detail": "1 before this match",
+                  "value": -0.25
+                }
+              ],
+              "rating": 2.5
+            }
+          ],
+          "average": 2.5
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "no level at all",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": null
+          },
+          {
+            "id": "b",
+            "level": null
+          },
+          {
+            "id": "c",
+            "level": null
+          },
+          {
+            "id": "d",
+            "level": null
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 50,
+          "b": 50,
+          "favored": null,
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "No level · counts as mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "No level · counts as mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            }
+          ],
+          "average": 4
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "No level · counts as mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "No level · counts as mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            }
+          ],
+          "average": 4
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "a full-form rate of one and place and trend",
+      "input": {
+        "match": {
+          "format": "doubles",
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low",
+            "form": {
+              "clubWinRate": 1,
+              "bestDay": true,
+              "place": 1,
+              "trend": 1
+            }
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low",
+            "form": {
+              "clubWinRate": 0,
+              "bestDay": false,
+              "place": -1,
+              "trend": -1
+            }
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 54,
+          "b": 46,
+          "favored": null,
+          "strong": false
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "100%",
+                  "value": 1
+                },
+                {
+                  "key": "best_day",
+                  "label": "Best day",
+                  "detail": "Plays best on this weekday",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_place",
+                  "label": "Club leaderboard",
+                  "detail": "Top quarter",
+                  "value": 0.25
+                },
+                {
+                  "key": "leaderboard_trend",
+                  "label": "Leaderboard direction",
+                  "detail": "Rising",
+                  "value": 0.25
+                }
+              ],
+              "rating": 4.75
+            },
+            {
+              "id": "b",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "0%",
+                  "value": -1
+                },
+                {
+                  "key": "leaderboard_place",
+                  "label": "Club leaderboard",
+                  "detail": "Bottom quarter",
+                  "value": -0.25
+                },
+                {
+                  "key": "leaderboard_trend",
+                  "label": "Leaderboard direction",
+                  "detail": "Falling",
+                  "value": -0.25
+                }
+              ],
+              "rating": 1.5
+            }
+          ],
+          "average": 3.125
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            },
+            {
+              "id": "d",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": false,
+        "upset": false
+      }
+    },
+    {
+      "name": "singles",
+      "input": {
+        "match": {
+          "format": "singles",
+          "teamA": ["a"],
+          "teamB": ["c"]
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ],
+        "matches": []
+      },
+      "expected": {
+        "chance": {
+          "a": 76,
+          "b": 24,
+          "favored": "A",
+          "strong": true
+        },
+        "teamA": {
+          "players": [
+            {
+              "id": "a",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Mid",
+                  "value": 4
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 4
+            }
+          ],
+          "average": 4
+        },
+        "teamB": {
+          "players": [
+            {
+              "id": "c",
+              "rows": [
+                {
+                  "key": "level",
+                  "label": "Level",
+                  "detail": "Intermediate Low",
+                  "value": 3
+                },
+                {
+                  "key": "club_win_rate",
+                  "label": "Club win rate",
+                  "detail": "No record · counts as 50%",
+                  "value": 0
+                }
+              ],
+              "rating": 3
+            }
+          ],
+          "average": 3
+        },
+        "lasting": false,
+        "upset": false
+      }
+    }
+  ]
+}

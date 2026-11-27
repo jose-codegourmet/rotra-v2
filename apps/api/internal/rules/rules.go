@@ -13,6 +13,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/match"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/model"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/roster"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/winchance"
 )
 
 // Ruleset is one version of the bucket 1 rules. Times are epoch milliseconds, passed in, never read.
@@ -45,6 +46,13 @@ type Ruleset struct {
 	WaitMinutes       func(p model.Player, matches []model.Match, startedAt *int64, now int64) int64
 	QueuedCount       func(id string, matches []model.Match) int
 	ComputeStandings  func(roster []model.Player, matches []model.Match) []match.Standing
+	// match: names and win chance
+	MatchCategory      func(teamA, teamB []string) string
+	MatchLabel         func(format model.Format, teamA, teamB []string, genderOf func(id string) string) string
+	WinChanceBreakdown func(m model.Match, players []winchance.SessionPlayer, matches []model.Match) winchance.Breakdown
+	FormRating         func(p winchance.SessionPlayer, players []winchance.SessionPlayer, matches []model.Match) float64
+	IsUpset            func(m model.Match, players []winchance.SessionPlayer) bool
+	FormFromHistory    func(sessions []winchance.SessionRecord, tonightWeekday int) winchance.Form
 	// courts
 	CourtOpen               func(c model.Court, now int64) bool
 	OpenedEarly             func(c model.Court, now int64) bool
@@ -93,6 +101,12 @@ func V1() Ruleset {
 		WaitMinutes:            match.WaitMinutes,
 		QueuedCount:            match.QueuedCount,
 		ComputeStandings:       match.ComputeStandings,
+		MatchCategory:          match.Category,
+		MatchLabel:             match.Label,
+		WinChanceBreakdown:     winchance.SessionBreakdown,
+		FormRating:             winchance.FormRating,
+		IsUpset:                winchance.IsUpset,
+		FormFromHistory:        winchance.FormFromHistory,
 
 		CourtOpen:               courts.Open,
 		OpenedEarly:             courts.OpenedEarly,

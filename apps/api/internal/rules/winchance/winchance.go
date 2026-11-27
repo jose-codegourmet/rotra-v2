@@ -3,8 +3,8 @@
 // of its players; win chance = 1 / (1 + 10^((opponents - own team) / 2)), kept between 5% and 95%. A finished game is read from the
 // lasting signals only (level, club win rate, best day, leaderboard place and direction), so an Upset mark never moves later.
 //
-// Only the lasting part is here: what the Player app shows on a finished game. Tonight's signals and the handicap stay with the Queue
-// Master's console and match making.
+// This file is the lasting part: what the Player app shows on a finished game. Tonight's signals and the handicap (the Queue Master's
+// console and Generate matches' Even game) are in session.go.
 package winchance
 
 import "math"
@@ -15,10 +15,10 @@ const midLevel = 4
 // Form is a player's lasting signals at a club (PlayerForm): the win rate over decided games (nil under 10), whether tonight is their best
 // weekday, and the leaderboard place and direction (-1, 0 or 1; 0 until rank calculation is real).
 type Form struct {
-	ClubWinRate *float64
-	BestDay     bool
-	Place       int
-	Trend       int
+	ClubWinRate *float64 `json:"clubWinRate"`
+	BestDay     bool     `json:"bestDay"`
+	Place       int      `json:"place"`
+	Trend       int      `json:"trend"`
 }
 
 // Face is one person on a side: their level in that game (the index in the nine levels, -1 for none) and, with a club record, their form.
@@ -117,9 +117,9 @@ func OfGame(left, right []Face, leftWon bool) *Game {
 
 // SessionRecord is one finalized session of a player at a club: its weekday (Sunday 0, Manila time) and the player's wins and losses in it.
 type SessionRecord struct {
-	Weekday int
-	Wins    int
-	Losses  int
+	Weekday int `json:"weekday"`
+	Wins    int `json:"wins"`
+	Losses  int `json:"losses"`
 }
 
 // FormFromHistory is formFromHistory: a player's lasting signals from their finalized sessions at this club. Win rate needs 10 decided

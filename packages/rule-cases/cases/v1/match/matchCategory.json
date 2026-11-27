@@ -1,0 +1,111 @@
+{
+  "kind": "rule",
+  "rule": "matchCategory",
+  "version": 1,
+  "cases": [
+    {
+      "name": "all men",
+      "input": {
+        "teamA": ["male", "male"],
+        "teamB": ["male", "male"]
+      },
+      "expected": "Men's"
+    },
+    {
+      "name": "all women",
+      "input": {
+        "teamA": ["female", "female"],
+        "teamB": ["female", "female"]
+      },
+      "expected": "Women's"
+    },
+    {
+      "name": "mixed, the same mix on both sides",
+      "input": {
+        "teamA": ["male", "female"],
+        "teamB": ["female", "male"]
+      },
+      "expected": "Mixed"
+    },
+    {
+      "name": "mixed singles is not a mix on a side",
+      "input": {
+        "teamA": ["male"],
+        "teamB": ["female"]
+      },
+      "expected": "Genderless"
+    },
+    {
+      "name": "a man and a woman against two men",
+      "input": {
+        "teamA": ["male", "female"],
+        "teamB": ["male", "male"]
+      },
+      "expected": "Genderless"
+    },
+    {
+      "name": "mixed on one side only",
+      "input": {
+        "teamA": ["male", "female"],
+        "teamB": ["female", "female"]
+      },
+      "expected": "Genderless"
+    },
+    {
+      "name": "one gender not given",
+      "input": {
+        "teamA": ["male", "male"],
+        "teamB": ["male", null]
+      },
+      "expected": "Genderless"
+    },
+    {
+      "name": "a gender left out reads as not given",
+      "input": {
+        "teamA": ["male", "male"],
+        "teamB": ["male", null]
+      },
+      "expected": "Genderless"
+    },
+    {
+      "name": "nobody on the court",
+      "input": {
+        "teamA": [],
+        "teamB": []
+      },
+      "expected": "Genderless"
+    },
+    {
+      "name": "men singles",
+      "input": {
+        "teamA": ["male"],
+        "teamB": ["male"]
+      },
+      "expected": "Men's"
+    },
+    {
+      "name": "women singles",
+      "input": {
+        "teamA": ["female"],
+        "teamB": ["female"]
+      },
+      "expected": "Women's"
+    },
+    {
+      "name": "fun 3v3 with a mix on each side",
+      "input": {
+        "teamA": ["male", "female", "male"],
+        "teamB": ["male", "male", "female"]
+      },
+      "expected": "Mixed"
+    },
+    {
+      "name": "fun 3v3 mixes that differ",
+      "input": {
+        "teamA": ["male", "female", "male"],
+        "teamB": ["male", "female", "female"]
+      },
+      "expected": "Genderless"
+    }
+  ]
+}

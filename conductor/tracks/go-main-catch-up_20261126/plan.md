@@ -120,10 +120,11 @@ Ticket: none yet (proposal: one issue per phase under epic #869, titled `<seq> Â
 
 ## Phase 4: Shared rules
 
-- [ ] **4.1** Confirm the `ruleswasm` and `sessionresult` state after #1114: 308 cases through the envelope, standings dense. Record which entries remain in `rulecases.GoCopyPending`
+- [x] **4.1** Confirm the `ruleswasm` and `sessionresult` state after #1114: 308 cases through the envelope, standings dense. Record which entries remain in `rulecases.GoCopyPending`
 - [ ] **4.2** **OWNER** `courts/expectedFinish` (D-2026-11-23-08, scoring-mode lengths) in `internal/rules`, remove it from `GoCopyPending`, rebuild and commit the `.wasm` and types
 - [ ] **4.3** **OWNER** `roster/levelRestrictionBlock` in `internal/rules`, remove it from `GoCopyPending`, rebuild the `.wasm`
-- [ ] **4.4** Run the whole rule-case set through Go and the wasm; update the hard-coded case count with the files on disk
+- [x] **4.4** Run the whole rule-case set through Go and the wasm; update the hard-coded case count with the files on disk
+  - **Done 2026-11-27 (4.1 and 4.4, plus the rules the merge added).** State found: 40 files and 309 cases through `rules.For(1)` and the wasm envelope (the plan's 308 was one short), standings dense, `rulecases.GoCopyPending` holds only `courts/expectedFinish` (4.2) and `roster/levelRestrictionBlock` (4.3), both owner items; the committed `.wasm` was stale (rule files had changed since #1114) and is rebuilt. Seven rules the merge wrote only in TypeScript are now Go rules with cases (AGENTS rule 16): `match/matchCategory`, `match/matchLabel` (`internal/rules/match/label.go`), `match/winChance`, `match/winChanceBreakdown`, `match/formRating`, `match/isUpset`, `match/formFromHistory` (`internal/rules/winchance/session.go`, `match.StreakOf` and `match.NightGames` in `match/night.go`; tonight's wins and losses, upsets, games in a row and handicap). 97 cases written from the TypeScript (written by running the TypeScript rules over my inputs; none from Go); they pass in `@rotra/data`, in Go (strict) and through the wasm wrapper (`@rotra/rules-wasm`: `matchCategory`, `matchLabel`, `winChance`, `winChanceBreakdown`, `formRating`, `isUpset`, `formFromHistory`). Counts now: 47 files and 406 cases run in Go (49 files, 475 cases on disk, 2 files pending), 47 runners. Left for the owner items: Even game and Suggest by win chance (match making, `matchMaking.rules.ts`) are not ported.
 
 ## Phase 5: Later or optional (each needs the owner to say go, and may stay on the device or in TypeScript)
 

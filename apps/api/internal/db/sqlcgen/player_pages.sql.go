@@ -34,6 +34,30 @@ func (q *Queries) CountPlayerCountedFacts(ctx context.Context, playerID pgtype.U
 	return count, err
 }
 
+const entryIsOpen = `-- name: EntryIsOpen :one
+SELECT EXISTS (SELECT 1 FROM shared_player_entries WHERE id = $1 AND claimed_player_id IS NULL AND retired_at IS NULL)::bool
+`
+
+func (q *Queries) EntryIsOpen(ctx context.Context, entryID pgtype.UUID) (bool, error) {
+	row := q.db.QueryRow(ctx, entryIsOpen, entryID)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
+const findOpenEntryByRTR = `-- name: FindOpenEntryByRTR :one
+SELECT id FROM shared_player_entries WHERE rtr_id = $1::text AND claimed_player_id IS NULL AND retired_at IS NULL
+`
+
+// An unclaimed person a club saved (a shared entry, D-2026-11-16-04, D-2026-11-23-05): open means not claimed and not
+// retired. Their public profile is read from the clubs that hold them, the first club to save them first.
+func (q *Queries) FindOpenEntryByRTR(ctx context.Context, rtrID string) (pgtype.UUID, error) {
+	row := q.db.QueryRow(ctx, findOpenEntryByRTR, rtrID)
+	var id pgtype.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const findPlayerIDByRTR = `-- name: FindPlayerIDByRTR :one
 SELECT a.player_id, p.hidden_from_directory
 FROM player_id_allocations a
@@ -391,6 +415,88 @@ func (q *Queries) ListCompletedSessions(ctx context.Context, sessionIds []pgtype
 			&i.ClubID,
 			&i.ScheduledStartAt,
 			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listEntryClubs = `-- name: ListEntryClubs :many
+SELECT c.id, c.name, c.logo_ref
+FROM club_players cp
+JOIN clubs c ON c.id = cp.club_id
+WHERE cp.shared_entry_id = $1 AND cp.removed_at IS NULL AND cp.linked_to_club_player_id IS NULL
+ORDER BY cp.added_at ASC, cp.id ASC
+`
+
+type ListEntryClubsRow struct {
+	ID      pgtype.UUID
+	Name    string
+	LogoRef pgtype.Text
+}
+
+// readEntryClubs: the clubs that saved an unclaimed person (a club once, in the order it saved them).
+func (q *Queries) ListEntryClubs(ctx context.Context, entryID pgtype.UUID) ([]ListEntryClubsRow, error) {
+	rows, err := q.db.Query(ctx, listEntryClubs, entryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListEntryClubsRow
+	for rows.Next() {
+		var i ListEntryClubsRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.LogoRef); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listEntrySavers = `-- name: ListEntrySavers :many
+SELECT e.rtr_id, cp.display_name, cp.nickname, cp.avatar_ref, c.name AS club_name, pi.preset_fields
+FROM shared_player_entries e
+JOIN club_players cp ON cp.shared_entry_id = e.id
+JOIN clubs c ON c.id = cp.club_id
+LEFT JOIN club_player_private_inputs pi ON pi.club_player_id = cp.id
+WHERE e.id = $1 AND e.claimed_player_id IS NULL AND e.retired_at IS NULL
+  AND cp.removed_at IS NULL AND cp.linked_to_club_player_id IS NULL AND cp.player_id IS NULL
+ORDER BY cp.added_at ASC, cp.id ASC
+`
+
+type ListEntrySaversRow struct {
+	RtrID        string
+	DisplayName  string
+	Nickname     pgtype.Text
+	AvatarRef    pgtype.Text
+	ClubName     string
+	PresetFields []byte
+}
+
+func (q *Queries) ListEntrySavers(ctx context.Context, entryID pgtype.UUID) ([]ListEntrySaversRow, error) {
+	rows, err := q.db.Query(ctx, listEntrySavers, entryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListEntrySaversRow
+	for rows.Next() {
+		var i ListEntrySaversRow
+		if err := rows.Scan(
+			&i.RtrID,
+			&i.DisplayName,
+			&i.Nickname,
+			&i.AvatarRef,
+			&i.ClubName,
+			&i.PresetFields,
 		); err != nil {
 			return nil, err
 		}

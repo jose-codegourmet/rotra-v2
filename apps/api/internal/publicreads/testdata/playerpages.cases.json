@@ -6,7 +6,9 @@
     "UPDATE profile_banners SET shown = true, is_default = false, deleted_at = NULL WHERE id <> 'b0000000-0000-4000-8000-000000000001'",
     "UPDATE profile_banners SET is_default = true WHERE id = 'court'",
     "UPDATE players SET profile_visibility = v.vis::profile_visibility, hidden_from_directory = false FROM (VALUES ('d1000000-0000-4000-8000-000000000001', 'public'), ('d1000000-0000-4000-8000-000000000003', 'always_private'), ('d1000000-0000-4000-8000-000000000004', 'always_private')) AS v(pid, vis) WHERE id = v.pid::uuid",
-    "UPDATE club_players SET removed_at = NULL WHERE player_id = 'd1000000-0000-4000-8000-000000000001' AND id <> 'e2000000-0000-4000-8000-000000000013'"
+    "UPDATE club_players SET removed_at = NULL WHERE player_id = 'd1000000-0000-4000-8000-000000000001' AND id <> 'e2000000-0000-4000-8000-000000000013'",
+    "UPDATE shared_player_entries SET email = CASE WHEN id IN ('e5000000-0000-4000-8000-000000000003', 'e5000000-0000-4000-8000-000000000004') THEN NULL ELSE 'entry-' || right(id::text, 1) || '@example.test' END, claimed_player_id = CASE WHEN id = 'e5000000-0000-4000-8000-000000000003' THEN 'd1000000-0000-4000-8000-000000000009'::uuid END, claimed_at = CASE WHEN id = 'e5000000-0000-4000-8000-000000000003' THEN TIMESTAMPTZ '2026-11-10 00:00:00+00' END, retired_at = CASE WHEN id = 'e5000000-0000-4000-8000-000000000004' THEN TIMESTAMPTZ '2026-11-11 00:00:00+00' END",
+    "UPDATE club_players SET linked_to_club_player_id = CASE WHEN id = 'e2000000-0000-4000-8000-00000000002b' THEN 'e2000000-0000-4000-8000-00000000002a'::uuid END, removed_at = CASE WHEN id = 'e2000000-0000-4000-8000-000000000026' THEN TIMESTAMPTZ '2026-03-01 00:00:00+00' WHEN id = 'e2000000-0000-4000-8000-000000000028' THEN TIMESTAMPTZ '2026-01-15 00:00:00+00' WHEN id = 'e2000000-0000-4000-8000-00000000002b' THEN TIMESTAMPTZ '2026-02-11 00:00:00+00' END WHERE shared_entry_id IS NOT NULL OR id = 'e2000000-0000-4000-8000-00000000002b'"
   ],
   "scenarios": {
     "base": [],
@@ -71,6 +73,27 @@
     ],
     "job_unfinalized_session": [
       "BEGIN; SET LOCAL session_replication_role = replica; INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b1000000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', 'f1000000-0000-4000-8000-000000000001', 'pending', NULL, now()); INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b1000000-0000-4000-8000-000000000002', 'player_rank', 1, 'finalization', 'f1000000-0000-4000-8000-000000000004', 'running', NULL, now()); COMMIT"
+    ],
+    "entry_second_club_removed": [
+      "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-03-02 00:00:00+00' WHERE id = 'e2000000-0000-4000-8000-000000000023'"
+    ],
+    "entry_first_club_removed": [
+      "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-03-02 00:00:00+00' WHERE id = 'e2000000-0000-4000-8000-000000000022'"
+    ],
+    "entry_una_claimed_since": [
+      "UPDATE shared_player_entries SET email = NULL, claimed_player_id = 'd1000000-0000-4000-8000-000000000008', claimed_at = TIMESTAMPTZ '2026-11-12 00:00:00+00' WHERE id = 'e5000000-0000-4000-8000-000000000001'"
+    ],
+    "entry_una_retired": [
+      "UPDATE shared_player_entries SET email = NULL, retired_at = TIMESTAMPTZ '2026-11-12 00:00:00+00' WHERE id = 'e5000000-0000-4000-8000-000000000001'"
+    ],
+    "entry_olly_new_removed": [
+      "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-03-02 00:00:00+00' WHERE id = 'e2000000-0000-4000-8000-000000000029'"
+    ],
+    "entry_una_moved": [
+      "UPDATE club_players SET linked_to_club_player_id = 'e2000000-0000-4000-8000-000000000029', removed_at = TIMESTAMPTZ '2026-03-02 00:00:00+00' WHERE id = 'e2000000-0000-4000-8000-000000000021'"
+    ],
+    "entry_una_has_a_player_row": [
+      "UPDATE shared_player_entries SET rtr_id = 'RTR-PH-CEB-102926-0001' WHERE id = 'e5000000-0000-4000-8000-000000000001'"
     ]
   },
   "cases": [
@@ -568,6 +591,191 @@
       "name": "games_alice_always_private",
       "scenario": "alice_always_private",
       "path": "/api/players/d1000000-0000-4000-8000-000000000001/games"
+    },
+    {
+      "name": "rtr_entry_one_club",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0011"
+    },
+    {
+      "name": "rtr_entry_lowercase",
+      "scenario": "base",
+      "path": "/api/rtr-ids/rtr-ph-ceb-102926-0011"
+    },
+    {
+      "name": "rtr_entry_padded",
+      "scenario": "base",
+      "path": "/api/rtr-ids/%20RTR-PH-CEB-102926-0011%20"
+    },
+    {
+      "name": "rtr_entry_two_clubs_needs_sign_in",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0012"
+    },
+    {
+      "name": "rtr_entry_second_club_removed",
+      "scenario": "entry_second_club_removed",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0012"
+    },
+    {
+      "name": "rtr_entry_first_club_removed",
+      "scenario": "entry_first_club_removed",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0012"
+    },
+    {
+      "name": "rtr_entry_claimed_is_not_found",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0013"
+    },
+    {
+      "name": "rtr_entry_retired_is_not_found",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0014"
+    },
+    {
+      "name": "rtr_entry_every_record_removed",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0015"
+    },
+    {
+      "name": "rtr_entry_name_only",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0016"
+    },
+    {
+      "name": "rtr_entry_later_record",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0017"
+    },
+    {
+      "name": "rtr_entry_later_record_removed",
+      "scenario": "entry_olly_new_removed",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0017"
+    },
+    {
+      "name": "rtr_entry_record_moved",
+      "scenario": "base",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0018"
+    },
+    {
+      "name": "rtr_entry_claimed_since",
+      "scenario": "entry_una_claimed_since",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0011"
+    },
+    {
+      "name": "rtr_entry_retired_since",
+      "scenario": "entry_una_retired",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0011"
+    },
+    {
+      "name": "profile_entry_one_club",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_entry_two_clubs",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000002"
+    },
+    {
+      "name": "profile_entry_claimed",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000003"
+    },
+    {
+      "name": "profile_entry_retired",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000004"
+    },
+    {
+      "name": "profile_entry_every_record_removed",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000005"
+    },
+    {
+      "name": "profile_entry_name_only",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000006"
+    },
+    {
+      "name": "profile_entry_later_record",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000007"
+    },
+    {
+      "name": "profile_entry_record_moved",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000008"
+    },
+    {
+      "name": "profile_entry_uppercase_id",
+      "scenario": "base",
+      "path": "/api/players/E5000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_entry_second_club_removed",
+      "scenario": "entry_second_club_removed",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000002"
+    },
+    {
+      "name": "profile_entry_first_club_removed",
+      "scenario": "entry_first_club_removed",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000002"
+    },
+    {
+      "name": "profile_entry_later_record_removed",
+      "scenario": "entry_olly_new_removed",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000007"
+    },
+    {
+      "name": "profile_entry_claimed_since",
+      "scenario": "entry_una_claimed_since",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "profile_entry_retired_since",
+      "scenario": "entry_una_retired",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000001"
+    },
+    {
+      "name": "rank_entry_one_club",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000001/rank"
+    },
+    {
+      "name": "rank_entry_two_clubs",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000002/rank"
+    },
+    {
+      "name": "games_entry_one_club",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000001/games"
+    },
+    {
+      "name": "games_entry_two_clubs",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000002/games"
+    },
+    {
+      "name": "clubs_entry_one_club",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000001/clubs"
+    },
+    {
+      "name": "clubs_entry_two_clubs",
+      "scenario": "base",
+      "path": "/api/players/e5000000-0000-4000-8000-000000000002/clubs"
+    },
+    {
+      "name": "rtr_entry_record_moved_away",
+      "scenario": "entry_una_moved",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0011"
+    },
+    {
+      "name": "rtr_entry_with_a_players_id_finds_the_player",
+      "scenario": "entry_una_has_a_player_row",
+      "path": "/api/rtr-ids/RTR-PH-CEB-102926-0001"
     }
   ]
 }

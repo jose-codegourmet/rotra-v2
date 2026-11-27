@@ -4934,5 +4934,681 @@
     "body": {
       "games": []
     }
+  },
+  "rtr_entry_one_club": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "e5000000-0000-4000-8000-000000000001"
+    }
+  },
+  "rtr_entry_lowercase": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "e5000000-0000-4000-8000-000000000001"
+    }
+  },
+  "rtr_entry_padded": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "e5000000-0000-4000-8000-000000000001"
+    }
+  },
+  "rtr_entry_two_clubs_needs_sign_in": {
+    "status": 401,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "unauthenticated",
+        "message": "Sign in to continue."
+      }
+    }
+  },
+  "rtr_entry_second_club_removed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "e5000000-0000-4000-8000-000000000002"
+    }
+  },
+  "rtr_entry_first_club_removed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "e5000000-0000-4000-8000-000000000002"
+    }
+  },
+  "rtr_entry_claimed_is_not_found": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "rtr_entry_retired_is_not_found": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "rtr_entry_every_record_removed": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "rtr_entry_name_only": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "e5000000-0000-4000-8000-000000000006"
+    }
+  },
+  "rtr_entry_later_record": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "e5000000-0000-4000-8000-000000000007"
+    }
+  },
+  "rtr_entry_later_record_removed": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "rtr_entry_record_moved": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "e5000000-0000-4000-8000-000000000008"
+    }
+  },
+  "rtr_entry_claimed_since": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "rtr_entry_retired_since": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "profile_entry_one_club": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "profile": {
+        "playerId": "e5000000-0000-4000-8000-000000000001",
+        "rtrId": "RTR-PH-CEB-102926-0011",
+        "fullName": "Una Unclaimed",
+        "nickname": "Una",
+        "gender": null,
+        "picture": "https://example.test/una.png",
+        "bannerId": null,
+        "profileVisibility": "public",
+        "unclaimedSavedBy": "Smash Club",
+        "showProfileStats": true,
+        "showWeeklyPerformance": true,
+        "playingStyle": "Smasher",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
+        "experienceYears": 3,
+        "experienceMonths": 0,
+        "socialLinks": {
+          "facebook": "https://fb.test/una",
+          "instagram": "",
+          "youtube": "https://yt.test/una",
+          "linkedin": ""
+        },
+        "bannerKey": "court",
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
+      }
+    }
+  },
+  "profile_entry_two_clubs": {
+    "status": 401,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "unauthenticated",
+        "message": "Sign in to continue."
+      }
+    }
+  },
+  "profile_entry_claimed": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "profile_entry_retired": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "profile_entry_every_record_removed": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "profile_entry_name_only": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "profile": {
+        "playerId": "e5000000-0000-4000-8000-000000000006",
+        "rtrId": "RTR-PH-CEB-102926-0016",
+        "fullName": "Nia Nameonly",
+        "nickname": null,
+        "gender": null,
+        "picture": null,
+        "bannerId": null,
+        "profileVisibility": "public",
+        "unclaimedSavedBy": "Smash Club",
+        "showProfileStats": true,
+        "showWeeklyPerformance": true,
+        "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        },
+        "bannerKey": "court",
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
+      }
+    }
+  },
+  "profile_entry_later_record": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "profile": {
+        "playerId": "e5000000-0000-4000-8000-000000000007",
+        "rtrId": "RTR-PH-CEB-102926-0017",
+        "fullName": "Olly New",
+        "nickname": "Oz",
+        "gender": null,
+        "picture": "https://example.test/olly.png",
+        "bannerId": null,
+        "profileVisibility": "public",
+        "unclaimedSavedBy": "Smash Club",
+        "showProfileStats": true,
+        "showWeeklyPerformance": true,
+        "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        },
+        "bannerKey": "court",
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
+      }
+    }
+  },
+  "profile_entry_record_moved": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "profile": {
+        "playerId": "e5000000-0000-4000-8000-000000000008",
+        "rtrId": "RTR-PH-CEB-102926-0018",
+        "fullName": "Lin Linked",
+        "nickname": null,
+        "gender": null,
+        "picture": null,
+        "bannerId": null,
+        "profileVisibility": "public",
+        "unclaimedSavedBy": "Smash Club",
+        "showProfileStats": true,
+        "showWeeklyPerformance": true,
+        "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        },
+        "bannerKey": "court",
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
+      }
+    }
+  },
+  "profile_entry_uppercase_id": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "profile": {
+        "playerId": "e5000000-0000-4000-8000-000000000001",
+        "rtrId": "RTR-PH-CEB-102926-0011",
+        "fullName": "Una Unclaimed",
+        "nickname": "Una",
+        "gender": null,
+        "picture": "https://example.test/una.png",
+        "bannerId": null,
+        "profileVisibility": "public",
+        "unclaimedSavedBy": "Smash Club",
+        "showProfileStats": true,
+        "showWeeklyPerformance": true,
+        "playingStyle": "Smasher",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
+        "experienceYears": 3,
+        "experienceMonths": 0,
+        "socialLinks": {
+          "facebook": "https://fb.test/una",
+          "instagram": "",
+          "youtube": "https://yt.test/una",
+          "linkedin": ""
+        },
+        "bannerKey": "court",
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
+      }
+    }
+  },
+  "profile_entry_second_club_removed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "profile": {
+        "playerId": "e5000000-0000-4000-8000-000000000002",
+        "rtrId": "RTR-PH-CEB-102926-0012",
+        "fullName": "Dave Duo",
+        "nickname": "Dave",
+        "gender": null,
+        "picture": "https://example.test/dave.png",
+        "bannerId": null,
+        "profileVisibility": "public",
+        "unclaimedSavedBy": "Smash Club",
+        "showProfileStats": true,
+        "showWeeklyPerformance": true,
+        "playingStyle": "Lifter",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
+        "experienceYears": 0,
+        "experienceMonths": 6,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "https://ig.test/dave",
+          "youtube": "",
+          "linkedin": ""
+        },
+        "bannerKey": "court",
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
+      }
+    }
+  },
+  "profile_entry_first_club_removed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "profile": {
+        "playerId": "e5000000-0000-4000-8000-000000000002",
+        "rtrId": "RTR-PH-CEB-102926-0012",
+        "fullName": "David Two",
+        "nickname": "Dee",
+        "gender": null,
+        "picture": null,
+        "bannerId": null,
+        "profileVisibility": "public",
+        "unclaimedSavedBy": "  😀 Birdie Club",
+        "showProfileStats": true,
+        "showWeeklyPerformance": true,
+        "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
+        "experienceYears": null,
+        "experienceMonths": null,
+        "socialLinks": {
+          "facebook": "",
+          "instagram": "",
+          "youtube": "",
+          "linkedin": ""
+        },
+        "bannerKey": "court",
+        "bannerImageUrl": null,
+        "leaderboardPlaces": []
+      }
+    }
+  },
+  "profile_entry_later_record_removed": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "profile_entry_claimed_since": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "profile_entry_retired_since": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "rank_entry_one_club": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "rank": null
+    }
+  },
+  "rank_entry_two_clubs": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "rank": null
+    }
+  },
+  "games_entry_one_club": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "games": []
+    }
+  },
+  "games_entry_two_clubs": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "games": []
+    }
+  },
+  "clubs_entry_one_club": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "clubs": [
+        {
+          "id": "e1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "isHost": false
+        }
+      ]
+    }
+  },
+  "clubs_entry_two_clubs": {
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-type": "application/json"
+    },
+    "body": {
+      "clubs": [
+        {
+          "id": "e1000000-0000-4000-8000-000000000001",
+          "name": "Smash Club",
+          "initials": "SC",
+          "logoUrl": "https://example.test/smash.png",
+          "isHost": false
+        },
+        {
+          "id": "e1000000-0000-4000-8000-000000000002",
+          "name": "  😀 Birdie Club",
+          "initials": "\ud83dB",
+          "logoUrl": null,
+          "isHost": false
+        }
+      ]
+    }
+  },
+  "rtr_entry_record_moved_away": {
+    "status": 404,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "error": {
+        "code": "not_found",
+        "message": "Not found."
+      }
+    }
+  },
+  "rtr_entry_with_a_players_id_finds_the_player": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "playerId": "d1000000-0000-4000-8000-000000000001"
+    }
   }
 }

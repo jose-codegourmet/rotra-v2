@@ -162,4 +162,39 @@ FROM (VALUES
   ('d1000000-0000-4000-8000-000000000006', 0::smallint, 10::numeric, 'established', 0)
 ) AS v(player_id, skill_level_id, numeric_rank, state, recent);
 
+-- Unclaimed people a club saved (shared entries, D-2026-11-16-04, D-2026-11-23-05): found by RTR ID, with no players row.
+--   ...01 saved by one club (Smash Club), with its own details      ...02 saved by two clubs
+--   ...03 already claimed by Ida                                    ...04 retired
+--   ...05 every club record removed                                 ...06 saved by one club, nothing but a name
+--   ...07 saved by one club, a removed record then a later live one ...08 a record moved into another (linked)
+INSERT INTO shared_player_entries (id, email, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence, claimed_player_id, claimed_at, retired_at, updated_at) VALUES
+  ('e5000000-0000-4000-8000-000000000001', 'entry-1@example.test', 'RTR-PH-CEB-102926-0011', 'e1000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 11, NULL, NULL, NULL, now()),
+  ('e5000000-0000-4000-8000-000000000002', 'entry-2@example.test', 'RTR-PH-CEB-102926-0012', 'e1000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 12, NULL, NULL, NULL, now()),
+  ('e5000000-0000-4000-8000-000000000003', NULL, 'RTR-PH-CEB-102926-0013', 'e1000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 13, 'd1000000-0000-4000-8000-000000000009', TIMESTAMPTZ '2026-11-10 00:00:00+00', NULL, now()),
+  ('e5000000-0000-4000-8000-000000000004', NULL, 'RTR-PH-CEB-102926-0014', 'e1000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 14, NULL, NULL, TIMESTAMPTZ '2026-11-11 00:00:00+00', now()),
+  ('e5000000-0000-4000-8000-000000000005', 'entry-5@example.test', 'RTR-PH-CEB-102926-0015', 'e1000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 15, NULL, NULL, NULL, now()),
+  ('e5000000-0000-4000-8000-000000000006', 'entry-6@example.test', 'RTR-PH-CEB-102926-0016', 'e1000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 16, NULL, NULL, NULL, now()),
+  ('e5000000-0000-4000-8000-000000000007', 'entry-7@example.test', 'RTR-PH-CEB-102926-0017', 'e1000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 17, NULL, NULL, NULL, now()),
+  ('e5000000-0000-4000-8000-000000000008', 'entry-8@example.test', 'RTR-PH-CEB-102926-0018', 'e1000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 18, NULL, NULL, NULL, now());
+
+INSERT INTO club_players (id, club_id, player_id, display_name, nickname, avatar_ref, shared_entry_id, linked_to_club_player_id, added_at, removed_at, updated_at) VALUES
+  ('e2000000-0000-4000-8000-000000000021', 'e1000000-0000-4000-8000-000000000001', NULL, 'Una Unclaimed', 'Una', 'https://example.test/una.png', 'e5000000-0000-4000-8000-000000000001', NULL, TIMESTAMPTZ '2026-02-01 00:00:00+00', NULL, now()),
+  ('e2000000-0000-4000-8000-000000000022', 'e1000000-0000-4000-8000-000000000001', NULL, 'Dave Duo', 'Dave', 'https://example.test/dave.png', 'e5000000-0000-4000-8000-000000000002', NULL, TIMESTAMPTZ '2026-02-02 00:00:00+00', NULL, now()),
+  ('e2000000-0000-4000-8000-000000000023', 'e1000000-0000-4000-8000-000000000002', NULL, 'David Two', 'Dee', NULL, 'e5000000-0000-4000-8000-000000000002', NULL, TIMESTAMPTZ '2026-02-03 00:00:00+00', NULL, now()),
+  ('e2000000-0000-4000-8000-000000000024', 'e1000000-0000-4000-8000-000000000001', NULL, 'Cleo Claimed', NULL, NULL, 'e5000000-0000-4000-8000-000000000003', NULL, TIMESTAMPTZ '2026-02-04 00:00:00+00', NULL, now()),
+  ('e2000000-0000-4000-8000-000000000025', 'e1000000-0000-4000-8000-000000000001', NULL, 'Rex Retired', NULL, NULL, 'e5000000-0000-4000-8000-000000000004', NULL, TIMESTAMPTZ '2026-02-05 00:00:00+00', NULL, now()),
+  ('e2000000-0000-4000-8000-000000000026', 'e1000000-0000-4000-8000-000000000001', NULL, 'Rae Removed', NULL, NULL, 'e5000000-0000-4000-8000-000000000005', NULL, TIMESTAMPTZ '2026-02-06 00:00:00+00', TIMESTAMPTZ '2026-03-01 00:00:00+00', now()),
+  ('e2000000-0000-4000-8000-000000000027', 'e1000000-0000-4000-8000-000000000001', NULL, 'Nia Nameonly', NULL, NULL, 'e5000000-0000-4000-8000-000000000006', NULL, TIMESTAMPTZ '2026-02-07 00:00:00+00', NULL, now()),
+  ('e2000000-0000-4000-8000-000000000028', 'e1000000-0000-4000-8000-000000000003', NULL, 'Old Olly', 'Ol', NULL, 'e5000000-0000-4000-8000-000000000007', NULL, TIMESTAMPTZ '2026-01-01 00:00:00+00', TIMESTAMPTZ '2026-01-15 00:00:00+00', now()),
+  ('e2000000-0000-4000-8000-000000000029', 'e1000000-0000-4000-8000-000000000001', NULL, 'Olly New', 'Oz', 'https://example.test/olly.png', 'e5000000-0000-4000-8000-000000000007', NULL, TIMESTAMPTZ '2026-02-08 00:00:00+00', NULL, now()),
+  ('e2000000-0000-4000-8000-00000000002a', 'e1000000-0000-4000-8000-000000000001', NULL, 'Lin Linked', NULL, NULL, 'e5000000-0000-4000-8000-000000000008', NULL, TIMESTAMPTZ '2026-02-09 00:00:00+00', NULL, now()),
+  ('e2000000-0000-4000-8000-00000000002b', 'e1000000-0000-4000-8000-000000000001', NULL, 'Lin Moved', NULL, NULL, NULL, 'e2000000-0000-4000-8000-00000000002a', TIMESTAMPTZ '2026-02-10 00:00:00+00', TIMESTAMPTZ '2026-02-11 00:00:00+00', now());
+
+-- What a club entered about its own person (club_player_private_inputs.preset_fields, version 1).
+INSERT INTO club_player_private_inputs (club_player_id, club_id, preset_fields, captured_at, updated_at) VALUES
+  ('e2000000-0000-4000-8000-000000000021', 'e1000000-0000-4000-8000-000000000001', '{"version":1,"playingStyle":"Smasher","experienceMonths":30,"experienceRecordedAt":"2026-05-20T00:00:00.000Z","socialLinks":{"facebook":"https://fb.test/una","instagram":"","youtube":"https://yt.test/una","linkedin":""}}'::jsonb, now(), now()),
+  ('e2000000-0000-4000-8000-000000000022', 'e1000000-0000-4000-8000-000000000001', '{"version":1,"playingStyle":"Lifter","experienceMonths":6,"experienceRecordedAt":null,"socialLinks":{"facebook":"","instagram":"https://ig.test/dave","youtube":"","linkedin":""}}'::jsonb, now(), now()),
+  ('e2000000-0000-4000-8000-000000000027', 'e1000000-0000-4000-8000-000000000001', '[]'::jsonb, now(), now()),
+  ('e2000000-0000-4000-8000-000000000029', 'e1000000-0000-4000-8000-000000000001', '{"version":1,"playingStyle":7,"experienceMonths":"12","socialLinks":"x"}'::jsonb, now(), now());
+
 COMMIT;

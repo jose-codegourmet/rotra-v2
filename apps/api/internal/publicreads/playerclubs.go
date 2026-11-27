@@ -40,6 +40,23 @@ func (p *players) clubs(w http.ResponseWriter, r *http.Request) {
 	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) error {
 		visibility, err := q.GetPublicClubsVisibility(r.Context(), id)
 		if errors.Is(err, pgx.ErrNoRows) {
+			// An unclaimed person a club saved (a shared entry): the clubs that saved them.
+			open, err := entryOpen(r.Context(), q, id)
+			if err != nil || !open {
+				return err
+			}
+			found = true
+			entryClubs, err := q.ListEntryClubs(r.Context(), id)
+			if err != nil {
+				return fmt.Errorf("listing entry clubs: %w", err)
+			}
+			seen := map[pgtype.UUID]bool{}
+			for _, c := range entryClubs {
+				if !seen[c.ID] {
+					seen[c.ID] = true
+					body.Clubs = append(body.Clubs, clubDTO{ID: c.ID.String(), Name: c.Name, Initials: clubInitials(c.Name), LogoURL: textPtr(c.LogoRef)})
+				}
+			}
 			return nil
 		}
 		if err != nil {

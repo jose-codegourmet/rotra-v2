@@ -128,7 +128,9 @@ UPDATE players
 SET full_name = @full_name, nickname = @nickname,
     avatar_ref = CASE WHEN @set_avatar::bool THEN sqlc.narg('avatar_ref')::text ELSE avatar_ref END,
     avatar_previous_ref = CASE WHEN @set_avatar::bool THEN sqlc.narg('avatar_previous_ref')::text ELSE avatar_previous_ref END,
-    personal_details = CASE WHEN @set_style::bool THEN @personal_details::jsonb ELSE personal_details END,
+    -- mergeDetails: the playing style laid over the stored details (an object; anything else reads as empty), so the getting-to-know
+    -- answers kept beside it survive.
+    personal_details = CASE WHEN @set_style::bool THEN (CASE WHEN jsonb_typeof(personal_details) = 'object' THEN personal_details ELSE '{}'::jsonb END) || @personal_details::jsonb ELSE personal_details END,
     details_version = CASE WHEN @set_style::bool THEN 1 ELSE details_version END,
     experience_months = CASE WHEN @set_experience::bool THEN sqlc.narg('experience_months')::int ELSE experience_months END,
     experience_recorded_at = CASE WHEN @set_experience::bool THEN sqlc.narg('experience_recorded_at')::timestamptz ELSE experience_recorded_at END,

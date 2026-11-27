@@ -51,6 +51,15 @@
     ],
     "hana_rtr_moved": [
       "UPDATE player_id_allocations SET rtr_id = 'RTR-PH-CEB-102926-0015', sequence = 15 WHERE player_id = 'd4000000-0000-4000-8000-000000000008'"
+    ],
+    "alice_with_answers": [
+      "UPDATE players SET personal_details = '{\"playingStyle\":\"Aggressive net player\",\"court_position\":\"front\",\"skills\":[\"smash\",\"drop\"],\"skills_other\":[\"half volley\"],\"favorite_player\":\"lindan\",\"favorite_player_other\":\"\",\"kept\":\"by another screen\"}'::jsonb WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_details_an_array": [
+      "UPDATE players SET personal_details = '[\"x\"]'::jsonb WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+    ],
+    "alice_details_null": [
+      "UPDATE players SET personal_details = NULL, details_version = NULL WHERE id = 'd4000000-0000-4000-8000-000000000001'"
     ]
   },
   "snapshot": [
@@ -11143,6 +11152,142 @@
               "email": "una.new@example.test",
               "password": "",
               "reason": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+              "registrationPlace": "PH-CEB",
+              "registrationDate": "2026-10-29"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "playing_style_keeps_the_answers",
+      "scenario": "alice_with_answers",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "values": {
+              "picture": "https://example.test/alice.png",
+              "name": "Alice Reyes",
+              "nickname": "Ace",
+              "playingStyle": "Net rusher",
+              "experienceYears": "3",
+              "experienceMonths": "0",
+              "facebook": "https://facebook.com/alice",
+              "instagram": "",
+              "youtube": "https://youtube.com/@alice",
+              "linkedin": "",
+              "profilePrivate": false,
+              "phoneHidden": false,
+              "phone": "+639175550001",
+              "email": "alice@example.test",
+              "password": "",
+              "reason": "Corrected on request",
+              "registrationPlace": "PH-CEB",
+              "registrationDate": "2026-10-29"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "playing_style_cleared_keeps_the_answers",
+      "scenario": "alice_with_answers",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "values": {
+              "picture": "https://example.test/alice.png",
+              "name": "Alice Reyes",
+              "nickname": "Ace",
+              "playingStyle": "",
+              "experienceYears": "3",
+              "experienceMonths": "0",
+              "facebook": "https://facebook.com/alice",
+              "instagram": "",
+              "youtube": "https://youtube.com/@alice",
+              "linkedin": "",
+              "profilePrivate": false,
+              "phoneHidden": false,
+              "phone": "+639175550001",
+              "email": "alice@example.test",
+              "password": "",
+              "reason": "Corrected on request",
+              "registrationPlace": "PH-CEB",
+              "registrationDate": "2026-10-29"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "playing_style_over_details_that_are_an_array",
+      "scenario": "alice_details_an_array",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "values": {
+              "picture": "https://example.test/alice.png",
+              "name": "Alice Reyes",
+              "nickname": "Ace",
+              "playingStyle": "Net rusher",
+              "experienceYears": "3",
+              "experienceMonths": "0",
+              "facebook": "https://facebook.com/alice",
+              "instagram": "",
+              "youtube": "https://youtube.com/@alice",
+              "linkedin": "",
+              "profilePrivate": false,
+              "phoneHidden": false,
+              "phone": "+639175550001",
+              "email": "alice@example.test",
+              "password": "",
+              "reason": "Corrected on request",
+              "registrationPlace": "PH-CEB",
+              "registrationDate": "2026-10-29"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "playing_style_over_no_details",
+      "scenario": "alice_details_null",
+      "steps": [
+        {
+          "method": "PATCH",
+          "path": "/api/players/d4000000-0000-4000-8000-000000000001",
+          "who": "ad100000-0000-4000-8000-000000000001",
+          "body": {
+            "revision": "3",
+            "values": {
+              "picture": "https://example.test/alice.png",
+              "name": "Alice Reyes",
+              "nickname": "Ace",
+              "playingStyle": "Net rusher",
+              "experienceYears": "3",
+              "experienceMonths": "0",
+              "facebook": "https://facebook.com/alice",
+              "instagram": "",
+              "youtube": "https://youtube.com/@alice",
+              "linkedin": "",
+              "profilePrivate": false,
+              "phoneHidden": false,
+              "phone": "+639175550001",
+              "email": "alice@example.test",
+              "password": "",
+              "reason": "Corrected on request",
               "registrationPlace": "PH-CEB",
               "registrationDate": "2026-10-29"
             }

@@ -365,7 +365,7 @@ func (s *server) addSavedPlayer(r *http.Request, club pgtype.UUID) (writes.Resul
 		if e164 != "" {
 			match, err := t.q.FindSavedPlayerByPhone(t.ctx, sqlcgen.FindSavedPlayerByPhoneParams{ClubID: t.club, Phone: pgtype.Text{String: e164, Valid: true}})
 			if err == nil {
-				return nil, alreadySaved(match)
+				return nil, writes.Fail(httpapi.ErrConflict, map[string]string{"phone": match + " already has this number."})
 			}
 			if !errors.Is(err, pgx.ErrNoRows) {
 				return nil, err

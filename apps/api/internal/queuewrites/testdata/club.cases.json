@@ -20,6 +20,12 @@
   "s3_full": [
    "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000012', 'Lee Guest', true, TIMESTAMPTZ '2026-11-19 01:08:00+00', 'a0300000-0000-4000-8000-000000000199', 3, TIMESTAMPTZ '2026-11-19 01:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-19 01:08:00+00', 3)"
   ],
+  "club_has_a_name_change": [
+   "INSERT INTO club_name_change_requests (id, club_id, requested_name, requested_name_key, requested_at, state, source_command_id, created_at, updated_at, revision) VALUES ('b4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'Pending Name', 'pending name', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'pending', 'b3000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)"
+  ],
+  "other_club_name_change": [
+   "INSERT INTO club_name_change_requests (id, club_id, requested_name, requested_name_key, requested_at, state, source_command_id, created_at, updated_at, revision) VALUES ('b4000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000003', 'Other Pending', 'other pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'pending', 'b3000000-0000-4000-8000-000000000009', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)"
+  ],
   "club_has_a_code": [
    "UPDATE clubs SET invite_code = 'ABCDEFGHJK' WHERE id = 'c9000000-0000-4000-8000-000000000001'"
   ],
@@ -134,6 +140,10 @@
   {
    "name": "club_venues",
    "sql": "SELECT id, club_id, name, address, court_fee_per_court_hour_minor, entrance_fee_minor, currency, created_at, updated_at, revision::text AS revision FROM club_venues ORDER BY id"
+  },
+  {
+   "name": "club_name_change_requests",
+   "sql": "SELECT club_id, requested_name, requested_name_key, requested_at, state, reviewed_at, source_command_id, created_at, updated_at, revision::text AS revision FROM club_name_change_requests ORDER BY club_id, requested_at, source_command_id"
   },
   {
    "name": "club_player_claim_links",
@@ -2484,6 +2494,419 @@
     {
      "method": "POST",
      "path": "/api/club/players/c6000000-0000-4000-8000-000000000020/registration-link",
+     "who": "c7000000-0000-4000-8000-000000000002"
+    }
+   ]
+  },
+  {
+   "name": "namechange_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": null,
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "New Name"
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "namechange_request",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "New Name"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "namechange_name_is_trimmed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "   Spaced   Out  "
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "namechange_own_name_in_other_case_is_allowed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "SMASH club"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "namechange_blank_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "   "
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_name_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_command_missing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "name": "New Name"
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_command_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": 5,
+      "name": "New Name"
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_command_not_a_uuid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "x",
+      "name": "New Name"
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_name_of_another_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "  Other-CLUB "
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_second_pending_is_refused",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "First Name"
+     },
+     "redact": [
+      "request.id"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000002",
+      "name": "Second Name"
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_retry_of_the_same_command",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "First Name"
+     },
+     "redact": [
+      "request.id"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "Changed Name"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "namechange_retry_after_cancel_returns_the_cancelled_one",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "First Name"
+     },
+     "redact": [
+      "request.id"
+     ]
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    },
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "First Name"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "namechange_new_request_after_cancel",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "First Name"
+     },
+     "redact": [
+      "request.id"
+     ]
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    },
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000002",
+      "name": "Second Name"
+     },
+     "redact": [
+      "request.id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "namechange_command_of_another_club",
+   "scenario": "other_club_name_change",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000009",
+      "name": "New Name"
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_while_one_is_pending",
+   "scenario": "club_has_a_name_change",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000002",
+      "name": "Second Name"
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_lapsed_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "b3000000-0000-4000-8000-000000000001",
+      "name": "New Name"
+     }
+    }
+   ]
+  },
+  {
+   "name": "namechange_cancel_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/club/name-change",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "namechange_cancel_pending",
+   "scenario": "club_has_a_name_change",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "namechange_cancel_nothing_pending",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "namechange_cancel_twice",
+   "scenario": "club_has_a_name_change",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "namechange_cancel_leaves_another_clubs_request",
+   "scenario": "other_club_name_change",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/club/name-change",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "namechange_cancel_lapsed_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/club/name-change",
      "who": "c7000000-0000-4000-8000-000000000002"
     }
    ]

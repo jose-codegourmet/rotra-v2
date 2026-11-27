@@ -18,7 +18,7 @@ DELETE FROM session_hosts; DELETE FROM club_trusted_hosts;
 DELETE FROM session_courts; DELETE FROM queue_sessions; DELETE FROM club_venues;
 DELETE FROM club_player_private_inputs; DELETE FROM club_player_claim_links; DELETE FROM player_claim_links; DELETE FROM club_players; DELETE FROM shared_player_entries;
 DELETE FROM player_accounts; DELETE FROM player_private_contacts; DELETE FROM player_id_allocations; DELETE FROM player_id_counters; DELETE FROM players;
-DELETE FROM club_entitlements; DELETE FROM club_license_terms; DELETE FROM club_accounts; DELETE FROM clubs; DELETE FROM admin_accounts;
+DELETE FROM club_name_change_requests; DELETE FROM club_entitlements; DELETE FROM club_license_terms; DELETE FROM club_accounts; DELETE FROM clubs; DELETE FROM admin_accounts;
 
 -- ---- clubs: Smash Club (the one that writes), Lapsed Club (its entitlement ended), Other Club (another club's rows) ----
 INSERT INTO clubs (id, name, name_key, founding_location_code_id, founding_address, license_pricing, source_command_id, created_at, updated_at, revision) VALUES

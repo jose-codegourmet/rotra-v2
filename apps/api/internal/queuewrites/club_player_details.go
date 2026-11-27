@@ -181,6 +181,20 @@ func (t *txn) updateDetails(id pgtype.UUID, in detailsInput, experience *int64) 
 		}
 	}
 	message := "Details saved · " + in.name
+	// #1019: the entry's link key follows this club's links; no email and no link left is a guest.
+	if row.SharedEntryID.Valid && !row.PlayerID.Valid {
+		stored, err := t.q.GetClubPlayerPresetFields(t.ctx, row.ID)
+		if err != nil {
+			return nil, err
+		}
+		guest, err := t.followClubLinks(row.ID, row.SharedEntryID, signedin.OwnDetailsOf(stored).Links)
+		if err != nil {
+			return nil, err
+		}
+		if guest {
+			return detailsAnswer{ClubPlayerID: row.ID.String(), Message: message + " · now a guest"}, nil
+		}
+	}
 	if email == "" {
 		return detailsAnswer{ClubPlayerID: row.ID.String(), Message: message}, nil
 	}

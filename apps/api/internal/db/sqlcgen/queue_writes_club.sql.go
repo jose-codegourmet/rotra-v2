@@ -550,7 +550,7 @@ func (q *Queries) ReleasePreparedEntriesOfClubPlayer(ctx context.Context, arg Re
 }
 
 const retireSharedEntry = `-- name: RetireSharedEntry :exec
-UPDATE shared_player_entries SET retired_at = $1, email = NULL, revision = revision + 1, updated_at = $1 WHERE id = $2
+UPDATE shared_player_entries SET retired_at = $1, email = NULL, social_key = NULL, revision = revision + 1, updated_at = $1 WHERE id = $2
 `
 
 type RetireSharedEntryParams struct {

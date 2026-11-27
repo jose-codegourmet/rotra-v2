@@ -241,9 +241,40 @@ case('link_other_clubs_player', req('POST', f'{PLS}/{CP(30)}/registration-link')
 case('link_malformed_id', req('POST', f'{PLS}/nope/registration-link'), **CRASH)
 case('link_lapsed_club', req('POST', f'{PLS}/{CP(20)}/registration-link', who=LAPSED))
 
+# ---------------------------------------------------------------- POST and DELETE /api/club/name-change
+NC = '/api/club/name-change'
+CMD = lambda n: f'b3000000-0000-4000-8000-{n:012d}'
+NCRED = ['request.id']
+case('namechange_signed_out', req('POST', NC, {'commandId': CMD(1), 'name': 'New Name'}, who=None))
+case('namechange_body_not_json', req('POST', NC, rawBody='nope'))
+case('namechange_request', req('POST', NC, {'commandId': CMD(1), 'name': 'New Name'}, redact=NCRED))
+case('namechange_name_is_trimmed', req('POST', NC, {'commandId': CMD(1), 'name': '   Spaced   Out  '}, redact=NCRED))
+case('namechange_own_name_in_other_case_is_allowed', req('POST', NC, {'commandId': CMD(1), 'name': 'SMASH club'}, redact=NCRED))
+case('namechange_blank_name', req('POST', NC, {'commandId': CMD(1), 'name': '   '}))
+case('namechange_name_not_text', req('POST', NC, {'commandId': CMD(1), 'name': 5}))
+case('namechange_command_missing', req('POST', NC, {'name': 'New Name'}))
+case('namechange_command_not_text', req('POST', NC, {'commandId': 5, 'name': 'New Name'}))
+case('namechange_command_not_a_uuid', req('POST', NC, {'commandId': 'x', 'name': 'New Name'}))
+case('namechange_name_of_another_club', req('POST', NC, {'commandId': CMD(1), 'name': '  Other-CLUB '}))
+case('namechange_second_pending_is_refused', [req('POST', NC, {'commandId': CMD(1), 'name': 'First Name'}, redact=NCRED), req('POST', NC, {'commandId': CMD(2), 'name': 'Second Name'})])
+case('namechange_retry_of_the_same_command', [req('POST', NC, {'commandId': CMD(1), 'name': 'First Name'}, redact=NCRED), req('POST', NC, {'commandId': CMD(1), 'name': 'Changed Name'}, redact=NCRED)])
+case('namechange_retry_after_cancel_returns_the_cancelled_one', [req('POST', NC, {'commandId': CMD(1), 'name': 'First Name'}, redact=NCRED), req('DELETE', NC), req('POST', NC, {'commandId': CMD(1), 'name': 'First Name'}, redact=NCRED)])
+case('namechange_new_request_after_cancel', [req('POST', NC, {'commandId': CMD(1), 'name': 'First Name'}, redact=NCRED), req('DELETE', NC), req('POST', NC, {'commandId': CMD(2), 'name': 'Second Name'}, redact=NCRED)])
+case('namechange_command_of_another_club', req('POST', NC, {'commandId': CMD(9), 'name': 'New Name'}), scenario='other_club_name_change')
+case('namechange_while_one_is_pending', req('POST', NC, {'commandId': CMD(2), 'name': 'Second Name'}), scenario='club_has_a_name_change')
+case('namechange_lapsed_club', req('POST', NC, {'commandId': CMD(1), 'name': 'New Name'}, who=LAPSED))
+case('namechange_cancel_signed_out', req('DELETE', NC, who=None))
+case('namechange_cancel_pending', req('DELETE', NC), scenario='club_has_a_name_change')
+case('namechange_cancel_nothing_pending', req('DELETE', NC))
+case('namechange_cancel_twice', [req('DELETE', NC), req('DELETE', NC)], scenario='club_has_a_name_change')
+case('namechange_cancel_leaves_another_clubs_request', req('DELETE', NC), scenario='other_club_name_change')
+case('namechange_cancel_lapsed_club', req('DELETE', NC, who=LAPSED))
+
 # ---------------------------------------------------------------- scenarios
 SCEN = dict(BASE['scenarios'])
 SCEN.update({
+    'club_has_a_name_change': [f"INSERT INTO club_name_change_requests (id, club_id, requested_name, requested_name_key, requested_at, state, source_command_id, created_at, updated_at, revision) VALUES ('b4000000-0000-4000-8000-000000000001', '{CLUB1}', 'Pending Name', 'pending name', {NOW}, 'pending', '{'b3000000-0000-4000-8000-000000000001'}', {NOW}, {NOW}, 1)"],
+    'other_club_name_change': [f"INSERT INTO club_name_change_requests (id, club_id, requested_name, requested_name_key, requested_at, state, source_command_id, created_at, updated_at, revision) VALUES ('b4000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000003', 'Other Pending', 'other pending', {NOW}, 'pending', '{'b3000000-0000-4000-8000-000000000009'}', {NOW}, {NOW}, 1)"],
     'club_has_a_code': ["UPDATE clubs SET invite_code = 'ABCDEFGHJK' WHERE id = '" + CLUB1 + "'"],
     'club_has_settings': [f"UPDATE clubs SET post_template = 'Old template', description = 'Old description', court_rules = 'Old rules', self_check_in_enabled = true WHERE id = '{CLUB1}'"],
     'gus_has_a_phone': [f"INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, created_at, updated_at) VALUES ('{CP(1)}', '{CLUB1}', '+639175550100', 'pending', {NOW}, {NOW}, {NOW})"],
@@ -303,6 +334,7 @@ for s in BASE['snapshot']:
 SNAPSHOT += [
     {'name': 'clubs', 'sql': "SELECT id, name, invite_code, post_template, description, court_rules, self_check_in_enabled, revision::text AS revision, updated_at FROM clubs ORDER BY id", 'redact': ['invite_code']},
     {'name': 'club_venues', 'sql': "SELECT id, club_id, name, address, court_fee_per_court_hour_minor, entrance_fee_minor, currency, created_at, updated_at, revision::text AS revision FROM club_venues ORDER BY id"},
+    {'name': 'club_name_change_requests', 'sql': "SELECT club_id, requested_name, requested_name_key, requested_at, state, reviewed_at, source_command_id, created_at, updated_at, revision::text AS revision FROM club_name_change_requests ORDER BY club_id, requested_at, source_command_id"},
     {'name': 'club_player_claim_links', 'sql': "SELECT club_player_id, club_id, state, issued_at, expires_at, consumed_at, revoked_at, created_at, updated_at, revision::text AS revision FROM club_player_claim_links ORDER BY club_player_id, revision, state"},
     {'name': 'player_claim_links', 'sql': "SELECT player_id, issuing_club_id, state, issued_at, expires_at, consumed_at, revoked_at, created_at, updated_at, revision::text AS revision FROM player_claim_links ORDER BY player_id, revision, state"},
 ]

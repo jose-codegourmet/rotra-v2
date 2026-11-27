@@ -212,7 +212,7 @@ func (t *txn) createClubPlayer(operationID string, in newClubPlayer, at pgtype.T
 	// email's owner is not checked. One the club saved is refused.
 	var linked *emailResolution
 	if hasLink {
-		if linked, err = t.resolveSocialKey(link.key, at, false, ""); err != nil {
+		if linked, err = t.resolveSocialKey(link.Key, at, false, ""); err != nil {
 			return existing, nil, err
 		}
 		if linked != nil {
@@ -265,7 +265,7 @@ func (t *txn) createClubPlayer(operationID string, in newClubPlayer, at pgtype.T
 	if hasLink {
 		resolved := linked
 		if resolved == nil {
-			if resolved, err = t.resolveSocialKey(link.key, at, true, email); err != nil {
+			if resolved, err = t.resolveSocialKey(link.Key, at, true, email); err != nil {
 				return existing, nil, err
 			}
 		}

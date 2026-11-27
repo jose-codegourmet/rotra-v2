@@ -107,6 +107,25 @@ func (q *Queries) GetDirectoryPlayer(ctx context.Context, playerID pgtype.UUID) 
 	return i, err
 }
 
+const getFirstRecordOfEntry = `-- name: GetFirstRecordOfEntry :one
+SELECT display_name, avatar_ref FROM club_players
+WHERE shared_entry_id = $1 AND removed_at IS NULL AND linked_to_club_player_id IS NULL AND player_id IS NULL
+ORDER BY added_at ASC, id ASC LIMIT 1
+`
+
+type GetFirstRecordOfEntryRow struct {
+	DisplayName string
+	AvatarRef   pgtype.Text
+}
+
+// firstRecordOf: the club record that saved an unclaimed person first (its name and picture are the ones Player lookup shows).
+func (q *Queries) GetFirstRecordOfEntry(ctx context.Context, entryID pgtype.UUID) (GetFirstRecordOfEntryRow, error) {
+	row := q.db.QueryRow(ctx, getFirstRecordOfEntry, entryID)
+	var i GetFirstRecordOfEntryRow
+	err := row.Scan(&i.DisplayName, &i.AvatarRef)
+	return i, err
+}
+
 const getOpenEntryByEmail = `-- name: GetOpenEntryByEmail :one
 SELECT id, rtr_id FROM shared_player_entries
 WHERE email = $1 AND claimed_player_id IS NULL AND retired_at IS NULL
@@ -708,6 +727,57 @@ func (q *Queries) ListQueueLicenseTerms(ctx context.Context, clubID pgtype.UUID)
 			&i.PaymentReference,
 			&i.Notes,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listUnclaimedEntriesByName = `-- name: ListUnclaimedEntriesByName :many
+SELECT e.id, e.rtr_id
+FROM (
+  SELECT cp.shared_entry_id AS id, min(cp.added_at) AS first_added
+  FROM club_players cp
+  JOIN shared_player_entries se ON se.id = cp.shared_entry_id
+  WHERE cp.display_name ILIKE '%' || replace(replace(replace($1::text, '\', '\\'), '%', '\%'), '_', '\_') || '%'
+    AND cp.removed_at IS NULL AND cp.linked_to_club_player_id IS NULL AND cp.player_id IS NULL
+    AND se.claimed_player_id IS NULL AND se.retired_at IS NULL
+  GROUP BY cp.shared_entry_id
+) found
+JOIN shared_player_entries e ON e.id = found.id
+WHERE NOT EXISTS (
+  SELECT 1 FROM club_players mine WHERE mine.club_id = $2 AND mine.removed_at IS NULL AND mine.shared_entry_id = e.id
+)
+ORDER BY found.first_added ASC, e.id ASC
+LIMIT 20
+`
+
+type ListUnclaimedEntriesByNameParams struct {
+	Query  string
+	ClubID pgtype.UUID
+}
+
+type ListUnclaimedEntriesByNameRow struct {
+	ID    pgtype.UUID
+	RtrID string
+}
+
+// unclaimedByName: open unclaimed people whose name at any club contains the query (case-insensitive, the query taken literally),
+// leaving out anyone the club already saved. At most 100 records are read, 20 people are shown.
+func (q *Queries) ListUnclaimedEntriesByName(ctx context.Context, arg ListUnclaimedEntriesByNameParams) ([]ListUnclaimedEntriesByNameRow, error) {
+	rows, err := q.db.Query(ctx, listUnclaimedEntriesByName, arg.Query, arg.ClubID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListUnclaimedEntriesByNameRow
+	for rows.Next() {
+		var i ListUnclaimedEntriesByNameRow
+		if err := rows.Scan(&i.ID, &i.RtrID); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

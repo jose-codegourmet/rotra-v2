@@ -3576,6 +3576,467 @@
       "players": []
     }
   },
+  "lookup-club1-uri-link": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": {
+        "id": "a6000000-0000-4000-8000-000000000008",
+        "fullName": "Uri Beltran",
+        "nickname": null,
+        "rtrId": "RTR-PH-MNL-103026-0008",
+        "identity": "unclaimed",
+        "picture": null,
+        "suggestion": null,
+        "phoneHidden": false,
+        "ownNameRequired": true
+      },
+      "savedName": null,
+      "players": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ]
+    }
+  },
+  "lookup-club1-uri-link-short": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": {
+        "id": "a6000000-0000-4000-8000-000000000008",
+        "fullName": "Uri Beltran",
+        "nickname": null,
+        "rtrId": "RTR-PH-MNL-103026-0008",
+        "identity": "unclaimed",
+        "picture": null,
+        "suggestion": null,
+        "phoneHidden": false,
+        "ownNameRequired": true
+      },
+      "savedName": null,
+      "players": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ]
+    }
+  },
+  "lookup-club1-uri-link-bare": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": {
+        "id": "a6000000-0000-4000-8000-000000000008",
+        "fullName": "Uri Beltran",
+        "nickname": null,
+        "rtrId": "RTR-PH-MNL-103026-0008",
+        "identity": "unclaimed",
+        "picture": null,
+        "suggestion": null,
+        "phoneHidden": false,
+        "ownNameRequired": true
+      },
+      "savedName": null,
+      "players": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ]
+    }
+  },
+  "lookup-club1-una-link-saved": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": "Una Alonzo",
+      "players": []
+    }
+  },
+  "lookup-club1-unknown-link": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [],
+      "players": []
+    }
+  },
+  "lookup-club1-not-a-profile-link": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [],
+      "players": []
+    }
+  },
+  "lookup-club1-bare-site": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [],
+      "players": []
+    }
+  },
+  "lookup-club1-bare-site-slash": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [],
+      "players": []
+    }
+  },
+  "lookup-club2-uri-link": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": "Uri Beltran",
+      "players": []
+    }
+  },
+  "lookup-club1-name-uri": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ],
+      "players": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ]
+    }
+  },
+  "lookup-club1-name-uri-lower": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ],
+      "players": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ]
+    }
+  },
+  "lookup-club1-name-in-the-middle": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ],
+      "players": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ]
+    }
+  },
+  "lookup-club1-name-one-letter": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [],
+      "players": []
+    }
+  },
+  "lookup-club1-name-spaces": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ],
+      "players": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ]
+    }
+  },
+  "lookup-club1-name-already-saved": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [],
+      "players": []
+    }
+  },
+  "lookup-club1-name-registered-never-found": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [],
+      "players": []
+    }
+  },
+  "lookup-club1-name-no-one": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [],
+      "players": []
+    }
+  },
+  "lookup-club1-name-several": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [],
+      "players": []
+    }
+  },
+  "lookup-club2-name-uri": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [],
+      "players": []
+    }
+  },
+  "lookup-club1-name-among-many": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "player": null,
+      "savedName": null,
+      "matches": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ],
+      "players": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000008",
+          "fullName": "Uri Beltran",
+          "nickname": null,
+          "rtrId": "RTR-PH-MNL-103026-0008",
+          "identity": "unclaimed",
+          "picture": null,
+          "suggestion": null,
+          "phoneHidden": false,
+          "ownNameRequired": true
+        }
+      ]
+    }
+  },
   "lookup-club1-no-q": {
     "status": 200,
     "headers": {

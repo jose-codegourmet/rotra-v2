@@ -51,3 +51,12 @@ UPDATE club_players SET shared_entry_id = NULL, revision = revision + 1, updated
 -- name: GetClubPlayerPresetFields :one
 -- The club's own details after this save (followClubLinks reads the links back from the private input).
 SELECT preset_fields FROM club_player_private_inputs WHERE club_player_id = @club_player_id;
+
+-- name: SetClubPlayerSavedLevel :exec
+-- setSavedLevel: the level the club gives a saved player outside a session; a null level clears both columns.
+UPDATE club_players SET saved_skill_level_id = sqlc.narg('level')::smallint, saved_level_at = sqlc.narg('level_at')::timestamptz, revision = revision + 1, updated_at = @now
+WHERE club_id = @club_id AND id = @id;
+
+-- name: GetOpenSharedEntryBySocialKey :one
+-- openEntryBySocialKey: the open (unclaimed, not retired) shared entry whose link key it is.
+SELECT id, email, rtr_id FROM shared_player_entries WHERE social_key = @key AND claimed_player_id IS NULL AND retired_at IS NULL LIMIT 1;

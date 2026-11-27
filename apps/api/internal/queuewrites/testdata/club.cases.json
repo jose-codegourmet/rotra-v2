@@ -20,6 +20,12 @@
   "s3_full": [
    "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000012', 'Lee Guest', true, TIMESTAMPTZ '2026-11-19 01:08:00+00', 'a0300000-0000-4000-8000-000000000199', 3, TIMESTAMPTZ '2026-11-19 01:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-19 01:08:00+00', 3)"
   ],
+  "una_has_a_link": [
+   "UPDATE shared_player_entries SET social_key = 'facebook.com/una' WHERE id = 'a6000000-0000-4000-8000-000000000007'"
+  ],
+  "eve_has_a_link": [
+   "UPDATE shared_player_entries SET social_key = 'facebook.com/eve.open' WHERE id = 'a6000000-0000-4000-8000-000000000009'"
+  ],
   "club_has_a_name_change": [
    "INSERT INTO club_name_change_requests (id, club_id, requested_name, requested_name_key, requested_at, state, source_command_id, created_at, updated_at, revision) VALUES ('b4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'Pending Name', 'pending name', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'pending', 'b3000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)"
   ],
@@ -104,15 +110,15 @@
   },
   {
    "name": "club_players",
-   "sql": "SELECT id, club_id, player_id, (SELECT e.rtr_id FROM shared_player_entries e WHERE e.id = club_players.shared_entry_id) AS shared_entry_rtr_id, display_name, nickname, added_at, removed_at, linked_to_club_player_id, created_at, updated_at, revision::text AS revision FROM club_players ORDER BY id"
+   "sql": "SELECT id, club_id, player_id, (SELECT e.rtr_id FROM shared_player_entries e WHERE e.id = club_players.shared_entry_id) AS shared_entry_rtr_id, display_name, nickname, added_at, removed_at, saved_skill_level_id, saved_level_at, linked_to_club_player_id, created_at, updated_at, revision::text AS revision FROM club_players ORDER BY id"
   },
   {
    "name": "club_player_private_inputs",
-   "sql": "SELECT club_player_id, club_id, phone_e164, email, state, captured_at, created_at, updated_at, revision::text AS revision FROM club_player_private_inputs ORDER BY club_player_id"
+   "sql": "SELECT club_player_id, club_id, phone_e164, email, preset_fields, state, captured_at, created_at, updated_at, revision::text AS revision FROM club_player_private_inputs ORDER BY club_player_id"
   },
   {
    "name": "shared_player_entries",
-   "sql": "SELECT email, rtr_id, creating_club_id, country_code, city_code, sync_date, sequence, allocated_at, claimed_player_id, retired_at, created_at, updated_at, revision::text AS revision FROM shared_player_entries ORDER BY rtr_id"
+   "sql": "SELECT email, social_key, rtr_id, creating_club_id, country_code, city_code, sync_date, sequence, allocated_at, claimed_player_id, retired_at, created_at, updated_at, revision::text AS revision FROM shared_player_entries ORDER BY rtr_id"
   },
   {
    "name": "player_id_counters",
@@ -1516,6 +1522,578 @@
      "body": {
       "operationId": "b2000000-0000-4000-8000-000000000001",
       "name": "Newbie"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_social_link",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "socialLink": "https://facebook.com/Link.Newbie/"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_without_a_scheme",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "socialLink": " www.fb.com/link.newbie?ref=x#top "
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_an_instagram_link",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "socialLink": "instagram.com/link_newbie"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_youtube_link",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "socialLink": "https://youtu.be/@linknewbie"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_linkedin_link",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "socialLink": "https://m.linkedin.com/in/link-newbie/"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_and_a_nickname",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "nickname": "Linky",
+      "socialLink": "facebook.com/link.newbie"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_and_a_phone",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "phone": "0917 555 0188",
+      "socialLink": "facebook.com/link.newbie"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_and_a_new_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "email": "link.newbie@example.test",
+      "socialLink": "facebook.com/link.newbie"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_and_a_registered_players_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "email": "gil@example.test",
+      "socialLink": "facebook.com/link.newbie"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_and_an_open_entrys_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "email": "eve@example.test",
+      "socialLink": "facebook.com/link.newbie"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_and_a_bad_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "email": "nope",
+      "socialLink": "facebook.com/link.newbie"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_of_an_open_entry",
+   "scenario": "eve_has_a_link",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Eve Open",
+      "socialLink": "https://facebook.com/eve.open"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_of_an_open_entry_and_an_email",
+   "scenario": "eve_has_a_link",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Eve Open",
+      "email": "someone.else@example.test",
+      "socialLink": "facebook.com/Eve.Open/"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_already_saved",
+   "scenario": "una_has_a_link",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Una Again",
+      "socialLink": "facebook.com/una"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_already_saved_and_an_email",
+   "scenario": "una_has_a_link",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Una Again",
+      "email": "fresh@example.test",
+      "socialLink": "fb.com/una/"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_that_is_not_a_profile",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Bad Link",
+      "socialLink": "https://example.com/someone"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_bare_site",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Bad Link",
+      "socialLink": "facebook.com"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_bare_site_and_a_slash",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Bad Link",
+      "socialLink": "https://facebook.com/"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_text_that_is_not_a_link",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Bad Link",
+      "socialLink": "nope"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_bad_link_and_a_phone",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Bad Link",
+      "phone": "0917 555 0188",
+      "socialLink": "nope"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_link_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "socialLink": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_link_retry_same_operation",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "socialLink": "facebook.com/link.newbie"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Link Newbie",
+      "socialLink": "facebook.com/link.newbie"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Level Newbie",
+      "level": "intermediate_mid"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_level_and_an_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Level Newbie",
+      "email": "level.newbie@example.test",
+      "level": "advanced_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_level_and_a_link",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Level Newbie",
+      "socialLink": "facebook.com/level.newbie",
+      "level": "beginner_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_level_that_is_not_a_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Level Newbie",
+      "level": "wizard"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_a_level_that_is_not_a_level_adds_nobody",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Level Newbie",
+      "email": "level.newbie@example.test",
+      "level": "wizard"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_level_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Level Newbie",
+      "level": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_with_an_empty_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "name": "Level Newbie",
+      "level": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_directory_registered_player_with_a_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "directory",
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "playerId": "d4000000-0000-4000-8000-000000000006",
+      "level": "advanced_mid"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_directory_registered_player_with_a_bad_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "directory",
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "playerId": "d4000000-0000-4000-8000-000000000006",
+      "level": "wizard"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_directory_deleted_record_restored_with_a_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "directory",
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "playerId": "d4000000-0000-4000-8000-000000000003",
+      "level": "beginner_high"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_directory_unclaimed_person_with_a_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "directory",
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "playerId": "a6000000-0000-4000-8000-000000000009",
+      "name": "Eve Mine",
+      "level": "intermediate_high"
+     }
+    }
+   ]
+  },
+  {
+   "name": "player_add_directory_already_saved_with_a_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/club/players",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "directory",
+      "operationId": "b2000000-0000-4000-8000-000000000001",
+      "playerId": "d4000000-0000-4000-8000-000000000002",
+      "level": "advanced_high"
      }
     }
    ]

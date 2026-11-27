@@ -360,6 +360,9 @@ func (s *server) addSavedPlayer(r *http.Request, club pgtype.UUID) (writes.Resul
 			if !created {
 				return nil, alreadySaved(cp.DisplayName)
 			}
+			if err := t.saveLevel(cp.ID, body.Text("level")); err != nil {
+				return nil, err
+			}
 			return map[string]any{"clubPlayerId": cp.ID.String(), "name": cp.DisplayName}, nil
 		}
 		if e164 != "" {
@@ -374,6 +377,9 @@ func (s *server) addSavedPlayer(r *http.Request, club pgtype.UUID) (writes.Resul
 		person := newClubPlayer{name: body.Text("name"), nickname: body.Text("nickname"), email: body.Text("email"), socialLink: body.Text("socialLink"), phone: e164}
 		cp, words, err := t.createClubPlayer(operationID, person, t.stamp())
 		if err != nil {
+			return nil, err
+		}
+		if err := t.saveLevel(cp.ID, body.Text("level")); err != nil {
 			return nil, err
 		}
 		return map[string]any{"clubPlayerId": cp.ID.String(), "name": cp.DisplayName, "emailWords": words}, nil

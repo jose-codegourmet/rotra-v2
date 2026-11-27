@@ -20,6 +20,18 @@
   "s3_full": [
    "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000012', 'Lee Guest', true, TIMESTAMPTZ '2026-11-19 01:08:00+00', 'a0300000-0000-4000-8000-000000000199', 3, TIMESTAMPTZ '2026-11-19 01:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-19 01:08:00+00', 3)"
   ],
+  "una_has_a_link": [
+   "UPDATE shared_player_entries SET social_key = 'facebook.com/una' WHERE id = 'a6000000-0000-4000-8000-000000000007'"
+  ],
+  "eve_has_a_link": [
+   "UPDATE shared_player_entries SET social_key = 'facebook.com/eve.open' WHERE id = 'a6000000-0000-4000-8000-000000000009'"
+  ],
+  "club_has_a_name_change": [
+   "INSERT INTO club_name_change_requests (id, club_id, requested_name, requested_name_key, requested_at, state, source_command_id, created_at, updated_at, revision) VALUES ('b4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'Pending Name', 'pending name', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'pending', 'b3000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)"
+  ],
+  "other_club_name_change": [
+   "INSERT INTO club_name_change_requests (id, club_id, requested_name, requested_name_key, requested_at, state, source_command_id, created_at, updated_at, revision) VALUES ('b4000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000003', 'Other Pending', 'other pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'pending', 'b3000000-0000-4000-8000-000000000009', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)"
+  ],
   "club_has_a_code": [
    "UPDATE clubs SET invite_code = 'ABCDEFGHJK' WHERE id = 'c9000000-0000-4000-8000-000000000001'"
   ],
@@ -82,6 +94,24 @@
   ],
   "una_has_experience": [
    "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, preset_fields, state, captured_at, created_at, updated_at) VALUES ('c6000000-0000-4000-8000-000000000005', 'c9000000-0000-4000-8000-000000000001', NULL, '{\"version\":1,\"playingStyle\":\"Old\",\"experienceMonths\":24,\"experienceRecordedAt\":\"2026-03-10T00:00:00.000Z\",\"socialLinks\":{\"facebook\":\"old\"}}'::jsonb, 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "gus_saved_level": [
+   "UPDATE club_players SET saved_skill_level_id = 3, saved_level_at = TIMESTAMPTZ '2026-11-10 00:00:00+00' WHERE id = 'c6000000-0000-4000-8000-000000000001'"
+  ],
+  "gus_assessed_later": [
+   "UPDATE club_players SET saved_skill_level_id = 3, saved_level_at = TIMESTAMPTZ '2026-11-10 00:00:00+00' WHERE id = 'c6000000-0000-4000-8000-000000000001'",
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) VALUES ('a0300000-0000-4000-8000-000000000a01', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000099', 6, 'a0300000-0000-4000-8000-000000000b01', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', 1, 'c9000000-0000-4000-8000-000000000001')"
+  ],
+  "gus_assessed_earlier": [
+   "UPDATE club_players SET saved_skill_level_id = 3, saved_level_at = TIMESTAMPTZ '2026-11-10 00:00:00+00' WHERE id = 'c6000000-0000-4000-8000-000000000001'",
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) VALUES ('a0300000-0000-4000-8000-000000000a02', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000099', 6, 'a0300000-0000-4000-8000-000000000b02', TIMESTAMPTZ '2026-11-05 00:00:00+00', TIMESTAMPTZ '2026-11-05 00:00:00+00', 1, 'c9000000-0000-4000-8000-000000000001')"
+  ],
+  "gus_assessed_only": [
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) VALUES ('a0300000-0000-4000-8000-000000000a03', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000099', 6, 'a0300000-0000-4000-8000-000000000b03', TIMESTAMPTZ '2026-11-05 00:00:00+00', TIMESTAMPTZ '2026-11-05 00:00:00+00', 1, 'c9000000-0000-4000-8000-000000000001')"
+  ],
+  "una_link_only": [
+   "UPDATE shared_player_entries SET email = NULL, social_key = 'facebook.com/una' WHERE id = 'a6000000-0000-4000-8000-000000000007'",
+   "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, preset_fields, state, captured_at, created_at, updated_at) VALUES ('c6000000-0000-4000-8000-000000000005', 'c9000000-0000-4000-8000-000000000001', NULL, '{\"version\":1,\"playingStyle\":\"\",\"experienceMonths\":null,\"experienceRecordedAt\":null,\"socialLinks\":{\"facebook\":\"fb.com/una\"}}'::jsonb, 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
   ]
  },
  "snapshot": [
@@ -107,7 +137,7 @@
   },
   {
    "name": "club_players",
-   "sql": "SELECT id, club_id, player_id, (SELECT e.rtr_id FROM shared_player_entries e WHERE e.id = club_players.shared_entry_id) AS shared_entry_rtr_id, display_name, nickname, added_at, removed_at, linked_to_club_player_id, created_at, updated_at, revision::text AS revision FROM club_players ORDER BY id"
+   "sql": "SELECT id, club_id, player_id, (SELECT e.rtr_id FROM shared_player_entries e WHERE e.id = club_players.shared_entry_id) AS shared_entry_rtr_id, display_name, nickname, added_at, removed_at, saved_skill_level_id, saved_level_at, linked_to_club_player_id, created_at, updated_at, revision::text AS revision FROM club_players ORDER BY id"
   },
   {
    "name": "club_player_private_inputs",
@@ -115,7 +145,7 @@
   },
   {
    "name": "shared_player_entries",
-   "sql": "SELECT email, rtr_id, creating_club_id, country_code, city_code, sync_date, sequence, allocated_at, claimed_player_id, retired_at, created_at, updated_at, revision::text AS revision FROM shared_player_entries ORDER BY rtr_id"
+   "sql": "SELECT email, social_key, rtr_id, creating_club_id, country_code, city_code, sync_date, sequence, allocated_at, claimed_player_id, retired_at, created_at, updated_at, revision::text AS revision FROM shared_player_entries ORDER BY rtr_id"
   },
   {
    "name": "player_id_counters",
@@ -143,6 +173,10 @@
   {
    "name": "club_venues",
    "sql": "SELECT id, club_id, name, address, court_fee_per_court_hour_minor, entrance_fee_minor, currency, created_at, updated_at, revision::text AS revision FROM club_venues ORDER BY id"
+  },
+  {
+   "name": "club_name_change_requests",
+   "sql": "SELECT club_id, requested_name, requested_name_key, requested_at, state, reviewed_at, source_command_id, created_at, updated_at, revision::text AS revision FROM club_name_change_requests ORDER BY club_id, requested_at, source_command_id"
   },
   {
    "name": "club_player_claim_links",
@@ -852,6 +886,451 @@
        }
       }
      ]
+    }
+   ]
+  },
+  {
+   "name": "edit_level_sets_the_saved_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "beginner_mid"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_on_an_unclaimed_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "level": "advanced_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_same_as_the_saved_one_changes_nothing",
+   "scenario": "gus_saved_level",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "intermediate_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_changed",
+   "scenario": "gus_saved_level",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "advanced_high"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_cleared_by_an_empty_text",
+   "scenario": "gus_saved_level",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_left_out_clears_it",
+   "scenario": "gus_saved_level",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_not_text_clears_it",
+   "scenario": "gus_saved_level",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_not_a_level",
+   "scenario": "gus_saved_level",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "wizard"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_not_a_level_rolls_the_name_back",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Renamed",
+      "level": "wizard"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_a_session_assessment_is_newer",
+   "scenario": "gus_assessed_later",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "advanced_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_a_session_assessment_is_newer_and_another_is_typed",
+   "scenario": "gus_assessed_later",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "beginner_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_the_saved_level_is_newer_than_the_assessment",
+   "scenario": "gus_assessed_earlier",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "intermediate_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_the_saved_level_is_newer_and_another_is_typed",
+   "scenario": "gus_assessed_earlier",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "advanced_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_only_an_assessment_exists",
+   "scenario": "gus_assessed_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "advanced_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_only_an_assessment_exists_and_it_is_cleared",
+   "scenario": "gus_assessed_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_level_twice",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "beginner_high"
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "Gus",
+      "level": "beginner_high"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_link_only_adds_an_email",
+   "scenario": "una_link_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "email": " New.Una@Example.test ",
+      "socialLinks": {
+       "facebook": "fb.com/una"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_link_only_email_of_a_registered_player_leaves_the_link",
+   "scenario": "una_link_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "email": "ben@example.test",
+      "socialLinks": {
+       "facebook": "fb.com/una"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_link_only_email_of_an_open_entry_leaves_the_link",
+   "scenario": "una_link_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "email": "eve@example.test",
+      "socialLinks": {
+       "facebook": "fb.com/una"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_link_only_email_not_valid",
+   "scenario": "una_link_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "email": "nope",
+      "socialLinks": {
+       "facebook": "fb.com/una"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_link_only_no_email_keeps_the_link",
+   "scenario": "una_link_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "socialLinks": {
+       "facebook": "fb.com/una"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_link_only_clearing_the_link_makes_a_guest",
+   "scenario": "una_link_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_link_only_changing_the_link_moves_the_key",
+   "scenario": "una_link_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "socialLinks": {
+       "instagram": "instagram.com/una_a"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_link_only_adds_an_email_and_clears_the_link",
+   "scenario": "una_link_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "email": "solo.una@example.test"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_link_only_adds_an_email_twice",
+   "scenario": "una_link_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "email": "first.una@example.test",
+      "socialLinks": {
+       "facebook": "fb.com/una"
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "email": "second.una@example.test",
+      "socialLinks": {
+       "facebook": "fb.com/una"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_an_unclaimed_player_with_an_email_ignores_a_typed_one",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo",
+      "email": "other@example.test",
+      "socialLinks": {
+       "facebook": "fb.com/una"
+      }
+     }
     }
    ]
   }

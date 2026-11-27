@@ -90,6 +90,24 @@ func (q *Queries) GetClubPlayerPresetFields(ctx context.Context, clubPlayerID pg
 	return preset_fields, err
 }
 
+const getOpenSharedEntryBySocialKey = `-- name: GetOpenSharedEntryBySocialKey :one
+SELECT id, email, rtr_id FROM shared_player_entries WHERE social_key = $1 AND claimed_player_id IS NULL AND retired_at IS NULL LIMIT 1
+`
+
+type GetOpenSharedEntryBySocialKeyRow struct {
+	ID    pgtype.UUID
+	Email pgtype.Text
+	RtrID string
+}
+
+// openEntryBySocialKey: the open (unclaimed, not retired) shared entry whose link key it is.
+func (q *Queries) GetOpenSharedEntryBySocialKey(ctx context.Context, key pgtype.Text) (GetOpenSharedEntryBySocialKeyRow, error) {
+	row := q.db.QueryRow(ctx, getOpenSharedEntryBySocialKey, key)
+	var i GetOpenSharedEntryBySocialKeyRow
+	err := row.Scan(&i.ID, &i.Email, &i.RtrID)
+	return i, err
+}
+
 const getSharedEntryForLinks = `-- name: GetSharedEntryForLinks :one
 SELECT id, email, social_key, claimed_player_id, retired_at FROM shared_player_entries WHERE id = $1
 `
@@ -123,6 +141,31 @@ SELECT pg_advisory_xact_lock(hashtext('social:' || $1::text))
 // lockSocialKey (#1019): serializes everything that reads and then writes one social link key. The key is the TypeScript's.
 func (q *Queries) LockSocialKey(ctx context.Context, key string) error {
 	_, err := q.db.Exec(ctx, lockSocialKey, key)
+	return err
+}
+
+const setClubPlayerSavedLevel = `-- name: SetClubPlayerSavedLevel :exec
+UPDATE club_players SET saved_skill_level_id = $1::smallint, saved_level_at = $2::timestamptz, revision = revision + 1, updated_at = $3
+WHERE club_id = $4 AND id = $5
+`
+
+type SetClubPlayerSavedLevelParams struct {
+	Level   pgtype.Int2
+	LevelAt pgtype.Timestamptz
+	Now     pgtype.Timestamptz
+	ClubID  pgtype.UUID
+	ID      pgtype.UUID
+}
+
+// setSavedLevel: the level the club gives a saved player outside a session; a null level clears both columns.
+func (q *Queries) SetClubPlayerSavedLevel(ctx context.Context, arg SetClubPlayerSavedLevelParams) error {
+	_, err := q.db.Exec(ctx, setClubPlayerSavedLevel,
+		arg.Level,
+		arg.LevelAt,
+		arg.Now,
+		arg.ClubID,
+		arg.ID,
+	)
 	return err
 }
 

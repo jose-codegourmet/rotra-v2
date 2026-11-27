@@ -32,6 +32,7 @@ func (s *server) registerRosterOps(rt *signedin.Router) {
 	rt.Handle("DELETE "+base+"/roster/{rosterId}/no-show", store.AudienceClub, s.club(s.undoNoShow))
 	rt.Handle("POST "+base+"/roster/{rosterId}/waitlist", store.AudienceClub, s.club(s.stepDown))
 	rt.Handle("PATCH "+base+"/roster/games", store.AudienceClub, s.club(s.setGamesPlayed))
+	rt.Handle("PATCH "+base+"/roster/handicap", store.AudienceClub, s.club(s.setHandicap))
 	rt.Handle("POST "+base+"/presence", store.AudienceClub, s.club(s.setPresence))
 	rt.Handle("DELETE "+base+"/waitlist/{waitlistId}", store.AudienceClub, s.club(s.removeFromWaitlist))
 	rt.Handle("POST "+base+"/waitlist/{waitlistId}/slot", store.AudienceClub, s.club(s.giveSlot))

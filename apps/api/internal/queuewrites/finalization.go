@@ -289,6 +289,10 @@ func (t *txn) finalize(command pgtype.UUID) ([]signedin.Shortfall, error) {
 	if err := t.dropUnstarted(now); err != nil {
 		return nil, err
 	}
+	// Handicap · tonight is session only (D-2026-11-25-03): Session done clears it.
+	if err := t.q.ClearSessionHandicaps(t.ctx, t.sess.ID); err != nil {
+		return nil, err
+	}
 	// Finishing closes every open match request (kept on the record, hidden).
 	if err := t.closeSessionMatchRequests(now); err != nil {
 		return nil, err

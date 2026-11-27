@@ -286,6 +286,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Gus Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -400,6 +401,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -606,6 +608,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Gus Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
           "over_budget_at": "2026-11-19T04:00:00+00:00",
           "release_reason": null,
           "skill_level_id": 3,
@@ -1124,6 +1127,7 @@
               "confirmed_at": "2026-11-19T04:00:00+00:00",
               "name_snapshot": "Gus Guest",
               "club_player_id": "c6000000-0000-4000-8000-000000000001",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 3,
@@ -1236,6 +1240,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Gus Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -1397,6 +1402,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Gus Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -1729,6 +1735,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Larry Lapsed",
           "club_player_id": "c6000000-0000-4000-8000-000000000020",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -1843,6 +1850,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Gil Gomez",
           "club_player_id": "d0e98b62-de29-8760-8663-5015a8ab60eb",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -1995,6 +2003,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Uri B.",
           "club_player_id": "d0e98b62-de29-8760-8663-5015a8ab60eb",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -2263,6 +2272,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Blank Phone",
           "club_player_id": "d0e98b62-de29-8760-8663-5015a8ab60eb",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -2534,6 +2544,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Eli Newmail",
           "club_player_id": "d0e98b62-de29-8760-8663-5015a8ab60eb",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -2687,6 +2698,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Gil Again",
           "club_player_id": "d0e98b62-de29-8760-8663-5015a8ab60eb",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -2874,6 +2886,7 @@
               "confirmed_at": "2026-11-19T04:00:00+00:00",
               "name_snapshot": "Newbie",
               "club_player_id": "459e28e6-f895-8e91-9c11-81ce48e457db",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 3,
@@ -3025,6 +3038,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Newbie",
           "club_player_id": "459e28e6-f895-8e91-9c11-81ce48e457db",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -3178,6 +3192,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Odd Source",
           "club_player_id": "d0e98b62-de29-8760-8663-5015a8ab60eb",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -3413,6 +3428,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": "removed",
           "skill_level_id": 3,
@@ -3437,6 +3453,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -3588,6 +3605,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": "removed",
           "skill_level_id": 3,
@@ -3612,6 +3630,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -4154,6 +4173,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 6,
@@ -4178,6 +4198,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -4288,6 +4309,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -4312,6 +4334,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -4420,6 +4443,7 @@
               "confirmed_at": "2026-11-15T01:00:00+00:00",
               "name_snapshot": "Hal Guest",
               "club_player_id": "c6000000-0000-4000-8000-000000000007",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 6,
@@ -4444,6 +4468,7 @@
               "confirmed_at": "2026-11-15T01:00:00+00:00",
               "name_snapshot": "Hal Guest",
               "club_player_id": "c6000000-0000-4000-8000-000000000007",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 3,
@@ -4552,6 +4577,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 6,
@@ -4576,6 +4602,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -4712,6 +4739,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 0,
@@ -4736,6 +4764,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -4873,6 +4902,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 6,
@@ -4897,6 +4927,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -5581,6 +5612,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -5605,6 +5637,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -5741,6 +5774,7 @@
               "confirmed_at": "2026-11-18T02:00:00+00:00",
               "name_snapshot": "Ivy Guest",
               "club_player_id": "c6000000-0000-4000-8000-000000000008",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 4,
@@ -5765,6 +5799,7 @@
               "confirmed_at": "2026-11-18T02:00:00+00:00",
               "name_snapshot": "Ivy Guest",
               "club_player_id": "c6000000-0000-4000-8000-000000000008",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 4,
@@ -5875,6 +5910,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -5899,6 +5935,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -6576,6 +6613,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -6600,6 +6638,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -6769,6 +6808,7 @@
           "confirmed_at": "2026-11-19T02:00:00+00:00",
           "name_snapshot": "Larry Lapsed",
           "club_player_id": "c6000000-0000-4000-8000-000000000020",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -6793,6 +6833,7 @@
           "confirmed_at": "2026-11-19T02:00:00+00:00",
           "name_snapshot": "Larry Lapsed",
           "club_player_id": "c6000000-0000-4000-8000-000000000020",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -6920,6 +6961,7 @@
           "confirmed_at": "2026-11-15T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -6944,6 +6986,7 @@
           "confirmed_at": "2026-11-15T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -7038,6 +7081,7 @@
               "confirmed_at": "2026-11-15T02:00:00+00:00",
               "name_snapshot": "Ivy Guest",
               "club_player_id": "c6000000-0000-4000-8000-000000000008",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 4,
@@ -7062,6 +7106,7 @@
               "confirmed_at": "2026-11-15T02:00:00+00:00",
               "name_snapshot": "Ivy Guest",
               "club_player_id": "c6000000-0000-4000-8000-000000000008",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 4,
@@ -7130,6 +7175,7 @@
           "confirmed_at": "2026-11-15T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -7154,6 +7200,7 @@
           "confirmed_at": "2026-11-15T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -7345,6 +7392,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -7369,6 +7417,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -7807,6 +7856,7 @@
           "confirmed_at": "2026-11-19T02:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": "demoted",
           "skill_level_id": 3,
@@ -7831,6 +7881,7 @@
           "confirmed_at": "2026-11-19T02:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -7980,6 +8031,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": "demoted",
           "skill_level_id": 3,
@@ -8004,6 +8056,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -8925,6 +8978,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -8949,6 +9003,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -9088,6 +9143,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -9110,6 +9166,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -9132,6 +9189,7 @@
           "confirmed_at": "2026-11-18T03:00:00+00:00",
           "name_snapshot": "Jo Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 5,
@@ -9156,6 +9214,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -9178,6 +9237,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -9200,6 +9260,7 @@
           "confirmed_at": "2026-11-18T03:00:00+00:00",
           "name_snapshot": "Jo Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 5,
@@ -9329,6 +9390,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -9353,6 +9415,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -9589,6 +9652,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -9613,6 +9677,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -9977,6 +10042,7 @@
           "confirmed_at": "2026-11-18T03:00:00+00:00",
           "name_snapshot": "Jo Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 5,
@@ -10001,6 +10067,7 @@
           "confirmed_at": "2026-11-18T03:00:00+00:00",
           "name_snapshot": "Jo Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 5,
@@ -10130,6 +10197,7 @@
           "confirmed_at": "2026-11-18T03:00:00+00:00",
           "name_snapshot": "Jo Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 5,
@@ -10154,6 +10222,7 @@
           "confirmed_at": "2026-11-18T03:00:00+00:00",
           "name_snapshot": "Jo Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 5,
@@ -10293,6 +10362,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -10315,6 +10385,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -10337,6 +10408,7 @@
           "confirmed_at": "2026-11-18T03:00:00+00:00",
           "name_snapshot": "Jo Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 5,
@@ -10361,6 +10433,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -10383,6 +10456,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -10405,6 +10479,7 @@
           "confirmed_at": "2026-11-18T03:00:00+00:00",
           "name_snapshot": "Jo Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 5,
@@ -10532,6 +10607,7 @@
               "confirmed_at": "2026-11-18T01:00:00+00:00",
               "name_snapshot": "Hal Guest",
               "club_player_id": "c6000000-0000-4000-8000-000000000007",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 3,
@@ -10556,6 +10632,7 @@
               "confirmed_at": "2026-11-18T01:00:00+00:00",
               "name_snapshot": "Hal Guest",
               "club_player_id": "c6000000-0000-4000-8000-000000000007",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 3,
@@ -10683,6 +10760,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -10707,6 +10785,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -11197,6 +11276,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -11221,6 +11301,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -11394,6 +11475,7 @@
           "confirmed_at": "2026-11-19T02:00:00+00:00",
           "name_snapshot": "Larry Lapsed",
           "club_player_id": "c6000000-0000-4000-8000-000000000020",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -11418,6 +11500,7 @@
           "confirmed_at": "2026-11-19T02:00:00+00:00",
           "name_snapshot": "Larry Lapsed",
           "club_player_id": "c6000000-0000-4000-8000-000000000020",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -11543,6 +11626,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -11567,6 +11651,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -11648,6 +11733,7 @@
           "confirmed_at": "2026-11-15T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -11672,6 +11758,7 @@
           "confirmed_at": "2026-11-15T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -11753,6 +11840,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -11777,6 +11865,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -11858,6 +11947,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -11882,6 +11972,7 @@
           "confirmed_at": "2026-11-15T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -12051,6 +12142,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -12075,6 +12167,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -12156,6 +12249,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -12178,6 +12272,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -12202,6 +12297,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -12224,6 +12320,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -12448,6 +12545,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -12472,6 +12570,7 @@
           "confirmed_at": "2026-11-18T01:00:00+00:00",
           "name_snapshot": "Hal Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -12615,6 +12714,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -12639,6 +12739,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -12765,6 +12866,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -12789,6 +12891,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -12873,6 +12976,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -12897,6 +13001,7 @@
           "confirmed_at": "2026-11-18T02:00:00+00:00",
           "name_snapshot": "Ivy Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -14065,6 +14170,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": "2026-11-19T04:00:00+00:00",
           "release_reason": null,
           "skill_level_id": 3,
@@ -14203,6 +14309,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Kai Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000011",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 2,
@@ -14369,6 +14476,7 @@
               "confirmed_at": "2026-11-19T04:00:00+00:00",
               "name_snapshot": "Ann Reyes",
               "club_player_id": "c6000000-0000-4000-8000-000000000003",
+              "handicap_spots": [],
               "over_budget_at": "2026-11-19T04:00:00+00:00",
               "release_reason": null,
               "skill_level_id": 3,
@@ -14505,6 +14613,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": "2026-11-19T04:00:00+00:00",
           "release_reason": null,
           "skill_level_id": 3,
@@ -14643,6 +14752,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": "2026-11-19T04:00:00+00:00",
           "release_reason": null,
           "skill_level_id": 3,
@@ -14781,6 +14891,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": "2026-11-19T04:00:00+00:00",
           "release_reason": null,
           "skill_level_id": 3,
@@ -14805,6 +14916,7 @@
           "confirmed_at": "2026-11-19T02:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": "removed",
           "skill_level_id": 3,
@@ -15209,6 +15321,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": "2026-11-19T04:00:00+00:00",
           "release_reason": null,
           "skill_level_id": 3,
@@ -15610,6 +15723,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -15731,6 +15845,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Kai Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000011",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 2,
@@ -15882,6 +15997,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Gus Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -15991,6 +16107,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Gus Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 4,
@@ -16013,6 +16130,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Kai Guest",
           "club_player_id": "c6000000-0000-4000-8000-000000000011",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 2,
@@ -16207,6 +16325,7 @@
               "confirmed_at": "2026-11-19T04:00:00+00:00",
               "name_snapshot": "Ann Reyes",
               "club_player_id": "c6000000-0000-4000-8000-000000000003",
+              "handicap_spots": [],
               "over_budget_at": null,
               "release_reason": null,
               "skill_level_id": 3,
@@ -16326,6 +16445,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -16447,6 +16567,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -16568,6 +16689,7 @@
           "confirmed_at": "2026-11-19T04:00:00+00:00",
           "name_snapshot": "Ann Reyes",
           "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "handicap_spots": [],
           "over_budget_at": null,
           "release_reason": null,
           "skill_level_id": 3,
@@ -16854,6 +16976,3607 @@
           "queue_revision": "1"
         }
       ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_signed_out": {
+    "steps": [
+      {
+        "status": 401,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "unauthenticated",
+            "message": "Sign in to continue."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_player_subject_is_not_a_club": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "wrong_account",
+            "message": "This account cannot use this app."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_body_not_json": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_one_spot": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "left_knee"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_several_spots_in_figure_order": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "left_shoulder",
+            "lower_back",
+            "left_knee",
+            "right_ankle"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "left_shoulder",
+            "lower_back",
+            "left_knee",
+            "right_ankle"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_every_spot": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "left_shoulder",
+            "right_shoulder",
+            "left_elbow",
+            "right_elbow",
+            "left_wrist",
+            "right_wrist",
+            "lower_back",
+            "left_knee",
+            "right_knee",
+            "left_ankle",
+            "right_ankle"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "left_shoulder",
+            "right_shoulder",
+            "left_elbow",
+            "right_elbow",
+            "left_wrist",
+            "right_wrist",
+            "lower_back",
+            "left_knee",
+            "right_knee",
+            "left_ankle",
+            "right_ankle"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_duplicate_spots_count_once": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "lower_back",
+            "left_knee"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "lower_back",
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_unknown_spot": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "spots": "Choose spots on the figure."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_spot_is_no_text": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "spots": "Choose spots on the figure."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_spot_null": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "spots": "Choose spots on the figure."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_spot_wrong_case": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "spots": "Choose spots on the figure."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_spots_not_a_list_clears": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": []
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "lower_back",
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_spots_missing_clears": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": []
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "lower_back",
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_empty_list_clears": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": []
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "lower_back",
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_clear_when_none_writes_nothing": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": []
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_replaces_the_set": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "right_wrist"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "right_wrist"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "lower_back",
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_same_set_again_writes_nothing": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "lower_back",
+            "left_knee"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_same_set_in_another_order_writes_nothing": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "lower_back",
+            "left_knee"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_retry_same_operation": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "left_knee"
+          ]
+        },
+        "db": {
+          "queue_sessions": [
+            {
+              "id": "a3000000-0000-4000-8000-000000000003",
+              "state": "active",
+              "revision": "13",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "minimum_games": 2,
+              "queue_revision": "1"
+            }
+          ],
+          "queue_sessions (removed)": [
+            {
+              "id": "a3000000-0000-4000-8000-000000000003",
+              "state": "active",
+              "revision": "12",
+              "updated_at": "2026-11-19T01:00:00+00:00",
+              "minimum_games": 2,
+              "queue_revision": "1"
+            }
+          ],
+          "session_players": [
+            {
+              "id": "a7000000-0000-4000-8000-000000000005",
+              "present": false,
+              "revision": "4",
+              "joined_at": "2026-11-18T02:00:00+00:00",
+              "created_at": "2026-11-18T02:00:00+00:00",
+              "no_show_at": null,
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "released_at": null,
+              "confirmed_at": "2026-11-18T02:00:00+00:00",
+              "name_snapshot": "Ivy Guest",
+              "club_player_id": "c6000000-0000-4000-8000-000000000008",
+              "handicap_spots": [
+                "left_knee"
+              ],
+              "over_budget_at": null,
+              "release_reason": null,
+              "skill_level_id": 4,
+              "level_locked_at": "2026-11-19T01:00:00+00:00",
+              "games_adjustment": 0,
+              "player_id_at_entry": null,
+              "present_changed_at": "2026-11-19T01:06:00+00:00",
+              "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+            }
+          ],
+          "session_players (removed)": [
+            {
+              "id": "a7000000-0000-4000-8000-000000000005",
+              "present": false,
+              "revision": "3",
+              "joined_at": "2026-11-18T02:00:00+00:00",
+              "created_at": "2026-11-18T02:00:00+00:00",
+              "no_show_at": null,
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T01:06:00+00:00",
+              "released_at": null,
+              "confirmed_at": "2026-11-18T02:00:00+00:00",
+              "name_snapshot": "Ivy Guest",
+              "club_player_id": "c6000000-0000-4000-8000-000000000008",
+              "handicap_spots": [],
+              "over_budget_at": null,
+              "release_reason": null,
+              "skill_level_id": 4,
+              "level_locked_at": "2026-11-19T01:00:00+00:00",
+              "games_adjustment": 0,
+              "player_id_at_entry": null,
+              "present_changed_at": "2026-11-19T01:06:00+00:00",
+              "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+            }
+          ],
+          "club_assessments": [],
+          "club_assessments (removed)": [],
+          "session_waitlist": [],
+          "session_waitlist (removed)": [],
+          "session_join_requests": [],
+          "session_join_requests (removed)": [],
+          "club_players": [],
+          "club_players (removed)": [],
+          "club_player_private_inputs": [],
+          "club_player_private_inputs (removed)": [],
+          "shared_player_entries": [],
+          "shared_player_entries (removed)": [],
+          "player_id_counters": [],
+          "player_id_counters (removed)": [],
+          "player_notifications": [],
+          "player_notifications (removed)": [],
+          "session_match_requests": [
+            {
+              "id": "a3700000-0000-4000-8000-000000000001",
+              "status": "closed",
+              "revision": "2",
+              "created_at": "2026-11-19T03:50:00+00:00",
+              "decided_at": "2026-11-19T04:00:00+00:00",
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "session_player_id": "a7000000-0000-4000-8000-000000000004"
+            },
+            {
+              "id": "a3700000-0000-4000-8000-000000000002",
+              "status": "closed",
+              "revision": "2",
+              "created_at": "2026-11-19T03:45:00+00:00",
+              "decided_at": "2026-11-19T04:00:00+00:00",
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "session_player_id": "a7000000-0000-4000-8000-000000000005"
+            }
+          ],
+          "session_match_requests (removed)": [
+            {
+              "id": "a3700000-0000-4000-8000-000000000001",
+              "status": "open",
+              "revision": "1",
+              "created_at": "2026-11-19T03:50:00+00:00",
+              "decided_at": null,
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T03:50:00+00:00",
+              "session_player_id": "a7000000-0000-4000-8000-000000000004"
+            },
+            {
+              "id": "a3700000-0000-4000-8000-000000000002",
+              "status": "open",
+              "revision": "1",
+              "created_at": "2026-11-19T03:45:00+00:00",
+              "decided_at": null,
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T03:45:00+00:00",
+              "session_player_id": "a7000000-0000-4000-8000-000000000005"
+            }
+          ],
+          "admin_audit_events": [],
+          "admin_audit_events (removed)": []
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "left_knee"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "14",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_set_then_clear": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "left_knee"
+          ]
+        },
+        "db": {
+          "queue_sessions": [
+            {
+              "id": "a3000000-0000-4000-8000-000000000003",
+              "state": "active",
+              "revision": "13",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "minimum_games": 2,
+              "queue_revision": "1"
+            }
+          ],
+          "queue_sessions (removed)": [
+            {
+              "id": "a3000000-0000-4000-8000-000000000003",
+              "state": "active",
+              "revision": "12",
+              "updated_at": "2026-11-19T01:00:00+00:00",
+              "minimum_games": 2,
+              "queue_revision": "1"
+            }
+          ],
+          "session_players": [
+            {
+              "id": "a7000000-0000-4000-8000-000000000005",
+              "present": false,
+              "revision": "4",
+              "joined_at": "2026-11-18T02:00:00+00:00",
+              "created_at": "2026-11-18T02:00:00+00:00",
+              "no_show_at": null,
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "released_at": null,
+              "confirmed_at": "2026-11-18T02:00:00+00:00",
+              "name_snapshot": "Ivy Guest",
+              "club_player_id": "c6000000-0000-4000-8000-000000000008",
+              "handicap_spots": [
+                "left_knee"
+              ],
+              "over_budget_at": null,
+              "release_reason": null,
+              "skill_level_id": 4,
+              "level_locked_at": "2026-11-19T01:00:00+00:00",
+              "games_adjustment": 0,
+              "player_id_at_entry": null,
+              "present_changed_at": "2026-11-19T01:06:00+00:00",
+              "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+            }
+          ],
+          "session_players (removed)": [
+            {
+              "id": "a7000000-0000-4000-8000-000000000005",
+              "present": false,
+              "revision": "3",
+              "joined_at": "2026-11-18T02:00:00+00:00",
+              "created_at": "2026-11-18T02:00:00+00:00",
+              "no_show_at": null,
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T01:06:00+00:00",
+              "released_at": null,
+              "confirmed_at": "2026-11-18T02:00:00+00:00",
+              "name_snapshot": "Ivy Guest",
+              "club_player_id": "c6000000-0000-4000-8000-000000000008",
+              "handicap_spots": [],
+              "over_budget_at": null,
+              "release_reason": null,
+              "skill_level_id": 4,
+              "level_locked_at": "2026-11-19T01:00:00+00:00",
+              "games_adjustment": 0,
+              "player_id_at_entry": null,
+              "present_changed_at": "2026-11-19T01:06:00+00:00",
+              "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+            }
+          ],
+          "club_assessments": [],
+          "club_assessments (removed)": [],
+          "session_waitlist": [],
+          "session_waitlist (removed)": [],
+          "session_join_requests": [],
+          "session_join_requests (removed)": [],
+          "club_players": [],
+          "club_players (removed)": [],
+          "club_player_private_inputs": [],
+          "club_player_private_inputs (removed)": [],
+          "shared_player_entries": [],
+          "shared_player_entries (removed)": [],
+          "player_id_counters": [],
+          "player_id_counters (removed)": [],
+          "player_notifications": [],
+          "player_notifications (removed)": [],
+          "session_match_requests": [
+            {
+              "id": "a3700000-0000-4000-8000-000000000001",
+              "status": "closed",
+              "revision": "2",
+              "created_at": "2026-11-19T03:50:00+00:00",
+              "decided_at": "2026-11-19T04:00:00+00:00",
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "session_player_id": "a7000000-0000-4000-8000-000000000004"
+            },
+            {
+              "id": "a3700000-0000-4000-8000-000000000002",
+              "status": "closed",
+              "revision": "2",
+              "created_at": "2026-11-19T03:45:00+00:00",
+              "decided_at": "2026-11-19T04:00:00+00:00",
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "session_player_id": "a7000000-0000-4000-8000-000000000005"
+            }
+          ],
+          "session_match_requests (removed)": [
+            {
+              "id": "a3700000-0000-4000-8000-000000000001",
+              "status": "open",
+              "revision": "1",
+              "created_at": "2026-11-19T03:50:00+00:00",
+              "decided_at": null,
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T03:50:00+00:00",
+              "session_player_id": "a7000000-0000-4000-8000-000000000004"
+            },
+            {
+              "id": "a3700000-0000-4000-8000-000000000002",
+              "status": "open",
+              "revision": "1",
+              "created_at": "2026-11-19T03:45:00+00:00",
+              "decided_at": null,
+              "session_id": "a3000000-0000-4000-8000-000000000003",
+              "updated_at": "2026-11-19T03:45:00+00:00",
+              "session_player_id": "a7000000-0000-4000-8000-000000000005"
+            }
+          ],
+          "admin_audit_events": [],
+          "admin_audit_events (removed)": []
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": []
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "14",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "5",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_two_players": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "left_knee"
+          ]
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000006",
+          "name": "Jo Guest",
+          "spots": [
+            "lower_back"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "14",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        },
+        {
+          "id": "a7000000-0000-4000-8000-000000000006",
+          "present": true,
+          "revision": "4",
+          "joined_at": "2026-11-18T03:00:00+00:00",
+          "created_at": "2026-11-18T03:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T03:00:00+00:00",
+          "name_snapshot": "Jo Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "handicap_spots": [
+            "lower_back"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 5,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:07:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000106"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        },
+        {
+          "id": "a7000000-0000-4000-8000-000000000006",
+          "present": true,
+          "revision": "3",
+          "joined_at": "2026-11-18T03:00:00+00:00",
+          "created_at": "2026-11-18T03:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:07:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T03:00:00+00:00",
+          "name_snapshot": "Jo Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 5,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:07:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000106"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_operation_id_is_not_read": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000005",
+          "name": "Ivy Guest",
+          "spots": [
+            "left_knee"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "4",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000005",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-18T02:00:00+00:00",
+          "created_at": "2026-11-18T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T01:06:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-18T02:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": "2026-11-19T01:00:00+00:00",
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T01:06:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000105"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "closed",
+          "revision": "2",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:50:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "status": "open",
+          "revision": "1",
+          "created_at": "2026-11-19T03:45:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_prepared_session": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000001",
+          "name": "Hal Guest",
+          "spots": [
+            "left_knee"
+          ]
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 40,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000001",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-15T01:00:00+00:00",
+          "created_at": "2026-11-15T01:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-15T01:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-15T01:00:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000101"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000001",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-15T01:00:00+00:00",
+          "created_at": "2026-11-15T01:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-15T01:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-15T01:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-15T01:00:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000101"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_prepared_session_clear": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterId": "a7000000-0000-4000-8000-000000000001",
+          "name": "Hal Guest",
+          "spots": []
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 40,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000001",
+          "present": false,
+          "revision": "3",
+          "joined_at": "2026-11-15T01:00:00+00:00",
+          "created_at": "2026-11-15T01:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-15T01:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-15T01:00:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000101"
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000001",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-15T01:00:00+00:00",
+          "created_at": "2026-11-15T01:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-15T01:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-15T01:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "handicap_spots": [
+            "left_knee"
+          ],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-15T01:00:00+00:00",
+          "assessment_operation_id": "a0300000-0000-4000-8000-000000000101"
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_closed_session": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "state": "This session is closed."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_closed_session_unknown_spot_says_ended": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "state": "This session is closed."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_unknown_spot_before_unknown_player": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "spots": "Choose spots on the figure."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_unknown_entry": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_entry_of_another_session": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_malformed_entry": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_missing_entry": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_released_entry": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_no_show_entry": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_unknown_session": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "handicap_lapsed_club": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "entitlement_required",
+            "message": "This club does not have an active license."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
       "session_players": [],
       "session_players (removed)": [],
       "club_assessments": [],

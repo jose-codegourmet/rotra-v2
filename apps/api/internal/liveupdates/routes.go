@@ -94,6 +94,7 @@ var routes = map[string]Route{
 	"club POST /api/sessions/{sessionId}/roster":                               kind(KindRoster),
 	"club POST /api/sessions/{sessionId}/roster/batch":                         kind(KindRoster),
 	"club PATCH /api/sessions/{sessionId}/roster/games":                        kind(KindRoster),
+	"club PATCH /api/sessions/{sessionId}/roster/handicap":                     kind(KindRoster),
 	"club DELETE /api/sessions/{sessionId}/roster/{rosterId}":                  kind(KindRoster),
 	"club POST /api/sessions/{sessionId}/roster/{rosterId}/level":              kind(KindRoster),
 	"club POST /api/sessions/{sessionId}/roster/{rosterId}/no-show":            kind(KindRoster),

@@ -45,3 +45,11 @@ WHERE session_id = @session_id AND released_at IS NULL AND no_show_at IS NULL AN
 
 -- name: SetSessionPlayerGamesAdjustment :exec
 UPDATE session_players SET games_adjustment = @games_adjustment, revision = revision + 1, updated_at = @now WHERE id = @id;
+
+-- name: SetSessionPlayerHandicap :exec
+-- setHandicap: the whole set of marked spots on one live entry, in figure order (empty clears it).
+UPDATE session_players SET handicap_spots = @handicap_spots::text[], revision = revision + 1, updated_at = @now WHERE id = @id;
+
+-- name: ClearSessionHandicaps :exec
+-- Session done: Handicap · tonight is session only (finalization.ts), so every entry is emptied. No revision bump (updateMany).
+UPDATE session_players SET handicap_spots = '{}' WHERE session_id = @session_id AND cardinality(handicap_spots) > 0;

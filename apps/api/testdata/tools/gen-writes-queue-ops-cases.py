@@ -301,6 +301,46 @@ case('fill_unknown_session', req('POST', WF('a3000000-0000-4000-8000-0000000000f
 case('fill_lapsed_club_prepared', req('POST', WF(S[7]), {'operationId': op(1)}, who=LAPSED))
 case('fill_bumps_the_revision_even_when_nothing_moves', req('POST', WF(S[1]), {'operationId': op(1)}))
 
+# ---------------------------------------------------------------- PATCH /roster/handicap
+# Handicap · tonight (D-2026-11-25-03; prepared or active since the mockup change of 2026-11-27): the whole set of spots on one live entry.
+H = lambda s: roster_path(s, 'handicap')
+KNEE_BACK = ['lower_back', 'left_knee']
+case('handicap_signed_out', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']}, who=None))
+case('handicap_player_subject_is_not_a_club', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']}, who=PLAYER_SUBJECT, **NOSUBJECT))
+case('handicap_body_not_json', req('PATCH', H(S[3]), rawBody='nope'))
+case('handicap_one_spot', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']}))
+case('handicap_several_spots_in_figure_order', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['right_ankle', 'left_knee', 'lower_back', 'left_shoulder']}))
+case('handicap_every_spot', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['right_ankle', 'left_ankle', 'right_knee', 'left_knee', 'lower_back', 'right_wrist', 'left_wrist', 'right_elbow', 'left_elbow', 'right_shoulder', 'left_shoulder']}))
+case('handicap_duplicate_spots_count_once', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee', 'left_knee', 'lower_back']}))
+case('handicap_unknown_spot', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee', 'neck']}))
+case('handicap_spot_is_no_text', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': [3]}))
+case('handicap_spot_null', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': [None]}))
+case('handicap_spot_wrong_case', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['Left_Knee']}))
+case('handicap_spots_not_a_list_clears', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': 'left_knee'}), scenario='ivy_handicapped')
+case('handicap_spots_missing_clears', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5)}), scenario='ivy_handicapped')
+case('handicap_empty_list_clears', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': []}), scenario='ivy_handicapped')
+case('handicap_clear_when_none_writes_nothing', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': []}))
+case('handicap_replaces_the_set', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['right_wrist']}), scenario='ivy_handicapped')
+case('handicap_same_set_again_writes_nothing', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee', 'lower_back']}), scenario='ivy_handicapped')
+case('handicap_same_set_in_another_order_writes_nothing', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee', 'lower_back']}), scenario='ivy_handicapped_reverse')
+case('handicap_retry_same_operation', [req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']}, snapshot=True), req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']})])
+case('handicap_set_then_clear', [req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']}, snapshot=True), req('PATCH', H(S[3]), {'operationId': op(2), 'rosterId': SP(5), 'spots': []})])
+case('handicap_two_players', [req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']}), req('PATCH', H(S[3]), {'operationId': op(2), 'rosterId': SP(6), 'spots': ['lower_back']})])
+case('handicap_operation_id_is_not_read', req('PATCH', H(S[3]), {'rosterId': SP(5), 'spots': ['left_knee']}))
+case('handicap_prepared_session', req('PATCH', H(S[1]), {'operationId': op(1), 'rosterId': SP(1), 'spots': ['left_knee']}))
+case('handicap_prepared_session_clear', req('PATCH', H(S[1]), {'operationId': op(1), 'rosterId': SP(1), 'spots': []}), scenario='s1_handicapped')
+case('handicap_closed_session', req('PATCH', H(S[4]), {'operationId': op(1), 'rosterId': SP(7), 'spots': ['left_knee']}))
+case('handicap_closed_session_unknown_spot_says_ended', req('PATCH', H(S[4]), {'operationId': op(1), 'rosterId': SP(7), 'spots': ['neck']}))
+case('handicap_unknown_spot_before_unknown_player', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': UNKNOWN, 'spots': ['neck']}))
+case('handicap_unknown_entry', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': UNKNOWN, 'spots': ['left_knee']}))
+case('handicap_entry_of_another_session', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(1), 'spots': ['left_knee']}))
+case('handicap_malformed_entry', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': 'q', 'spots': ['left_knee']}, **MALFORMED))
+case('handicap_missing_entry', req('PATCH', H(S[3]), {'operationId': op(1), 'spots': ['left_knee']}, **MALFORMED))
+case('handicap_released_entry', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']}), scenario='ivy_released_on_s3')
+case('handicap_no_show_entry', req('PATCH', H(S[3]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']}), scenario='s3_ivy_no_show')
+case('handicap_unknown_session', req('PATCH', H('a3000000-0000-4000-8000-0000000000ff'), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']}))
+case('handicap_lapsed_club', req('PATCH', H(S[7]), {'operationId': op(1), 'rosterId': SP(5), 'spots': ['left_knee']}, who=LAPSED))
+
 # ---------------------------------------------------------------- scenarios
 NOW = "TIMESTAMPTZ '2026-11-19 02:00:00+00'"
 CLUB1 = 'c9000000-0000-4000-8000-000000000001'
@@ -334,6 +374,9 @@ SCENARIOS.update({
     'ivy_in_a_waiting_match': match_sql(1, S[3], [SP(5), SP(4)]),
     'ivy_played_a_game': match_sql(1, S[3], [SP(5), SP(4)], state='completed', decided=True),
     'jo_played_a_game': match_sql(1, S[3], [SP(6), SP(4)], state='completed', decided=True),
+    'ivy_handicapped': [f"UPDATE session_players SET handicap_spots = '{{lower_back,left_knee}}' WHERE id = '{SP(5)}'"],
+    'ivy_handicapped_reverse': [f"UPDATE session_players SET handicap_spots = '{{lower_back,left_knee}}' WHERE id = '{SP(5)}'"],
+    's1_handicapped': [f"UPDATE session_players SET handicap_spots = '{{left_knee}}' WHERE id = '{SP(1)}'"],
     'ivy_games_adjusted': [f"UPDATE session_players SET games_adjustment = 1 WHERE id = '{SP(5)}'"],
     'ivy_released_on_s3': [RELEASE(SP(5))],
     's2_ivy_released': [RELEASE(SP(3))],
@@ -359,7 +402,7 @@ SNAPSHOT = []
 for s in BASE['snapshot']:
     s = dict(s)
     if s['name'] == 'session_players':
-        s['sql'] = s['sql'].replace('no_show_at, revision::text', 'no_show_at, games_adjustment, revision::text')
+        s['sql'] = s['sql'].replace('no_show_at, revision::text', 'no_show_at, games_adjustment, handicap_spots, revision::text')
         assert 'games_adjustment' in s['sql']
     SNAPSHOT.append(s)
 

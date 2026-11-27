@@ -220,6 +220,7 @@ def make_prior(first_day='2026-11-01'):
 prior = make_prior()
 SCEN['baseline'] = SCEN['played'] + prior
 SCEN['baseline_one_session_months_ago'] = SCEN['played'] + make_prior('2026-07-01')
+SCEN['played_handicapped'] = SCEN['played'] + [f"UPDATE session_players SET handicap_spots = '{{lower_back,left_knee}}' WHERE id IN ('{GUS}', '{HAL}')"]
 SCEN['adjusted_games'] = SCEN['played'] + [f"UPDATE session_players SET games_adjustment = 2 WHERE id = '{GUS}'"]
 SCEN['baseline_ann_only_off_day'] = SCEN['baseline'] + match(8, 8, 'singles', 'completed', [GAIL], [BEN], 'A') + match(9, 9, 'singles', 'completed', [GAIL], [GUS], 'A')
 # Gus and Ann also won rank evidence elsewhere; Ann has an assessment of her own at the club.
@@ -281,6 +282,7 @@ def at(minute, second=0):
 
 
 MALFORMED = {'allow500': True, 'goExpects': {'status': 404, 'code': 'not_found'}}
+case('post_clears_the_handicap_tonight', fin(), 'played_handicapped')
 case('post_signed_out', fin(who=None), 'played')
 case('post_body_not_json', req('POST', f'/api/sessions/{S3}/finalization', rawBody='nope'), 'played')
 case('post_without_a_body', req('POST', f'/api/sessions/{S3}/finalization'), 'played')
@@ -356,6 +358,7 @@ case('post_a_failed_job_before_its_backoff_is_retried_at_once', fin(S4, now=at(0
 
 SNAPSHOT = [s for s in BASE['snapshot'] if s['name'] in ('matches', 'match_court_usage', 'active_court_holds', 'active_player_holds', 'session_match_requests', 'session_drop_out_notices')]
 SNAPSHOT += [
+    {'name': 'session_players_handicap', 'sql': "SELECT id, handicap_spots, revision::text AS revision FROM session_players WHERE session_id = 'a3000000-0000-4000-8000-000000000003' ORDER BY id"},
     {'name': 'queue_sessions', 'sql': "SELECT id, state, revision::text AS revision, queue_revision::text AS queue_revision, finalized_at, record_games, updated_at FROM queue_sessions ORDER BY id"},
     {'name': 'club_session_reservations', 'sql': "SELECT club_id, session_id, acquired_at FROM club_session_reservations ORDER BY session_id"},
     {'name': 'session_finalizations', 'sql': "SELECT session_id, club_id, command_id, state, stage, failed_stage, failure_code, stream_manifest, encode(manifest_digest, 'hex') AS manifest_digest, accepted_session_revision::text AS accepted_session_revision, policy_version_id, started_at, committed_at, completed_at, encode(facts_digest, 'hex') AS facts_digest, updated_at, revision::text AS revision FROM session_finalizations ORDER BY session_id"},

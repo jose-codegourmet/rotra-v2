@@ -46,7 +46,25 @@ Ticket: none yet (proposal: one issue per phase under epic #869, titled `<seq> Â
 
 ## Phase 2: Queue response shapes and writes (Go behind main)
 
-- [ ] **2.1** Gap table by route: for each new field in R2, which Go reader or writer must send it and which golden covers it (`session`, `roster`, `courts`, `saved players`, `match result`). Write it under this task; add a failing golden per row
+- [x] **2.1** Gap table by route: for each new field in R2, which Go reader or writer must send it and which golden covers it (`session`, `roster`, `courts`, `saved players`, `match result`). Write it under this task; add a failing golden per row
+  - **Done 2026-11-27, docs only (code read, nothing changed in Go).** Method: ran `go test ./internal/queuewrites/` at `go-stack` `47c15910` (315 subtests red, 0 on status except `move_a_playing_match`), parsed every `got` / `want` pair and counted the differing paths; then compared the TypeScript route files in `apps/queue/src/app/api` with the Go routes. **No new golden is needed for the first table**: the recaptured goldens of 1.3 already go red on each row, so a row is done when its test goes green. The second table has no golden at all, so each of its tasks writes cases first and captures from the TypeScript.
+  - **Table A: fields and rows Go does not send (red today, subtests that differ):**
+
+    | Missing in Go | Where (route, golden) | Subtests | Task |
+    |---|---|---|---|
+    | `levelRestriction` (`{"kind":"all"}` by default) and `plannedBeforeStart` in every session object | `POST/PATCH /sessions`, `/start`, `/cancel`, `/end`, `/extend`, money and prep answers; goldens prep, money, finish | ~110 | 2.2 and 2.3 |
+    | `hosts` (`null` when none) next to `session` in the create and edit answers | `POST /sessions`, `PATCH /sessions/{id}`; goldens prep, money | ~92 | new task 2.11 (the BL-22 routes exist; the answer field does not) |
+    | `handicapSpots` (`[]` by default) on a roster entry | roster batch (127), `POST /roster`, `/roster/{id}/level`, `/waitlist/{id}/slot` (24), `join-requests/{id}/confirm` (12) | ~165 | 2.5 (**OWNER**: read-only or part of the math) |
+    | `recordGames` in the finalization `status` and its GET/POST body; with Record games off, Session done writes facts, summaries, the snapshot and the history job and enqueues no rank job | `GET/POST /sessions/{id}/finalization`; golden finalize | 57 body, 6 row | 2.10 (**OWNER**) |
+    | Waitlist number in the notification text: "You're number 2" where Go says 1 (a player moved off the roster comes first, D-2026-11-23-06) | `step-down`, `roster/{id}/waitlist`; goldens pubmr, rosterops | 3 rows | 2.9 |
+    | Phone clash answer: field `phone` ("<Name> already has this number."), not `player` | `POST /club/players`; golden club | 2 | 2.7 |
+    | Editing an unclaimed player also updates its `shared_player_entries` row (revision 2) | `PATCH /club/players/{id}`; golden details | 1 | 2.7 |
+    | `autoPlaced`, `queueRevision`, `result` in the move answer, and the move of a Playing match | `POST /matches/{id}/move`; golden match | 1 | 2.10 (**OWNER**); 2.8 has no other red row |
+
+    - The `answers` failures (parallel steps) are the same fields as above, in a race.
+    - Court `position` and the court-label rule already pass (the merge and 1.4 did them): nothing left for those.
+  - **Table B: TypeScript routes with no Go route** (found by comparing route files with the Go source by final path segment; check each one when you start its task, the match is by name): `POST` and `DELETE /club/name-change` (2.7); `POST /sessions/{id}/back-to-preparation` (2.3); `PATCH /sessions/{id}/courts/order`, `POST /matches/clear`, `POST /matches/{id}/trade-courts`, `switch-sides`, `swap-from-match`, `pause` (2.4); `PATCH /sessions/{id}/roster/handicap` (2.5); `GET /public-sessions/{slug}/payment-status`, `POST /sessions/{id}/payments/refunds`, `POST /requests/transfers/{id}/refund`, `.../reject` (new task 2.12: payments and slot transfer; owner to confirm scope, money).
+  - Not in either table (cannot be seen from the goldens): `almost-done` (migration on `main` only), gender, handicap logic, match making, the club leaderboards, `entryId` (#1019).
 - [ ] **2.2** `levelRestriction` (all, beginners, beginners-intermediate, per-level slots; migration `20261124000100`) on session setup and reads; the invalid-slots answer (**OWNER**: enforcement rule, spec question 3)
 - [ ] **2.3** `plannedBeforeStart` and `POST sessions/{id}/back-to-preparation` (migration `20261125000100_session_back_to_preparation`, owner decision of 2026-11-25)
 - [ ] **2.4** Court `position` and `courts/order` (migration `20261125000100_session_court_position`); `matches/clear`, `trade-courts`, `switch-sides`, `swap-from-match`, `pause`
@@ -56,6 +74,8 @@ Ticket: none yet (proposal: one issue per phase under epic #869, titled `<seq> Â
 - [ ] **2.8** Match results shape: `autoPlaced` and `queueRevision` on every route that returns a match result; make the `match` golden pass
 - [ ] **2.9** Waitlist order (D-2026-11-23-06): waitlist `addedAt` is `demotedAt ?? addedAt` in the Go public session read and the signed-in reads; golden from the TypeScript with a moved-off-roster player first
 - [ ] **2.10** **OWNER** Move a playing match (`canMovePlaying`, `packages/data/src/match/liveMatch.rules.ts`; matches module, owner November 19, 2026) and Record games off in Session done (facts, snapshot, history job, no rank job; #1080, D-2026-11-20-02). A shared-rule change: Go rule and `@rotra/rule-cases` first, then rebuild the wasm in the same PR (AGENTS rule 16). Clears `TestMatchControlGolden/move_a_playing_match` and the finalize rows
+- [ ] **2.11** `hosts` in the create and edit session answers (`null` when the session has none, the Hosts list otherwise): goldens prep and money, ~92 subtests. Not a rule: a response field next to `session`
+- [ ] **2.12** **OWNER** Payments and slot transfer routes with no Go counterpart: `payment-status` (public), `payments/refunds`, `transfers/{id}/refund` and `reject`. Money: ask before building; cases first, captured from the TypeScript
 
 ## Phase 3: Sign-in and Player goldens with the new columns
 

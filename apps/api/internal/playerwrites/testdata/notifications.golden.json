@@ -119,11 +119,11 @@
         {
           "revision": "1",
           "player_id": "d4000000-0000-4000-8000-000000000002",
-          "updated_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
           "disabled_at": null,
           "google_email": null,
           "contact_sync_version": "1",
-          "verification_reminder_read_at": "2026-11-20T04:00:00+00:00"
+          "verification_reminder_read_at": null
         },
         {
           "revision": "1",
@@ -1470,11 +1470,11 @@
         {
           "revision": "1",
           "player_id": "d4000000-0000-4000-8000-000000000001",
-          "updated_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
           "disabled_at": null,
           "google_email": null,
           "contact_sync_version": "1",
-          "verification_reminder_read_at": "2026-11-20T04:00:00+00:00"
+          "verification_reminder_read_at": null
         },
         {
           "revision": "1",
@@ -2170,11 +2170,11 @@
         {
           "revision": "1",
           "player_id": "d4000000-0000-4000-8000-000000000002",
-          "updated_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
           "disabled_at": null,
           "google_email": null,
           "contact_sync_version": "1",
-          "verification_reminder_read_at": "2026-11-20T04:00:00+00:00"
+          "verification_reminder_read_at": null
         },
         {
           "revision": "1",
@@ -2564,11 +2564,11 @@
         {
           "revision": "1",
           "player_id": "d4000000-0000-4000-8000-000000000008",
-          "updated_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
           "disabled_at": null,
           "google_email": null,
           "contact_sync_version": "1",
-          "verification_reminder_read_at": "2026-11-20T04:00:00+00:00"
+          "verification_reminder_read_at": null
         }
       ],
       "players": [
@@ -6298,11 +6298,11 @@
         {
           "revision": "1",
           "player_id": "d4000000-0000-4000-8000-000000000002",
-          "updated_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
           "disabled_at": null,
           "google_email": null,
           "contact_sync_version": "1",
-          "verification_reminder_read_at": "2026-11-20T04:00:00+00:00"
+          "verification_reminder_read_at": null
         },
         {
           "revision": "1",
@@ -11441,11 +11441,11 @@
         {
           "revision": "1",
           "player_id": "d4000000-0000-4000-8000-000000000002",
-          "updated_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
           "disabled_at": null,
           "google_email": null,
           "contact_sync_version": "1",
-          "verification_reminder_read_at": "2026-11-20T04:00:00+00:00"
+          "verification_reminder_read_at": null
         },
         {
           "revision": "1",
@@ -12132,11 +12132,11 @@
         {
           "revision": "1",
           "player_id": "d4000000-0000-4000-8000-000000000002",
-          "updated_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
           "disabled_at": null,
           "google_email": null,
           "contact_sync_version": "1",
-          "verification_reminder_read_at": "2026-11-20T04:00:00+00:00"
+          "verification_reminder_read_at": null
         },
         {
           "revision": "1",

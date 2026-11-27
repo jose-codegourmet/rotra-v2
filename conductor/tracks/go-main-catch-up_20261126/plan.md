@@ -98,7 +98,8 @@ Ticket: none yet (proposal: one issue per phase under epic #869, titled `<seq> Â
 
 ## Phase 3: Sign-in and Player goldens with the new columns
 
-- [ ] **3.1** Recapture `auth/claim`, `auth/google`, `auth/register` and `signedin` goldens from the TypeScript on the fully migrated DB; list what changed
+- [x] **3.1** Recapture `auth/claim`, `auth/google`, `auth/register` and `signedin` goldens from the TypeScript on the fully migrated DB; list what changed
+  - **Done 2026-11-27.** Recaptured with no hand edits; the list is in [phase3-golden-diff.md](phase3-golden-diff.md): 11 golden files changed, failing subtests in the four packages 52 â†’ 486 (the goldens now describe what `main` does; Go has not been changed). Grouped for 3.2 and 3.3 there.
 - [ ] **3.2** Fix Go where those goldens fail (claim and registration rows carry the new `club_players` / `session_players` columns; gender; verified, D-2026-11-23-07)
 - [ ] **3.3** Player reads that changed on `main`: `matches/{matchId}`, `me/gender`, unclaimed shared-entry profiles by RTR ID (D-2026-11-23-05), the profile masking the merge settled (B-54, `isMasked`); goldens first
 

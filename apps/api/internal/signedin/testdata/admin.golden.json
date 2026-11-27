@@ -5956,6 +5956,7 @@
           "id": "d4000000-0000-4000-8000-000000000001",
           "name": "Alice Reyes",
           "nickname": "Ace",
+          "gender": null,
           "rtrId": "RTR-PH-CEB-102926-0001",
           "createdByClubId": "c9000000-0000-4000-8000-000000000001",
           "createdOn": "2026-10-29",
@@ -5993,12 +5994,18 @@
           },
           "archivedAt": null,
           "revision": "3",
-          "removalReason": "This part of ROTRA isn't connected to saved data yet."
+          "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+          "verification": {
+            "verified": true,
+            "verifiedByAdmin": false,
+            "completedSteps": 3
+          }
         },
         {
           "id": "d4000000-0000-4000-8000-000000000002",
           "name": "Bob Santos",
           "nickname": "Bobby",
+          "gender": null,
           "rtrId": "RTR-PH-CEB-102926-0002",
           "createdByClubId": "c9000000-0000-4000-8000-000000000001",
           "createdOn": "2026-10-29",
@@ -6030,12 +6037,18 @@
           },
           "archivedAt": null,
           "revision": "9007199254740993",
-          "removalReason": "This part of ROTRA isn't connected to saved data yet."
+          "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+          "verification": {
+            "verified": true,
+            "verifiedByAdmin": true,
+            "completedSteps": 1
+          }
         },
         {
           "id": "d4000000-0000-4000-8000-000000000003",
           "name": "Carla Dizon",
           "nickname": "CD",
+          "gender": null,
           "rtrId": "RTR-PH-CEB-102926-0003",
           "createdByClubId": "c9000000-0000-4000-8000-000000000001",
           "createdOn": "2026-10-29",
@@ -6066,12 +6079,18 @@
           },
           "archivedAt": null,
           "revision": "1",
-          "removalReason": "This part of ROTRA isn't connected to saved data yet."
+          "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+          "verification": {
+            "verified": false,
+            "verifiedByAdmin": false,
+            "completedSteps": 2
+          }
         },
         {
           "id": "d4000000-0000-4000-8000-000000000005",
           "name": "Erin Lim",
           "nickname": "Er",
+          "gender": null,
           "rtrId": "RTR-PH-MNL-102926-0005",
           "createdByClubId": "c9000000-0000-4000-8000-000000000002",
           "createdOn": "2026-10-29",
@@ -6101,12 +6120,14 @@
           },
           "archivedAt": null,
           "revision": "2",
-          "removalReason": "This part of ROTRA isn't connected to saved data yet."
+          "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+          "verification": null
         },
         {
           "id": "d4000000-0000-4000-8000-000000000007",
           "name": "Gina Claimed No Contact",
           "nickname": null,
+          "gender": null,
           "rtrId": "RTR-PH-CEB-102926-0013",
           "createdByClubId": "c9000000-0000-4000-8000-000000000001",
           "createdOn": "2026-10-29",
@@ -6129,7 +6150,12 @@
           },
           "archivedAt": null,
           "revision": "1",
-          "removalReason": "This part of ROTRA isn't connected to saved data yet."
+          "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+          "verification": {
+            "verified": false,
+            "verifiedByAdmin": false,
+            "completedSteps": 0
+          }
         },
         {
           "id": "a6000000-0000-4000-8000-000000000007",
@@ -6174,7 +6200,8 @@
           },
           "archivedAt": null,
           "revision": "1",
-          "removalReason": "Saved by its club only; the club manages this record"
+          "removalReason": "Saved by its club only; the club manages this record",
+          "verification": null
         },
         {
           "id": "a6000000-0000-4000-8000-000000000008",
@@ -6210,7 +6237,8 @@
           },
           "archivedAt": null,
           "revision": "5",
-          "removalReason": "Saved by its club only; the club manages this record"
+          "removalReason": "Saved by its club only; the club manages this record",
+          "verification": null
         },
         {
           "id": "a6000000-0000-4000-8000-000000000012",
@@ -6246,7 +6274,8 @@
           },
           "archivedAt": null,
           "revision": "1",
-          "removalReason": "Saved by its club only; the club manages this record"
+          "removalReason": "Saved by its club only; the club manages this record",
+          "verification": null
         },
         {
           "id": "c6000000-0000-4000-8000-000000000021",
@@ -6282,7 +6311,8 @@
           },
           "archivedAt": null,
           "revision": "7",
-          "removalReason": "Saved by its club only; the club manages this record"
+          "removalReason": "Saved by its club only; the club manages this record",
+          "verification": null
         },
         {
           "id": "c6000000-0000-4000-8000-000000000022",
@@ -6319,7 +6349,8 @@
           },
           "archivedAt": null,
           "revision": "1",
-          "removalReason": "Saved by its club only; the club manages this record"
+          "removalReason": "Saved by its club only; the club manages this record",
+          "verification": null
         }
       ]
     }
@@ -6337,6 +6368,7 @@
           "id": "d4000000-0000-4000-8000-000000000001",
           "name": "Alice Reyes",
           "nickname": "Ace",
+          "gender": null,
           "rtrId": "RTR-PH-CEB-102926-0001",
           "createdByClubId": "c9000000-0000-4000-8000-000000000001",
           "createdOn": "2026-10-29",
@@ -6372,12 +6404,18 @@
           },
           "archivedAt": null,
           "revision": "3",
-          "removalReason": "This part of ROTRA isn't connected to saved data yet."
+          "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+          "verification": {
+            "verified": false,
+            "verifiedByAdmin": false,
+            "completedSteps": 1
+          }
         },
         {
           "id": "d4000000-0000-4000-8000-000000000002",
           "name": "Bob Santos",
           "nickname": "Bobby",
+          "gender": null,
           "rtrId": "RTR-PH-CEB-102926-0002",
           "createdByClubId": "c9000000-0000-4000-8000-000000000001",
           "createdOn": "2026-10-29",
@@ -6407,12 +6445,18 @@
           },
           "archivedAt": null,
           "revision": "9007199254740993",
-          "removalReason": "This part of ROTRA isn't connected to saved data yet."
+          "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+          "verification": {
+            "verified": true,
+            "verifiedByAdmin": true,
+            "completedSteps": 0
+          }
         },
         {
           "id": "d4000000-0000-4000-8000-000000000003",
           "name": "Carla Dizon",
           "nickname": "CD",
+          "gender": null,
           "rtrId": "RTR-PH-CEB-102926-0003",
           "createdByClubId": "c9000000-0000-4000-8000-000000000001",
           "createdOn": "2026-10-29",
@@ -6442,12 +6486,18 @@
           },
           "archivedAt": null,
           "revision": "1",
-          "removalReason": "This part of ROTRA isn't connected to saved data yet."
+          "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+          "verification": {
+            "verified": false,
+            "verifiedByAdmin": false,
+            "completedSteps": 1
+          }
         },
         {
           "id": "d4000000-0000-4000-8000-000000000005",
           "name": "Erin Lim",
           "nickname": "Er",
+          "gender": null,
           "rtrId": "RTR-PH-MNL-102926-0005",
           "createdByClubId": "c9000000-0000-4000-8000-000000000002",
           "createdOn": "2026-10-29",
@@ -6476,12 +6526,14 @@
           },
           "archivedAt": null,
           "revision": "2",
-          "removalReason": "This part of ROTRA isn't connected to saved data yet."
+          "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+          "verification": null
         },
         {
           "id": "d4000000-0000-4000-8000-000000000007",
           "name": "Gina Claimed No Contact",
           "nickname": null,
+          "gender": null,
           "rtrId": "RTR-PH-CEB-102926-0013",
           "createdByClubId": "c9000000-0000-4000-8000-000000000001",
           "createdOn": "2026-10-29",
@@ -6504,7 +6556,12 @@
           },
           "archivedAt": null,
           "revision": "1",
-          "removalReason": "This part of ROTRA isn't connected to saved data yet."
+          "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+          "verification": {
+            "verified": false,
+            "verifiedByAdmin": false,
+            "completedSteps": 0
+          }
         },
         {
           "id": "a6000000-0000-4000-8000-000000000007",
@@ -6549,7 +6606,8 @@
           },
           "archivedAt": null,
           "revision": "1",
-          "removalReason": "Saved by its club only; the club manages this record"
+          "removalReason": "Saved by its club only; the club manages this record",
+          "verification": null
         },
         {
           "id": "a6000000-0000-4000-8000-000000000008",
@@ -6585,7 +6643,8 @@
           },
           "archivedAt": null,
           "revision": "5",
-          "removalReason": "Saved by its club only; the club manages this record"
+          "removalReason": "Saved by its club only; the club manages this record",
+          "verification": null
         },
         {
           "id": "a6000000-0000-4000-8000-000000000012",
@@ -6621,7 +6680,8 @@
           },
           "archivedAt": null,
           "revision": "1",
-          "removalReason": "Saved by its club only; the club manages this record"
+          "removalReason": "Saved by its club only; the club manages this record",
+          "verification": null
         },
         {
           "id": "c6000000-0000-4000-8000-000000000021",
@@ -6657,7 +6717,8 @@
           },
           "archivedAt": null,
           "revision": "7",
-          "removalReason": "Saved by its club only; the club manages this record"
+          "removalReason": "Saved by its club only; the club manages this record",
+          "verification": null
         },
         {
           "id": "c6000000-0000-4000-8000-000000000022",
@@ -6694,7 +6755,8 @@
           },
           "archivedAt": null,
           "revision": "1",
-          "removalReason": "Saved by its club only; the club manages this record"
+          "removalReason": "Saved by its club only; the club manages this record",
+          "verification": null
         }
       ]
     }
@@ -6711,6 +6773,7 @@
         "id": "d4000000-0000-4000-8000-000000000001",
         "name": "Alice Reyes",
         "nickname": "Ace",
+        "gender": null,
         "rtrId": "RTR-PH-CEB-102926-0001",
         "createdByClubId": "c9000000-0000-4000-8000-000000000001",
         "createdOn": "2026-10-29",
@@ -6749,6 +6812,11 @@
         "archivedAt": null,
         "revision": "3",
         "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+        "verification": {
+          "verified": true,
+          "verifiedByAdmin": false,
+          "completedSteps": 3
+        },
         "playingStyle": "Aggressive net player",
         "experienceYears": 3,
         "experienceMonths": 0,
@@ -6785,6 +6853,7 @@
         "id": "d4000000-0000-4000-8000-000000000002",
         "name": "Bob Santos",
         "nickname": null,
+        "gender": null,
         "rtrId": "RTR-PH-CEB-102926-0002",
         "createdByClubId": "c9000000-0000-4000-8000-000000000001",
         "createdOn": "2026-10-29",
@@ -6817,6 +6886,11 @@
         "archivedAt": null,
         "revision": "9007199254740993",
         "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+        "verification": {
+          "verified": true,
+          "verifiedByAdmin": true,
+          "completedSteps": 1
+        },
         "playingStyle": "",
         "experienceYears": 0,
         "experienceMonths": 5,
@@ -6853,6 +6927,7 @@
         "id": "d4000000-0000-4000-8000-000000000003",
         "name": "Carla Dizon",
         "nickname": "CD",
+        "gender": null,
         "rtrId": "RTR-PH-CEB-102926-0003",
         "createdByClubId": "c9000000-0000-4000-8000-000000000001",
         "createdOn": "2026-10-29",
@@ -6884,6 +6959,11 @@
         "archivedAt": null,
         "revision": "1",
         "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+        "verification": {
+          "verified": false,
+          "verifiedByAdmin": false,
+          "completedSteps": 2
+        },
         "playingStyle": "",
         "experienceYears": null,
         "experienceMonths": null,
@@ -6920,6 +7000,7 @@
         "id": "d4000000-0000-4000-8000-000000000004",
         "name": "Dan Uy",
         "nickname": null,
+        "gender": null,
         "rtrId": "RTR-PH-CEB-102926-0004",
         "createdByClubId": "c9000000-0000-4000-8000-000000000001",
         "createdOn": "2026-10-29",
@@ -6944,6 +7025,7 @@
         "archivedAt": null,
         "revision": "1",
         "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+        "verification": null,
         "playingStyle": "",
         "experienceYears": null,
         "experienceMonths": null,
@@ -6980,6 +7062,7 @@
         "id": "d4000000-0000-4000-8000-000000000005",
         "name": "Erin Lim",
         "nickname": null,
+        "gender": null,
         "rtrId": "RTR-PH-MNL-102926-0005",
         "createdByClubId": "c9000000-0000-4000-8000-000000000002",
         "createdOn": "2026-10-29",
@@ -7010,6 +7093,7 @@
         "archivedAt": null,
         "revision": "2",
         "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+        "verification": null,
         "playingStyle": "",
         "experienceYears": null,
         "experienceMonths": null,
@@ -7060,6 +7144,7 @@
         "id": "d4000000-0000-4000-8000-000000000007",
         "name": "Gina Claimed No Contact",
         "nickname": null,
+        "gender": null,
         "rtrId": "RTR-PH-CEB-102926-0013",
         "createdByClubId": "c9000000-0000-4000-8000-000000000001",
         "createdOn": "2026-10-29",
@@ -7083,6 +7168,11 @@
         "archivedAt": null,
         "revision": "1",
         "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+        "verification": {
+          "verified": false,
+          "verifiedByAdmin": false,
+          "completedSteps": 0
+        },
         "playingStyle": "",
         "experienceYears": null,
         "experienceMonths": null,
@@ -7173,6 +7263,7 @@
         "archivedAt": null,
         "revision": "1",
         "removalReason": "Saved by its club only; the club manages this record",
+        "verification": null,
         "playingStyle": "",
         "experienceYears": null,
         "experienceMonths": null,
@@ -7240,6 +7331,7 @@
         "archivedAt": null,
         "revision": "5",
         "removalReason": "Saved by its club only; the club manages this record",
+        "verification": null,
         "playingStyle": "",
         "experienceYears": null,
         "experienceMonths": null,
@@ -7349,6 +7441,7 @@
         "archivedAt": null,
         "revision": "7",
         "removalReason": "Saved by its club only; the club manages this record",
+        "verification": null,
         "playingStyle": "",
         "experienceYears": null,
         "experienceMonths": null,
@@ -7417,6 +7510,7 @@
         "archivedAt": null,
         "revision": "1",
         "removalReason": "Saved by its club only; the club manages this record",
+        "verification": null,
         "playingStyle": "",
         "experienceYears": null,
         "experienceMonths": null,
@@ -7495,6 +7589,7 @@
         "id": "d4000000-0000-4000-8000-000000000001",
         "name": "Alice Reyes",
         "nickname": "Ace",
+        "gender": null,
         "rtrId": "RTR-PH-CEB-102926-0001",
         "createdByClubId": "c9000000-0000-4000-8000-000000000001",
         "createdOn": "2026-10-29",
@@ -7533,6 +7628,11 @@
         "archivedAt": null,
         "revision": "3",
         "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+        "verification": {
+          "verified": true,
+          "verifiedByAdmin": false,
+          "completedSteps": 3
+        },
         "playingStyle": "Aggressive net player",
         "experienceYears": 3,
         "experienceMonths": 0,
@@ -7569,6 +7669,7 @@
         "id": "d4000000-0000-4000-8000-000000000001",
         "name": "Alice Reyes",
         "nickname": "Ace",
+        "gender": null,
         "rtrId": "RTR-PH-CEB-102926-0001",
         "createdByClubId": "c9000000-0000-4000-8000-000000000001",
         "createdOn": "2026-10-29",
@@ -7607,6 +7708,11 @@
         "archivedAt": null,
         "revision": "3",
         "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+        "verification": {
+          "verified": true,
+          "verifiedByAdmin": false,
+          "completedSteps": 3
+        },
         "playingStyle": "Aggressive net player",
         "experienceYears": 3,
         "experienceMonths": 0,
@@ -7646,6 +7752,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-16T15:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000007",
@@ -7667,6 +7774,7 @@
           "clubName": "  😀 Birdie Club",
           "finishedAt": "2026-11-14T22:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000004",
@@ -7697,6 +7805,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-13T14:00:00.500Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000002",
@@ -7776,6 +7885,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-13T14:00:00.500Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000001",
@@ -7834,6 +7944,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-13T14:00:00.500Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000001",
@@ -7928,6 +8039,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-13T14:00:00.500Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000001",
@@ -7974,6 +8086,7 @@
           "clubName": "  😀 Birdie Club",
           "finishedAt": "2026-11-14T22:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000004",
@@ -8027,6 +8140,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-13T14:00:00.500Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000002",
@@ -8108,6 +8222,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-16T15:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000007",
@@ -8129,6 +8244,7 @@
           "clubName": "  😀 Birdie Club",
           "finishedAt": "2026-11-14T22:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000004",
@@ -8159,6 +8275,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-13T14:00:00.500Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000002",
@@ -8238,6 +8355,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-16T15:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000007",
@@ -8259,6 +8377,7 @@
           "clubName": "  😀 Birdie Club",
           "finishedAt": "2026-11-14T22:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000004",
@@ -8289,6 +8408,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-13T14:00:00.500Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "a5000000-0000-4000-8000-000000000002",

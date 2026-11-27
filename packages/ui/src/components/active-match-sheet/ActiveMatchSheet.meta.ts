@@ -5,6 +5,7 @@ export const activeMatchSheetMeta = {
   description:
     'Q-ACTIVE-MATCH: the in-game control sheet for a match on court. "Match N · Court X", the head row as on the court card (green #N, format pill, elapsed-time pill with a clock, status pill Playing / Ending / Ending soon), "Started TIME · Scoring · LABEL", the Almost done switch row, both teams with levels, one line per substitution ("Neither gets credit" or "NAME got the game (QM choice)"), the hint "Drag a player onto someone in the other pair to swap partners. Tap a player\'s card to bring in someone from outside (substitute or replace), or their picture to see their profile." (a card tap opens PlayerActionSheet), and Mark invalid and Match done.',
   usage: [
+    'Pass winChance for the pair chips beside TEAM A / TEAM B and onOpenWinChance to open WinChanceDialog; no chip without winChance.',
     'Open it from an occupied court on the live console or from an active queue card. The container passes the match, its court label ("Court 1 + Court 2" for 5v5) and each player\'s counted games.',
     'The three footer actions only open the next sheet (Q-INVALID-MATCH, Q-SUBSTITUTE, Q-MATCH-DONE); nothing here changes the match. Closing the sheet never ends the game or frees the court.',
     'Move to a free court sits under the substitutions (as in the prototype) and calls onMoveToFree, which opens MoveMatchSheet with variant "playing". Pass freeCourtCount; it is disabled with "No court is free" when fewer courts are free than the match needs (two for a 5v5). Omit onMoveToFree to hide it.',

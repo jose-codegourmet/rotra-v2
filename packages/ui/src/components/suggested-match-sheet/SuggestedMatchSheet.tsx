@@ -1,6 +1,7 @@
 'use client'
 
 import type { MatchFormat } from '@rotra/data/match/types'
+import type { WinChance } from '@rotra/data/match/win-chance'
 import type { SessionMode } from '@rotra/data/queue-session/types'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
@@ -22,6 +23,10 @@ export type SuggestedLineup = {
 
 export type SuggestedMatchSheetProps = {
   open: boolean
+  /** Win chance (D-2026-11-27-02): a chip beside each team's label; none when missing */
+  winChance?: WinChance
+  /** Makes the chips buttons that open WinChanceDialog */
+  onOpenWinChance?: () => void
   onOpenChange: (open: boolean) => void
   /** null when no lineup is possible; `reason` then explains why, with only Close */
   lineup: SuggestedLineup | null
@@ -104,6 +109,8 @@ function dealIn(root: HTMLElement) {
  */
 export function SuggestedMatchSheet({
   open,
+  winChance,
+  onOpenWinChance,
   onOpenChange,
   lineup,
   reason,
@@ -173,6 +180,8 @@ export function SuggestedMatchSheet({
       </div>
       <div ref={dealRef}>
         <TeamLineup
+          winChance={winChance}
+          onOpenWinChance={onOpenWinChance}
           teamA={lineup.teamA}
           teamB={lineup.teamB}
           minimumGames={minimumGames}
@@ -197,7 +206,7 @@ export function SuggestedMatchSheet({
             : 'Everyone here has met the minimum; they have the fewest games among present players.'}
         </p>
         <p className="m-0 text-[13px] text-fg2">
-          Teams are split by assigned levels to suit {mode} mode.
+          Teams are split by win chance to suit {mode} mode.
         </p>
       </Card>
     </Sheet>

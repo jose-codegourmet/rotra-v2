@@ -1,7 +1,9 @@
+import type { WinChance } from '@rotra/data/match/win-chance'
 import { cn } from '@rotra/ui/cn'
 import { MatchCourt, type MatchCourtPlayer } from '@rotra/ui/match-court'
 import { type MatchRecordCardProps, substitutionCreditLine } from '@rotra/ui/match-record-card'
 import { formatTimeRange } from '@rotra/ui/now-card/helpers'
+import { winChanceText, winChanceTitle } from '@rotra/ui/win-chance-chip'
 
 export type RecordCourtColumn = {
   /** "Court 1" */
@@ -11,6 +13,9 @@ export type RecordCourtColumn = {
     id: string
     /** Best of 3 (Q22): every game, Team A first; `score` then holds the games won */
     games?: { a: number; b: number }[] | null
+    /** Win chance (D-2026-11-27-02): the corner pill "39% · 61%"; `upset` adds the Upset pill */
+    winChance?: WinChance
+    upset?: boolean
   })[]
 }
 
@@ -18,6 +23,8 @@ export type RecordCourtColumnsProps = {
   columns: RecordCourtColumn[]
   /** A player's picture opens their profile */
   onSelectPlayer: (playerId: string) => void
+  /** A match's win chance pill (or Upset pill) was tapped: open WinChanceDialog for that match */
+  onOpenWinChance?: (matchId: string) => void
   className?: string
 }
 
@@ -33,6 +40,7 @@ export type RecordCourtColumnsProps = {
 export function RecordCourtColumns({
   columns,
   onSelectPlayer,
+  onOpenWinChance,
   className,
 }: RecordCourtColumnsProps) {
   const face = (p: RecordCourtColumn['matches'][number]['teamA'][number]): MatchCourtPlayer => ({
@@ -79,6 +87,19 @@ export function RecordCourtColumns({
                     }
                     ariaLabel={`Match ${m.number} on ${column.label}: ${names(m.teamA)} versus ${names(m.teamB)}`}
                     fun={m.fun}
+                    winChance={
+                      m.winChance
+                        ? {
+                            text: winChanceText(m.winChance),
+                            title: winChanceTitle(m.winChance, {
+                              a: names(m.teamA),
+                              b: names(m.teamB),
+                            }),
+                            upset: m.upset ?? false,
+                            onOpen: onOpenWinChance ? () => onOpenWinChance(m.id) : undefined,
+                          }
+                        : undefined
+                    }
                     left={m.teamA.map(face)}
                     right={m.teamB.map(face)}
                     winner={

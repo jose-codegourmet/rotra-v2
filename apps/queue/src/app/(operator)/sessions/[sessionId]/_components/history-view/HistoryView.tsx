@@ -1,6 +1,7 @@
 'use client'
 
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { isUpset, winChance } from '@rotra/data/match/win-chance'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { playerFacingName } from '@rotra/data/session-roster/sessionRoster.rules'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
@@ -9,6 +10,7 @@ import { Skeleton } from '@rotra/ui/skeleton'
 import { useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import type { ConsoleViewProps } from '@/app/(operator)/sessions/[sessionId]/_components/session-console/SessionConsole'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 import { useClubPlayerPictures } from '@/lib/useClubPlayerPictures'
 
 export type HistoryViewProps = ConsoleViewProps
@@ -25,6 +27,7 @@ export function HistoryView({ sessionId, onOpenProfile }: HistoryViewProps) {
   const matches = useSessionMatches(sessionId)
   const { pictureOf } = useClubPlayerPictures()
   const [courtFilter, setCourtFilter] = useState('all')
+  const winChanceDialog = useWinChanceDialog(roster.data?.roster, matches.data, playerFacingName)
 
   if (session.isError || roster.isError || matches.isError)
     return (
@@ -78,6 +81,8 @@ export function HistoryView({ sessionId, onOpenProfile }: HistoryViewProps) {
       fun: m.format.startsWith('fun_'),
       teamA: m.teamA.map(playerOf),
       teamB: m.teamB.map(playerOf),
+      winChance: winChance(m, roster.data.roster, matches.data),
+      upset: isUpset(m, roster.data.roster),
       winningTeam: m.decision?.winningTeam ?? null,
       score:
         m.decision?.teamAScore != null && m.decision.teamBScore != null
@@ -103,12 +108,18 @@ export function HistoryView({ sessionId, onOpenProfile }: HistoryViewProps) {
   }
 
   return (
-    <LiveMatchHistory
-      courts={courts}
-      matches={finished}
-      courtFilter={courtFilter}
-      onCourtFilterChange={setCourtFilter}
-      onOpenPlayer={openPlayer}
-    />
+    <>
+      <LiveMatchHistory
+        courts={courts}
+        matches={finished}
+        courtFilter={courtFilter}
+        onCourtFilterChange={setCourtFilter}
+        onOpenPlayer={openPlayer}
+        onOpenWinChance={(matchId) =>
+          winChanceDialog.open((all) => all.find((x) => x.id === matchId))
+        }
+      />
+      {winChanceDialog.dialog}
+    </>
   )
 }

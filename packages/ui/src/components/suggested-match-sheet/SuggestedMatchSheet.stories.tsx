@@ -87,3 +87,11 @@ const withStacks = (): SuggestedMatchSheetProps => {
 }
 export const NameStacks: Story = { args: withStacks() }
 export const NameStacksLight: Story = { args: withStacks(), globals: { theme: 'light' } }
+
+/** A chip beside each team label; tapping it opens WinChanceDialog. */
+export const WithWinChance: Story = {
+  args: {
+    winChance: { a: 39, b: 61, favored: 'B', strong: false } as const,
+    onOpenWinChance: fn(),
+  },
+}

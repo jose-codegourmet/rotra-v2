@@ -28,6 +28,8 @@ import {
   realSetMyProfilePicture,
   realUpdateMyProfile,
 } from '../real/player'
+import { gameWinChanceFields } from './gameWinChance.rules'
+import { mockGameWinChanceFaces } from './mockGameWinChance'
 import { normalizeOnboardingAnswers, type OnboardingAnswers } from './onboardingAnswers.rules'
 import { mockPhotoReference } from './photo'
 import { characterPictureReference, type PlayerPictureChoice } from './picture'
@@ -80,26 +82,37 @@ export async function getPlayerGames(
   await playerRequest(signal)
   await requireProfileAccess(playerId)
   const state = readMockState()
-  return (playerProjection(state).games[playerId] ?? []).map((session) => ({
-    ...session,
-    // Games are stored oldest first; each face counts that person's games so far, this one included.
-    games: session.games.map((game, index) => {
-      const played = (name: string) =>
-        session.games
-          .slice(0, index + 1)
-          .filter((g) => g.partners.includes(name) || g.opponents.includes(name)).length
-      const face = (name: string): PlayerGamePlayer => ({
-        ...gamePlayer(name, state.playerProfiles),
-        sessionGameNumber: played(name),
-      })
-      return {
-        ...game,
-        sessionGameNumber: index + 1,
-        partnerPlayers: game.partners.map(face),
-        opponentPlayers: game.opponents.map(face),
-      }
-    }),
-  }))
+  return (playerProjection(state).games[playerId] ?? []).map((session) => {
+    const chanceFace = mockGameWinChanceFaces(state, session)
+    return {
+      ...session,
+      // Games are stored oldest first; each face counts that person's games so far, this one included.
+      games: session.games.map((game, index) => {
+        const played = (name: string) =>
+          session.games
+            .slice(0, index + 1)
+            .filter((g) => g.partners.includes(name) || g.opponents.includes(name)).length
+        const face = (name: string): PlayerGamePlayer => ({
+          ...gamePlayer(name, state.playerProfiles),
+          sessionGameNumber: played(name),
+        })
+        const partnerPlayers = game.partners.map(face)
+        const opponentPlayers = game.opponents.map(face)
+        return {
+          ...game,
+          sessionGameNumber: index + 1,
+          partnerPlayers,
+          opponentPlayers,
+          // Win chance (D-2026-11-27-03): the profile owner's side is the left side.
+          ...gameWinChanceFields(
+            game,
+            [chanceFace(playerId), ...partnerPlayers.map((p) => chanceFace(p.playerId))],
+            opponentPlayers.map((p) => chanceFace(p.playerId)),
+          ),
+        }
+      }),
+    }
+  })
 }
 /**
  * The picture a club set for its guest (D-2026-11-09-12), by full name or nickname, resolved to an

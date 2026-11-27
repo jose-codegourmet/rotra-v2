@@ -36,6 +36,7 @@ import { handicapSpotsOf } from '../session-roster/handicap.rules'
 import { levelLabel, queueMasterName } from '../session-roster/sessionRoster.rules'
 import type {
   DirectoryPlayer,
+  PlayerForm,
   PlayerLookup,
   SessionJoinRequest,
   SessionNoShow,
@@ -534,6 +535,8 @@ export type WireRosterEntry = {
   confirmedAt: string
   /** Present on the roster GET; mutations still use the stored entry DTO. */
   hasPlayedAtClubBefore?: boolean
+  /** Win chance inputs (D-2026-11-27-02); roster GET only, missing on older servers and for guests */
+  form?: PlayerForm
   /** A registered player's club nickname (D-2026-11-18-03); Queue Master reads only */
   clubNickname?: string | null
   /** Set games played adjustment (#717); missing on older servers means 0 */

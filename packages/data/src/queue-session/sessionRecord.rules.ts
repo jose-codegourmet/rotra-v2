@@ -1,4 +1,5 @@
 import type { Match } from '../match/match.types'
+import { type WinChanceBreakdown, winChanceBreakdown } from '../match/winChance.rules'
 import type { PlayingLevel } from '../player/player.types'
 import { playerFacingName } from '../session-roster/sessionRoster.rules'
 import type { SessionPlayer } from '../session-roster/sessionRoster.types'
@@ -48,6 +49,11 @@ export type RecordMatch = {
     inName: string
     creditTo: 'nobody' | 'incoming' | 'outgoing'
   }[]
+  /**
+   * Win chance (D-2026-11-27-02), read from the lasting signals; null or missing for an invalid
+   * match. Queue Master only: the public page builds its own matches and never sets it.
+   */
+  winChance?: WinChanceBreakdown | null
 }
 /** Q-HISTORY › How the night ran: the courts, every match that ran, and the replay's time bounds. */
 export type SessionRecordHistory = {
@@ -76,6 +82,8 @@ export function sessionRecordHistory(input: {
   courts: SessionCourt[]
   roster: SessionPlayer[]
   matches: Match[]
+  /** The Queue Master's record only (D-2026-11-27-02); the public reads leave it off. */
+  winChance?: boolean
 }): SessionRecordHistory {
   const played = input.matches
     .filter((m) => m.startedAt != null && m.endedAt != null)
@@ -121,6 +129,10 @@ export function sessionRecordHistory(input: {
       inName: playerOf(sub.inId).name,
       creditTo: !sub.creditTo || sub.creditTo === 'none' ? 'nobody' : sub.creditTo,
     })),
+    winChance:
+      input.winChance && m.state === 'completed' && m.teamA.length && m.teamB.length
+        ? winChanceBreakdown(m, input.roster, input.matches)
+        : null,
   }))
   const from = matches.length ? Math.min(...matches.map((m) => m.startedAt)) : input.fallbackStart
   const to = Math.max(from + MINUTE, ...matches.map((m) => m.replayEndAt))

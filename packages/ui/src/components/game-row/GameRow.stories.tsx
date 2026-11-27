@@ -84,3 +84,46 @@ export const SkillRings: Story = {
   globals: { theme: 'dark' },
 }
 export const SkillRingsLight: Story = { ...SkillRings, globals: { theme: 'light' } }
+
+/**
+ * Win chance (D-2026-11-27-03): “41% · 59%” after the format, left side first; display only in a
+ * list, where the court still opens the Game page.
+ */
+export const WinChance: Story = {
+  args: {
+    game: {
+      ...withFaces(0, 0),
+      winChance: { a: 41, b: 59, favored: 'B', strong: false },
+      upset: false,
+    },
+    onOpen: () => {},
+  },
+  globals: { theme: 'dark' },
+}
+export const WinChanceLight: Story = { ...WinChance, globals: { theme: 'light' } }
+/** The Favored side (65% or more) lost: the Upset pill follows. */
+export const WinChanceUpset: Story = {
+  args: {
+    game: {
+      ...withFaces(0, 0),
+      winChance: { a: 27, b: 73, favored: 'B', strong: true },
+      upset: true,
+    },
+    onOpen: () => {},
+  },
+  globals: { theme: 'dark' },
+}
+export const WinChanceUpsetLight: Story = { ...WinChanceUpset, globals: { theme: 'light' } }
+export const WinChanceUpsetPhone: Story = {
+  ...WinChanceUpset,
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}
+/** The Game page court: both pills are buttons that open the Win chance dialog. */
+export const WinChanceOpensDialog: Story = {
+  args: { ...WinChanceUpset.args, onOpen: undefined, onOpenWinChance: () => {} },
+  globals: { theme: 'dark' },
+}
+export const WinChanceOpensDialogLight: Story = {
+  ...WinChanceOpensDialog,
+  globals: { theme: 'light' },
+}

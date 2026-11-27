@@ -41,6 +41,13 @@ export type MatchCourtProps = {
   number?: number
   /** “7:10–7:30 PM” */
   timeLabel?: string
+  /**
+   * Win chance (D-2026-11-27-02): a corner pill after the label, “39% · 61%”, left pair first, and an
+   * “Upset” pill when the Favored pair lost. Queue Master only (the Player variant shows it too, in
+   * the label's size). With `onOpen` both pills are buttons that open WinChanceDialog; they sit above
+   * the `onOpen` court overlay.
+   */
+  winChance?: { text: string; title: string; upset: boolean; onOpen?: () => void }
   /** Player variant: the whole corner pill text instead of “#N · time”, drawn small caps (“Doubles”) */
   cornerLabel?: string
   /** Accessible name of the court; defaults to “Match N: A versus B” */
@@ -136,6 +143,51 @@ export function MatchCourtArt() {
   )
 }
 
+/** A corner pill; a button above the court overlay when it opens something. */
+function CornerPill({
+  title,
+  onOpen,
+  label,
+  className,
+  children,
+}: {
+  title: string
+  onOpen?: () => void
+  label: string
+  className?: string
+  children: ReactNode
+}) {
+  const base = 'rounded-full bg-court-level-label px-2 font-bold whitespace-nowrap'
+  if (!onOpen)
+    return (
+      <span title={title} className={cn(base, 'text-on-photo/90', className)}>
+        {children}
+      </span>
+    )
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={label}
+      aria-haspopup="dialog"
+      onClick={(e) => {
+        e.stopPropagation()
+        onOpen()
+      }}
+      onKeyDown={(e) => e.stopPropagation()}
+      className={cn(
+        base,
+        'pointer-events-auto relative cursor-pointer border-0 text-on-photo/90 hover:bg-on-photo/25',
+        'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent',
+        'touch:before:absolute touch:before:-inset-2 touch:before:content-[""]',
+        className,
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
 /**
  * One match of a finished session's Match history drawn as a small court (2026-11-13 match history
  * courts log; the prototype's pubHistoryMatch, `.gm*`), the same design as ROTRA Player's game rows:
@@ -147,6 +199,7 @@ export function MatchCourtArt() {
 export function MatchCourt({
   number,
   timeLabel,
+  winChance,
   cornerLabel,
   ariaLabel,
   action,
@@ -256,6 +309,7 @@ export function MatchCourt({
   const playerVariant = cornerLabel !== undefined
   const games = invalid || versus || !score ? [] : (gameScores ?? [])
   const hasGames = games.length > 0
+  const pillSize = playerVariant ? 'text-[10px]' : 'text-[11px] max-[480px]:text-[10px]'
   const courtLabel = ariaLabel ?? `Match ${number}: ${names(left)} versus ${names(right)}`
   return (
     <article
@@ -288,16 +342,39 @@ export function MatchCourt({
           />
         ) : null}
         <div className="pointer-events-none absolute top-2 right-2 left-2 z-2 flex flex-col items-start gap-1">
-          {playerVariant ? (
-            <span className="rounded-full bg-court-level-label px-2 text-[10px] font-extrabold tracking-[0.5px] whitespace-nowrap text-on-photo/85 uppercase">
-              {cornerLabel}
-            </span>
-          ) : (
-            <span className="rounded-full bg-court-level-label px-2 text-[11px] font-bold whitespace-nowrap text-on-photo/90 max-[480px]:text-[10px]">
-              #{number} · {timeLabel}
-              {fun ? ' · Fun' : ''}
-            </span>
-          )}
+          <span className="flex flex-wrap items-center gap-1">
+            {playerVariant ? (
+              <span className="rounded-full bg-court-level-label px-2 text-[10px] font-extrabold tracking-[0.5px] whitespace-nowrap text-on-photo/85 uppercase">
+                {cornerLabel}
+              </span>
+            ) : (
+              <span className="rounded-full bg-court-level-label px-2 text-[11px] font-bold whitespace-nowrap text-on-photo/90 max-[480px]:text-[10px]">
+                #{number} · {timeLabel}
+                {fun ? ' · Fun' : ''}
+              </span>
+            )}
+            {winChance && !invalid ? (
+              <CornerPill
+                title={winChance.title}
+                onOpen={winChance.onOpen}
+                label={`Win chance ${winChance.text}. Explain`}
+                className={cn('tabular-nums', pillSize)}
+              >
+                <span className="sr-only">Win chance </span>
+                {winChance.text}
+              </CornerPill>
+            ) : null}
+            {winChance?.upset && !invalid ? (
+              <CornerPill
+                title="The favored team lost"
+                onOpen={winChance.onOpen}
+                label="Upset. Explain"
+                className={cn('text-warn', pillSize)}
+              >
+                Upset
+              </CornerPill>
+            ) : null}
+          </span>
           {hasGames ? (
             <span
               title="Game scores"

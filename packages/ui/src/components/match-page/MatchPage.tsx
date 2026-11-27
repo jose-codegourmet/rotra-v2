@@ -1,6 +1,7 @@
 'use client'
 
 import type { MatchPage as MatchPageData, MatchPagePlayer } from '@rotra/data/match-page/types'
+import { drawnWinChanceBreakdown, gameFaceKey } from '@rotra/data/player/game-win-chance'
 import type { PlayerGame } from '@rotra/data/player/types'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
@@ -12,6 +13,7 @@ import { Notice } from '@rotra/ui/notice'
 import { PlayerStatsCard } from '@rotra/ui/player-stats-card'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { VsCard } from '@rotra/ui/vs-card'
+import { WinChanceDialog, type WinChanceDialogPlayer } from '@rotra/ui/win-chance-dialog'
 import { type ReactNode, useEffect, useId, useRef, useState } from 'react'
 
 export type MatchPageProps = {
@@ -57,8 +59,17 @@ const face = (player: MatchPagePlayer): GameRowPlayer => ({
 /** A signed-in player sees their side on the left, themselves first. Other visitors see Team A. */
 function drawSides(page: MatchPageData, id: string) {
   const viewer = page.viewerPlayerId
-  const a = page.teamA.map((player, ix) => ({ player, id: `${id}-a-${ix}` }))
-  const b = page.teamB.map((player, ix) => ({ player, id: `${id}-b-${ix}` }))
+  // `chanceKey`: the face's id in the page's win chance breakdown.
+  const a = page.teamA.map((player, ix) => ({
+    player,
+    id: `${id}-a-${ix}`,
+    chanceKey: gameFaceKey('a', ix),
+  }))
+  const b = page.teamB.map((player, ix) => ({
+    player,
+    id: `${id}-b-${ix}`,
+    chanceKey: gameFaceKey('b', ix),
+  }))
   const inA = !!viewer && a.some(({ player }) => player.playerId === viewer)
   const inB = !!viewer && b.some(({ player }) => player.playerId === viewer)
   const [mine, theirs] = inB ? [b, a] : [a, b]
@@ -188,6 +199,7 @@ function MatchPageContent({
     scroll: false,
   })
   const picked = selection.ids
+  const [chanceOpen, setChanceOpen] = useState(false)
 
   useEffect(() => {
     if (!selection.scroll) return
@@ -241,6 +253,27 @@ function MatchPageContent({
   const share = (player: MatchPagePlayer) =>
     own && viewer && player.playerId === viewer ? onShareGame : undefined
   const shareCourt = lead ? share(lead) : undefined
+  // Win chance (D-2026-11-27-03), read as the court is drawn; never on a partial (not counted) game.
+  const breakdown =
+    page.winChance && lead && lead.counting !== 'partial'
+      ? drawnWinChanceBreakdown(
+          page.winChance,
+          left.map(({ chanceKey }) => chanceKey),
+          right.map(({ chanceKey }) => chanceKey),
+        )
+      : null
+  // The dialog's faces are the court's: a masked name stays masked.
+  const chanceFaces: Record<string, WinChanceDialogPlayer> = Object.fromEntries(
+    players.map(({ chanceKey, player }) => [
+      chanceKey,
+      {
+        name: player.name,
+        shortName: firstName(player.name),
+        photoUrl: player.picture ?? undefined,
+      },
+    ]),
+  )
+  const openChance = () => setChanceOpen(true)
   const court: PlayerGame | null = lead
     ? withFunGameNote({
         id: page.matchId,
@@ -257,6 +290,7 @@ function MatchPageContent({
           : {}),
         note: lead.note,
         sessionGameNumber: lead.sessionGameNumber,
+        ...(breakdown ? { winChance: breakdown.chance, upset: breakdown.upset } : {}),
       })
     : null
 
@@ -282,6 +316,7 @@ function MatchPageContent({
                   skillRings={(player) =>
                     player.playerId ? (skill.get(player.playerId) ?? null) : null
                   }
+                  onOpenWinChance={breakdown ? openChance : undefined}
                 />
               ) : null}
             </section>
@@ -320,6 +355,7 @@ function MatchPageContent({
           picked={picked}
           onPickPlayer={pickPlayer}
           onPickTeam={pickTeam}
+          winChance={breakdown ? { chance: breakdown.chance, onOpen: openChance } : undefined}
         />
       </div>
       {pickedPlayers.length ? (
@@ -346,6 +382,12 @@ function MatchPageContent({
           ))}
         </div>
       ) : null}
+      <WinChanceDialog
+        open={chanceOpen}
+        onClose={() => setChanceOpen(false)}
+        breakdown={breakdown}
+        players={chanceFaces}
+      />
     </main>
   )
 }

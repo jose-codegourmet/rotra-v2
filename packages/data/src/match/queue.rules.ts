@@ -141,6 +141,11 @@ export function generateMatches(
   matches: Match[],
   n: number,
   rng: () => number,
+  /**
+   * The level each player counts as in the team split (default: the assigned level). Suggest passes
+   * the form rating behind Win chance (D-2026-11-27-02); Main Queue regeneration keeps the default.
+   */
+  levelOf?: (p: SessionPlayer) => number,
 ): { matches: MatchLineup[]; error: null } | { matches: never[]; error: string } {
   const present = roster.filter((p) => p.sessionId === session.id && p.present),
     games = matches.filter((m) => m.sessionId === session.id)
@@ -177,7 +182,7 @@ export function generateMatches(
     const pick = [...present]
       .sort((a, b) => (load.get(a.id) ?? 0) - (load.get(b.id) ?? 0))
       .slice(0, size)
-    out.push(splitTeams(session, pick, format, rng))
+    out.push(splitTeams(session, pick, format, rng, levelOf))
     for (const p of pick) load.set(p.id, (load.get(p.id) ?? 0) + 1)
   }
   return { matches: out, error: null }

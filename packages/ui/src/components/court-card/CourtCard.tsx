@@ -1,3 +1,4 @@
+import type { WinChance } from '@rotra/data/match/win-chance'
 import { elapsedTime, queueTime } from '@rotra/schema/queue-time'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
@@ -7,6 +8,7 @@ import { Icon } from '@rotra/ui/icon'
 import { OverflowMenu, type OverflowMenuItem } from '@rotra/ui/overflow-menu'
 import { PairFaces, type PairFacesPlayer } from '@rotra/ui/pair-faces'
 import { Switch } from '@rotra/ui/switch'
+import { WinChanceChip } from '@rotra/ui/win-chance-chip'
 import type { ReactNode } from 'react'
 import './CourtCard.css'
 import { courtActsClass, courtCardVariants, freeCourtDropClass } from './CourtCard.variants'
@@ -39,6 +41,13 @@ type CourtCardMatchBase = CourtCardBase & {
   merged?: boolean
   teamA: CourtPlayer[]
   teamB: CourtPlayer[]
+  /**
+   * Win chance (D-2026-11-27-02): one chip before the status, "39% · 61%", left pair first. Queue
+   * Master only; the read-only card never shows it.
+   */
+  winChance?: WinChance
+  /** Makes the win chance chip a button that opens WinChanceDialog */
+  onOpenWinChance?: () => void
   onOpenProfile?: (playerId: string) => void
   /**
    * Opens the player's games this session (D-SESSION-GAMES). Makes the games badge on each face its own
@@ -501,6 +510,8 @@ function MatchCourtHead({
   onOpenGames,
   onOpenMatch,
   onDragMove,
+  winChance,
+  onOpenWinChance,
   chip,
   menu,
 }: Pick<
@@ -517,6 +528,8 @@ function MatchCourtHead({
   | 'onOpenGames'
   | 'onOpenMatch'
   | 'onDragMove'
+  | 'winChance'
+  | 'onOpenWinChance'
 > & { chip: ReactNode; menu: ReactNode }) {
   return (
     <>
@@ -526,6 +539,16 @@ function MatchCourtHead({
           <TimeLine {...{ startLabel, untilLabel, bookingEnded, openedEarly }} />
         </div>
         <div className="flex flex-nowrap items-center gap-1.5">
+          {winChance ? (
+            <WinChanceChip
+              chance={winChance}
+              onOpen={onOpenWinChance}
+              teamNames={{
+                a: listNames(teamA.map((p) => p.shortName)),
+                b: listNames(teamB.map((p) => p.shortName)),
+              }}
+            />
+          ) : null}
           {chip}
           {menu}
         </div>
@@ -562,6 +585,8 @@ function PlayingCourtCard({
   onAlmostDoneChange,
   onOpenMatch,
   onDragMove,
+  winChance,
+  onOpenWinChance,
   dropCourtId,
   onPause,
   onMatchDone,
@@ -586,7 +611,16 @@ function PlayingCourtCard({
     >
       <MatchCourtHead
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
-        {...{ teamA, teamB, onOpenProfile, onOpenGames, onOpenMatch, onDragMove }}
+        {...{
+          teamA,
+          teamB,
+          onOpenProfile,
+          onOpenGames,
+          onOpenMatch,
+          onDragMove,
+          winChance,
+          onOpenWinChance,
+        }}
         chip={<CourtStatusPill status={status} merged={merged} />}
         menu={
           <CourtMenu
@@ -646,6 +680,8 @@ function GettingReadyCourtCard({
   onStartMatch,
   onOpenMatch,
   onDragMove,
+  winChance,
+  onOpenWinChance,
   dropCourtId,
   onSwap,
   swapWith,
@@ -668,7 +704,16 @@ function GettingReadyCourtCard({
     >
       <MatchCourtHead
         {...{ label, untilLabel, startLabel, bookingEnded, openedEarly, merged }}
-        {...{ teamA, teamB, onOpenProfile, onOpenGames, onOpenMatch, onDragMove }}
+        {...{
+          teamA,
+          teamB,
+          onOpenProfile,
+          onOpenGames,
+          onOpenMatch,
+          onDragMove,
+          winChance,
+          onOpenWinChance,
+        }}
         chip={<Chip>{merged ? 'Merged · Waiting' : 'Waiting'}</Chip>}
         menu={
           <CourtMenu

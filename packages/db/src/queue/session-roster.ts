@@ -1,4 +1,6 @@
 import 'server-only'
+import { formFromHistory } from '@rotra/data/match/win-chance'
+import { sessionWeekday } from '@rotra/data/player/rules'
 import { handicapSpotsOf, isHandicapSpot } from '@rotra/data/session-roster/handicap'
 import { levelRestrictionBlockFor } from '@rotra/data/session-roster/levelRestriction.rules'
 import {
@@ -1218,11 +1220,30 @@ async function readSessionRosterIn(tx: Tx, context: ClubContext, session: QueueS
           sessionId: { not: sessionId },
           finalization: { committedAt: { lt: session.finalizedAt ?? new Date() } },
         },
-        select: { clubPlayerId: true },
-        distinct: ['clubPlayerId'],
+        select: { clubPlayerId: true, sessionId: true, wins: true, losses: true },
       })
     : []
   const returning = new Set(prior.map((row) => row.clubPlayerId))
+  // Win chance inputs (D-2026-11-27-02): each player's win and loss record at this club, by the
+  // weekday of the session. A player with no finalized session here (a first-timer) has no form.
+  const priorSessions = prior.length
+    ? await tx.queueSession.findMany({
+        where: { id: { in: [...new Set(prior.map((row) => row.sessionId))] } },
+        select: { id: true, scheduledStartAt: true },
+      })
+    : []
+  const weekdayOf = new Map(priorSessions.map((s) => [s.id, sessionWeekday(s.scheduledStartAt)]))
+  const history = new Map<string, { weekday: number; wins: number; losses: number }[]>()
+  for (const row of prior) {
+    const rows = history.get(row.clubPlayerId) ?? []
+    rows.push({ weekday: weekdayOf.get(row.sessionId) ?? -1, wins: row.wins, losses: row.losses })
+    history.set(row.clubPlayerId, rows)
+  }
+  const tonightWeekday = sessionWeekday(session.scheduledStartAt)
+  const formOf = (clubPlayerId: string) => {
+    const rows = history.get(clubPlayerId)
+    return rows ? { form: formFromHistory(rows, tonightWeekday) } : {}
+  }
   const requests = await tx.sessionJoinRequest.findMany({
     where: { sessionId, status: 'pending' },
     orderBy: [{ requestedAt: 'asc' }, { id: 'asc' }],
@@ -1233,6 +1254,7 @@ async function readSessionRosterIn(tx: Tx, context: ClubContext, session: QueueS
     roster: roster.map((entry) => ({
       ...rosterEntryDto(entry, nicknames.get(entry.clubPlayerId) ?? null),
       hasPlayedAtClubBefore: returning.has(entry.clubPlayerId),
+      ...formOf(entry.clubPlayerId),
     })),
     noShows: noShows.map((entry) => ({
       ...rosterEntryDto(entry, nicknames.get(entry.clubPlayerId) ?? null),

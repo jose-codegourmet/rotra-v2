@@ -35,6 +35,7 @@ import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useSetAlmostDone } from '@rotra/data/match/useSetAlmostDone'
 import { useStartMatch } from '@rotra/data/match/useStartMatch'
 import { useTradeCourts } from '@rotra/data/match/useTradeCourts'
+import { winChance } from '@rotra/data/match/win-chance'
 import { MockError } from '@rotra/data/mock/errors'
 import { courtFillModeOf } from '@rotra/data/queue-session/courtFill'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
@@ -71,6 +72,7 @@ import { useEffect, useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { OnCourt } from '@/app/(operator)/sessions/[sessionId]/_components/on-court/OnCourt'
 import { usePlayerGames } from '@/app/(operator)/sessions/[sessionId]/_components/player-games/PlayerGames'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 
 export type SessionViewProps = {
   sessionId: string
@@ -183,6 +185,7 @@ export function SessionView({
   const fillOpened = useFillOpenedCourts()
   const updateCourt = useUpdateCourt()
   const playerGames = usePlayerGames()
+  const winChanceDialog = useWinChanceDialog(roster.data?.roster, matches.data)
   // One placement or start per tap: a second tap can land before isPending reaches this render.
   const committing = useRef(false)
   /** The On court match whose sheet is open (Open match on a Getting ready card) */
@@ -513,6 +516,8 @@ export function SessionView({
         bookingEnded: isBookingEnded(c, s.scheduledEndAt, now),
         teamA: m.teamA.map(courtPlayer),
         teamB: m.teamB.map(courtPlayer),
+        winChance: winChance(m, ctx.roster, ctx.matches),
+        onOpenWinChance: () => winChanceDialog.open((all) => all.find((x) => x.id === m.id)),
         onOpenProfile: openProfile,
         onOpenGames: playerGames.open,
         formatLabel: FORMAT_LABELS[m.format],
@@ -622,6 +627,8 @@ export function SessionView({
     status: matchStatus(m, ctx),
     teamA: m.teamA.map(queuePlayer),
     teamB: m.teamB.map(queuePlayer),
+    winChance: winChance(m, ctx.roster, ctx.matches),
+    onOpenWinChance: () => winChanceDialog.open((all) => all.find((x) => x.id === m.id)),
     onSelectPlayer: openProfile,
     onOpenGames: playerGames.open,
     onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
@@ -758,6 +765,7 @@ export function SessionView({
           setMoveFirst(null)
         }}
       />
+      {winChanceDialog.dialog}
     </>
   )
 }

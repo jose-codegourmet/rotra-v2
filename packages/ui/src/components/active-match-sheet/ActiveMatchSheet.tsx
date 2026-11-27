@@ -1,6 +1,7 @@
 'use client'
 
 import type { MatchFormat } from '@rotra/data/match/types'
+import type { WinChance } from '@rotra/data/match/win-chance'
 import { SCORING } from '@rotra/schema/scoring'
 import { Button } from '@rotra/ui/button'
 import {
@@ -28,6 +29,10 @@ export type ActiveMatchSubstitution = {
 
 export type ActiveMatchSheetProps = {
   open: boolean
+  /** Win chance (D-2026-11-27-02): a chip beside each team's label; none when missing */
+  winChance?: WinChance
+  /** Makes the chips buttons that open WinChanceDialog */
+  onOpenWinChance?: () => void
   onOpenChange: (open: boolean) => void
   matchNo: number
   /** "Court 1", or "Court 1 + Court 2" for a merged 5v5 */
@@ -112,6 +117,8 @@ function substitutionLine(s: ActiveMatchSubstitution) {
  */
 export function ActiveMatchSheet({
   open,
+  winChance,
+  onOpenWinChance,
   onOpenChange,
   matchNo,
   courtLabel,
@@ -173,6 +180,8 @@ export function ActiveMatchSheet({
         <AlmostDoneRow courtLabel={courtLabel} checked={almostDone} onChange={onAlmostDoneChange} />
       ) : null}
       <TeamLineup
+        winChance={winChance}
+        onOpenWinChance={onOpenWinChance}
         teamA={teamA}
         teamB={teamB}
         minimumGames={minimumGames}

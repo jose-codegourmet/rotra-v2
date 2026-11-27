@@ -23,6 +23,7 @@ type Ruleset struct {
 	CanStart               func(m model.Match, courtIDs []string, ctx model.Context) bool
 	CanSendBack            func(state string) bool
 	CanMoveCourt           func(m model.Match, courtIDs []string, ctx model.Context) bool
+	CanMovePlaying         func(m model.Match, courtIDs []string, ctx model.Context) bool
 	CanReplacePlayer       func(m model.Match, outID, inID string, ctx model.Context) bool
 	ReplacedLineup         func(l model.Lineup, outID, inID string) model.Lineup
 	SwapTarget             func(m model.Match, ctx model.Context) *match.SwapTarget
@@ -80,6 +81,7 @@ func V1() Ruleset {
 		CanStart:               match.CanStart,
 		CanSendBack:            match.CanSendBack,
 		CanMoveCourt:           match.CanMoveCourt,
+		CanMovePlaying:         match.CanMovePlaying,
 		CanReplacePlayer:       match.CanReplacePlayer,
 		ReplacedLineup:         match.ReplacedLineup,
 		SwapTarget:             match.Swap,

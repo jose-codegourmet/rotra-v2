@@ -345,7 +345,7 @@ func (s *server) sendBackToQueue(r *http.Request, club pgtype.UUID) (writes.Resu
 	return writes.Result{Body: placedReply(done, placed)}, err
 }
 
-// moveCourt is POST move, Q-ON-COURT Move to another court: the On court match releases its court(s) and takes the chosen free open
+// moveCourt is POST move, Q-ON-COURT Move to another court: the On court or Playing match releases its court(s) and takes the chosen free open
 // one(s); player holds stay. In Auto Queue the court(s) it left are refilled.
 func (s *server) moveCourt(r *http.Request, club pgtype.UUID) (writes.Result, error) {
 	body, err := writes.ReadBody(r)
@@ -362,15 +362,27 @@ func (s *server) moveCourt(r *http.Request, club pgtype.UUID) (writes.Result, er
 		if row.acquiredBy(op) {
 			return t.matchOf(row.m.ID)
 		}
-		if err := requireOnCourt(row); err != nil {
+		// A Playing match moves too (owner, November 19, 2026): it keeps playing on the new court(s) with the same start time; only
+		// the court usage changes.
+		playing := row.m.State == sqlcgen.MatchStateActive
+		if playing {
+			err = requireLineupEditable(row)
+		} else {
+			err = requireOnCourt(row)
+		}
+		if err != nil {
 			return nil, err
 		}
 		state, err := t.matchContext()
 		if err != nil {
 			return nil, err
 		}
+		allowed := match.CanMoveCourt
+		if playing {
+			allowed = match.CanMovePlaying
+		}
 		view, ok := state.view(row.m.ID)
-		if !ok || !match.CanMoveCourt(view, courtIDs, state.rules(t.s.at().UnixMilli())) {
+		if !ok || !allowed(view, courtIDs, state.rules(t.s.at().UnixMilli())) {
 			return nil, conflictMatch()
 		}
 		now := t.stamp()

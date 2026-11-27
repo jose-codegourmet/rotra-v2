@@ -3,68 +3,25 @@ package queuewrites
 import (
 	"encoding/json"
 	"errors"
-	"net/url"
-	"regexp"
-	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/sociallink"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 )
 
-// socialHosts is SOCIAL_PROVIDERS (packages/schema/src/social-link.ts): per provider, the hosts of its site; the first is the key's host.
-var socialHosts = map[string][]string{
-	"facebook":  {"facebook.com", "fb.com"},
-	"instagram": {"instagram.com"},
-	"youtube":   {"youtube.com", "youtu.be"},
-	"linkedin":  {"linkedin.com"},
-}
+// socialLink is NormalizedSocialLink: the provider, the entry key (e.g. facebook.com/jun.bautista) and the link as typed.
+type socialLink = sociallink.Link
 
-var (
-	hasScheme   = regexp.MustCompile(`(?i)^https?://`)
-	wwwPrefix   = regexp.MustCompile(`^(www\.|m\.|mobile\.)`)
-	trailingBar = regexp.MustCompile(`/+$`)
-)
-
-// socialLink is NormalizedSocialLink: the provider, the entry key (e.g. facebook.com/jun.bautista) and the link as typed (trimmed, with
-// https:// added when the scheme was left out).
-type socialLink struct{ provider, key, url string }
-
-// normalizeSocialLink is normalizeSocialLink (#1019): the scheme may be left out; www., m. and mobile. and the provider's other hosts become
-// its site; the query, hash and trailing slash are dropped; lower case. A bare site with no profile path is not a link (false).
-func normalizeSocialLink(typed string) (socialLink, bool) {
-	value := strings.TrimSpace(typed)
-	if value == "" {
-		return socialLink{}, false
-	}
-	if !hasScheme.MatchString(value) {
-		value = "https://" + value
-	}
-	u, err := url.Parse(value)
-	if err != nil || u.Hostname() == "" {
-		return socialLink{}, false
-	}
-	host := wwwPrefix.ReplaceAllString(strings.ToLower(u.Hostname()), "")
-	path := strings.ToLower(trailingBar.ReplaceAllString(u.EscapedPath(), ""))
-	if path == "" {
-		return socialLink{}, false
-	}
-	for _, provider := range socialProviders {
-		for _, h := range socialHosts[provider] {
-			if h == host {
-				return socialLink{provider: provider, key: socialHosts[provider][0] + path, url: value}, true
-			}
-		}
-	}
-	return socialLink{}, false
-}
+// normalizeSocialLink is normalizeSocialLink (#1019); see package sociallink.
+func normalizeSocialLink(typed string) (socialLink, bool) { return sociallink.Normalize(typed) }
 
 // socialLinkKey is normalizeSocialLink(...).key, "" when it is no link.
 func socialLinkKey(typed string) string {
 	link, _ := normalizeSocialLink(typed)
-	return link.key
+	return link.Key
 }
 
 // socialLinkKeys is socialLinkKeys: the entry keys of the profile links, in provider order (empty and malformed links are skipped).
@@ -200,7 +157,7 @@ func (t *txn) keepClubLink(clubPlayer pgtype.UUID, link socialLink, now pgtype.T
 	for _, p := range socialProviders {
 		links[p] = own.Links[p]
 	}
-	links[link.provider] = link.url
+	links[link.Provider] = link.URL
 	var recorded any
 	if own.RecordedAt != "" {
 		recorded = own.RecordedAt

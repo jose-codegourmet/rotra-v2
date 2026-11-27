@@ -141,6 +141,21 @@ for q, label in [("RTR-PH-CEB-102926-0001", "alice-rtr"), ("rtr-ph-ceb-102926-00
                  ("nobody@example.test", "unknown-email"), ("RTR-PH-CEB-102926-9999", "unknown-rtr"), ("not an email", "garbage"), ("a b@c.d", "email-with-space"),
                  ("RTR-PH-CEB-102926-000", "short-rtr")]:
     case(f"lookup-club1-{label}", "/api/players?q=" + q.replace(" ", "%20").replace("+", "%2B").replace("@", "%40"), club=1)
+# #1019: an exact social link finds an unclaimed person only; D-2026-11-23-01: with no exact match, unclaimed people whose name contains the query
+ENTRY = lambda n: f"a6000000-0000-4000-8000-0000000000{n:02d}"
+links = scenario("entries_have_links", f"UPDATE shared_player_entries SET social_key = 'facebook.com/uri.b' WHERE id = '{ENTRY(8)}'",
+                 f"UPDATE shared_player_entries SET social_key = 'instagram.com/una_a' WHERE id = '{ENTRY(7)}'")
+LQ = lambda q: "/api/players?q=" + q.replace(" ", "%20").replace("+", "%2B").replace("@", "%40").replace("#", "%23").replace("?", "%3F")
+for q, label in [("https://www.facebook.com/Uri.B/", "uri-link"), ("fb.com/uri.b?ref=x#top", "uri-link-short"), ("facebook.com/uri.b", "uri-link-bare"),
+                 ("instagram.com/una_a", "una-link-saved"), ("facebook.com/nobody.here", "unknown-link"), ("https://example.com/uri.b", "not-a-profile-link"),
+                 ("facebook.com", "bare-site"), ("https://facebook.com/", "bare-site-slash")]:
+    case(f"lookup-club1-{label}", LQ(q), club=1, scenario=links)
+case("lookup-club2-uri-link", LQ("facebook.com/uri.b"), club=2, scenario=links)
+for q, label in [("Uri", "name-uri"), ("uri bel", "name-uri-lower"), ("ELT", "name-in-the-middle"), ("U", "name-one-letter"), ("  Ur  ", "name-spaces"),
+                 ("Una", "name-already-saved"), ("Alice", "name-registered-never-found"), ("zz", "name-no-one"), ("Person", "name-several")]:
+    case(f"lookup-club1-{label}", LQ(q), club=1)
+case("lookup-club2-name-uri", LQ("Uri"), club=2)
+case("lookup-club1-name-among-many", LQ("an"), club=1)
 case("lookup-club1-no-q", "/api/players", club=1)
 case("lookup-club1-two-q", "/api/players?q=alice%40example.test&q=bob%40example.test", club=1)
 case("lookup-club2-alice-saved", "/api/players?q=RTR-PH-CEB-102926-0001", club=2)

@@ -100,10 +100,10 @@ func (s *server) editClubPlayerDetails(r *http.Request, club pgtype.UUID) (write
 
 type detailsInput struct {
 	fullName, nickname, phone, email, playingStyle, level string
-	links                                          map[string]string
-	years, months                                  float64
-	hasYears, hasMonths                            bool
-	name                                           string
+	links                                                 map[string]string
+	years, months                                         float64
+	hasYears, hasMonths                                   bool
+	name                                                  string
 }
 
 // experience is the months of experience typed, nil when both are empty. Whole years from 0 to 80 and months from 0 to 11.

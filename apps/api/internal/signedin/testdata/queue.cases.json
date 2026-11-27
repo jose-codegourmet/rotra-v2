@@ -44,6 +44,10 @@
    "UPDATE players SET show_profile_stats = false WHERE id = 'd4000000-0000-4000-8000-000000000001'",
    "UPDATE players SET show_profile_stats = false WHERE id = 'd4000000-0000-4000-8000-000000000003'"
   ],
+  "entries_have_links": [
+   "UPDATE shared_player_entries SET social_key = 'facebook.com/uri.b' WHERE id = 'a6000000-0000-4000-8000-000000000008'",
+   "UPDATE shared_player_entries SET social_key = 'instagram.com/una_a' WHERE id = 'a6000000-0000-4000-8000-000000000007'"
+  ],
   "alice_hidden": [
    "UPDATE players SET hidden_from_directory = true WHERE id = 'd4000000-0000-4000-8000-000000000001'"
   ],
@@ -1343,6 +1347,126 @@
   {
    "name": "lookup-club1-short-rtr",
    "path": "/api/players?q=RTR-PH-CEB-102926-000",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-uri-link",
+   "path": "/api/players?q=https://www.facebook.com/Uri.B/",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "entries_have_links"
+  },
+  {
+   "name": "lookup-club1-uri-link-short",
+   "path": "/api/players?q=fb.com/uri.b%3Fref=x%23top",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "entries_have_links"
+  },
+  {
+   "name": "lookup-club1-uri-link-bare",
+   "path": "/api/players?q=facebook.com/uri.b",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "entries_have_links"
+  },
+  {
+   "name": "lookup-club1-una-link-saved",
+   "path": "/api/players?q=instagram.com/una_a",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "entries_have_links"
+  },
+  {
+   "name": "lookup-club1-unknown-link",
+   "path": "/api/players?q=facebook.com/nobody.here",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "entries_have_links"
+  },
+  {
+   "name": "lookup-club1-not-a-profile-link",
+   "path": "/api/players?q=https://example.com/uri.b",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "entries_have_links"
+  },
+  {
+   "name": "lookup-club1-bare-site",
+   "path": "/api/players?q=facebook.com",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "entries_have_links"
+  },
+  {
+   "name": "lookup-club1-bare-site-slash",
+   "path": "/api/players?q=https://facebook.com/",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "entries_have_links"
+  },
+  {
+   "name": "lookup-club2-uri-link",
+   "path": "/api/players?q=facebook.com/uri.b",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "entries_have_links"
+  },
+  {
+   "name": "lookup-club1-name-uri",
+   "path": "/api/players?q=Uri",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-name-uri-lower",
+   "path": "/api/players?q=uri%20bel",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-name-in-the-middle",
+   "path": "/api/players?q=ELT",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-name-one-letter",
+   "path": "/api/players?q=U",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-name-spaces",
+   "path": "/api/players?q=%20%20Ur%20%20",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-name-already-saved",
+   "path": "/api/players?q=Una",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-name-registered-never-found",
+   "path": "/api/players?q=Alice",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-name-no-one",
+   "path": "/api/players?q=zz",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-name-several",
+   "path": "/api/players?q=Person",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club2-name-uri",
+   "path": "/api/players?q=Uri",
+   "who": "c7000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lookup-club1-name-among-many",
+   "path": "/api/players?q=an",
    "who": "c7000000-0000-4000-8000-000000000001",
    "scenario": "base"
   },

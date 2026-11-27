@@ -1,17 +1,20 @@
 package signedin
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
 	"time"
+	"unicode/utf16"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/sociallink"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
 )
 
@@ -421,9 +424,11 @@ func allIn(s string, min, max int, lo, hi byte) bool {
 }
 
 type lookupBody struct {
-	Player    *directoryPlayerDTO  `json:"player"`
-	SavedName *string              `json:"savedName"`
-	Players   []directoryPlayerDTO `json:"players"`
+	Player    *directoryPlayerDTO `json:"player"`
+	SavedName *string             `json:"savedName"`
+	// Matches is the unclaimed people whose name contains the query; absent when the query found someone or was empty, [] when none.
+	Matches *[]directoryPlayerDTO `json:"matches,omitempty"`
+	Players []directoryPlayerDTO  `json:"players"`
 }
 
 func (s *server) queuePlayerLookup(r *http.Request, q *sqlcgen.Queries, club pgtype.UUID) (any, error) {
@@ -435,25 +440,70 @@ func (s *server) queuePlayerLookup(r *http.Request, q *sqlcgen.Queries, club pgt
 	found.Players = []directoryPlayerDTO{}
 	if found.Player != nil {
 		found.Players = []directoryPlayerDTO{*found.Player}
+	} else if found.Matches != nil {
+		found.Players = *found.Matches
 	}
 	return found, nil
 }
 
-// lookupPlayer is lookupPlayer: the one ROTRA person whose RTR ID or email is exactly the query, registered or
-// unclaimed. No name search and no phone lookup. When this club already saved them, savedName is this club's name for
-// them instead. Players who chose Hide me from Player Information are not found.
+// unclaimedResult is an unclaimed person as Player lookup shows them (D-2026-11-23-01): the name and picture of the club that saved them
+// first. The adding club still enters its own name (ownNameRequired).
+func unclaimedResult(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID, rtrID string) (directoryPlayerDTO, error) {
+	first, err := q.GetFirstRecordOfEntry(ctx, id)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return directoryPlayerDTO{}, err
+	}
+	d := directoryPlayerDTO{ID: id.String(), RtrID: rtrID, Identity: "unclaimed", OwnNameRequired: true}
+	if err == nil {
+		d.FullName, d.Picture = first.DisplayName, textPtr(first.AvatarRef)
+	}
+	return d, nil
+}
+
+// unclaimedByName is unclaimedByName (D-2026-11-23-01): open unclaimed people whose name at any club contains the query (two letters or
+// more), leaving out anyone this club already saved. Registered players are never found by name.
+func unclaimedByName(ctx context.Context, q *sqlcgen.Queries, club pgtype.UUID, query string) ([]directoryPlayerDTO, error) {
+	typed := publicreads.JSTrim(query)
+	out := []directoryPlayerDTO{}
+	if len(utf16.Encode([]rune(typed))) < 2 {
+		return out, nil
+	}
+	rows, err := q.ListUnclaimedEntriesByName(ctx, sqlcgen.ListUnclaimedEntriesByNameParams{Query: typed, ClubID: club})
+	if err != nil {
+		return nil, err
+	}
+	for _, row := range rows {
+		d, err := unclaimedResult(ctx, q, row.ID, row.RtrID)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, d)
+	}
+	return out, nil
+}
+
+// lookupPlayer is lookupPlayer: the one ROTRA person whose RTR ID or email is exactly the query (#1019: or, for an unclaimed person only,
+// whose normalized social link is), registered or unclaimed. No phone lookup. When this club already saved them, savedName is this club's
+// name for them instead. Players who chose Hide me from Player Information are not found. With no exact match, matches lists the
+// unclaimed people whose name contains the query.
 func (s *server) lookupPlayer(r *http.Request, q *sqlcgen.Queries, club pgtype.UUID, query string) (lookupBody, error) {
 	ctx := r.Context()
-	none := lookupBody{}
 	typed := publicreads.JSTrim(query)
 	if typed == "" {
-		return none, nil
+		return lookupBody{}, nil
+	}
+	byName := func() (lookupBody, error) {
+		matches, err := unclaimedByName(ctx, q, club, typed)
+		return lookupBody{Matches: &matches}, err
 	}
 	rtrID := normalizeLookupRtrID(typed)
-	email := ""
+	email, link := "", sociallink.Link{}
+	hasLink := false
 	if rtrID == "" {
 		if email = normalizeLookupEmail(typed); email == "" {
-			return none, nil
+			if link, hasLink = sociallink.Normalize(typed); !hasLink {
+				return byName()
+			}
 		}
 	}
 	var entry struct {
@@ -461,25 +511,34 @@ func (s *server) lookupPlayer(r *http.Request, q *sqlcgen.Queries, club pgtype.U
 		rtrID string
 		found bool
 	}
-	if rtrID != "" {
+	switch {
+	case rtrID != "":
 		e, err := q.GetOpenEntryByRtrID(ctx, rtrID)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return none, err
+			return lookupBody{}, err
 		}
 		if err == nil {
 			entry.id, entry.rtrID, entry.found = e.ID, e.RtrID, true
 		}
-	} else {
+	case email != "":
 		e, err := q.GetOpenEntryByEmail(ctx, pgtype.Text{String: email, Valid: true})
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return none, err
+			return lookupBody{}, err
+		}
+		if err == nil {
+			entry.id, entry.rtrID, entry.found = e.ID, e.RtrID, true
+		}
+	default:
+		e, err := q.GetOpenSharedEntryBySocialKey(ctx, pgtype.Text{String: link.Key, Valid: true})
+		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+			return lookupBody{}, err
 		}
 		if err == nil {
 			entry.id, entry.rtrID, entry.found = e.ID, e.RtrID, true
 		}
 	}
 	var playerID pgtype.UUID
-	if !entry.found {
+	if !entry.found && !hasLink {
 		var err error
 		if rtrID != "" {
 			playerID, err = q.GetPlayerIDByRtrID(ctx, rtrID)
@@ -487,21 +546,21 @@ func (s *server) lookupPlayer(r *http.Request, q *sqlcgen.Queries, club pgtype.U
 			playerID, err = s.registeredPlayerByEmail(r, q, email)
 		}
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return none, err
+			return lookupBody{}, err
 		}
 		if errors.Is(err, pgx.ErrNoRows) {
 			playerID = pgtype.UUID{}
 		}
 	}
 	if !entry.found && !playerID.Valid {
-		return none, nil
+		return byName()
 	}
 	// What this club already saved of them.
 	var savedName *string
 	if entry.found {
 		name, err := q.GetSavedClubPlayerForEntry(ctx, sqlcgen.GetSavedClubPlayerForEntryParams{ClubID: club, EntryID: entry.id})
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return none, err
+			return lookupBody{}, err
 		}
 		if err == nil {
 			savedName = &name
@@ -509,7 +568,7 @@ func (s *server) lookupPlayer(r *http.Request, q *sqlcgen.Queries, club pgtype.U
 	} else {
 		saved, err := q.GetSavedClubPlayerForPlayer(ctx, sqlcgen.GetSavedClubPlayerForPlayerParams{ClubID: club, PlayerID: playerID})
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return none, err
+			return lookupBody{}, err
 		}
 		if err == nil {
 			name := saved.DisplayName
@@ -523,14 +582,15 @@ func (s *server) lookupPlayer(r *http.Request, q *sqlcgen.Queries, club pgtype.U
 		return lookupBody{SavedName: savedName}, nil
 	}
 	if entry.found {
-		return lookupBody{Player: &directoryPlayerDTO{ID: entry.id.String(), RtrID: entry.rtrID, Identity: "unclaimed", OwnNameRequired: true}}, nil
+		d, err := unclaimedResult(ctx, q, entry.id, entry.rtrID)
+		return lookupBody{Player: &d}, err
 	}
 	p, err := q.GetDirectoryPlayer(ctx, playerID)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return none, nil
+		return lookupBody{}, nil
 	}
 	if err != nil {
-		return none, err
+		return lookupBody{}, err
 	}
 	return lookupBody{Player: &directoryPlayerDTO{
 		ID: p.ID.String(), FullName: p.FullName, Nickname: textPtr(p.Nickname), RtrID: p.RtrID, Identity: "registered",

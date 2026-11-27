@@ -106,7 +106,10 @@ SELECT cp.id,
        p.profile_visibility,
        pb.id AS banner_id,
        pb.image AS banner_image,
-       a.rtr_id AS player_rtr_id
+       a.rtr_id AS player_rtr_id,
+       p.gender,
+       cp.display_name,
+       cp.avatar_ref AS club_avatar_ref
 FROM club_players cp
 LEFT JOIN shared_player_entries se ON se.id = cp.shared_entry_id
 LEFT JOIN players p ON p.id = cp.player_id
@@ -223,3 +226,19 @@ SELECT totals.all_count, totals.h2h_count, totals.together_count,
     ) ORDER BY finished_at DESC, match_id) FROM page_rows
   ), '[]'::jsonb)::jsonb AS games
 FROM totals CROSS JOIN paging;
+
+-- name: ListSessionHostRows :many
+-- The hosts a read shows (#1008, D-2026-11-22-01): the current rows of an open session, or the rows frozen when a finished session
+-- ended. Oldest first.
+SELECT h.club_player_id, h.name_snapshot
+FROM session_hosts h
+WHERE h.session_id = @session_id
+  AND ((@ended::bool AND h.frozen_at IS NOT NULL) OR (NOT @ended::bool AND h.removed_at IS NULL))
+ORDER BY h.assigned_at ASC, h.id ASC;
+
+-- name: ListLatestAssessmentLevels :many
+-- The latest assessment level of each saved player (a host who is not on the roster).
+SELECT DISTINCT ON (club_player_id) club_player_id, skill_level_id
+FROM club_assessments
+WHERE club_player_id = ANY (@ids::uuid[])
+ORDER BY club_player_id, assessed_at DESC;

@@ -45,6 +45,11 @@ func rosterPeople(ctx context.Context, q *sqlcgen.Queries, entries []sqlcgen.Lis
 	for _, e := range entries {
 		ids = append(ids, e.ClubPlayerID)
 	}
+	return peopleByID(ctx, q, ids)
+}
+
+// peopleByID reads the saved players behind club player IDs (roster entries, waiting players and hosts).
+func peopleByID(ctx context.Context, q *sqlcgen.Queries, ids []pgtype.UUID) (map[pgtype.UUID]sqlcgen.ListRosterPeopleRow, error) {
 	rows, err := q.ListRosterPeople(ctx, ids)
 	if err != nil {
 		return nil, err

@@ -12,6 +12,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/sessionresult"
 )
 
 // GET /api/me/sessions and GET /api/me/sessions/{sessionId}/share. Ports of
@@ -252,7 +253,7 @@ func hasSlide(slides []string, want string) bool {
 // when the saved standings are an array and that position is a number; otherwise nil.
 func ownStandingPosition(raw []byte, mine map[string]bool) *float64 {
 	var rows []json.RawMessage
-	if json.Unmarshal(raw, &rows) != nil {
+	if json.Unmarshal(sessionresult.SharePositions(raw), &rows) != nil {
 		return nil // not an array (or no snapshot)
 	}
 	for _, row := range rows {

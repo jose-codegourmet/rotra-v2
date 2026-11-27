@@ -3,6 +3,7 @@ package publicreads
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -15,7 +16,7 @@ import (
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 )
 
-// The period leaderboards (D-2026-11-16-05): Top annual, Top monthly and Top weekly, ordered by wins in standard
+// The period leaderboards (D-2026-11-25-04, amending D-2026-11-16-05): Top annual, quarterly, monthly and weekly, ordered by wins in standard
 // matches from the recorded match facts. A port of readPeriodLeaderboard in packages/db/src/player/leaderboard.ts and
 // of leaderboardStandings and ownPeriodPosition in packages/data/src/leaderboard/leaderboard.rules.ts. Nothing here
 // calculates a rank.
@@ -23,12 +24,14 @@ import (
 type period string
 
 const (
-	periodYear  period = "year"
-	periodMonth period = "month"
-	periodWeek  period = "week"
+	periodYear    period = "year"
+	periodQuarter period = "quarter"
+	periodMonth   period = "month"
+	periodWeek    period = "week"
 )
 
-var allPeriods = []period{periodYear, periodMonth, periodWeek}
+// allPeriods is LEADERBOARD_PERIODS: the display and tab order.
+var allPeriods = []period{periodYear, periodQuarter, periodMonth, periodWeek}
 
 // boardLimit is LEADERBOARD_LIMIT: each list shows the top 50.
 const boardLimit = 50
@@ -36,20 +39,20 @@ const boardLimit = 50
 // manilaOffsetMs is Asia/Manila, UTC+8 with no daylight saving: every period boundary is at 00:00 there.
 const manilaOffsetMs = 8 * 3_600_000
 
-// parsePeriod is parseLeaderboardPeriod: a missing parameter is the year, anything but the three names is invalid.
+// parsePeriod is parseLeaderboardPeriod: a missing parameter is the year, anything but the four names is invalid.
 func parsePeriod(value string, present bool) (period, bool) {
 	if !present {
 		return periodYear, true
 	}
 	switch p := period(value); p {
-	case periodYear, periodMonth, periodWeek:
+	case periodYear, periodQuarter, periodMonth, periodWeek:
 		return p, true
 	}
 	return "", false
 }
 
 // periodStart is leaderboardPeriodStart: the instant (Unix milliseconds) the period that contains now began. The
-// year starts on January 1, the month on its first day and the week on Monday.
+// year starts on January 1, the quarter on January 1, April 1, July 1 or October 1, the month on its first day and the week on Monday.
 func periodStart(p period, nowMs int64) int64 {
 	local := time.UnixMilli(nowMs + manilaOffsetMs).UTC()
 	switch p {
@@ -58,6 +61,9 @@ func periodStart(p period, nowMs int64) int64 {
 		return time.Date(local.Year(), local.Month(), local.Day()-sinceMonday, 0, 0, 0, 0, time.UTC).UnixMilli() - manilaOffsetMs
 	case periodYear:
 		return time.Date(local.Year(), time.January, 1, 0, 0, 0, 0, time.UTC).UnixMilli() - manilaOffsetMs
+	case periodQuarter:
+		month := local.Month() - (local.Month()-1)%3
+		return time.Date(local.Year(), month, 1, 0, 0, 0, 0, time.UTC).UnixMilli() - manilaOffsetMs
 	}
 	return time.Date(local.Year(), local.Month(), 1, 0, 0, 0, 0, time.UTC).UnixMilli() - manilaOffsetMs
 }
@@ -120,11 +126,18 @@ type board struct {
 
 // readBoard loads the facts of the period and the one before it, and the players they belong to.
 func readBoard(ctx context.Context, q *sqlcgen.Queries, p period, nowMs int64) (*board, error) {
+	return readClubBoard(ctx, q, p, nowMs, pgtype.UUID{})
+}
+
+// readClubBoard is readPeriodLeaderboard with a club: only the facts of that club's own sessions (D-2026-11-25-04). A zero club is the
+// ROTRA leaderboard.
+func readClubBoard(ctx context.Context, q *sqlcgen.Queries, p period, nowMs int64, club pgtype.UUID) (*board, error) {
 	start := periodStart(p, nowMs)
 	previousStart := periodStart(p, start-1)
 	rows, err := q.ListBoardFacts(ctx, sqlcgen.ListBoardFactsParams{
 		FromAt: pgtype.Timestamptz{Time: time.UnixMilli(previousStart), Valid: true},
 		ToAt:   pgtype.Timestamptz{Time: time.UnixMilli(nowMs), Valid: true},
+		ClubID: club,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("listing match facts: %w", err)
@@ -215,15 +228,11 @@ func (b *board) standingsOf(p period) []standing {
 		}
 	}
 	prevPositions := map[string]int{}
-	for i, row := range b.order(previous, names) {
-		if i >= boardLimit {
-			break
-		}
-		prevPositions[row.id] = i + 1
+	for _, row := range topOf(b.order(previous, names)) {
+		prevPositions[row.id] = row.position
 	}
 	out := b.order(current, names)
 	for i := range out {
-		out[i].position = i + 1
 		out[i].previous = prevPositions[out[i].id]
 	}
 	return out
@@ -247,11 +256,42 @@ func (b *board) order(records map[string]*recordOf, names map[string]string) []s
 		}
 		return a.id < c.id
 	})
+	// Shared places: the same wins and the same win rate share one, numbered without gaps (1, 1, 2). Inside a shared place the order
+	// is the name, then the ID, and never changes the place.
+	for i := range out {
+		switch {
+		case i == 0:
+			out[i].position = 1
+		case samePlace(out[i-1], out[i]):
+			out[i].position = out[i-1].position
+		default:
+			out[i].position = out[i-1].position + 1
+		}
+	}
 	return out
 }
 
-// top is the first 50 of the board's own period.
-func (b *board) top() []standing { return b.standings[:min(len(b.standings), boardLimit)] }
+// samePlace is the same wins and the same win rate.
+func samePlace(a, b standing) bool {
+	return a.wins == b.wins && compareWinRate(recordOf{a.wins, a.losses}, recordOf{b.wins, b.losses}) == 0
+}
+
+// topOf is leaderboardTop: the first 50 rows in standings order, plus anyone who shares the 50th row's place, so a list can run a
+// little over 50.
+func topOf(standings []standing) []standing {
+	if len(standings) < boardLimit {
+		return standings
+	}
+	cutoff := standings[boardLimit-1].position
+	n := boardLimit
+	for n < len(standings) && standings[n].position == cutoff {
+		n++
+	}
+	return standings[:n]
+}
+
+// top is the board's own list: the first 50 plus anyone sharing the 50th place.
+func (b *board) top() []standing { return topOf(b.standings) }
 
 // place is one box of a profile: the place and the wins in a list the player is in the top 50 of.
 type place struct {
@@ -270,8 +310,7 @@ func (b *board) places(ids ...pgtype.UUID) map[string][]place {
 	for _, p := range allPeriods {
 		list := b.top()
 		if p != b.p {
-			list = b.standingsOf(p)
-			list = list[:min(len(list), boardLimit)]
+			list = topOf(b.standingsOf(p))
 		}
 		for _, row := range list {
 			if _, ok := out[row.id]; ok {
@@ -295,7 +334,7 @@ func (b *board) ownPosition(id pgtype.UUID) map[string]any {
 	out := map[string]any{"position": nil, "wins": 0, "losses": 0}
 	if row != nil {
 		out["position"], out["wins"], out["losses"] = row.position, row.wins, row.losses
-		if row.position <= boardLimit {
+		if slices.ContainsFunc(b.top(), func(s standing) bool { return s.id == row.id }) {
 			out["previousPosition"] = previousOrNil(row.previous)
 			return out
 		}
@@ -317,8 +356,9 @@ func previousOrNil(previous int) any {
 	return previous
 }
 
-// boardRow is a LeaderboardRow on the wire. A masked row (the rule of ./masking.go) carries the masked name only:
-// no nickname, no level and no player ID, the key being its place in the list; the picture and banner stay.
+// boardRow is a LeaderboardRow on the wire. A leaderboard never masks a name, nickname or picture (D-2026-11-25-04). A masked row (the
+// rule of ./masking.go: the viewer may not open this profile) carries no player ID, the key being its place in the list; an always private
+// player's level is hidden from everyone else.
 type boardRow struct {
 	ID               string  `json:"id"`
 	Wins             int     `json:"wins"`
@@ -359,14 +399,18 @@ func (b *board) rows(ctx context.Context, q *sqlcgen.Queries, list []standing, v
 			continue
 		}
 		masked := !pl.unclaimed && isMasked(pl.visibility, v, pl.id)
+		levelHidden := !pl.unclaimed && pl.visibility == sqlcgen.ProfileVisibilityAlwaysPrivate && (!v.ok || v.id != pl.id)
 		row := boardRow{
 			ID: s.id, Wins: s.wins, Losses: s.losses, Position: s.position, PreviousPosition: previousOrNil(s.previous),
 			FullName: pl.fullName, Nickname: pl.nickname, PlayingLevel: levelCode(pl.skillLevelID),
-			PictureURL: textPtr(pl.avatarRef), Masked: masked, LevelHidden: masked, Unclaimed: pl.unclaimed,
+			PictureURL: textPtr(pl.avatarRef), Masked: masked, LevelHidden: levelHidden, Unclaimed: pl.unclaimed,
 		}
 		if masked {
+			// A masked row carries no player ID that opens a profile; the key is its place in the list.
 			row.ID = fmt.Sprintf("masked-%d", s.position)
-			row.FullName, row.Nickname, row.PlayingLevel = maskPublicName(pl.fullName), nil, nil
+		}
+		if levelHidden {
+			row.PlayingLevel = nil
 		}
 		row.BannerKey, row.BannerImageURL = resolveBanner(pl.bannerID, pl.bannerImage, shown)
 		out = append(out, row)
@@ -383,8 +427,8 @@ func (b *board) pageOf(ctx context.Context, q *sqlcgen.Queries, offset int64, li
 	return pageBody{Entries: entries, Total: len(top), PeriodStart: httpapi.ToIso(time.UnixMilli(b.start))}, err
 }
 
-// searchOf is board.search: the unmasked rows of the top 50 whose name or nickname holds the query, case folded the
-// way JavaScript does.
+// searchOf is board.search: the rows of the list whose name or nickname holds the query, case folded the way JavaScript
+// does. Full names are visible on a leaderboard, so it finds these players too (D-2026-11-25-04).
 func (b *board) searchOf(ctx context.Context, q *sqlcgen.Queries, query string, v viewerRef) (searchBody, error) {
 	needle := jsToLower(jsTrim(query))
 	hits := []boardRow{}
@@ -394,9 +438,6 @@ func (b *board) searchOf(ctx context.Context, q *sqlcgen.Queries, query string, 
 			return searchBody{}, err
 		}
 		for _, row := range rows {
-			if row.Masked {
-				continue
-			}
 			if strings.Contains(jsToLower(row.FullName), needle) ||
 				(row.Nickname != nil && strings.Contains(jsToLower(*row.Nickname), needle)) {
 				hits = append(hits, row)

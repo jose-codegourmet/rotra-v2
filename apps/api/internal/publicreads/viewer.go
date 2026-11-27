@@ -21,10 +21,15 @@ import (
 type ViewerReads struct {
 	Leaderboard http.Handler // GET /api/leaderboard
 	Search      http.Handler // GET /api/leaderboard/search
-	Profile     http.Handler // GET /api/players/{playerId}
-	FindByRTR   http.Handler // GET /api/rtr-ids/{rtrId}
-	Rank        http.Handler // GET /api/players/{playerId}/rank
-	Games       http.Handler // GET /api/players/{playerId}/games
+	// ClubLeaderboard is GET /api/clubs/{clubId}/leaderboard. The Queue app calls the Visitor ones: it cannot verify a Player sign-in, so
+	// its viewer is always a visitor.
+	ClubLeaderboard        http.Handler
+	VisitorLeaderboard     http.Handler // GET /api/leaderboard for the Queue app
+	VisitorClubLeaderboard http.Handler // GET /api/clubs/{clubId}/leaderboard for the Queue app
+	Profile                http.Handler // GET /api/players/{playerId}
+	FindByRTR              http.Handler // GET /api/rtr-ids/{rtrId}
+	Rank                   http.Handler // GET /api/players/{playerId}/rank
+	Games                  http.Handler // GET /api/players/{playerId}/games
 	// ClubPage and RankingSettings are public, but Admin answers the same paths with its own reads, so the signed-in
 	// layer routes them per app too.
 	ClubPage        http.Handler // GET /api/clubs/{clubId}
@@ -50,7 +55,8 @@ func NewViewerReads(d Deps) *ViewerReads {
 	limited := func(h http.HandlerFunc) http.Handler { return httpapi.RateLimit(d.Limiter, rateLimitMessage, h) }
 	return &ViewerReads{
 		ClubPage: limited(cp.page), RankingSettings: limited(lib.rankingSettings),
-		Leaderboard: limited(lb.page), Search: limited(lb.search),
+		Leaderboard: limited(lb.page), Search: limited(lb.search), ClubLeaderboard: limited(lb.clubPage),
+		VisitorLeaderboard: limited(lb.visitorPage), VisitorClubLeaderboard: limited(lb.visitorClubPage),
 		Profile: limited(pl.profile), FindByRTR: limited(pl.findByRTR), Rank: limited(pl.rank), Games: limited(pl.games),
 	}
 }
@@ -61,6 +67,7 @@ func RegisterVisitorOnly(d Deps) func(*http.ServeMux) {
 	return func(mux *http.ServeMux) {
 		mux.Handle("GET /api/leaderboard", v.Leaderboard)
 		mux.Handle("GET /api/leaderboard/search", v.Search)
+		mux.Handle("GET /api/clubs/{clubId}/leaderboard", v.ClubLeaderboard)
 		mux.Handle("GET /api/players/{playerId}", v.Profile)
 		mux.Handle("GET /api/players/{playerId}/rank", v.Rank)
 		mux.Handle("GET /api/players/{playerId}/games", v.Games)

@@ -40,11 +40,12 @@ func ReadMyLeaderboard(ctx context.Context, q *sqlcgen.Queries, period string, p
 	if present {
 		return map[string]any{"standing": standing}, nil
 	}
-	position, _ := standing["position"].(int)
-	if standing["position"] == nil || position > boardLimit {
+	// Places are shared (1, 1, 2), so a place number under 50 can still be past the cut: only a standing with no cutoff comparison is on
+	// the public list.
+	if _, pastCut := standing["cutoffWins"]; pastCut {
 		return map[string]any{"position": nil}, nil
 	}
-	return map[string]any{"position": position}, nil
+	return map[string]any{"position": standing["position"]}, nil
 }
 
 // ownProfile is the profile with the owner-only Admin change note (P-EDIT-PROFILE).

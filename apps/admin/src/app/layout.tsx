@@ -1,6 +1,6 @@
 import { getThemeScript } from '@rotra/ui/theme-provider/script'
 import { Analytics } from '@vercel/analytics/next'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { AppProviders } from '@/providers/AppProviders'
 import { THEME_STORAGE_KEY } from '@/providers/themeStorageKey'
@@ -10,6 +10,11 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'ROTRA Admin',
   description: 'Platform owner tools: clubs, licenses, players and configuration.',
+  appleWebApp: { capable: true, title: 'ROTRA Admin', statusBarStyle: 'black' },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#0b0b0c',
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {

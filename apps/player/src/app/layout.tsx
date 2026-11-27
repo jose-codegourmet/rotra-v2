@@ -1,6 +1,6 @@
 import { getThemeScript } from '@rotra/ui/theme-provider/script'
 import { Analytics } from '@vercel/analytics/next'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { PlayerShell } from '@/app/_components/player-shell/PlayerShell'
 import { readPlayerGoogleSignInEnabled } from '@/feature-flags/readPlayerGoogleSignInEnabled'
@@ -13,6 +13,11 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'ROTRA Player Information',
   description: 'Player profiles, shared rank and the leaderboard.',
+  appleWebApp: { capable: true, title: 'ROTRA Player', statusBarStyle: 'black' },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#0b0b0c',
 }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {

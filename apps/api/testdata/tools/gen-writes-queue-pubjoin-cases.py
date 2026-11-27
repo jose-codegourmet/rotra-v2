@@ -85,6 +85,17 @@ case('join_after_a_confirmed_request_was_removed_asks_again', join(1, who=ANN, *
 case('join_two_at_once_by_one_player', {'parallel': [join(1, who=GIL), join(1, who=GIL)], 'redact': ['requestId'], 'redactOptional': True}, redact=RAND_JOIN)
 case('join_two_members_at_once', {'parallel': [join(1, who=BEN), join(1, who=BEN)]}, scenario='ben_is_a_member', redact=RAND_JOIN)
 
+# Restrictions (D-2026-11-19-12, task 2.2): a Player outside the session's pick, or whose band is full, cannot request or join. Ben is an intermediate member.
+case('join_restricted_beginners_blocks_a_member', join(1, who=BEN), scenario='ben_member_s1_beginners')
+case('join_restricted_beginners_blocks_the_waitlist_choice_too', join(1, who=BEN, body={'placement': 'waitlist'}), scenario='ben_member_s1_beginners')
+case('join_restricted_beginners_intermediate_places_a_member', join(1, who=BEN), scenario='ben_member_s1_beginners_intermediate', redact=RAND_JOIN)
+case('join_restricted_per_level_band_full_blocks_a_member', join(1, who=BEN), scenario='ben_member_s1_per_level_full')
+case('join_restricted_per_level_band_open_places_a_member', join(1, who=BEN), scenario='ben_member_s1_per_level_open', redact=RAND_JOIN)
+case('join_restricted_a_player_with_no_level_may_request', join(1, who=GIL, **JOIN_ID), scenario='s1_beginners', redact=RAND_JOIN)
+case('join_restricted_from_waitlist_is_not_checked', join(2, who=ANN, body={'placement': 'from_waitlist'}, **JOIN_ID), scenario='s2_free_slot_ann_request_declined_beginners', redact=RAND_JOIN)
+case('join_restricted_a_member_already_in_is_not_checked', join(1, who=BEN), scenario='ben_member_on_s1_beginners')
+case('join_restricted_member_always_requires_is_still_checked', join(1, who=BEN), scenario='ben_member_s1_beginners_always_requires')
+
 CAN = lambda who=ANN, n=1, **kw: post(SLUG[n], 'cancel', who, {}, **kw)
 case('cancel_signed_out', CAN(who=None))
 case('cancel_without_an_origin', CAN(headers={}))
@@ -179,7 +190,18 @@ SCEN['ben_is_a_member_with_a_pending_request'] = BEN_MEMBER + [f"INSERT INTO ses
 SCEN['ben_is_a_member_calculated_minimum'] = BEN_MEMBER + [f"UPDATE queue_sessions SET minimum_is_calculated = true, minimum_games = 99 WHERE id = '{S[1]}'"]
 SCEN['ann_request_confirmed_but_removed'] = [f"UPDATE session_join_requests SET status = 'confirmed', decided_at = {NOW}, club_player_id = '{CP(3)}' WHERE id = 'a3400000-0000-4000-8000-000000000002'"]
 SCEN['s2_ann_request_declined'] = ["UPDATE session_join_requests SET status = 'declined', decided_at = TIMESTAMPTZ '2026-11-19 02:00:00+00' WHERE id = 'a3400000-0000-4000-8000-000000000006'"]
+RESTRICT = lambda n, sql: f"UPDATE queue_sessions SET {sql} WHERE id = '{S[n]}'"
+BEGINNERS = RESTRICT(1, "level_restriction = 'beginners'")
+SCEN['s1_beginners'] = [BEGINNERS]
+SCEN['ben_member_s1_beginners'] = BEN_MEMBER + [BEGINNERS]
+SCEN['ben_member_s1_beginners_always_requires'] = BEN_MEMBER + [BEGINNERS, f"UPDATE queue_sessions SET always_require_request = true WHERE id = '{S[1]}'"]
+SCEN['ben_member_s1_beginners_intermediate'] = BEN_MEMBER + [RESTRICT(1, "level_restriction = 'beginners_intermediate'")]
+# One court of two: Ben (intermediate) and Hal (intermediate, on Prep Open) against one intermediate slot: full; two intermediate slots: open.
+SCEN['ben_member_s1_per_level_full'] = BEN_MEMBER + [RESTRICT(1, "level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0")]
+SCEN['ben_member_s1_per_level_open'] = BEN_MEMBER + [RESTRICT(1, "level_restriction = 'slots_per_band', beginner_slots = 0, intermediate_slots = 2, advanced_slots = 0")]
+SCEN['ben_member_on_s1_beginners'] = BEN_MEMBER + [entry_sql(61, 1, 4, 'Ben Santos'), BEGINNERS]
 SCEN['s2_free_slot_ann_request_declined'] = SCEN['s2_free_slot'] + SCEN['s2_ann_request_declined']
+SCEN['s2_free_slot_ann_request_declined_beginners'] = SCEN['s2_free_slot_ann_request_declined'] + [RESTRICT(2, "level_restriction = 'beginners'")]
 SCEN['ann_request_declined'] = [f"UPDATE session_join_requests SET status = 'declined', decided_at = {NOW} WHERE id = 'a3400000-0000-4000-8000-000000000002'"]
 SCEN['ann_on_s1'] = [entry_sql(40, 1, 3, 'Ann Reyes')]
 SCEN['ann_on_s1_closed_to_requests'] = SCEN['ann_on_s1'] + SCEN['s1_closed_to_requests']

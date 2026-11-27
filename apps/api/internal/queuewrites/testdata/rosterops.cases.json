@@ -20,6 +20,26 @@
   "s3_full": [
    "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000012', 'Lee Guest', true, TIMESTAMPTZ '2026-11-19 01:08:00+00', 'a0300000-0000-4000-8000-000000000199', 3, TIMESTAMPTZ '2026-11-19 01:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-19 01:08:00+00', 3)"
   ],
+  "s1_beginners": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "s2_beginners": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a3000000-0000-4000-8000-000000000002'"
+  ],
+  "s1_beginners_intermediate": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners_intermediate' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "s1_per_level": [
+   "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0 WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "s1_per_level_hal_released": [
+   "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0 WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed', level_locked_at = NULL WHERE id = 'a7000000-0000-4000-8000-000000000001'"
+  ],
+  "s1_beginners_intermediate_two_free": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners_intermediate' WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed', level_locked_at = NULL WHERE id = 'a7000000-0000-4000-8000-000000000001'"
+  ],
   "ivy_in_a_waiting_match": [
    "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, source_operation_id, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'waiting', 'singles', 1, 'manual', 'a4100000-0000-4000-8000-000000000001', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
    "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000000010', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000005', 'A', 1, 'a4300000-0000-4000-8000-000000000010', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
@@ -3412,6 +3432,335 @@
      "who": "c7000000-0000-4000-8000-000000000001",
      "body": {
       "operationId": "b1000000-0000-4000-8000-000000000001"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_beginners_refuses_an_intermediate",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "intermediate_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_beginners_allows_a_beginner",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "beginner_mid"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_beginners_refuses_an_advanced_new_player",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "name": "Newbie",
+      "level": "advanced_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_outside_levels_allowed_after_the_warning",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "intermediate_low",
+      "allowOutsideLevels": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_outside_levels_flag_not_true_does_not_count",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "intermediate_low",
+      "allowOutsideLevels": "true"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_to_the_waitlist_is_not_checked",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "intermediate_low",
+      "toWaitlist": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_full_roster_goes_to_the_waitlist_unchecked",
+   "scenario": "s2_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "intermediate_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_overfill_is_checked",
+   "scenario": "s2_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "intermediate_low",
+      "allowOverfill": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_beginners_intermediate_refuses_an_advanced",
+   "scenario": "s1_beginners_intermediate",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "advanced_mid"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_beginners_intermediate_allows_an_intermediate",
+   "scenario": "s1_beginners_intermediate",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "intermediate_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_per_level_band_full",
+   "scenario": "s1_per_level",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "intermediate_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_per_level_band_has_no_slots",
+   "scenario": "s1_per_level",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "advanced_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_per_level_band_has_a_free_slot",
+   "scenario": "s1_per_level",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "beginner_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_per_level_a_released_player_frees_the_band",
+   "scenario": "s1_per_level_hal_released",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "intermediate_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_restricted_a_retry_is_not_checked_again",
+   "scenario": "s1_per_level",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000005",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "beginner_low"
+     },
+     "snapshot": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "source": "saved",
+      "operationId": "b1000000-0000-4000-8000-000000000005",
+      "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+      "level": "beginner_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "batch_restricted_refuses_the_whole_batch",
+   "scenario": "s1_beginners_intermediate_two_free",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b1000000-0000-4000-8000-000000000001",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "beginner_low"
+       },
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b1000000-0000-4000-8000-000000000002",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000002",
+        "level": "advanced_low"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "batch_restricted_allows_the_warning_on_one_add",
+   "scenario": "s1_beginners_intermediate_two_free",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b1000000-0000-4000-8000-000000000001",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+        "level": "beginner_low"
+       },
+       {
+        "op": "add",
+        "source": "saved",
+        "operationId": "b1000000-0000-4000-8000-000000000002",
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000002",
+        "level": "advanced_low",
+        "allowOutsideLevels": true
+       }
+      ]
      }
     }
    ]

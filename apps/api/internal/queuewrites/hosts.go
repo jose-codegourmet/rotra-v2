@@ -296,7 +296,7 @@ func (t *txn) assignHost(player sqlcgen.GetQueueHostPlayerRow) (hostRegistration
 		return result, err
 	}
 	if hasLevel {
-		placed, err := t.place(clubPlayer, pgtype.Int2{Int16: level, Valid: true}, placeID, at, false, false)
+		placed, err := t.place(clubPlayer, pgtype.Int2{Int16: level, Valid: true}, placeID, at, false, false, true)
 		if err != nil {
 			return result, err
 		}

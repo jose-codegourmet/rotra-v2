@@ -524,6 +524,12 @@ for tail in ('/access', '/my-night', '/match-history', '/match-request', '/match
     case(f'{t}_other_origin', pub('live', tail), 'alice', origin='http://localhost:9001')
     case(f'{t}_evil_origin', pub('live', tail), 'alice', origin='https://evil.example')
     case(f'{t}_unknown_slug', '/api/public-sessions/no-such-session' + tail, 'alice')
+# Restrictions (D-2026-11-19-12, task 2.2): "Not open to your level" on the Player's session page, by the pick; Big Night is a prepared session.
+for scen in ('big_beginners', 'big_beginners_intermediate', 'big_per_level', 'big_per_level_no_slots', 'wait_beginners', 'live_beginners'):
+    sess = scen.split('_')[0]
+    for p in (('alice', 'ben', 'dan', 'eli', 'nia') if sess != 'live' else ('alice', 'ben')):
+        case(f'access_{p}_{scen}', pub(sess, '/access'), p, scenario=scen)
+        case(f'night_{p}_{scen}', pub(sess, '/my-night'), p, scenario=scen)
 case('access_google_gate', pub('live', '/access'), 'alice', scenario='google_gate', now='2027-01-01T04:00:00.000Z')
 case('night_google_gate', pub('live', '/my-night'), 'alice', scenario='google_gate', now='2027-01-01T04:00:00.000Z')
 case('compare_google_gate', f'/api/players/{P[2]}/compare', 'alice', origin=None, scenario='google_gate', now='2027-01-01T04:00:00.000Z')
@@ -570,6 +576,8 @@ cmp('compare_alice_self_bad_filter', P[1], query='?filter=weekly')
 case('compare_visitor', f'/api/players/{P[2]}/compare', None, origin=None)
 case('compare_other_app_origin', f'/api/players/{P[2]}/compare', 'alice', origin='https://evil.example')
 
+# The Player's level at the club (clubLevelIdOf): Ben intermediate, Dan advanced, Eli beginner; Alice has her own assessment.
+LEVELS = [f"UPDATE club_players SET saved_skill_level_id = {lvl}, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = '{uid('e1', cp)}'" for cp, lvl in ((2, 3), (4, 6), (5, 0))]
 reset = [
     "INSERT INTO feature_flags (key, name, description, value, updated_at) VALUES ('player_google_sign_in', 'Google sign-in for players', 'x', false, now()) ON CONFLICT DO NOTHING",
     "UPDATE feature_flags SET value = false WHERE key = 'player_google_sign_in'",
@@ -579,7 +587,13 @@ out = {
     'subjects': {k: v for k, v in ((name, SUBJ[n]) for name, n in who.items())},
     'passwordless': [],
     'reset': reset,
-    'scenarios': {'base': [], 'google_gate': ["UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"]},
+    'scenarios': {'base': [], 'google_gate': ["UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"],
+                  'big_beginners': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = '{S['big']}'"],
+                  'big_beginners_intermediate': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'beginners_intermediate' WHERE id = '{S['big']}'"],
+                  'big_per_level': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 2, intermediate_slots = 1, advanced_slots = 1 WHERE id = '{S['big']}'"],
+                  'big_per_level_no_slots': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 4, intermediate_slots = 0, advanced_slots = 0 WHERE id = '{S['big']}'"],
+                  'wait_beginners': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = '{S['wait']}'"],
+                  'live_beginners': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = '{S['live']}'"]},
     'approved': ['rank-test-v1'],
     'cases': cases,
 }

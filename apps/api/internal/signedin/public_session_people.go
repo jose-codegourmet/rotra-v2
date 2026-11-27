@@ -10,6 +10,7 @@ import (
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/levelrestriction"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
 )
 
@@ -181,4 +182,31 @@ func playerStanding(ctx context.Context, q *sqlcgen.Queries, playerID, sessionID
 // isClubMember is memberOf: the Player's current saved record in the club with a level.
 func isClubMember(ctx context.Context, q *sqlcgen.Queries, clubID, playerID pgtype.UUID) (bool, error) {
 	return q.IsClubMemberWithLevel(ctx, sqlcgen.IsClubMemberWithLevelParams{ClubID: clubID, PlayerID: playerID})
+}
+
+// playerLevelBlock is playerLevelBlock: "Not open to your level" (D-2026-11-19-12) for a signed-in Player who holds no slot or waitlist
+// place on an upcoming session, the reason and their level at the club; nil when they may request. A Player with no level at the club
+// always may.
+func playerLevelBlock(ctx context.Context, q *sqlcgen.Queries, ls *loadedSession, playerID pgtype.UUID) (*levelBlockDTO, error) {
+	restriction := levelrestriction.Of(ls.row.LevelRestriction, ls.row.BeginnerSlots, ls.row.IntermediateSlots, ls.row.AdvancedSlots)
+	if ls.row.State != sqlcgen.QueueSessionStatePrepared || !restriction.Restricted() {
+		return nil, nil
+	}
+	id, err := q.GetPlayerClubLevel(ctx, sqlcgen.GetPlayerClubLevelParams{ClubID: ls.row.ClubID, PlayerID: playerID})
+	if errors.Is(err, pgx.ErrNoRows) || (err == nil && id < 0) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	level := levelOf(pgtype.Int2{Int16: id, Valid: true})
+	roster := make([]*string, len(ls.roster))
+	for i, e := range ls.roster {
+		roster[i] = levelOf(e.SkillLevelID)
+	}
+	reason, blocked := levelrestriction.Block(restriction, level, roster)
+	if !blocked || level == nil {
+		return nil, nil
+	}
+	return &levelBlockDTO{Reason: reason, Level: *level}, nil
 }

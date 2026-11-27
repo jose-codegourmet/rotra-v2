@@ -1,7 +1,7 @@
 {
-  "wasm": "rules.50502b6bb302.wasm",
-  "sha256": "50502b6bb30235c0ff6eed302e9df2a8e45d2829e772f6d25db3d1788f283f2f",
-  "bytes": 3981028,
+  "wasm": "rules.6e9c208289da.wasm",
+  "sha256": "6e9c208289dac925ecd0eefd52a938a6a92024142ecb85f83aa7b66e5d7dda77",
+  "bytes": 3993429,
   "versions": [
     1
   ],

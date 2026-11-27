@@ -58,7 +58,7 @@ func (t *txn) addSavedPlayerIn(in savedPlayerAdd) (placed, error) {
 	if err != nil {
 		return placed{}, err
 	}
-	return t.place(cp, level, in.operationID, t.stamp(), in.toWaitlist, in.allowOverfill)
+	return t.place(cp, level, in.operationID, t.stamp(), in.toWaitlist, in.allowOverfill, in.allowOutsideLevels)
 }
 
 // addDirectoryPlayerIn adds a Player Information profile to the session, saving them to the club on the way (Q-ROSTER).
@@ -72,7 +72,7 @@ func (t *txn) addDirectoryPlayerIn(in directoryPlayerAdd) (placed, error) {
 	if err != nil {
 		return placed{}, err
 	}
-	return t.place(cp, level, in.operationID, now, in.toWaitlist, in.allowOverfill)
+	return t.place(cp, level, in.operationID, now, in.toWaitlist, in.allowOverfill, in.allowOutsideLevels)
 }
 
 // addNewPlayerIn adds a new guest or phone-entered player. emailWords is what the email did, for the toast; nil for a guest.
@@ -86,7 +86,7 @@ func (t *txn) addNewPlayerIn(in newPlayerAdd) (placed, *string, error) {
 	if err != nil {
 		return placed{}, nil, err
 	}
-	p, err := t.place(cp, level, in.operationID, now, in.toWaitlist, in.allowOverfill)
+	p, err := t.place(cp, level, in.operationID, now, in.toWaitlist, in.allowOverfill, in.allowOutsideLevels)
 	return p, words, err
 }
 
@@ -139,6 +139,8 @@ type requestAccept struct {
 	requestID   string
 	level       string
 	deviceID    pgtype.UUID
+	// allowOutsideLevels is Confirm again after the level restriction warning (D-2026-11-19-12).
+	allowOutsideLevels bool
 }
 
 // confirmJoinRequestIn confirms a join request on a locked session: a guest's creates the club player (phone kept as private
@@ -183,7 +185,7 @@ func (t *txn) confirmJoinRequestIn(in requestAccept) (confirmed, error) {
 		return confirmed{}, err
 	}
 	p, err := t.place(cp, level, in.operationID, pgtype.Timestamptz{Time: current.RequestedAt.Time.Truncate(time.Millisecond), Valid: true},
-		current.Placement == sqlcgen.JoinRequestPlacementWaitlist, false)
+		current.Placement == sqlcgen.JoinRequestPlacementWaitlist, false, in.allowOutsideLevels)
 	if err != nil {
 		return confirmed{}, err
 	}

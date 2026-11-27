@@ -18,6 +18,42 @@
     "base": [],
     "google_gate": [
       "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+    ],
+    "big_beginners": [
+      "UPDATE club_players SET saved_skill_level_id = 3, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000002'",
+      "UPDATE club_players SET saved_skill_level_id = 6, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000004'",
+      "UPDATE club_players SET saved_skill_level_id = 0, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000005'",
+      "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a1000000-0000-4000-8000-000000000004'"
+    ],
+    "big_beginners_intermediate": [
+      "UPDATE club_players SET saved_skill_level_id = 3, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000002'",
+      "UPDATE club_players SET saved_skill_level_id = 6, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000004'",
+      "UPDATE club_players SET saved_skill_level_id = 0, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000005'",
+      "UPDATE queue_sessions SET level_restriction = 'beginners_intermediate' WHERE id = 'a1000000-0000-4000-8000-000000000004'"
+    ],
+    "big_per_level": [
+      "UPDATE club_players SET saved_skill_level_id = 3, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000002'",
+      "UPDATE club_players SET saved_skill_level_id = 6, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000004'",
+      "UPDATE club_players SET saved_skill_level_id = 0, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000005'",
+      "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 2, intermediate_slots = 1, advanced_slots = 1 WHERE id = 'a1000000-0000-4000-8000-000000000004'"
+    ],
+    "big_per_level_no_slots": [
+      "UPDATE club_players SET saved_skill_level_id = 3, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000002'",
+      "UPDATE club_players SET saved_skill_level_id = 6, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000004'",
+      "UPDATE club_players SET saved_skill_level_id = 0, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000005'",
+      "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 4, intermediate_slots = 0, advanced_slots = 0 WHERE id = 'a1000000-0000-4000-8000-000000000004'"
+    ],
+    "wait_beginners": [
+      "UPDATE club_players SET saved_skill_level_id = 3, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000002'",
+      "UPDATE club_players SET saved_skill_level_id = 6, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000004'",
+      "UPDATE club_players SET saved_skill_level_id = 0, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000005'",
+      "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a1000000-0000-4000-8000-000000000005'"
+    ],
+    "live_beginners": [
+      "UPDATE club_players SET saved_skill_level_id = 3, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000002'",
+      "UPDATE club_players SET saved_skill_level_id = 6, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000004'",
+      "UPDATE club_players SET saved_skill_level_id = 0, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000005'",
+      "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a1000000-0000-4000-8000-000000000001'"
     ]
   },
   "approved": [
@@ -703,6 +739,384 @@
       "path": "/api/public-sessions/no-such-session/match-request/options",
       "player": "f1000000-0000-4000-8000-000000000001",
       "scenario": "base",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_big_beginners",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_big_beginners",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_ben_big_beginners",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "big_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_big_beginners",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "big_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_dan_big_beginners",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "big_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_dan_big_beginners",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "big_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_eli_big_beginners",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "big_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_eli_big_beginners",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "big_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_nia_big_beginners",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "big_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_nia_big_beginners",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "big_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_big_beginners_intermediate",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_beginners_intermediate",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_big_beginners_intermediate",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_beginners_intermediate",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_ben_big_beginners_intermediate",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "big_beginners_intermediate",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_big_beginners_intermediate",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "big_beginners_intermediate",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_dan_big_beginners_intermediate",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "big_beginners_intermediate",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_dan_big_beginners_intermediate",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "big_beginners_intermediate",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_eli_big_beginners_intermediate",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "big_beginners_intermediate",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_eli_big_beginners_intermediate",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "big_beginners_intermediate",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_nia_big_beginners_intermediate",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "big_beginners_intermediate",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_nia_big_beginners_intermediate",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "big_beginners_intermediate",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_big_per_level",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_per_level",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_big_per_level",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_per_level",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_ben_big_per_level",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "big_per_level",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_big_per_level",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "big_per_level",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_dan_big_per_level",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "big_per_level",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_dan_big_per_level",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "big_per_level",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_eli_big_per_level",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "big_per_level",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_eli_big_per_level",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "big_per_level",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_nia_big_per_level",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "big_per_level",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_nia_big_per_level",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "big_per_level",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_big_per_level_no_slots",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_per_level_no_slots",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_big_per_level_no_slots",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_per_level_no_slots",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_ben_big_per_level_no_slots",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "big_per_level_no_slots",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_big_per_level_no_slots",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "big_per_level_no_slots",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_dan_big_per_level_no_slots",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "big_per_level_no_slots",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_dan_big_per_level_no_slots",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "big_per_level_no_slots",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_eli_big_per_level_no_slots",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "big_per_level_no_slots",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_eli_big_per_level_no_slots",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "big_per_level_no_slots",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_nia_big_per_level_no_slots",
+      "path": "/api/public-sessions/big-night/access",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "big_per_level_no_slots",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_nia_big_per_level_no_slots",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "big_per_level_no_slots",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_wait_beginners",
+      "path": "/api/public-sessions/waitlist-night/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "wait_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_wait_beginners",
+      "path": "/api/public-sessions/waitlist-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "wait_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_ben_wait_beginners",
+      "path": "/api/public-sessions/waitlist-night/access",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "wait_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_wait_beginners",
+      "path": "/api/public-sessions/waitlist-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "wait_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_dan_wait_beginners",
+      "path": "/api/public-sessions/waitlist-night/access",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "wait_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_dan_wait_beginners",
+      "path": "/api/public-sessions/waitlist-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000004",
+      "scenario": "wait_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_eli_wait_beginners",
+      "path": "/api/public-sessions/waitlist-night/access",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "wait_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_eli_wait_beginners",
+      "path": "/api/public-sessions/waitlist-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000005",
+      "scenario": "wait_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_nia_wait_beginners",
+      "path": "/api/public-sessions/waitlist-night/access",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "wait_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_nia_wait_beginners",
+      "path": "/api/public-sessions/waitlist-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000008",
+      "scenario": "wait_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_alice_live_beginners",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "live_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_live_beginners",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "live_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "access_ben_live_beginners",
+      "path": "/api/public-sessions/live-now/access",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "live_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_live_beginners",
+      "path": "/api/public-sessions/live-now/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "live_beginners",
       "origin": "http://localhost:9000"
     },
     {

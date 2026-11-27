@@ -15,6 +15,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/levelrestriction"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/liveupdates"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/courts"
@@ -153,6 +154,17 @@ type validated struct {
 	start, end      int64
 	playersPerCourt int16
 	courts          []courtInput
+	// restriction is the Restrictions pick the body sent, to write when set (D-2026-11-19-12); a body without one keeps the stored pick.
+	restriction    levelrestriction.Columns
+	setRestriction bool
+}
+
+// restrictionKind is the pick to store: All levels when the body sent none (a new session's default).
+func (v validated) restrictionKind() sqlcgen.LevelRestriction {
+	if v.restriction.Kind == "" {
+		return sqlcgen.LevelRestrictionAll
+	}
+	return v.restriction.Kind
 }
 
 // validate is validate in session-preparation.ts, in its order.
@@ -248,7 +260,12 @@ func (t *txn) validate(in writes.Body) (validated, error) {
 			return validated{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"courts": firstMessage(msg)})
 		}
 	}
-	return validated{venue: venue, start: start, end: end, playersPerCourt: int16(perCourt), courts: crts}, nil
+	// Restrictions (D-2026-11-19-12): refused unless the slots per level add up to the session's slots.
+	cols, set, refused := levelrestriction.Input(in["levelRestriction"], len(crts), int16(perCourt))
+	if refused != "" {
+		return validated{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"levelRestriction": refused})
+	}
+	return validated{venue: venue, start: start, end: end, playersPerCourt: int16(perCourt), courts: crts, restriction: cols, setRestriction: set}, nil
 }
 
 // sessionFields are the columns create and edit both write, read from the form after validate.
@@ -426,6 +443,7 @@ func (t *txn) createSessions(commandID string, in writes.Body) (createResult, er
 			AllowSingles: f.singles, AllowDoubles: f.doubles, MinimumGames: f.minimumGames, MinimumIsCalculated: f.minimumIsCalculated,
 			PlayersPerCourt: v.playersPerCourt, ExpectedPlayers: f.expectedPlayers, RequestFormats: formats, RecordGames: recordGames,
 			SeriesID: seriesID, PublicSlug: slug, SourceCommandID: derivedID(commandID, "session:"+strconv.Itoa(index)), Now: t.stamp(),
+			LevelRestriction: v.restrictionKind(), BeginnerSlots: v.restriction.Beginner, IntermediateSlots: v.restriction.Intermediate, AdvancedSlots: v.restriction.Advanced,
 		})
 		if err != nil {
 			return createResult{}, err
@@ -572,6 +590,8 @@ func (t *txn) updateSession(commandID, expectedRevision string, in writes.Body) 
 		ScheduledStartAt: timestamp(v.start), ScheduledEndAt: timestamp(v.end), SessionMode: f.mode, AllowSingles: f.singles, AllowDoubles: f.doubles,
 		MinimumGames: f.minimumGames, MinimumIsCalculated: f.minimumIsCalculated, ExpectedPlayers: f.expectedPlayers, PlayersPerCourt: v.playersPerCourt,
 		Now: t.stamp(), ID: t.sess.ID,
+		SetLevelRestriction: v.setRestriction, LevelRestriction: v.restrictionKind(),
+		BeginnerSlots: v.restriction.Beginner, IntermediateSlots: v.restriction.Intermediate, AdvancedSlots: v.restriction.Advanced,
 	}
 	if f.hasFormats {
 		params.RequestFormats = f.requestFormats

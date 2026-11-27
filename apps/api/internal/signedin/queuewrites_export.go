@@ -3,6 +3,7 @@ package signedin
 import (
 	"context"
 	"errors"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/levelrestriction"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -121,6 +122,7 @@ func SessionOf(r sqlcgen.LockQueueSessionRow) Session {
 		FinalizedAt: isoPtr(r.FinalizedAt), SeriesID: uuidPtr(r.SeriesID), PublicSlug: r.PublicSlug, AcceptJoinRequests: r.AcceptJoinRequests,
 		AlwaysRequireRequest: r.AlwaysRequireRequest, CourtFillMode: string(r.CourtFillMode), RequestFormats: requestFormatsRecord(formats),
 		RecordGames: r.RecordGames, Revision: httpapi.ToDecimalString(r.Revision),
+		LevelRestriction: levelrestriction.Of(r.LevelRestriction, r.BeginnerSlots, r.IntermediateSlots, r.AdvancedSlots),
 	}
 	if r.ExpectedPlayers.Valid {
 		v := r.ExpectedPlayers.Int32

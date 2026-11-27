@@ -246,6 +246,25 @@ func (s *server) joinSession(r *http.Request, p session.Principal) (writes.Resul
 		if standing.RequestPending {
 			return nil, conflict("request", requestAlreadySentText)
 		}
+		// D-2026-11-19-12: a Player whose level here is outside the restriction, or whose band's slots are full, cannot request or
+		// join. A waitlisted Player's Join from waitlist is not checked.
+		if placement != "from_waitlist" && !standing.InSession {
+			level := pgtype.Int2{}
+			id, err := t.q.GetPlayerClubLevel(t.ctx, sqlcgen.GetPlayerClubLevelParams{ClubID: t.sess.ClubID, PlayerID: player})
+			if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+				return nil, err
+			}
+			if err == nil && id >= 0 {
+				level = pgtype.Int2{Int16: id, Valid: true}
+			}
+			reason, blocked, err := t.levelBlock(level)
+			if err != nil {
+				return nil, err
+			}
+			if blocked {
+				return nil, writes.Fail(httpapi.ErrForbidden, map[string]string{"request": reason})
+			}
+		}
 		full, err := t.slotsFull()
 		if err != nil {
 			return nil, err
@@ -261,7 +280,7 @@ func (s *server) joinSession(r *http.Request, p session.Principal) (writes.Resul
 			if standing.InSession {
 				return nil, conflict("request", "You're already in this session.")
 			}
-			placed, err := t.place(*member, memberLevel, requestID.String(), t.stamp(), placement == "waitlist" || full, false)
+			placed, err := t.place(*member, memberLevel, requestID.String(), t.stamp(), placement == "waitlist" || full, false, true)
 			if err != nil {
 				return nil, err
 			}

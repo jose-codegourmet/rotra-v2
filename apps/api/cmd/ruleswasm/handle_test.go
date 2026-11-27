@@ -145,7 +145,7 @@ func TestEveryCaseThroughTheEnvelope(t *testing.T) {
 			files = append(files, path)
 		}
 	}
-	if err != nil || len(files) != 47 {
+	if err != nil || len(files) != 48 {
 		t.Fatalf("%d case files, %v", len(files), err)
 	}
 	total := 0
@@ -169,8 +169,8 @@ func TestEveryCaseThroughTheEnvelope(t *testing.T) {
 			}
 		}
 	}
-	if total != 406 {
-		t.Errorf("%d cases, want 406", total)
+	if total != 427 {
+		t.Errorf("%d cases, want 427", total)
 	}
 }
 

@@ -301,6 +301,27 @@ case('fill_unknown_session', req('POST', WF('a3000000-0000-4000-8000-0000000000f
 case('fill_lapsed_club_prepared', req('POST', WF(S[7]), {'operationId': op(1)}, who=LAPSED))
 case('fill_bumps_the_revision_even_when_nothing_moves', req('POST', WF(S[1]), {'operationId': op(1)}))
 
+# ---------------------------------------------------------------- Restrictions (D-2026-11-19-12, task 2.2): a slot outside the pick is refused
+# Prep Open has two slots; Hal (intermediate) holds one. Gus (CP 1) is added at the level the case names.
+BATCH = lambda s_, ops: req('POST', roster_path(s_, 'batch'), {'operations': ops})
+case('add_restricted_beginners_refuses_an_intermediate', req('POST', POST_ROSTER(S[1]), add_saved(CP(1))), scenario='s1_beginners')
+case('add_restricted_beginners_allows_a_beginner', req('POST', POST_ROSTER(S[1]), add_saved(CP(1), level='beginner_mid')), scenario='s1_beginners')
+case('add_restricted_beginners_refuses_an_advanced_new_player', req('POST', POST_ROSTER(S[1]), add_new('Newbie', level='advanced_low')), scenario='s1_beginners')
+case('add_restricted_outside_levels_allowed_after_the_warning', req('POST', POST_ROSTER(S[1]), add_saved(CP(1), allowOutsideLevels=True)), scenario='s1_beginners')
+case('add_restricted_outside_levels_flag_not_true_does_not_count', req('POST', POST_ROSTER(S[1]), add_saved(CP(1), allowOutsideLevels='true')), scenario='s1_beginners')
+case('add_restricted_to_the_waitlist_is_not_checked', req('POST', POST_ROSTER(S[1]), add_saved(CP(1), toWaitlist=True)), scenario='s1_beginners')
+case('add_restricted_full_roster_goes_to_the_waitlist_unchecked', req('POST', POST_ROSTER(S[2]), add_saved(CP(1))), scenario='s2_beginners')
+case('add_restricted_overfill_is_checked', req('POST', POST_ROSTER(S[2]), add_saved(CP(1), allowOverfill=True)), scenario='s2_beginners')
+case('add_restricted_beginners_intermediate_refuses_an_advanced', req('POST', POST_ROSTER(S[1]), add_saved(CP(1), level='advanced_mid')), scenario='s1_beginners_intermediate')
+case('add_restricted_beginners_intermediate_allows_an_intermediate', req('POST', POST_ROSTER(S[1]), add_saved(CP(1))), scenario='s1_beginners_intermediate')
+case('add_restricted_per_level_band_full', req('POST', POST_ROSTER(S[1]), add_saved(CP(1))), scenario='s1_per_level')
+case('add_restricted_per_level_band_has_no_slots', req('POST', POST_ROSTER(S[1]), add_saved(CP(1), level='advanced_low')), scenario='s1_per_level')
+case('add_restricted_per_level_band_has_a_free_slot', req('POST', POST_ROSTER(S[1]), add_saved(CP(1), level='beginner_low')), scenario='s1_per_level')
+case('add_restricted_per_level_a_released_player_frees_the_band', req('POST', POST_ROSTER(S[1]), add_saved(CP(1))), scenario='s1_per_level_hal_released')
+case('add_restricted_a_retry_is_not_checked_again', [req('POST', POST_ROSTER(S[1]), add_saved(CP(1), 5, level='beginner_low'), snapshot=True), req('POST', POST_ROSTER(S[1]), add_saved(CP(1), 5, level='beginner_low'))], scenario='s1_per_level')
+case('batch_restricted_refuses_the_whole_batch', BATCH(S[1], [{'op': 'add', **add_saved(CP(1), 1, level='beginner_low')}, {'op': 'add', **add_saved(CP(2), 2, level='advanced_low')}]), scenario='s1_beginners_intermediate_two_free')
+case('batch_restricted_allows_the_warning_on_one_add', BATCH(S[1], [{'op': 'add', **add_saved(CP(1), 1, level='beginner_low')}, {'op': 'add', **add_saved(CP(2), 2, level='advanced_low', allowOutsideLevels=True)}]), scenario='s1_beginners_intermediate_two_free')
+
 # ---------------------------------------------------------------- scenarios
 NOW = "TIMESTAMPTZ '2026-11-19 02:00:00+00'"
 CLUB1 = 'c9000000-0000-4000-8000-000000000001'
@@ -331,6 +352,13 @@ def match_sql(n, session, entries, state='waiting', decided=False):
 RELEASE = lambda sp: f"UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed', level_locked_at = NULL WHERE id = '{sp}'"
 SCENARIOS = dict(BASE['scenarios'])
 SCENARIOS.update({
+    's1_beginners': [f"UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = '{S[1]}'"],
+    's2_beginners': [f"UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = '{S[2]}'"],
+    's1_beginners_intermediate': [f"UPDATE queue_sessions SET level_restriction = 'beginners_intermediate' WHERE id = '{S[1]}'"],
+    # One court of two: Hal (intermediate) takes the one intermediate slot; there is one beginner slot and none for advanced.
+    's1_per_level': [f"UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0 WHERE id = '{S[1]}'"],
+    's1_per_level_hal_released': [f"UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0 WHERE id = '{S[1]}'", RELEASE(SP(1))],
+    's1_beginners_intermediate_two_free': [f"UPDATE queue_sessions SET level_restriction = 'beginners_intermediate' WHERE id = '{S[1]}'", RELEASE(SP(1))],
     'ivy_in_a_waiting_match': match_sql(1, S[3], [SP(5), SP(4)]),
     'ivy_played_a_game': match_sql(1, S[3], [SP(5), SP(4)], state='completed', decided=True),
     'jo_played_a_game': match_sql(1, S[3], [SP(6), SP(4)], state='completed', decided=True),

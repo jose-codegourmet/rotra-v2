@@ -13,14 +13,14 @@ import (
 func rosterRow(name, avatar string) sqlcgen.ListPublicSessionRosterRow {
 	r := sqlcgen.ListPublicSessionRosterRow{NameSnapshot: name}
 	if avatar != "" {
-		r.AvatarRef = pgtype.Text{String: avatar, Valid: true}
+		r.HasProfile, r.ProfileAvatarRef = true, pgtype.Text{String: avatar, Valid: true}
 	}
 	return r
 }
 
 func TestResultsWithPicturesPutsFacesOnNamedRowsOnly(t *testing.T) {
 	roster := []sqlcgen.ListPublicSessionRosterRow{rosterRow("Ann Lee", "https://x.test/a.png"), rosterRow("Twin", ""), rosterRow("Twin", "https://x.test/t.png"), rosterRow("Bo", "")}
-	raw := `{"standings":[{"position":1,"name":"Ann Lee"},{"name":"Twin"},{"name":"Bo"},{"name":"Nobody"},{"name":7},{"x":1},"s",null],"awards":{"mvp":{"name":"Ann Lee"},"mostImproved":null},"offDay":[{"name":"Bo","priorSessions":2}]}`
+	raw := `{"standings":[{"position":1,"name":"Ann Lee"},{"name":"Twin"},{"name":"Bo"},{"name":"Nobody"},{"name":7},{"x":1},"s"],"awards":{"mvp":{"name":"Ann Lee"},"mostImproved":null},"offDay":[{"name":"Bo","priorSessions":2}]}`
 	out, err := resultsWithPictures([]byte(raw), roster)
 	if err != nil {
 		t.Fatal(err)
@@ -29,7 +29,7 @@ func TestResultsWithPicturesPutsFacesOnNamedRowsOnly(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := `{"standings":[{"position":1,"name":"Ann Lee","pictureUrl":"https://x.test/a.png","participant":0},{"name":"Twin","pictureUrl":null},{"name":"Bo","pictureUrl":null,"participant":3},{"name":"Nobody","pictureUrl":null},{"name":7,"pictureUrl":null},{"x":1},"s",null],"awards":{"mvp":{"name":"Ann Lee","pictureUrl":"https://x.test/a.png","participant":0},"mostImproved":null},"offDay":[{"name":"Bo","priorSessions":2,"pictureUrl":null,"participant":3}]}`
+	want := `{"standings":[{"position":1,"name":"Ann Lee","pictureUrl":"https://x.test/a.png","participant":0},{"name":"Twin","position":1,"pictureUrl":null},{"name":"Bo","position":1,"pictureUrl":null,"participant":3},{"name":"Nobody","position":1,"pictureUrl":null},{"name":7,"position":1,"pictureUrl":null},{"x":1,"position":1},{"0":"s","position":1}],"awards":{"mvp":{"name":"Ann Lee","pictureUrl":"https://x.test/a.png","participant":0},"mostImproved":null},"offDay":[{"name":"Bo","priorSessions":2,"pictureUrl":null,"participant":3}]}`
 	if string(got) != want {
 		t.Errorf("\n got %s\nwant %s", got, want)
 	}
@@ -49,13 +49,20 @@ func TestResultsWithPicturesNoCopyIsNullAndABadCopyIsAnError(t *testing.T) {
 	}
 }
 
+// A null standings row is the TypeScript's TypeError (reading wins of null): the whole read fails.
+func TestResultsWithANullStandingsRowFail(t *testing.T) {
+	if _, err := resultsWithPictures([]byte(`{"standings":[{"name":"A"},null]}`), nil); err == nil {
+		t.Fatal("want an error")
+	}
+}
+
 func TestResultsNumbersPrintAsJavaScriptDoes(t *testing.T) {
 	out, err := resultsWithPictures([]byte(`{"standings":[{"wins":2.0,"a":1e2,"b":1.50,"d":123456789012}]}`), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	got, _ := json.Marshal(out)
-	if want := `{"standings":[{"wins":2,"a":100,"b":1.5,"d":123456789012}]}`; string(got) != want {
+	if want := `{"standings":[{"wins":2,"a":100,"b":1.5,"d":123456789012,"position":1}]}`; string(got) != want {
 		t.Errorf("\n got %s\nwant %s", got, want)
 	}
 }

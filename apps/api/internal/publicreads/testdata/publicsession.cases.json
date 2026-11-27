@@ -8,7 +8,15 @@
   "INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, updated_at) VALUES ('e6000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000012', 1, TIMESTAMPTZ '2026-11-02 10:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00') ON CONFLICT DO NOTHING",
   "UPDATE queue_sessions SET updated_at = TIMESTAMPTZ '2026-11-10 08:00:00.123456+00', title = 'Open Night' WHERE id = 'e4000000-0000-4000-8000-000000000001'",
   "UPDATE queue_sessions SET state = 'active', finalized_at = NULL WHERE id = 'e4000000-0000-4000-8000-00000000000c'",
-  "UPDATE clubs SET name = 'Rally Club', logo_ref = 'https://example.test/club1.png' WHERE id = 'e1000000-0000-4000-8000-000000000001'"
+  "UPDATE clubs SET name = 'Rally Club', logo_ref = 'https://example.test/club1.png' WHERE id = 'e1000000-0000-4000-8000-000000000001'",
+  "DELETE FROM session_hosts WHERE id::text LIKE 'f1000000-%'",
+  "DELETE FROM club_assessments WHERE id::text LIKE 'f2000000-%'",
+  "DELETE FROM club_players WHERE id::text LIKE 'f3000000-%'",
+  "DELETE FROM session_shuttle_plan_lines WHERE id::text LIKE 'f4000000-%'",
+  "DELETE FROM session_cost_estimates WHERE session_id::text LIKE 'e4000000-%'",
+  "DELETE FROM inventory_items WHERE id::text LIKE 'f5000000-%'",
+  "UPDATE queue_sessions SET level_restriction = 'all', beginner_slots = NULL, intermediate_slots = NULL, advanced_slots = NULL, expected_players = NULL",
+  "UPDATE session_publications SET public_results = jsonb_set(public_results, '{standings}', '[{\"name\":5,\"wins\":1},{\"position\":3},\"str\",[1],{\"name\":\"Alice Reyes\",\"pictureUrl\":\"old\",\"participant\":99},1.50,1e2,{\"name\":\"Mika\",\"extra\":{\"deep\":[1,{\"k\":null}]}}]'::jsonb) WHERE id = 'e7000000-0000-4000-8000-000000000009'"
  ],
  "scenarios": {
   "base": [],
@@ -33,6 +41,66 @@
   ],
   "club_renamed": [
    "UPDATE clubs SET name = 'Rally  Renamed  Club', logo_ref = NULL WHERE id = 'e1000000-0000-4000-8000-000000000001'"
+  ],
+  "hosts_open": [
+   "INSERT INTO club_players (id, club_id, player_id, display_name, avatar_ref, added_at, updated_at) VALUES ('f3000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', NULL, 'Hosty Lone', 'https://example.test/hosty.png', now(), now())",
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, accepted_revision, actor_club_id) VALUES ('f2000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'f3000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 7, 'f2000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-10-01 00:00:00+00', 1, 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, accepted_revision, actor_club_id) VALUES ('f2000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 'f3000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 5, 'f2000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-09-01 00:00:00+00', 1, 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, frozen_at, created_at, updated_at) VALUES ('f1000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-03 00:00:00+00', NULL, 'Snapshot Name', NULL, now(), now())",
+   "INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, frozen_at, created_at, updated_at) VALUES ('f1000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000012', TIMESTAMPTZ '2026-11-02 00:00:00+00', NULL, 'Snapshot Name', NULL, now(), now())",
+   "INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, frozen_at, created_at, updated_at) VALUES ('f1000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f3000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-01 00:00:00+00', NULL, 'Snapshot Name', NULL, now(), now())",
+   "INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, frozen_at, created_at, updated_at) VALUES ('f1000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-01 12:00:00+00', TIMESTAMPTZ '2026-11-04 00:00:00+00', 'Snapshot Name', NULL, now(), now())",
+   "INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, frozen_at, created_at, updated_at) VALUES ('f1000000-0000-4000-8000-000000000005', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-00000000001e', TIMESTAMPTZ '2026-11-01 13:00:00+00', NULL, 'Snapshot Name', NULL, now(), now())"
+  ],
+  "hosts_of_a_finished_session": [
+   "INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, frozen_at, created_at, updated_at) VALUES ('f1000000-0000-4000-8000-000000000011', 'e1000000-0000-4000-8000-00000000000e', 'e4000000-0000-4000-8000-000000000004', 'e3000000-0000-4000-8000-000000000028', TIMESTAMPTZ '2026-11-10 00:00:00+00', NULL, 'Alice Frozen', TIMESTAMPTZ '2026-11-14 16:00:00+00', now(), now())",
+   "INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, frozen_at, created_at, updated_at) VALUES ('f1000000-0000-4000-8000-000000000012', 'e1000000-0000-4000-8000-00000000000e', 'e4000000-0000-4000-8000-000000000004', 'e3000000-0000-4000-8000-000000000029', TIMESTAMPTZ '2026-11-10 01:00:00+00', TIMESTAMPTZ '2026-11-11 00:00:00+00', 'Dropped Early', NULL, now(), now())",
+   "INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, removed_at, name_snapshot, frozen_at, created_at, updated_at) VALUES ('f1000000-0000-4000-8000-000000000013', 'e1000000-0000-4000-8000-00000000000e', 'e4000000-0000-4000-8000-000000000004', 'e3000000-0000-4000-8000-00000000002a', TIMESTAMPTZ '2026-11-10 02:00:00+00', NULL, 'Snapshot Name', NULL, now(), now())"
+  ],
+  "restriction_beginners": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'e4000000-0000-4000-8000-000000000001'"
+  ],
+  "restriction_beginners_intermediate": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners_intermediate' WHERE id = 'e4000000-0000-4000-8000-000000000001'"
+  ],
+  "restriction_per_level": [
+   "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 4, intermediate_slots = 0, advanced_slots = 8 WHERE id = 'e4000000-0000-4000-8000-000000000001'"
+  ],
+  "estimate_break_even": [
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000001', 2, 0)"
+  ],
+  "estimate_custom": [
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 12000, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000001', 2, 0)"
+  ],
+  "estimate_custom_free": [
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 0, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000001', 2, 0)"
+  ],
+  "estimate_expected_players_empty_roster": [
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000001', 2, 0)",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-03 00:00:00+00', release_reason = 'removed' WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND released_at IS NULL AND no_show_at IS NULL",
+   "UPDATE queue_sessions SET expected_players = 7 WHERE id = 'e4000000-0000-4000-8000-000000000001'"
+  ],
+  "estimate_empty_roster_uses_slots": [
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000001', 2, 0)",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-03 00:00:00+00', release_reason = 'removed' WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND released_at IS NULL AND no_show_at IS NULL"
+  ],
+  "standings_with_a_null_row": [
+   "UPDATE session_publications SET public_results = jsonb_set(public_results, '{standings}', '[{\"name\":\"Mika\",\"wins\":1},null]'::jsonb) WHERE id = 'e7000000-0000-4000-8000-000000000009'"
+  ],
+  "hosts_and_estimate_on_a_finished_session": [
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 9000, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000004', 'f5000000-0000-4000-8000-000000000001', 2, 0)"
   ]
  },
  "cases": [
@@ -275,6 +343,66 @@
    "name": "club_renamed_after",
    "scenario": "club_renamed",
    "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "hosts_open_session",
+   "scenario": "hosts_open",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "hosts_finished_session",
+   "scenario": "hosts_of_a_finished_session",
+   "path": "/api/public-sessions/done-published"
+  },
+  {
+   "name": "restriction_beginners",
+   "scenario": "restriction_beginners",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "restriction_beginners_intermediate",
+   "scenario": "restriction_beginners_intermediate",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "restriction_per_level",
+   "scenario": "restriction_per_level",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "estimate_break_even",
+   "scenario": "estimate_break_even",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "estimate_custom",
+   "scenario": "estimate_custom",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "estimate_custom_free",
+   "scenario": "estimate_custom_free",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "estimate_expected_players",
+   "scenario": "estimate_expected_players_empty_roster",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "estimate_empty_roster_uses_slots",
+   "scenario": "estimate_empty_roster_uses_slots",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "standings_with_a_null_row_fails",
+   "scenario": "standings_with_a_null_row",
+   "path": "/api/public-sessions/done-odd-rows"
+  },
+  {
+   "name": "estimate_on_a_finished_session",
+   "scenario": "hosts_and_estimate_on_a_finished_session",
+   "path": "/api/public-sessions/done-published"
   }
  ]
 }

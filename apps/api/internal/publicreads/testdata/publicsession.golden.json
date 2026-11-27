@@ -31,6 +31,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 3,
    "notes": "Bring shuttles.",
    "participantCount": 14,
@@ -114,19 +117,8 @@
     "advanced": 4,
     "unrated": 3
    },
+   "hosts": [],
    "waitlist": [
-    {
-     "name": "D*** T***",
-     "pictureUrl": null,
-     "skillGroup": "intermediate",
-     "levelLabel": "Intermediate Low"
-    },
-    {
-     "name": "D*** O***",
-     "pictureUrl": null,
-     "skillGroup": "intermediate",
-     "levelLabel": "Intermediate Mid"
-    },
     {
      "name": "V***",
      "pictureUrl": null,
@@ -174,12 +166,25 @@
      "pictureUrl": null,
      "skillGroup": null,
      "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
     }
    ],
    "openSlots": 0,
    "slotBudget": 12,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794297600123,
    "hasPendingChanges": false,
@@ -217,6 +222,9 @@
     "doubles": true
    },
    "mode": "hard",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 3,
@@ -246,6 +254,7 @@
     "advanced": 1,
     "unrated": 1
    },
+   "hosts": [],
    "waitlist": [
     {
      "name": "L***",
@@ -258,6 +267,7 @@
    "slotBudget": 16,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": true,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794904200000,
    "hasPendingChanges": false,
@@ -294,6 +304,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 3,
@@ -323,11 +336,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 1,
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794924000000,
    "hasPendingChanges": true,
@@ -365,6 +380,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 6,
@@ -412,6 +430,7 @@
     "advanced": 2,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [
     {
      "name": "A*** R***",
@@ -424,6 +443,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794679200000,
    "hasPendingChanges": false,
@@ -541,6 +561,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 2,
@@ -564,11 +587,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 6,
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794592800000,
    "hasPendingChanges": false,
@@ -606,6 +631,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 1,
@@ -623,11 +651,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 7,
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794506400000,
    "hasPendingChanges": false,
@@ -690,6 +720,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 0,
@@ -700,11 +733,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 0,
    "slotBudget": 0,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
@@ -739,6 +774,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 0,
@@ -749,11 +787,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 0,
    "slotBudget": 0,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
@@ -788,6 +828,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 0,
@@ -798,11 +841,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 0,
    "slotBudget": 0,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
@@ -839,6 +884,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 1,
@@ -856,11 +904,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 3,
    "slotBudget": 4,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794902400000,
    "hasPendingChanges": false,
@@ -895,6 +945,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 0,
@@ -905,11 +958,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 0,
    "slotBudget": 0,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
@@ -944,6 +999,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 0,
@@ -954,11 +1012,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 0,
    "slotBudget": 0,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
@@ -995,6 +1055,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 1,
@@ -1012,11 +1075,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 3,
    "slotBudget": 4,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794333600000,
    "hasPendingChanges": false,
@@ -1057,6 +1122,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 2,
@@ -1080,11 +1148,13 @@
     "advanced": 0,
     "unrated": 1
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 6,
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794247200000,
    "hasPendingChanges": false,
@@ -1134,6 +1204,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 2,
@@ -1157,11 +1230,13 @@
     "advanced": 0,
     "unrated": 1
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 6,
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794160800000,
    "hasPendingChanges": false,
@@ -1204,6 +1279,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 2,
@@ -1227,11 +1305,13 @@
     "advanced": 0,
     "unrated": 1
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 6,
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794074400000,
    "hasPendingChanges": false,
@@ -1268,6 +1348,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 2,
@@ -1291,11 +1374,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 2,
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1793988000000,
    "hasPendingChanges": false,
@@ -1319,23 +1404,34 @@
      {
       "name": 5,
       "wins": 1,
+      "position": 1,
       "pictureUrl": null
      },
      {
-      "position": 3
+      "position": 2
      },
-     "str",
-     null,
-     [
-      1
-     ],
+     {
+      "0": "s",
+      "1": "t",
+      "2": "r",
+      "position": 2
+     },
+     {
+      "0": 1,
+      "position": 2
+     },
      {
       "name": "Alice Reyes",
       "pictureUrl": null,
-      "participant": 0
+      "participant": 0,
+      "position": 2
      },
-     1.5,
-     100,
+     {
+      "position": 2
+     },
+     {
+      "position": 2
+     },
      {
       "name": "Mika",
       "extra": {
@@ -1346,6 +1442,7 @@
         }
        ]
       },
+      "position": 2,
       "pictureUrl": null,
       "participant": 1
      }
@@ -1383,6 +1480,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 2,
@@ -1406,11 +1506,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 2,
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1793988000000,
    "hasPendingChanges": false,
@@ -1456,6 +1558,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 2,
@@ -1479,11 +1584,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 2,
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1793988000000,
    "hasPendingChanges": false,
@@ -1522,6 +1629,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 2,
@@ -1545,11 +1655,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 2,
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1793988000000,
    "hasPendingChanges": false,
@@ -1590,6 +1702,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 3,
    "notes": "Bring shuttles.",
    "participantCount": 14,
@@ -1673,19 +1788,8 @@
     "advanced": 4,
     "unrated": 3
    },
+   "hosts": [],
    "waitlist": [
-    {
-     "name": "D*** T***",
-     "pictureUrl": null,
-     "skillGroup": "intermediate",
-     "levelLabel": "Intermediate Low"
-    },
-    {
-     "name": "D*** O***",
-     "pictureUrl": null,
-     "skillGroup": "intermediate",
-     "levelLabel": "Intermediate Mid"
-    },
     {
      "name": "V***",
      "pictureUrl": null,
@@ -1733,12 +1837,25 @@
      "pictureUrl": null,
      "skillGroup": null,
      "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
     }
    ],
    "openSlots": 0,
    "slotBudget": 12,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794297600123,
    "hasPendingChanges": false,
@@ -1777,6 +1894,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 3,
    "notes": "Bring shuttles.",
    "participantCount": 14,
@@ -1860,19 +1980,8 @@
     "advanced": 4,
     "unrated": 3
    },
+   "hosts": [],
    "waitlist": [
-    {
-     "name": "D*** T***",
-     "pictureUrl": null,
-     "skillGroup": "intermediate",
-     "levelLabel": "Intermediate Low"
-    },
-    {
-     "name": "D*** O***",
-     "pictureUrl": null,
-     "skillGroup": "intermediate",
-     "levelLabel": "Intermediate Mid"
-    },
     {
      "name": "V***",
      "pictureUrl": null,
@@ -1920,12 +2029,25 @@
      "pictureUrl": null,
      "skillGroup": null,
      "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
     }
    ],
    "openSlots": 0,
    "slotBudget": 12,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794297600123,
    "hasPendingChanges": false,
@@ -2187,6 +2309,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 2,
@@ -2210,11 +2335,13 @@
     "advanced": 0,
     "unrated": 1
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 6,
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794074400000,
    "hasPendingChanges": false,
@@ -2252,6 +2379,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 2,
@@ -2275,11 +2405,13 @@
     "advanced": 0,
     "unrated": 1
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 6,
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794074400000,
    "hasPendingChanges": false,
@@ -2329,6 +2461,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 6,
@@ -2376,6 +2511,7 @@
     "advanced": 2,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [
     {
      "name": "A*** R***",
@@ -2388,6 +2524,7 @@
    "slotBudget": 8,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794679200000,
    "hasPendingChanges": false,
@@ -2534,6 +2671,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 3,
    "notes": "Bring shuttles.",
    "participantCount": 13,
@@ -2617,19 +2757,8 @@
     "advanced": 4,
     "unrated": 3
    },
+   "hosts": [],
    "waitlist": [
-    {
-     "name": "D*** T***",
-     "pictureUrl": null,
-     "skillGroup": "intermediate",
-     "levelLabel": "Intermediate Low"
-    },
-    {
-     "name": "D*** O***",
-     "pictureUrl": null,
-     "skillGroup": "intermediate",
-     "levelLabel": "Intermediate Mid"
-    },
     {
      "name": "V***",
      "pictureUrl": null,
@@ -2671,12 +2800,25 @@
      "pictureUrl": null,
      "skillGroup": null,
      "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
     }
    ],
    "openSlots": 0,
    "slotBudget": 12,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794384000000,
    "hasPendingChanges": false,
@@ -2713,6 +2855,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 0,
    "notes": null,
    "participantCount": 1,
@@ -2730,11 +2875,13 @@
     "advanced": 0,
     "unrated": 0
    },
+   "hosts": [],
    "waitlist": [],
    "openSlots": 3,
    "slotBudget": 4,
    "acceptJoinRequests": false,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794902400000,
    "hasPendingChanges": false,
@@ -2785,6 +2932,9 @@
     "doubles": true
    },
    "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
    "minimum": 3,
    "notes": "Bring shuttles.",
    "participantCount": 14,
@@ -2868,19 +3018,8 @@
     "advanced": 4,
     "unrated": 3
    },
+   "hosts": [],
    "waitlist": [
-    {
-     "name": "D*** T***",
-     "pictureUrl": null,
-     "skillGroup": "intermediate",
-     "levelLabel": "Intermediate Low"
-    },
-    {
-     "name": "D*** O***",
-     "pictureUrl": null,
-     "skillGroup": "intermediate",
-     "levelLabel": "Intermediate Mid"
-    },
     {
      "name": "V***",
      "pictureUrl": null,
@@ -2928,16 +3067,2018 @@
      "pictureUrl": null,
      "skillGroup": null,
      "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
     }
    ],
    "openSlots": 0,
    "slotBudget": 12,
    "acceptJoinRequests": true,
    "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
    "recordGames": true,
    "lastSyncedAt": 1794297600123,
    "hasPendingChanges": false,
    "results": null
+  }
+ },
+ "hosts_open_session": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "hosts": [
+    {
+     "name": "H*** L***",
+     "pictureUrl": "https://example.test/hosty.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    }
+   ],
+   "waitlist": [
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
+   "recordGames": true,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "hosts_finished_session": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-published",
+   "status": "completed",
+   "title": "Done and Published",
+   "start": 1794646800000,
+   "end": 1794668400000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000e",
+    "name": "Done Deals",
+    "initials": "DD",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 6,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "T*** N***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "T*** N***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "S*** S***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    }
+   ],
+   "skillMix": {
+    "beginner": 2,
+    "intermediate": 2,
+    "advanced": 2,
+    "unrated": 0
+   },
+   "hosts": [
+    {
+     "name": "A*** F***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    }
+   ],
+   "waitlist": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    }
+   ],
+   "openSlots": 2,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
+   "recordGames": true,
+   "lastSyncedAt": 1794679200000,
+   "hasPendingChanges": false,
+   "results": {
+    "awards": {
+     "mvp": {
+      "name": "A*** R***",
+      "pictureUrl": "https://example.test/alice.png",
+      "participant": 0
+     },
+     "mostImproved": {
+      "name": "M***",
+      "priorSessions": 3,
+      "pictureUrl": "https://example.test/mika.png",
+      "participant": 1
+     }
+    },
+    "offDay": [
+     {
+      "name": "Solo Sam",
+      "priorSessions": 2,
+      "pictureUrl": null,
+      "participant": 5
+     },
+     {
+      "name": "Twin Name",
+      "priorSessions": 0,
+      "pictureUrl": null
+     }
+    ],
+    "standings": [
+     {
+      "name": "A*** R***",
+      "wins": 5,
+      "games": 6,
+      "losses": 1,
+      "position": 1,
+      "pictureUrl": "https://example.test/alice.png",
+      "participant": 0
+     },
+     {
+      "name": "M***",
+      "wins": 4,
+      "games": 6,
+      "losses": 2,
+      "position": 2,
+      "pictureUrl": "https://example.test/mika.png",
+      "participant": 1
+     },
+     {
+      "name": "Twin Name",
+      "wins": 3,
+      "games": 6,
+      "losses": 3,
+      "position": 3,
+      "pictureUrl": null
+     },
+     {
+      "name": "J*** A***",
+      "wins": 2,
+      "games": 6,
+      "losses": 4,
+      "position": 4,
+      "pictureUrl": "https://example.test/jose.png",
+      "participant": 4
+     },
+     {
+      "name": "Not On Roster",
+      "wins": 1,
+      "games": 6,
+      "losses": 5,
+      "position": 5,
+      "pictureUrl": null
+     },
+     {
+      "name": "alice reyes",
+      "wins": 0,
+      "games": 6,
+      "losses": 6,
+      "position": 6,
+      "pictureUrl": null
+     }
+    ]
+   }
+  }
+ },
+ "restriction_beginners": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "beginners"
+   },
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "hosts": [],
+   "waitlist": [
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
+   "recordGames": true,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "restriction_beginners_intermediate": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "beginners-intermediate"
+   },
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "hosts": [],
+   "waitlist": [
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
+   "recordGames": true,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "restriction_per_level": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "per-level",
+    "slots": {
+     "beginner": 4,
+     "intermediate": 0,
+     "advanced": 8
+    }
+   },
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "hosts": [],
+   "waitlist": [
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": null,
+   "recordGames": true,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "estimate_break_even": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "hosts": [],
+   "waitlist": [
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": 49300,
+   "recordGames": true,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "estimate_custom": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "hosts": [],
+   "waitlist": [
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": 12000,
+   "recordGames": true,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "estimate_custom_free": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 14,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "b*** s***",
+     "pictureUrl": "character:b",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Ü*** Ç***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "C*** D***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "日*** 太***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "😀*** S*** L***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "X***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    },
+    {
+     "name": "G*** G***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "M*** J***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    }
+   ],
+   "skillMix": {
+    "beginner": 4,
+    "intermediate": 3,
+    "advanced": 4,
+    "unrated": 3
+   },
+   "hosts": [],
+   "waitlist": [
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    }
+   ],
+   "openSlots": 0,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": 0,
+   "recordGames": true,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "estimate_expected_players": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 0,
+   "participants": [],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 0,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "hosts": [],
+   "waitlist": [
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    }
+   ],
+   "openSlots": 12,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": 93600,
+   "recordGames": true,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "estimate_empty_roster_uses_slots": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "open-night",
+   "status": "prepared",
+   "title": "Open Night",
+   "start": 1795165200000,
+   "end": 1795186800000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "name": "Rally Club",
+    "initials": "RC",
+    "logoUrl": "https://example.test/club1.png"
+   },
+   "venue": {
+    "name": "Court House",
+    "address": "1 Fixture Road"
+   },
+   "courts": [
+    "Court 1",
+    "Court 2",
+    "Court 🏸"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
+   "minimum": 3,
+   "notes": "Bring shuttles.",
+   "participantCount": 0,
+   "participants": [],
+   "skillMix": {
+    "beginner": 0,
+    "intermediate": 0,
+    "advanced": 0,
+    "unrated": 0
+   },
+   "hosts": [],
+   "waitlist": [
+    {
+     "name": "V***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    },
+    {
+     "name": "W*** W***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate High"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Low"
+    },
+    {
+     "name": "T*** T*** A***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "T*** T*** B***",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "🏸*** S***",
+     "pictureUrl": "https://example.test/shuttle.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "Player",
+     "pictureUrl": null,
+     "skillGroup": null,
+     "levelLabel": null
+    },
+    {
+     "name": "D*** T***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "D*** O***",
+     "pictureUrl": null,
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    }
+   ],
+   "openSlots": 12,
+   "slotBudget": 12,
+   "acceptJoinRequests": true,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": 56700,
+   "recordGames": true,
+   "lastSyncedAt": 1794297600123,
+   "hasPendingChanges": false,
+   "results": null
+  }
+ },
+ "standings_with_a_null_row_fails": {
+  "status": 500,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "internal",
+    "message": "Something went wrong."
+   }
+  }
+ },
+ "estimate_on_a_finished_session": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "slug": "done-published",
+   "status": "completed",
+   "title": "Done and Published",
+   "start": 1794646800000,
+   "end": 1794668400000,
+   "club": {
+    "id": "e1000000-0000-4000-8000-00000000000e",
+    "name": "Done Deals",
+    "initials": "DD",
+    "logoUrl": null
+   },
+   "venue": {
+    "name": "",
+    "address": null
+   },
+   "courts": [
+    "Court 1",
+    "Court 2"
+   ],
+   "formats": {
+    "singles": true,
+    "doubles": true
+   },
+   "mode": "fair",
+   "levelRestriction": {
+    "kind": "all"
+   },
+   "minimum": 0,
+   "notes": null,
+   "participantCount": 6,
+   "participants": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Mid"
+    },
+    {
+     "name": "M***",
+     "pictureUrl": "https://example.test/mika.png",
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Mid"
+    },
+    {
+     "name": "T*** N***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced Mid"
+    },
+    {
+     "name": "T*** N***",
+     "pictureUrl": null,
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner Low"
+    },
+    {
+     "name": "J*** A***",
+     "pictureUrl": "https://example.test/jose.png",
+     "skillGroup": "intermediate",
+     "levelLabel": "Intermediate Low"
+    },
+    {
+     "name": "S*** S***",
+     "pictureUrl": null,
+     "skillGroup": "advanced",
+     "levelLabel": "Advanced High"
+    }
+   ],
+   "skillMix": {
+    "beginner": 2,
+    "intermediate": 2,
+    "advanced": 2,
+    "unrated": 0
+   },
+   "hosts": [],
+   "waitlist": [
+    {
+     "name": "A*** R***",
+     "pictureUrl": "https://example.test/alice.png",
+     "skillGroup": "beginner",
+     "levelLabel": "Beginner High"
+    }
+   ],
+   "openSlots": 2,
+   "slotBudget": 8,
+   "acceptJoinRequests": false,
+   "alwaysRequireRequest": false,
+   "amountDuePerPlayer": 9000,
+   "recordGames": true,
+   "lastSyncedAt": 1794679200000,
+   "hasPendingChanges": false,
+   "results": {
+    "awards": {
+     "mvp": {
+      "name": "A*** R***",
+      "pictureUrl": "https://example.test/alice.png",
+      "participant": 0
+     },
+     "mostImproved": {
+      "name": "M***",
+      "priorSessions": 3,
+      "pictureUrl": "https://example.test/mika.png",
+      "participant": 1
+     }
+    },
+    "offDay": [
+     {
+      "name": "Solo Sam",
+      "priorSessions": 2,
+      "pictureUrl": null,
+      "participant": 5
+     },
+     {
+      "name": "Twin Name",
+      "priorSessions": 0,
+      "pictureUrl": null
+     }
+    ],
+    "standings": [
+     {
+      "name": "A*** R***",
+      "wins": 5,
+      "games": 6,
+      "losses": 1,
+      "position": 1,
+      "pictureUrl": "https://example.test/alice.png",
+      "participant": 0
+     },
+     {
+      "name": "M***",
+      "wins": 4,
+      "games": 6,
+      "losses": 2,
+      "position": 2,
+      "pictureUrl": "https://example.test/mika.png",
+      "participant": 1
+     },
+     {
+      "name": "Twin Name",
+      "wins": 3,
+      "games": 6,
+      "losses": 3,
+      "position": 3,
+      "pictureUrl": null
+     },
+     {
+      "name": "J*** A***",
+      "wins": 2,
+      "games": 6,
+      "losses": 4,
+      "position": 4,
+      "pictureUrl": "https://example.test/jose.png",
+      "participant": 4
+     },
+     {
+      "name": "Not On Roster",
+      "wins": 1,
+      "games": 6,
+      "losses": 5,
+      "position": 5,
+      "pictureUrl": null
+     },
+     {
+      "name": "alice reyes",
+      "wins": 0,
+      "games": 6,
+      "losses": 6,
+      "position": 6,
+      "pictureUrl": null
+     }
+    ]
+   }
   }
  }
 }

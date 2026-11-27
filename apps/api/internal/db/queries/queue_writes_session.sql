@@ -103,11 +103,38 @@ SET level_locked_at = @now, present_changed_at = CASE WHEN present THEN @now ELS
 WHERE id = @id;
 
 -- name: StartQueueSession :exec
--- A late or other-day start also moves the end (scheduled_end_at null keeps it).
+-- A late or other-day start also moves the end (scheduled_end_at null keeps it), and one on an earlier day than planned moves the start to
+-- now (scheduled_start_at null keeps it). The planned window at Start is kept for Back to preparation (owner, November 25, 2026).
 UPDATE queue_sessions
 SET state = 'active', started_at = @now, scheduled_end_at = COALESCE(sqlc.narg('scheduled_end_at')::timestamptz, scheduled_end_at),
+    scheduled_start_at = COALESCE(sqlc.narg('scheduled_start_at')::timestamptz, scheduled_start_at),
+    planned_start_before_start_at = scheduled_start_at, planned_end_before_start_at = scheduled_end_at,
     start_license_term_id = @start_license_term_id, revision = revision + 1, updated_at = @now
 WHERE id = @id;
+
+-- name: BackToPreparationQueueSession :exec
+-- backToPreparation: prepared again with no start time or license term; the planned window comes back to what it was at Start (a session
+-- started before that was kept keeps its current times). The session is prepared first: the level-lock trigger allows an unlock only then.
+UPDATE queue_sessions
+SET state = 'prepared', started_at = NULL, start_license_term_id = NULL,
+    scheduled_start_at = COALESCE(planned_start_before_start_at, scheduled_start_at),
+    scheduled_end_at = COALESCE(planned_end_before_start_at, scheduled_end_at),
+    planned_start_before_start_at = NULL, planned_end_before_start_at = NULL,
+    revision = revision + 1, updated_at = @now
+WHERE id = @id;
+
+-- name: ClearCourtsOpenedEarly :exec
+UPDATE session_courts SET opened_early_at = NULL, revision = revision + 1, updated_at = @now WHERE session_id = @session_id AND opened_early_at IS NOT NULL;
+
+-- name: UnlockSessionPlayerLevels :exec
+UPDATE session_players SET level_locked_at = NULL, revision = revision + 1, updated_at = @now WHERE session_id = @session_id AND level_locked_at IS NOT NULL;
+
+-- name: CountPlayedMatches :one
+-- A match that is Playing, done or invalid: a game has started.
+SELECT count(*)::int4 FROM matches WHERE session_id = @session_id AND state IN ('active', 'completed', 'invalid');
+
+-- name: CountUnstartedMatches :one
+SELECT count(*)::int4 FROM matches WHERE session_id = @session_id AND state IN ('waiting', 'on_court') AND removed_at IS NULL;
 
 -- name: CloseQueueJoinRequestsAtStart :execrows
 -- updateMany: the pending requests close (closed, not declined); the revision stays.

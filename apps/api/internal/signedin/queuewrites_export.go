@@ -93,7 +93,18 @@ func CountedGamesByEntry(ctx context.Context, q *sqlcgen.Queries, session pgtype
 }
 
 // Session is sessionDto on the wire.
-type Session = queueSessionDTO
+// Session is sessionDto as a write answers it: the read DTO and plannedBeforeStart, the planned window at Start (Back to preparation puts it
+// back; owner, November 25, 2026). The reads do not carry it yet: their goldens are recaptured with the Phase 3 columns.
+type Session struct {
+	queueSessionDTO
+	PlannedBeforeStart *PlannedWindow `json:"plannedBeforeStart"`
+}
+
+// PlannedWindow is the planned start and end a session had when it started.
+type PlannedWindow struct {
+	StartAt string `json:"startAt"`
+	EndAt   string `json:"endAt"`
+}
 
 // Court is courtDto on the wire.
 type Court = queueCourtDTO
@@ -101,7 +112,7 @@ type Court = queueCourtDTO
 // SessionOf is sessionDto for a queue_sessions row, as a write reads it (the columns of LockQueueSession).
 func SessionOf(r sqlcgen.LockQueueSessionRow) Session {
 	formats := r.RequestFormats
-	d := Session{
+	d := queueSessionDTO{
 		ID: r.ID.String(), ClubID: r.ClubID.String(), Title: r.Title, Notes: r.Notes.String,
 		ScheduledStartAt: httpapi.ToIso(r.ScheduledStartAt.Time), ScheduledEndAt: httpapi.ToIso(r.ScheduledEndAt.Time),
 		VenueID: uuidPtr(r.VenueID), VenueName: r.VenueName.String, VenueAddress: r.VenueAddress.String, State: string(r.State),
@@ -116,7 +127,11 @@ func SessionOf(r sqlcgen.LockQueueSessionRow) Session {
 		v := r.ExpectedPlayers.Int32
 		d.ExpectedPlayers = &v
 	}
-	return d
+	out := Session{queueSessionDTO: d}
+	if r.PlannedStartBeforeStartAt.Valid && r.PlannedEndBeforeStartAt.Valid {
+		out.PlannedBeforeStart = &PlannedWindow{StartAt: httpapi.ToIso(r.PlannedStartBeforeStartAt.Time), EndAt: httpapi.ToIso(r.PlannedEndBeforeStartAt.Time)}
+	}
+	return out
 }
 
 // CourtOf is courtDto for a session court row.

@@ -154,12 +154,17 @@
    "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, source_operation_id, placed_at, started_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'on_court', 'singles', 1, 'manual', 'a4100000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
    "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id) VALUES ('a4500000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000004', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4600000-0000-4000-8000-000000000001')",
    "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "s3_on_court_match": [
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, source_operation_id, placed_at, started_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'on_court', 'singles', 1, 'manual', 'a4100000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id) VALUES ('a4500000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4600000-0000-4000-8000-000000000001')",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
   ]
  },
  "snapshot": [
   {
    "name": "queue_sessions",
-   "sql": "SELECT id, club_id, title, notes, state, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court, expected_players, queue_revision::text AS queue_revision, started_at, series_id, start_license_term_id, public_slug, accept_join_requests, always_require_request, court_fill_mode, record_games, request_formats::text AS request_formats, source_command_id, revision::text AS revision, created_at, updated_at FROM queue_sessions ORDER BY id"
+   "sql": "SELECT id, club_id, title, notes, state, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court, expected_players, queue_revision::text AS queue_revision, started_at, series_id, start_license_term_id, public_slug, accept_join_requests, always_require_request, court_fill_mode, record_games, request_formats::text AS request_formats, source_command_id, planned_start_before_start_at, planned_end_before_start_at, revision::text AS revision, created_at, updated_at FROM queue_sessions ORDER BY id"
   },
   {
    "name": "session_courts",
@@ -6940,6 +6945,314 @@
      "method": "DELETE",
      "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/nope/open-early",
      "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "bp_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": null,
+     "body": {
+      "expectedRevision": "12"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "bp_live_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "12"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_with_an_on_court_match_fails_at_the_write",
+   "scenario": "s3_on_court_match",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "12"
+     },
+     "allow500": true
+    }
+   ]
+  },
+  {
+   "name": "bp_refused_while_a_game_is_playing",
+   "scenario": "court3_held_by_a_match",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "12"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_refused_after_a_game_was_played",
+   "scenario": "court3_hosted_a_match",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "12"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "11"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_revision_missing_is_zero",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "bp_prepared_session_answers_it",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_closed_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "20"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_retry_answers_the_prepared_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "12"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "12"
+     },
+     "snapshot": true
+    }
+   ]
+  },
+  {
+   "name": "bp_clears_an_early_opened_court",
+   "scenario": "court4_opened_early_start_ahead",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "12"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_puts_the_planned_window_back",
+   "scenario": "late_s1",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/start",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "5",
+      "newEndAt": "2026-11-19T10:00:00.000Z"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "6"
+     },
+     "snapshot": true
+    }
+   ]
+  },
+  {
+   "name": "bp_after_a_same_day_start",
+   "scenario": "s1_today",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/start",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "5"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "6"
+     },
+     "snapshot": true
+    }
+   ]
+  },
+  {
+   "name": "bp_lapsed_club_is_refused_first",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_unknown_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_other_clubs_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_malformed_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/nope/back-to-preparation",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "1"
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "bp_parallel_twice",
+   "scenario": "base",
+   "steps": [
+    {
+     "parallel": [
+      {
+       "method": "POST",
+       "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+       "who": "c7000000-0000-4000-8000-000000000001",
+       "body": {
+        "expectedRevision": "12"
+       }
+      },
+      {
+       "method": "POST",
+       "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/back-to-preparation",
+       "who": "c7000000-0000-4000-8000-000000000001",
+       "body": {
+        "expectedRevision": "12"
+       }
+      }
+     ]
     }
    ]
   }

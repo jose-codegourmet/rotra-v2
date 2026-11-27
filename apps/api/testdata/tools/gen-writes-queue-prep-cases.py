@@ -407,6 +407,28 @@ case('undo_early_open_removed_court', req('DELETE', OPEN1(S[3], CT(4))), scenari
 case('undo_early_open_prepared_session', req('DELETE', OPEN1(S[1], CT(1))))
 case('undo_early_open_malformed_id_is_a_conflict', req('DELETE', OPEN1(S[3], 'nope')))
 
+# ---------------------------------------------------------------- POST /api/sessions/{id}/back-to-preparation
+BP = lambda sid: f'/api/sessions/{sid}/back-to-preparation'
+case('bp_signed_out', req('POST', BP(S[3]), {'expectedRevision': '12'}, who=None))
+case('bp_body_not_json', req('POST', BP(S[3]), rawBody='nope'))
+case('bp_live_session', req('POST', BP(S[3]), {'expectedRevision': '12'}))
+case('bp_with_an_on_court_match_fails_at_the_write', req('POST', BP(S[3]), {'expectedRevision': '12'}), scenario='s3_on_court_match', **CRASH)
+case('bp_refused_while_a_game_is_playing', req('POST', BP(S[3]), {'expectedRevision': '12'}), scenario='court3_held_by_a_match')
+case('bp_refused_after_a_game_was_played', req('POST', BP(S[3]), {'expectedRevision': '12'}), scenario='court3_hosted_a_match')
+case('bp_stale_revision', req('POST', BP(S[3]), {'expectedRevision': '11'}))
+case('bp_revision_missing_is_zero', req('POST', BP(S[3]), {}))
+case('bp_prepared_session_answers_it', req('POST', BP(S[1]), {'expectedRevision': '1'}))
+case('bp_closed_session', req('POST', BP(S[4]), {'expectedRevision': '20'}))
+case('bp_retry_answers_the_prepared_session', [req('POST', BP(S[3]), {'expectedRevision': '12'}), req('POST', BP(S[3]), {'expectedRevision': '12'}, snapshot=True)])
+case('bp_clears_an_early_opened_court', req('POST', BP(S[3]), {'expectedRevision': '12'}), scenario='court4_opened_early_start_ahead')
+case('bp_puts_the_planned_window_back', [req('POST', ST(S[1]), {'expectedRevision': '5', 'newEndAt': NEW_END}), req('POST', BP(S[1]), {'expectedRevision': '6'}, snapshot=True)], scenario='late_s1')
+case('bp_after_a_same_day_start', [req('POST', ST(S[1]), {'expectedRevision': '5'}), req('POST', BP(S[1]), {'expectedRevision': '6'}, snapshot=True)], scenario='s1_today')
+case('bp_lapsed_club_is_refused_first', req('POST', BP(S[7]), {'expectedRevision': '1'}, who=LAPSED))
+case('bp_unknown_session', req('POST', BP('a3000000-0000-4000-8000-0000000000ff'), {'expectedRevision': '1'}))
+case('bp_other_clubs_session', req('POST', BP(S[9]), {'expectedRevision': '1'}))
+case('bp_malformed_session', req('POST', BP('nope'), {'expectedRevision': '1'}), **MALFORMED)
+case('bp_parallel_twice', {'parallel': [req('POST', BP(S[3]), {'expectedRevision': '12'}), req('POST', BP(S[3]), {'expectedRevision': '12'})]})
+
 # ---------------------------------------------------------------- scenarios
 NOW = "TIMESTAMPTZ '2026-11-19 02:00:00+00'"
 SCEN = dict(BASE['scenarios'])
@@ -500,6 +522,7 @@ def match_used_court(n, court):
 
 SCEN['court3_hosted_a_match'] = match_used_court(1, CT(3))
 SCEN['court3_held_by_a_match'] = match_on_court(1, CT(3))
+SCEN['s3_on_court_match'] = match_on_court(1, CT(3), state='on_court', started=False)
 SCEN['court4_opened_early_held'] = [*SCEN['court4_opened_early_start_ahead'], *match_on_court(1, CT(4), state='on_court', started=False)]
 
 SNAPSHOT = []
@@ -509,7 +532,7 @@ for s in BASE['snapshot']:
         s['sql'] = ("SELECT id, club_id, title, notes, state, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address, session_mode, allow_singles, allow_doubles, "
                     "minimum_games, minimum_is_calculated, players_per_court, expected_players, queue_revision::text AS queue_revision, started_at, series_id, start_license_term_id, "
                     "public_slug, accept_join_requests, always_require_request, court_fill_mode, record_games, request_formats::text AS request_formats, source_command_id, "
-                    "revision::text AS revision, created_at, updated_at FROM queue_sessions ORDER BY id")
+                    "planned_start_before_start_at, planned_end_before_start_at, revision::text AS revision, created_at, updated_at FROM queue_sessions ORDER BY id")
     if s['name'] == 'session_players':
         s['sql'] = s['sql'].replace('no_show_at, revision::text', 'no_show_at, games_adjustment, revision::text')
     SNAPSHOT.append(s)

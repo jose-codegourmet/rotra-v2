@@ -11,6 +11,42 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const backToPreparationQueueSession = `-- name: BackToPreparationQueueSession :exec
+UPDATE queue_sessions
+SET state = 'prepared', started_at = NULL, start_license_term_id = NULL,
+    scheduled_start_at = COALESCE(planned_start_before_start_at, scheduled_start_at),
+    scheduled_end_at = COALESCE(planned_end_before_start_at, scheduled_end_at),
+    planned_start_before_start_at = NULL, planned_end_before_start_at = NULL,
+    revision = revision + 1, updated_at = $1
+WHERE id = $2
+`
+
+type BackToPreparationQueueSessionParams struct {
+	Now pgtype.Timestamptz
+	ID  pgtype.UUID
+}
+
+// backToPreparation: prepared again with no start time or license term; the planned window comes back to what it was at Start (a session
+// started before that was kept keeps its current times). The session is prepared first: the level-lock trigger allows an unlock only then.
+func (q *Queries) BackToPreparationQueueSession(ctx context.Context, arg BackToPreparationQueueSessionParams) error {
+	_, err := q.db.Exec(ctx, backToPreparationQueueSession, arg.Now, arg.ID)
+	return err
+}
+
+const clearCourtsOpenedEarly = `-- name: ClearCourtsOpenedEarly :exec
+UPDATE session_courts SET opened_early_at = NULL, revision = revision + 1, updated_at = $1 WHERE session_id = $2 AND opened_early_at IS NOT NULL
+`
+
+type ClearCourtsOpenedEarlyParams struct {
+	Now       pgtype.Timestamptz
+	SessionID pgtype.UUID
+}
+
+func (q *Queries) ClearCourtsOpenedEarly(ctx context.Context, arg ClearCourtsOpenedEarlyParams) error {
+	_, err := q.db.Exec(ctx, clearCourtsOpenedEarly, arg.Now, arg.SessionID)
+	return err
+}
+
 const clearQueueSessionAssessmentLinks = `-- name: ClearQueueSessionAssessmentLinks :exec
 UPDATE club_assessments SET supersedes_id = NULL WHERE session_id = $1
 `
@@ -70,6 +106,18 @@ func (q *Queries) CountMatchCourtUsage(ctx context.Context, arg CountMatchCourtU
 	return column_1, err
 }
 
+const countPlayedMatches = `-- name: CountPlayedMatches :one
+SELECT count(*)::int4 FROM matches WHERE session_id = $1 AND state IN ('active', 'completed', 'invalid')
+`
+
+// A match that is Playing, done or invalid: a game has started.
+func (q *Queries) CountPlayedMatches(ctx context.Context, sessionID pgtype.UUID) (int32, error) {
+	row := q.db.QueryRow(ctx, countPlayedMatches, sessionID)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const countQueueSeriesSessions = `-- name: CountQueueSeriesSessions :one
 SELECT count(*)::int4 FROM queue_sessions WHERE club_id = $1 AND series_id = $2
 `
@@ -81,6 +129,17 @@ type CountQueueSeriesSessionsParams struct {
 
 func (q *Queries) CountQueueSeriesSessions(ctx context.Context, arg CountQueueSeriesSessionsParams) (int32, error) {
 	row := q.db.QueryRow(ctx, countQueueSeriesSessions, arg.ClubID, arg.SeriesID)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
+const countUnstartedMatches = `-- name: CountUnstartedMatches :one
+SELECT count(*)::int4 FROM matches WHERE session_id = $1 AND state IN ('waiting', 'on_court') AND removed_at IS NULL
+`
+
+func (q *Queries) CountUnstartedMatches(ctx context.Context, sessionID pgtype.UUID) (int32, error) {
+	row := q.db.QueryRow(ctx, countUnstartedMatches, sessionID)
 	var column_1 int32
 	err := row.Scan(&column_1)
 	return column_1, err
@@ -680,25 +739,44 @@ func (q *Queries) SetSessionCourtEarlyOpen(ctx context.Context, arg SetSessionCo
 const startQueueSession = `-- name: StartQueueSession :exec
 UPDATE queue_sessions
 SET state = 'active', started_at = $1, scheduled_end_at = COALESCE($2::timestamptz, scheduled_end_at),
-    start_license_term_id = $3, revision = revision + 1, updated_at = $1
-WHERE id = $4
+    scheduled_start_at = COALESCE($3::timestamptz, scheduled_start_at),
+    planned_start_before_start_at = scheduled_start_at, planned_end_before_start_at = scheduled_end_at,
+    start_license_term_id = $4, revision = revision + 1, updated_at = $1
+WHERE id = $5
 `
 
 type StartQueueSessionParams struct {
 	Now                pgtype.Timestamptz
 	ScheduledEndAt     pgtype.Timestamptz
+	ScheduledStartAt   pgtype.Timestamptz
 	StartLicenseTermID pgtype.UUID
 	ID                 pgtype.UUID
 }
 
-// A late or other-day start also moves the end (scheduled_end_at null keeps it).
+// A late or other-day start also moves the end (scheduled_end_at null keeps it), and one on an earlier day than planned moves the start to
+// now (scheduled_start_at null keeps it). The planned window at Start is kept for Back to preparation (owner, November 25, 2026).
 func (q *Queries) StartQueueSession(ctx context.Context, arg StartQueueSessionParams) error {
 	_, err := q.db.Exec(ctx, startQueueSession,
 		arg.Now,
 		arg.ScheduledEndAt,
+		arg.ScheduledStartAt,
 		arg.StartLicenseTermID,
 		arg.ID,
 	)
+	return err
+}
+
+const unlockSessionPlayerLevels = `-- name: UnlockSessionPlayerLevels :exec
+UPDATE session_players SET level_locked_at = NULL, revision = revision + 1, updated_at = $1 WHERE session_id = $2 AND level_locked_at IS NOT NULL
+`
+
+type UnlockSessionPlayerLevelsParams struct {
+	Now       pgtype.Timestamptz
+	SessionID pgtype.UUID
+}
+
+func (q *Queries) UnlockSessionPlayerLevels(ctx context.Context, arg UnlockSessionPlayerLevelsParams) error {
+	_, err := q.db.Exec(ctx, unlockSessionPlayerLevels, arg.Now, arg.SessionID)
 	return err
 }
 

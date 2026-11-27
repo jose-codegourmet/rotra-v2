@@ -19,23 +19,25 @@ import (
 // packages/db/src/queue/session-roster.ts and rosterEntryDto, waitlistDto and joinRequestDto in queue/dto.ts.
 
 type queueRosterEntryDTO struct {
-	ID                   string  `json:"id"`
-	SessionID            string  `json:"sessionId"`
-	ClubPlayerID         string  `json:"clubPlayerId"`
-	NameSnapshot         string  `json:"nameSnapshot"`
-	NicknameSnapshot     *string `json:"nicknameSnapshot"`
-	ClubNickname         *string `json:"clubNickname"`
-	Present              bool    `json:"present"`
-	PresentChangedAt     string  `json:"presentChangedAt"`
-	Level                *string `json:"level"`
-	LevelLockedAt        *string `json:"levelLockedAt"`
-	ConfirmedAt          string  `json:"confirmedAt"`
-	GamesAdjustment      int32   `json:"gamesAdjustment"`
-	SelfCheckedInAt      *string `json:"selfCheckedInAt"`
-	LeftAt               *string `json:"leftAt"`
-	Revision             string  `json:"revision"`
-	HasPlayedAtClubBfore *bool   `json:"hasPlayedAtClubBefore,omitempty"`
-	NoShowAt             *string `json:"noShowAt,omitempty"`
+	ID               string  `json:"id"`
+	SessionID        string  `json:"sessionId"`
+	ClubPlayerID     string  `json:"clubPlayerId"`
+	NameSnapshot     string  `json:"nameSnapshot"`
+	NicknameSnapshot *string `json:"nicknameSnapshot"`
+	ClubNickname     *string `json:"clubNickname"`
+	Present          bool    `json:"present"`
+	PresentChangedAt string  `json:"presentChangedAt"`
+	Level            *string `json:"level"`
+	LevelLockedAt    *string `json:"levelLockedAt"`
+	ConfirmedAt      string  `json:"confirmedAt"`
+	GamesAdjustment  int32   `json:"gamesAdjustment"`
+	// HandicapSpots is Handicap · tonight (D-2026-11-25-03): Queue Master reads only; [] when none.
+	HandicapSpots        []string `json:"handicapSpots"`
+	SelfCheckedInAt      *string  `json:"selfCheckedInAt"`
+	LeftAt               *string  `json:"leftAt"`
+	Revision             string   `json:"revision"`
+	HasPlayedAtClubBfore *bool    `json:"hasPlayedAtClubBefore,omitempty"`
+	NoShowAt             *string  `json:"noShowAt,omitempty"`
 	// Form is the player's lasting signals at this club (Win chance, D-2026-11-27-02); absent for a first-timer.
 	Form *queueFormDTO `json:"form,omitempty"`
 }
@@ -87,13 +89,21 @@ func rosterNames(clubNickname, playerNickname pgtype.Text, state sqlcgen.NullPla
 	return textPtr(clubNickname), nil
 }
 
+// spotsOrEmpty keeps the wire value an array: a NULL or empty column is [].
+func spotsOrEmpty(s []string) []string {
+	if s == nil {
+		return []string{}
+	}
+	return s
+}
+
 func rosterEntryOf(e sqlcgen.ListQueueRosterRow) queueRosterEntryDTO {
 	nick, club := rosterNames(e.ClubNickname, e.PlayerNickname, e.ProfileState)
 	return queueRosterEntryDTO{
 		ID: e.ID.String(), SessionID: e.SessionID.String(), ClubPlayerID: e.ClubPlayerID.String(), NameSnapshot: e.NameSnapshot,
 		NicknameSnapshot: nick, ClubNickname: club, Present: e.Present, PresentChangedAt: httpapi.ToIso(e.PresentChangedAt.Time),
 		Level: levelOf(e.SkillLevelID), LevelLockedAt: isoPtr(e.LevelLockedAt), ConfirmedAt: httpapi.ToIso(e.ConfirmedAt.Time),
-		GamesAdjustment: e.GamesAdjustment, SelfCheckedInAt: isoPtr(e.SelfCheckedInAt), LeftAt: isoPtr(e.LeftAt),
+		GamesAdjustment: e.GamesAdjustment, HandicapSpots: spotsOrEmpty(e.HandicapSpots), SelfCheckedInAt: isoPtr(e.SelfCheckedInAt), LeftAt: isoPtr(e.LeftAt),
 		Revision: httpapi.ToDecimalString(e.Revision),
 	}
 }

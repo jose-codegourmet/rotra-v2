@@ -57,6 +57,15 @@
    "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000000011', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000004', 'B', 1, 'a4300000-0000-4000-8000-000000000011', TIMESTAMPTZ '2026-11-19 02:00:00+00', true, true, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
    "INSERT INTO match_decisions (match_id, club_id, session_id, kind, winning_team, team_a_score, team_b_score, source_operation_id, confirmed_at, actor_club_id) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'completed', 'A', 21, 15, 'a4400000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'c9000000-0000-4000-8000-000000000001')"
   ],
+  "ivy_handicapped": [
+   "UPDATE session_players SET handicap_spots = '{lower_back,left_knee}' WHERE id = 'a7000000-0000-4000-8000-000000000005'"
+  ],
+  "ivy_handicapped_reverse": [
+   "UPDATE session_players SET handicap_spots = '{lower_back,left_knee}' WHERE id = 'a7000000-0000-4000-8000-000000000005'"
+  ],
+  "s1_handicapped": [
+   "UPDATE session_players SET handicap_spots = '{left_knee}' WHERE id = 'a7000000-0000-4000-8000-000000000001'"
+  ],
   "ivy_games_adjusted": [
    "UPDATE session_players SET games_adjustment = 1 WHERE id = 'a7000000-0000-4000-8000-000000000005'"
   ],
@@ -114,7 +123,7 @@
   },
   {
    "name": "session_players",
-   "sql": "SELECT id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, (SELECT a.source_operation_id FROM club_assessments a WHERE a.id = session_players.assessment_id) AS assessment_operation_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, no_show_at, games_adjustment, revision::text AS revision, created_at, updated_at FROM session_players ORDER BY id"
+   "sql": "SELECT id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, (SELECT a.source_operation_id FROM club_assessments a WHERE a.id = session_players.assessment_id) AS assessment_operation_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, no_show_at, games_adjustment, handicap_spots, revision::text AS revision, created_at, updated_at FROM session_players ORDER BY id"
   },
   {
    "name": "club_assessments",
@@ -3760,6 +3769,685 @@
         "level": "advanced_low",
         "allowOutsideLevels": true
        }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": null,
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_player_subject_is_not_a_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "handicap_one_spot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_several_spots_in_figure_order",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "right_ankle",
+       "left_knee",
+       "lower_back",
+       "left_shoulder"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_every_spot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "right_ankle",
+       "left_ankle",
+       "right_knee",
+       "left_knee",
+       "lower_back",
+       "right_wrist",
+       "left_wrist",
+       "right_elbow",
+       "left_elbow",
+       "right_shoulder",
+       "left_shoulder"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_duplicate_spots_count_once",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee",
+       "left_knee",
+       "lower_back"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_unknown_spot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee",
+       "neck"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_spot_is_no_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       3
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_spot_null",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       null
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_spot_wrong_case",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "Left_Knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_spots_not_a_list_clears",
+   "scenario": "ivy_handicapped",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": "left_knee"
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_spots_missing_clears",
+   "scenario": "ivy_handicapped",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005"
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_empty_list_clears",
+   "scenario": "ivy_handicapped",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": []
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_clear_when_none_writes_nothing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": []
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_replaces_the_set",
+   "scenario": "ivy_handicapped",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "right_wrist"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_same_set_again_writes_nothing",
+   "scenario": "ivy_handicapped",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee",
+       "lower_back"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_same_set_in_another_order_writes_nothing",
+   "scenario": "ivy_handicapped_reverse",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee",
+       "lower_back"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_retry_same_operation",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     },
+     "snapshot": true
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_set_then_clear",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     },
+     "snapshot": true
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000002",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": []
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_two_players",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000002",
+      "rosterId": "a7000000-0000-4000-8000-000000000006",
+      "spots": [
+       "lower_back"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_operation_id_is_not_read",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_prepared_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000001",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_prepared_session_clear",
+   "scenario": "s1_handicapped",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000001",
+      "spots": []
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_closed_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000007",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_closed_session_unknown_spot_says_ended",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000004/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000007",
+      "spots": [
+       "neck"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_unknown_spot_before_unknown_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-0000000000ff",
+      "spots": [
+       "neck"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_unknown_entry",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-0000000000ff",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_entry_of_another_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000001",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_malformed_entry",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "q",
+      "spots": [
+       "left_knee"
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_missing_entry",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "spots": [
+       "left_knee"
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_released_entry",
+   "scenario": "ivy_released_on_s3",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_no_show_entry",
+   "scenario": "s3_ivy_no_show",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_unknown_session",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "handicap_lapsed_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/roster/handicap",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "operationId": "b1000000-0000-4000-8000-000000000001",
+      "rosterId": "a7000000-0000-4000-8000-000000000005",
+      "spots": [
+       "left_knee"
       ]
      }
     }

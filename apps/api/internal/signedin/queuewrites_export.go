@@ -37,7 +37,7 @@ func RosterEntryOf(e sqlcgen.SessionPlayer, nickname, clubNickname *string) Rost
 		ID: e.ID.String(), SessionID: e.SessionID.String(), ClubPlayerID: e.ClubPlayerID.String(), NameSnapshot: e.NameSnapshot,
 		NicknameSnapshot: nickname, ClubNickname: clubNickname, Present: e.Present, PresentChangedAt: httpapi.ToIso(e.PresentChangedAt.Time),
 		Level: levelOf(e.SkillLevelID), LevelLockedAt: isoPtr(e.LevelLockedAt), ConfirmedAt: httpapi.ToIso(e.ConfirmedAt.Time),
-		GamesAdjustment: e.GamesAdjustment, SelfCheckedInAt: isoPtr(e.SelfCheckedInAt), LeftAt: isoPtr(e.LeftAt),
+		GamesAdjustment: e.GamesAdjustment, HandicapSpots: spotsOrEmpty(e.HandicapSpots), SelfCheckedInAt: isoPtr(e.SelfCheckedInAt), LeftAt: isoPtr(e.LeftAt),
 		Revision: httpapi.ToDecimalString(e.Revision),
 	}
 }

@@ -54,7 +54,7 @@ WHERE r.session_id = @session_id AND r.status = 'open'
 -- read shows (rosterNamesOf): a registered player's account nickname and the club's own, else the club's alone.
 -- name: ListQueueRoster :many
 SELECT sp.id, sp.session_id, sp.club_player_id, sp.name_snapshot, sp.present, sp.present_changed_at, sp.skill_level_id,
-       sp.level_locked_at, sp.confirmed_at, sp.games_adjustment, sp.self_checked_in_at, sp.left_at, sp.revision,
+       sp.level_locked_at, sp.confirmed_at, sp.games_adjustment, sp.handicap_spots, sp.self_checked_in_at, sp.left_at, sp.revision,
        sp.no_show_at, cp.nickname AS club_nickname, p.nickname AS player_nickname, p.profile_state
 FROM session_players sp
 LEFT JOIN club_players cp ON cp.id = sp.club_player_id

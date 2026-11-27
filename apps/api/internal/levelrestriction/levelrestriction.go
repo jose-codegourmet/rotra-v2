@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/roster"
 )
 
@@ -168,5 +169,9 @@ func Block(w Wire, level *string, rosterLevels []*string) (string, bool) {
 			codes = append(codes, *c)
 		}
 	}
-	return roster.LevelRestrictionBlockFor(w.Rule(), *level, codes)
+	rs, err := rules.For(1) // version 1 until a session stamps its rules version
+	if err != nil {
+		return "", false // version 1 always exists
+	}
+	return rs.LevelRestrictionBlock(w.Rule(), roster.LevelBandOf(*level), roster.LevelBandCounts(codes))
 }

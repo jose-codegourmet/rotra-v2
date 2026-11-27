@@ -1,4 +1,867 @@
 {
+  "post_clears_the_handicap_tonight": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "status": {
+            "sessionId": "a3000000-0000-4000-8000-000000000003",
+            "commandId": "b1000000-0000-4000-8000-000000000001",
+            "state": "done",
+            "stage": "slides",
+            "accepted": true,
+            "committedAt": "2026-11-19T04:00:00.000Z",
+            "completedAt": "2026-11-19T04:00:00.000Z",
+            "failedStage": null,
+            "failureCode": null,
+            "recordGames": true,
+            "jobs": [
+              {
+                "kind": "club_session_summaries",
+                "status": "done",
+                "attempts": 0,
+                "lastErrorCode": null
+              },
+              {
+                "kind": "player_history",
+                "status": "done",
+                "attempts": 1,
+                "lastErrorCode": null
+              },
+              {
+                "kind": "player_rank",
+                "status": "done",
+                "attempts": 1,
+                "lastErrorCode": null
+              },
+              {
+                "kind": "result_snapshot",
+                "status": "done",
+                "attempts": 1,
+                "lastErrorCode": null
+              }
+            ]
+          },
+          "warnings": {
+            "belowMinimum": [
+              {
+                "sessionPlayerId": "a7000000-0000-4000-8000-000000000005",
+                "name": "Ivy Guest",
+                "games": 0
+              },
+              {
+                "sessionPlayerId": "a7000000-0000-4000-8000-000000000006",
+                "name": "Jo Guest",
+                "games": 0
+              },
+              {
+                "sessionPlayerId": "a7000000-0000-4000-8000-000000000004",
+                "name": "Hal Guest",
+                "games": 1
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "session_match_requests": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "format": "doubles",
+          "status": "closed",
+          "match_id": null,
+          "revision": "2",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "requested_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "format": "singles",
+          "status": "closed",
+          "match_id": null,
+          "revision": "2",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "requested_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000003",
+          "format": "doubles",
+          "status": "closed",
+          "match_id": null,
+          "revision": "2",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "requested_at": "2026-11-19T03:55:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000006"
+        }
+      ],
+      "session_match_requests (removed)": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "format": "doubles",
+          "status": "open",
+          "match_id": null,
+          "revision": "1",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:50:00+00:00",
+          "requested_at": "2026-11-19T03:50:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000004"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "format": "singles",
+          "status": "open",
+          "match_id": null,
+          "revision": "1",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:45:00+00:00",
+          "requested_at": "2026-11-19T03:45:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000005"
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000003",
+          "format": "doubles",
+          "status": "open",
+          "match_id": null,
+          "revision": "1",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T03:55:00+00:00",
+          "requested_at": "2026-11-19T03:55:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000006"
+        }
+      ],
+      "matches": [],
+      "matches (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000004",
+          "revision": "3",
+          "handicap_spots": []
+        },
+        {
+          "id": "a7000000-0000-4000-8000-000000000020",
+          "revision": "1",
+          "handicap_spots": []
+        }
+      ],
+      "session_players_handicap (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000004",
+          "revision": "3",
+          "handicap_spots": [
+            "lower_back",
+            "left_knee"
+          ]
+        },
+        {
+          "id": "a7000000-0000-4000-8000-000000000020",
+          "revision": "1",
+          "handicap_spots": [
+            "lower_back",
+            "left_knee"
+          ]
+        }
+      ],
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "completed",
+          "revision": "13",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "finalized_at": "2026-11-19T04:00:00+00:00",
+          "record_games": true,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000003",
+          "state": "active",
+          "revision": "12",
+          "updated_at": "2026-11-19T01:00:00+00:00",
+          "finalized_at": null,
+          "record_games": true,
+          "queue_revision": "1"
+        }
+      ],
+      "club_session_reservations": [],
+      "club_session_reservations (removed)": [],
+      "session_finalizations": [
+        {
+          "stage": "slides",
+          "state": "done",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "4",
+          "command_id": "b1000000-0000-4000-8000-000000000001",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "started_at": "2026-11-19T04:00:00+00:00",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "committed_at": "2026-11-19T04:00:00+00:00",
+          "completed_at": "2026-11-19T04:00:00+00:00",
+          "facts_digest": "91c5bc6c9ca47724fafc00e39745255866ec6ca5092941df71131015312e7356",
+          "failed_stage": null,
+          "failure_code": null,
+          "manifest_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "stream_manifest": [],
+          "policy_version_id": "fa000000-0000-4000-8000-000000000001",
+          "accepted_session_revision": "12"
+        }
+      ],
+      "session_finalizations (removed)": [],
+      "player_match_facts": [
+        {
+          "id": "<redacted>",
+          "team": "A",
+          "format": "singles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000001",
+          "played_at": "2026-11-19T02:01:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 15,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "standard_match": true,
+          "partner_entry_ids": [],
+          "session_player_id": "a7000000-0000-4000-8000-000000000020",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000021"
+          ],
+          "skill_level_snapshot_id": 3,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "singles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000001",
+          "played_at": "2026-11-19T02:01:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 15,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000002",
+          "standard_match": true,
+          "partner_entry_ids": [],
+          "session_player_id": "a7000000-0000-4000-8000-000000000021",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020"
+          ],
+          "skill_level_snapshot_id": 4,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "doubles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000002",
+          "played_at": "2026-11-19T02:02:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 15,
+          "team_b_score": 21,
+          "winning_team": "B",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "standard_match": true,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000021"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000020",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022",
+            "a7000000-0000-4000-8000-000000000023"
+          ],
+          "skill_level_snapshot_id": 3,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "doubles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000002",
+          "played_at": "2026-11-19T02:02:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 15,
+          "team_b_score": 21,
+          "winning_team": "B",
+          "club_player_id": "c6000000-0000-4000-8000-000000000002",
+          "standard_match": true,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000021",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022",
+            "a7000000-0000-4000-8000-000000000023"
+          ],
+          "skill_level_snapshot_id": 4,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "A",
+          "format": "doubles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000002",
+          "played_at": "2026-11-19T02:02:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 15,
+          "team_b_score": 21,
+          "winning_team": "B",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "standard_match": true,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000023"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000022",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020",
+            "a7000000-0000-4000-8000-000000000021"
+          ],
+          "skill_level_snapshot_id": 5,
+          "player_id_at_finalization": "d4000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "<redacted>",
+          "team": "A",
+          "format": "doubles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000002",
+          "played_at": "2026-11-19T02:02:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 15,
+          "team_b_score": 21,
+          "winning_team": "B",
+          "club_player_id": "c6000000-0000-4000-8000-000000000004",
+          "standard_match": true,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000023",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020",
+            "a7000000-0000-4000-8000-000000000021"
+          ],
+          "skill_level_snapshot_id": 6,
+          "player_id_at_finalization": "d4000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "singles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000003",
+          "played_at": "2026-11-19T02:03:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 10,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "standard_match": true,
+          "partner_entry_ids": [],
+          "session_player_id": "a7000000-0000-4000-8000-000000000004",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022"
+          ],
+          "skill_level_snapshot_id": 3,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "A",
+          "format": "singles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000003",
+          "played_at": "2026-11-19T02:03:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 10,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "standard_match": true,
+          "partner_entry_ids": [],
+          "session_player_id": "a7000000-0000-4000-8000-000000000022",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000004"
+          ],
+          "skill_level_snapshot_id": 5,
+          "player_id_at_finalization": "d4000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "<redacted>",
+          "team": "A",
+          "format": "fun_1v2",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000007",
+          "played_at": "2026-11-19T02:07:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 12,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "standard_match": false,
+          "partner_entry_ids": [],
+          "session_player_id": "a7000000-0000-4000-8000-000000000020",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022",
+            "a7000000-0000-4000-8000-000000000023"
+          ],
+          "skill_level_snapshot_id": 3,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "fun_1v2",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000007",
+          "played_at": "2026-11-19T02:07:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 12,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "standard_match": false,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000023"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000022",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020"
+          ],
+          "skill_level_snapshot_id": 5,
+          "player_id_at_finalization": "d4000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "fun_1v2",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000007",
+          "played_at": "2026-11-19T02:07:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 12,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000004",
+          "standard_match": false,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000023",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020"
+          ],
+          "skill_level_snapshot_id": 6,
+          "player_id_at_finalization": "d4000000-0000-4000-8000-000000000002"
+        }
+      ],
+      "player_match_facts (removed)": [],
+      "club_session_player_summaries": [
+        {
+          "id": "<redacted>",
+          "wins": 0,
+          "losses": 1,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 0,
+          "full_games": 1,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "standard_games": 1,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000004",
+          "player_id_snapshot": null,
+          "skill_level_snapshot_id": 3
+        },
+        {
+          "id": "<redacted>",
+          "wins": 0,
+          "losses": 0,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 0,
+          "full_games": 0,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "standard_games": 0,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000005",
+          "player_id_snapshot": null,
+          "skill_level_snapshot_id": 4
+        },
+        {
+          "id": "<redacted>",
+          "wins": 0,
+          "losses": 0,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 0,
+          "full_games": 0,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "standard_games": 0,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000006",
+          "player_id_snapshot": null,
+          "skill_level_snapshot_id": 5
+        },
+        {
+          "id": "<redacted>",
+          "wins": 3,
+          "losses": 0,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 1,
+          "full_games": 3,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "standard_games": 2,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000020",
+          "player_id_snapshot": null,
+          "skill_level_snapshot_id": 3
+        },
+        {
+          "id": "<redacted>",
+          "wins": 1,
+          "losses": 1,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 0,
+          "full_games": 2,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000002",
+          "standard_games": 2,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000021",
+          "player_id_snapshot": null,
+          "skill_level_snapshot_id": 4
+        },
+        {
+          "id": "<redacted>",
+          "wins": 1,
+          "losses": 2,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 1,
+          "full_games": 3,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "standard_games": 2,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000022",
+          "player_id_snapshot": "d4000000-0000-4000-8000-000000000001",
+          "skill_level_snapshot_id": 5
+        },
+        {
+          "id": "<redacted>",
+          "wins": 0,
+          "losses": 2,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 1,
+          "full_games": 2,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000004",
+          "standard_games": 1,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000023",
+          "player_id_snapshot": "d4000000-0000-4000-8000-000000000002",
+          "skill_level_snapshot_id": 6
+        }
+      ],
+      "club_session_player_summaries (removed)": [],
+      "session_result_snapshots": [
+        {
+          "id": "<redacted>",
+          "awards": {
+            "mvp": {
+              "name": "Gus Guest",
+              "games": 3,
+              "score": 2.6155976205368443,
+              "playerId": null,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000020"
+            },
+            "mostImproved": null
+          },
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "off_day": [],
+          "version": 1,
+          "standings": [
+            {
+              "name": "Gus Guest",
+              "wins": 3,
+              "games": 3,
+              "losses": 0,
+              "position": 1,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000020"
+            },
+            {
+              "name": "Gail Guest",
+              "wins": 1,
+              "games": 2,
+              "losses": 1,
+              "position": 2,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000002",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000021"
+            },
+            {
+              "name": "Ann Reyes",
+              "wins": 1,
+              "games": 3,
+              "losses": 2,
+              "position": 3,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000022"
+            },
+            {
+              "name": "Jo Guest",
+              "wins": 0,
+              "games": 1,
+              "losses": 0,
+              "position": 4,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000009",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000006"
+            },
+            {
+              "name": "Hal Guest",
+              "wins": 0,
+              "games": 1,
+              "losses": 1,
+              "position": 5,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000004"
+            },
+            {
+              "name": "Ben Santos",
+              "wins": 0,
+              "games": 3,
+              "losses": 2,
+              "position": 6,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000023"
+            }
+          ],
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "generated_at": "2026-11-19T04:00:00+00:00",
+          "calculation_version": "prototype-reference",
+          "baseline_session_ids": []
+        }
+      ],
+      "session_result_snapshots (removed)": [],
+      "projection_jobs": [
+        {
+          "id": "<redacted>",
+          "kind": "club_session_summaries",
+          "status": "done",
+          "attempts": 0,
+          "locked_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "finalization",
+          "completed_at": "2026-11-19T04:00:00+00:00",
+          "kind_version": 1,
+          "last_error_code": null,
+          "next_attempt_at": "2026-11-19T04:00:00+00:00",
+          "target_player_id": null,
+          "source_finalization_id": "a3000000-0000-4000-8000-000000000003"
+        },
+        {
+          "id": "<redacted>",
+          "kind": "result_snapshot",
+          "status": "done",
+          "attempts": 1,
+          "locked_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "finalization",
+          "completed_at": "2026-11-19T04:00:00+00:00",
+          "kind_version": 1,
+          "last_error_code": null,
+          "next_attempt_at": "2026-11-19T04:00:00+00:00",
+          "target_player_id": null,
+          "source_finalization_id": "a3000000-0000-4000-8000-000000000003"
+        },
+        {
+          "id": "<redacted>",
+          "kind": "player_history",
+          "status": "done",
+          "attempts": 1,
+          "locked_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "finalization",
+          "completed_at": "2026-11-19T04:00:00+00:00",
+          "kind_version": 1,
+          "last_error_code": null,
+          "next_attempt_at": "2026-11-19T04:00:00+00:00",
+          "target_player_id": null,
+          "source_finalization_id": "a3000000-0000-4000-8000-000000000003"
+        },
+        {
+          "id": "<redacted>",
+          "kind": "player_rank",
+          "status": "done",
+          "attempts": 1,
+          "locked_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "finalization",
+          "completed_at": "2026-11-19T04:00:00+00:00",
+          "kind_version": 1,
+          "last_error_code": null,
+          "next_attempt_at": "2026-11-19T04:00:00+00:00",
+          "target_player_id": null,
+          "source_finalization_id": "a3000000-0000-4000-8000-000000000003"
+        }
+      ],
+      "projection_jobs (removed)": [],
+      "player_rank_current": [
+        {
+          "state": "provisional",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "window_end": "2026-11-19T04:00:00+00:00",
+          "input_counts": {
+            "facts": 3,
+            "assessments": 0,
+            "recentStandardMatches": 2
+          },
+          "numeric_rank": null,
+          "window_start": "2026-08-21T04:00:00+00:00",
+          "calculated_at": "2026-11-19T04:00:00+00:00",
+          "skill_level_id": null,
+          "input_watermark": "1795060800000",
+          "next_recheck_at": "2027-02-17T02:02:00+00:00",
+          "explanation_code": "formula_pending",
+          "algorithm_version": "unapproved",
+          "policy_version_id": "fa000000-0000-4000-8000-000000000001",
+          "assessment_component": null,
+          "last_valid_played_at": "2026-11-19T02:03:00+00:00",
+          "leaderboard_eligible": false,
+          "performance_component": null,
+          "recent_standard_match_count": 2
+        },
+        {
+          "state": "provisional",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000002",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "window_end": "2026-11-19T04:00:00+00:00",
+          "input_counts": {
+            "facts": 2,
+            "assessments": 0,
+            "recentStandardMatches": 1
+          },
+          "numeric_rank": null,
+          "window_start": "2026-08-21T04:00:00+00:00",
+          "calculated_at": "2026-11-19T04:00:00+00:00",
+          "skill_level_id": null,
+          "input_watermark": "1795060800000",
+          "next_recheck_at": "2027-02-17T02:02:00+00:00",
+          "explanation_code": "formula_pending",
+          "algorithm_version": "unapproved",
+          "policy_version_id": "fa000000-0000-4000-8000-000000000001",
+          "assessment_component": null,
+          "last_valid_played_at": "2026-11-19T02:02:00+00:00",
+          "leaderboard_eligible": false,
+          "performance_component": null,
+          "recent_standard_match_count": 1
+        }
+      ],
+      "player_rank_current (removed)": [],
+      "rank_notifications": [
+        {
+          "body": "Tap to see what changed.",
+          "kind": "rank",
+          "title": "Your rank was updated",
+          "target": "/players/d4000000-0000-4000-8000-000000000001/rank",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "source_id": "<redacted>",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "projection_job",
+          "source_job_kind": "player_rank"
+        },
+        {
+          "body": "Tap to see what changed.",
+          "kind": "rank",
+          "title": "Your rank was updated",
+          "target": "/players/d4000000-0000-4000-8000-000000000002/rank",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000002",
+          "source_id": "<redacted>",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "projection_job",
+          "source_job_kind": "player_rank"
+        }
+      ],
+      "rank_notifications (removed)": []
+    }
+  },
   "post_signed_out": {
     "steps": [
       {
@@ -29,6 +892,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -79,6 +944,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -129,6 +996,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -182,6 +1051,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -235,6 +1106,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -288,6 +1161,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -465,6 +1340,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -1171,6 +2048,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -1221,6 +2100,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -1271,6 +2152,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -1358,6 +2241,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000008",
@@ -1676,6 +2561,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -2087,6 +2974,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -2950,6 +3839,7 @@
           "started_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "generation_id": null,
+          "almost_done_at": null,
           "queue_position": null,
           "manual_protected": false,
           "source_operation_id": "a4100000-0000-4000-8000-000000000005"
@@ -2971,6 +3861,7 @@
           "started_at": null,
           "updated_at": "2026-11-19T02:05:00+00:00",
           "generation_id": null,
+          "almost_done_at": null,
           "queue_position": 1,
           "manual_protected": false,
           "source_operation_id": "a4100000-0000-4000-8000-000000000005"
@@ -2984,6 +3875,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -3696,6 +4589,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -3903,6 +4798,7 @@
           "started_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "generation_id": null,
+          "almost_done_at": null,
           "queue_position": null,
           "manual_protected": false,
           "source_operation_id": "a4100000-0000-4000-8000-000000000005"
@@ -3922,6 +4818,7 @@
           "started_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "generation_id": null,
+          "almost_done_at": null,
           "queue_position": null,
           "manual_protected": false,
           "source_operation_id": "a4100000-0000-4000-8000-000000000006"
@@ -3943,6 +4840,7 @@
           "started_at": null,
           "updated_at": "2026-11-19T02:05:00+00:00",
           "generation_id": null,
+          "almost_done_at": null,
           "queue_position": 1,
           "manual_protected": false,
           "source_operation_id": "a4100000-0000-4000-8000-000000000005"
@@ -3962,6 +4860,7 @@
           "started_at": null,
           "updated_at": "2026-11-19T02:06:00+00:00",
           "generation_id": null,
+          "almost_done_at": null,
           "queue_position": null,
           "manual_protected": false,
           "source_operation_id": "a4100000-0000-4000-8000-000000000006"
@@ -3997,6 +4896,8 @@
       ],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -4846,6 +5747,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -5574,6 +6477,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -6312,6 +7217,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -6842,6 +7749,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -7039,6 +7948,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -7533,6 +8444,7 @@
           "started_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "generation_id": null,
+          "almost_done_at": null,
           "queue_position": null,
           "manual_protected": false,
           "source_operation_id": "a4100000-0000-4000-8000-000000000005"
@@ -7554,6 +8466,7 @@
           "started_at": null,
           "updated_at": "2026-11-19T02:05:00+00:00",
           "generation_id": null,
+          "almost_done_at": null,
           "queue_position": 1,
           "manual_protected": false,
           "source_operation_id": "a4100000-0000-4000-8000-000000000005"
@@ -7567,6 +8480,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -8322,6 +9237,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -9139,6 +10056,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -9972,6 +10891,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -10692,6 +11613,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -10745,6 +11668,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -10798,6 +11723,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -10851,6 +11778,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -10904,6 +11833,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -10957,6 +11888,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -11013,6 +11946,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -11066,6 +12001,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -11119,6 +12056,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -11172,6 +12111,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -11225,6 +12166,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -11278,6 +12221,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -11506,6 +12451,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -12390,6 +13337,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -13115,6 +14064,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -13177,6 +14128,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -13227,6 +14180,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -13404,6 +14359,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -14279,6 +15236,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -15154,6 +16113,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -15987,6 +16948,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -16958,6 +17921,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -17833,6 +18798,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -18753,6 +19720,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -19633,6 +20602,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -20228,6 +21199,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -21221,6 +22194,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -22105,6 +23080,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [
         {
           "id": "a3000000-0000-4000-8000-000000000003",
@@ -22765,6 +23742,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -22926,6 +23905,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -23076,6 +24057,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -23231,6 +24214,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -23387,6 +24372,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -23474,6 +24461,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -23630,6 +24619,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -23717,6 +24708,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -23799,6 +24792,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -23960,6 +24955,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -24116,6 +25113,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -24203,6 +25202,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -24279,6 +25280,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -24360,6 +25363,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -24442,6 +25447,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -24603,6 +25610,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -24759,6 +25768,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -24920,6 +25931,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -25076,6 +26089,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -25237,6 +26252,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -25393,6 +26410,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -25554,6 +26573,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -25710,6 +26731,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -25871,6 +26894,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -25995,6 +27020,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -26045,6 +27072,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -26095,6 +27124,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -26145,6 +27176,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -26195,6 +27228,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -26323,6 +27358,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -26479,6 +27516,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],
@@ -26640,6 +27679,8 @@
       "active_player_holds (removed)": [],
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": [],
+      "session_players_handicap": [],
+      "session_players_handicap (removed)": [],
       "queue_sessions": [],
       "queue_sessions (removed)": [],
       "club_session_reservations": [],

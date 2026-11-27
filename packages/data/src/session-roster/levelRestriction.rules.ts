@@ -10,7 +10,7 @@ import type { PlayingLevel } from '../player/player.types'
 /**
  * Level restrictions on slots (D-2026-11-19-12): the one place the allowed / full check lives.
  * Mock mode, the Route Handler services and the screens all call it. Written in TypeScript first;
- * its cases are `@rotra/rule-cases` `v1/roster/levelRestrictionBlock.json` and the Go copy follows.
+ * its cases are `@rotra/rule-cases` `v1/roster/levelRestrictionBlock.json`, and the Go copy is `apps/api/internal/rules/roster/level_restriction.go`.
  *
  * - A signed-in player outside the restriction, or whose band's slots are full, can't send a join
  *   request from the session page.

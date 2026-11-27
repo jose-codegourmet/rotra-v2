@@ -609,7 +609,7 @@ func (q *Queries) ListQueueReturningPlayers(ctx context.Context, arg ListQueueRe
 
 const listQueueRoster = `-- name: ListQueueRoster :many
 SELECT sp.id, sp.session_id, sp.club_player_id, sp.name_snapshot, sp.present, sp.present_changed_at, sp.skill_level_id,
-       sp.level_locked_at, sp.confirmed_at, sp.games_adjustment, sp.self_checked_in_at, sp.left_at, sp.revision,
+       sp.level_locked_at, sp.confirmed_at, sp.games_adjustment, sp.handicap_spots, sp.self_checked_in_at, sp.left_at, sp.revision,
        sp.no_show_at, cp.nickname AS club_nickname, p.nickname AS player_nickname, p.profile_state
 FROM session_players sp
 LEFT JOIN club_players cp ON cp.id = sp.club_player_id
@@ -629,6 +629,7 @@ type ListQueueRosterRow struct {
 	LevelLockedAt    pgtype.Timestamptz
 	ConfirmedAt      pgtype.Timestamptz
 	GamesAdjustment  int32
+	HandicapSpots    []string
 	SelfCheckedInAt  pgtype.Timestamptz
 	LeftAt           pgtype.Timestamptz
 	Revision         int64
@@ -660,6 +661,7 @@ func (q *Queries) ListQueueRoster(ctx context.Context, sessionID pgtype.UUID) ([
 			&i.LevelLockedAt,
 			&i.ConfirmedAt,
 			&i.GamesAdjustment,
+			&i.HandicapSpots,
 			&i.SelfCheckedInAt,
 			&i.LeftAt,
 			&i.Revision,

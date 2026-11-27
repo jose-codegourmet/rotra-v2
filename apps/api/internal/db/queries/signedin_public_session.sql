@@ -248,7 +248,7 @@ ORDER BY club_player_id, assessed_at DESC;
 -- gave outside a session or the latest session assessment, whichever is newer. No row: not saved in the club; -1: none yet.
 -- name: GetPlayerClubLevel :one
 SELECT COALESCE(CASE WHEN cp.saved_skill_level_id IS NULL OR cp.saved_level_at IS NULL THEN al.skill_level_id
-             WHEN al.assessed_at IS NOT NULL AND al.assessed_at > cp.saved_level_at THEN al.skill_level_id
+             WHEN al.assessed_at IS NOT NULL AND date_trunc('milliseconds', al.assessed_at) > date_trunc('milliseconds', cp.saved_level_at) THEN al.skill_level_id
              ELSE cp.saved_skill_level_id END, -1)::smallint AS level_id
 FROM club_players cp
 LEFT JOIN LATERAL (SELECT a.skill_level_id, a.assessed_at FROM club_assessments a WHERE a.club_player_id = cp.id

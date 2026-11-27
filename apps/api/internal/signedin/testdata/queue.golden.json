@@ -1368,7 +1368,7 @@
           "playingLevel": null,
           "phoneHidden": false,
           "hasPhone": false,
-          "emailOnFile": true,
+          "emailOnFile": false,
           "detailsRequired": false,
           "sessionsHere": 0,
           "addedAt": "2026-10-30T04:00:00.000Z"
@@ -1734,7 +1734,7 @@
           "playingLevel": null,
           "phoneHidden": false,
           "hasPhone": false,
-          "emailOnFile": true,
+          "emailOnFile": false,
           "detailsRequired": false,
           "sessionsHere": 0,
           "addedAt": "2026-10-30T04:00:00.000Z"
@@ -1956,7 +1956,7 @@
           "playingLevel": null,
           "phoneHidden": false,
           "hasPhone": false,
-          "emailOnFile": true,
+          "emailOnFile": false,
           "detailsRequired": false,
           "sessionsHere": 0,
           "addedAt": "2026-10-30T04:00:00.000Z"
@@ -2178,7 +2178,7 @@
           "playingLevel": null,
           "phoneHidden": false,
           "hasPhone": false,
-          "emailOnFile": true,
+          "emailOnFile": false,
           "detailsRequired": false,
           "sessionsHere": 0,
           "addedAt": "2026-10-30T04:00:00.000Z"
@@ -2221,6 +2221,13 @@
         "fullName": "Una Alonzo",
         "nickname": null,
         "phoneOnFile": true,
+        "level": "beginner_high",
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
         "profile": {
           "email": "una@example.test",
           "playingStyle": "",
@@ -2250,6 +2257,13 @@
         "fullName": "Cory Only",
         "nickname": "Cor",
         "phoneOnFile": true,
+        "level": null,
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
         "profile": {
           "email": "",
           "playingStyle": "Smasher",
@@ -2279,6 +2293,13 @@
         "fullName": "No Phone Ned",
         "nickname": null,
         "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
         "profile": null
       }
     }
@@ -2297,6 +2318,13 @@
         "fullName": "No Input Nia",
         "nickname": null,
         "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
         "profile": null
       }
     }
@@ -2315,6 +2343,13 @@
         "fullName": "Dan Uy",
         "nickname": null,
         "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
         "profile": {
           "email": "dan@example.test",
           "playingStyle": "",
@@ -2344,6 +2379,13 @@
         "fullName": "Retired Person",
         "nickname": null,
         "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
         "profile": {
           "email": "",
           "playingStyle": "",
@@ -2390,6 +2432,13 @@
         "fullName": "Erin Lim",
         "nickname": "Er",
         "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
         "profile": {
           "email": "",
           "playingStyle": "",
@@ -2462,7 +2511,7 @@
     }
   },
   "details-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -2470,8 +2519,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -2587,6 +2636,13 @@
         "fullName": "Cory Only",
         "nickname": "Cor",
         "phoneOnFile": true,
+        "level": null,
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
         "profile": {
           "email": "",
           "playingStyle": "Smasher",
@@ -2789,7 +2845,7 @@
     }
   },
   "delete-impact-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -2797,8 +2853,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -3215,7 +3271,7 @@
     "body": {
       "player": {
         "id": "a6000000-0000-4000-8000-000000000008",
-        "fullName": "",
+        "fullName": "Uri Beltran",
         "nickname": null,
         "rtrId": "RTR-PH-MNL-103026-0008",
         "identity": "unclaimed",
@@ -3228,7 +3284,7 @@
       "players": [
         {
           "id": "a6000000-0000-4000-8000-000000000008",
-          "fullName": "",
+          "fullName": "Uri Beltran",
           "nickname": null,
           "rtrId": "RTR-PH-MNL-103026-0008",
           "identity": "unclaimed",
@@ -3250,7 +3306,7 @@
     "body": {
       "player": {
         "id": "a6000000-0000-4000-8000-000000000008",
-        "fullName": "",
+        "fullName": "Uri Beltran",
         "nickname": null,
         "rtrId": "RTR-PH-MNL-103026-0008",
         "identity": "unclaimed",
@@ -3263,7 +3319,7 @@
       "players": [
         {
           "id": "a6000000-0000-4000-8000-000000000008",
-          "fullName": "",
+          "fullName": "Uri Beltran",
           "nickname": null,
           "rtrId": "RTR-PH-MNL-103026-0008",
           "identity": "unclaimed",
@@ -3285,6 +3341,7 @@
     "body": {
       "player": null,
       "savedName": null,
+      "matches": [],
       "players": []
     }
   },
@@ -3431,6 +3488,7 @@
     "body": {
       "player": null,
       "savedName": null,
+      "matches": [],
       "players": []
     }
   },
@@ -3444,6 +3502,7 @@
     "body": {
       "player": null,
       "savedName": null,
+      "matches": [],
       "players": []
     }
   },
@@ -3457,6 +3516,7 @@
     "body": {
       "player": null,
       "savedName": null,
+      "matches": [],
       "players": []
     }
   },
@@ -3470,6 +3530,7 @@
     "body": {
       "player": null,
       "savedName": null,
+      "matches": [],
       "players": []
     }
   },
@@ -3483,6 +3544,7 @@
     "body": {
       "player": null,
       "savedName": null,
+      "matches": [],
       "players": []
     }
   },
@@ -3496,6 +3558,7 @@
     "body": {
       "player": null,
       "savedName": null,
+      "matches": [],
       "players": []
     }
   },
@@ -3509,6 +3572,7 @@
     "body": {
       "player": null,
       "savedName": null,
+      "matches": [],
       "players": []
     }
   },
@@ -3681,6 +3745,7 @@
     "body": {
       "player": null,
       "savedName": null,
+      "matches": [],
       "players": []
     }
   },
@@ -3694,6 +3759,7 @@
     "body": {
       "player": null,
       "savedName": null,
+      "matches": [],
       "players": []
     }
   },
@@ -3756,6 +3822,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-10-20T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-10-20T14:00:00.000Z",
             "seriesId": null,
             "publicSlug": "october-night",
@@ -3771,6 +3838,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -3805,6 +3875,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-13T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-11-13T14:00:00.500Z",
             "seriesId": null,
             "publicSlug": "friday-night",
@@ -3820,6 +3891,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -3854,6 +3928,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-16T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-11-16T15:00:00.000Z",
             "seriesId": null,
             "publicSlug": "short-night",
@@ -3869,6 +3944,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -3903,6 +3981,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-19T01:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "live-now",
@@ -3918,6 +3997,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [
@@ -3925,6 +4007,7 @@
               "id": "a2c00000-0000-4000-8000-000000000001",
               "sessionId": "a3000000-0000-4000-8000-000000000001",
               "label": "Court 1",
+              "position": 1,
               "startsAt": null,
               "openedEarlyAt": null,
               "openUntil": null,
@@ -3934,6 +4017,7 @@
               "id": "a2c00000-0000-4000-8000-000000000002",
               "sessionId": "a3000000-0000-4000-8000-000000000001",
               "label": "Court 2",
+              "position": 2,
               "startsAt": "2026-11-19T02:00:00.000Z",
               "openedEarlyAt": null,
               "openUntil": "2026-11-19T06:00:00.000Z",
@@ -3971,6 +4055,7 @@
             "playersPerCourt": 6,
             "expectedPlayers": 14,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": "a3500000-0000-4000-8000-000000000001",
             "publicSlug": "next-friday",
@@ -3986,6 +4071,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "4"
           },
           "courts": [
@@ -3993,6 +4081,7 @@
               "id": "a2c00000-0000-4000-8000-000000000011",
               "sessionId": "a3000000-0000-4000-8000-000000000009",
               "label": "Court 1",
+              "position": 1,
               "startsAt": null,
               "openedEarlyAt": null,
               "openUntil": null,
@@ -4002,6 +4091,7 @@
               "id": "a2c00000-0000-4000-8000-000000000012",
               "sessionId": "a3000000-0000-4000-8000-000000000009",
               "label": "Court 2",
+              "position": 2,
               "startsAt": null,
               "openedEarlyAt": null,
               "openUntil": null,
@@ -4051,6 +4141,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-14T17:30:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-11-14T22:00:00.000Z",
             "seriesId": null,
             "publicSlug": "sat-morning",
@@ -4066,6 +4157,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4100,6 +4194,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-18T01:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "wrapping-up",
@@ -4115,6 +4210,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4161,6 +4259,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-15T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "invalid-night",
@@ -4176,6 +4275,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4210,6 +4312,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "not-yet",
@@ -4225,6 +4328,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4307,6 +4413,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-10-20T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-10-20T14:00:00.000Z",
             "seriesId": null,
             "publicSlug": "october-night",
@@ -4322,6 +4429,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4356,6 +4466,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-13T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-11-13T14:00:00.500Z",
             "seriesId": null,
             "publicSlug": "friday-night",
@@ -4371,6 +4482,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4405,6 +4519,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-16T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-11-16T15:00:00.000Z",
             "seriesId": null,
             "publicSlug": "short-night",
@@ -4420,6 +4535,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4454,6 +4572,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-19T01:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "live-now",
@@ -4469,6 +4588,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [
@@ -4476,6 +4598,7 @@
               "id": "a2c00000-0000-4000-8000-000000000001",
               "sessionId": "a3000000-0000-4000-8000-000000000001",
               "label": "Court 1",
+              "position": 1,
               "startsAt": null,
               "openedEarlyAt": null,
               "openUntil": null,
@@ -4485,6 +4608,7 @@
               "id": "a2c00000-0000-4000-8000-000000000002",
               "sessionId": "a3000000-0000-4000-8000-000000000001",
               "label": "Court 2",
+              "position": 2,
               "startsAt": "2026-11-19T02:00:00.000Z",
               "openedEarlyAt": null,
               "openUntil": "2026-11-19T06:00:00.000Z",
@@ -4522,6 +4646,7 @@
             "playersPerCourt": 6,
             "expectedPlayers": 14,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": "a3500000-0000-4000-8000-000000000001",
             "publicSlug": "next-friday",
@@ -4537,6 +4662,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "4"
           },
           "courts": [
@@ -4544,6 +4672,7 @@
               "id": "a2c00000-0000-4000-8000-000000000011",
               "sessionId": "a3000000-0000-4000-8000-000000000009",
               "label": "Court 1",
+              "position": 1,
               "startsAt": null,
               "openedEarlyAt": null,
               "openUntil": null,
@@ -4553,6 +4682,7 @@
               "id": "a2c00000-0000-4000-8000-000000000012",
               "sessionId": "a3000000-0000-4000-8000-000000000009",
               "label": "Court 2",
+              "position": 2,
               "startsAt": null,
               "openedEarlyAt": null,
               "openUntil": null,
@@ -4602,6 +4732,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-10-20T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-10-20T14:00:00.000Z",
             "seriesId": null,
             "publicSlug": "october-night",
@@ -4617,6 +4748,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4651,6 +4785,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-13T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-11-13T14:00:00.500Z",
             "seriesId": null,
             "publicSlug": "friday-night",
@@ -4666,6 +4801,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4700,6 +4838,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-16T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-11-16T15:00:00.000Z",
             "seriesId": null,
             "publicSlug": "short-night",
@@ -4715,6 +4854,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4749,6 +4891,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-19T01:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "live-now",
@@ -4764,6 +4907,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4798,6 +4944,7 @@
             "playersPerCourt": 6,
             "expectedPlayers": 14,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": "a3500000-0000-4000-8000-000000000001",
             "publicSlug": "next-friday",
@@ -4813,6 +4960,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "4"
           },
           "courts": [],
@@ -4859,6 +5009,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-10-20T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-10-20T14:00:00.000Z",
             "seriesId": null,
             "publicSlug": "october-night",
@@ -4874,6 +5025,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4908,6 +5062,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-13T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-11-13T14:00:00.500Z",
             "seriesId": null,
             "publicSlug": "friday-night",
@@ -4923,6 +5078,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -4957,6 +5115,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-16T09:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": "2026-11-16T15:00:00.000Z",
             "seriesId": null,
             "publicSlug": "short-night",
@@ -4972,6 +5131,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [],
@@ -5006,6 +5168,7 @@
             "playersPerCourt": 8,
             "expectedPlayers": null,
             "startedAt": "2026-11-19T01:00:00.000Z",
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "live-now",
@@ -5021,6 +5184,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "1"
           },
           "courts": [
@@ -5028,6 +5194,7 @@
               "id": "a2c00000-0000-4000-8000-000000000001",
               "sessionId": "a3000000-0000-4000-8000-000000000001",
               "label": "Court 1",
+              "position": 1,
               "startsAt": null,
               "openedEarlyAt": null,
               "openUntil": null,
@@ -5037,6 +5204,7 @@
               "id": "a2c00000-0000-4000-8000-000000000002",
               "sessionId": "a3000000-0000-4000-8000-000000000001",
               "label": "Court 2",
+              "position": 2,
               "startsAt": "2026-11-19T02:00:00.000Z",
               "openedEarlyAt": null,
               "openUntil": "2026-11-19T06:00:00.000Z",
@@ -5074,6 +5242,7 @@
             "playersPerCourt": 6,
             "expectedPlayers": 14,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": "a3500000-0000-4000-8000-000000000001",
             "publicSlug": "next-friday",
@@ -5089,6 +5258,9 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "4"
           },
           "courts": [
@@ -5096,6 +5268,7 @@
               "id": "a2c00000-0000-4000-8000-000000000011",
               "sessionId": "a3000000-0000-4000-8000-000000000009",
               "label": "Court 1",
+              "position": 1,
               "startsAt": null,
               "openedEarlyAt": null,
               "openUntil": null,
@@ -5105,6 +5278,7 @@
               "id": "a2c00000-0000-4000-8000-000000000012",
               "sessionId": "a3000000-0000-4000-8000-000000000009",
               "label": "Court 2",
+              "position": 2,
               "startsAt": null,
               "openedEarlyAt": null,
               "openUntil": null,
@@ -5166,6 +5340,7 @@
         "playersPerCourt": 8,
         "expectedPlayers": null,
         "startedAt": "2026-11-19T01:00:00.000Z",
+        "plannedBeforeStart": null,
         "finalizedAt": null,
         "seriesId": null,
         "publicSlug": "live-now",
@@ -5181,6 +5356,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "1"
       },
       "courts": [
@@ -5188,6 +5366,7 @@
           "id": "a2c00000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "label": "Court 1",
+          "position": 1,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -5197,6 +5376,7 @@
           "id": "a2c00000-0000-4000-8000-000000000002",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "label": "Court 2",
+          "position": 2,
           "startsAt": "2026-11-19T02:00:00.000Z",
           "openedEarlyAt": null,
           "openUntil": "2026-11-19T06:00:00.000Z",
@@ -5271,6 +5451,7 @@
         "playersPerCourt": 8,
         "expectedPlayers": null,
         "startedAt": "2026-11-13T09:00:00.000Z",
+        "plannedBeforeStart": null,
         "finalizedAt": "2026-11-13T14:00:00.500Z",
         "seriesId": null,
         "publicSlug": "friday-night",
@@ -5286,6 +5467,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "1"
       },
       "courts": [],
@@ -5342,6 +5526,7 @@
         "playersPerCourt": 8,
         "expectedPlayers": null,
         "startedAt": "2026-10-20T09:00:00.000Z",
+        "plannedBeforeStart": null,
         "finalizedAt": "2026-10-20T14:00:00.000Z",
         "seriesId": null,
         "publicSlug": "october-night",
@@ -5357,6 +5542,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "1"
       },
       "courts": [],
@@ -5399,6 +5587,7 @@
         "playersPerCourt": 8,
         "expectedPlayers": null,
         "startedAt": "2026-11-16T09:00:00.000Z",
+        "plannedBeforeStart": null,
         "finalizedAt": "2026-11-16T15:00:00.000Z",
         "seriesId": null,
         "publicSlug": "short-night",
@@ -5414,6 +5603,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "1"
       },
       "courts": [],
@@ -5470,6 +5662,7 @@
         "playersPerCourt": 6,
         "expectedPlayers": 14,
         "startedAt": null,
+        "plannedBeforeStart": null,
         "finalizedAt": null,
         "seriesId": "a3500000-0000-4000-8000-000000000001",
         "publicSlug": "next-friday",
@@ -5485,6 +5678,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "4"
       },
       "courts": [
@@ -5492,6 +5688,7 @@
           "id": "a2c00000-0000-4000-8000-000000000011",
           "sessionId": "a3000000-0000-4000-8000-000000000009",
           "label": "Court 1",
+          "position": 1,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -5501,6 +5698,7 @@
           "id": "a2c00000-0000-4000-8000-000000000012",
           "sessionId": "a3000000-0000-4000-8000-000000000009",
           "label": "Court 2",
+          "position": 2,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -5602,7 +5800,7 @@
     }
   },
   "session-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -5610,8 +5808,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -5659,6 +5857,7 @@
         "playersPerCourt": 8,
         "expectedPlayers": null,
         "startedAt": "2026-11-19T01:00:00.000Z",
+        "plannedBeforeStart": null,
         "finalizedAt": null,
         "seriesId": null,
         "publicSlug": "live-now",
@@ -5674,6 +5873,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "1"
       },
       "courts": [
@@ -5681,6 +5883,7 @@
           "id": "a2c00000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "label": "Court 1",
+          "position": 1,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -5690,6 +5893,7 @@
           "id": "a2c00000-0000-4000-8000-000000000002",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "label": "Court 2",
+          "position": 2,
           "startsAt": "2026-11-19T02:00:00.000Z",
           "openedEarlyAt": null,
           "openUntil": "2026-11-19T06:00:00.000Z",
@@ -5750,6 +5954,7 @@
         "playersPerCourt": 8,
         "expectedPlayers": null,
         "startedAt": "2026-11-19T01:00:00.000Z",
+        "plannedBeforeStart": null,
         "finalizedAt": null,
         "seriesId": null,
         "publicSlug": "live-now",
@@ -5765,6 +5970,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "1"
       },
       "courts": [
@@ -5772,6 +5980,7 @@
           "id": "a2c00000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "label": "Court 1",
+          "position": 1,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -5781,6 +5990,7 @@
           "id": "a2c00000-0000-4000-8000-000000000002",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "label": "Court 2",
+          "position": 2,
           "startsAt": "2026-11-19T02:00:00.000Z",
           "openedEarlyAt": null,
           "openUntil": "2026-11-19T06:00:00.000Z",
@@ -5834,10 +6044,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": "2026-11-19T01:05:00.000Z",
           "leftAt": null,
           "revision": "2",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000012",
@@ -5852,10 +6069,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:01:00.000Z",
           "gamesAdjustment": 1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000013",
@@ -5870,6 +6094,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:02:00.000Z",
           "gamesAdjustment": -1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": "2026-11-19T03:30:00.000Z",
           "revision": "1",
@@ -5888,10 +6113,17 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:03:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000015",
@@ -5906,6 +6138,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:04:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -5924,6 +6157,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:07:00.000Z",
           "gamesAdjustment": 2,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -5944,6 +6178,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:06:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "2",
@@ -5952,28 +6187,12 @@
       ],
       "waitlist": [
         {
-          "id": "a3300000-0000-4000-8000-000000000003",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
-          "level": "beginner_high",
-          "addedAt": "2026-11-19T00:20:00.000Z",
-          "position": 1
-        },
-        {
-          "id": "a3300000-0000-4000-8000-000000000002",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
-          "level": null,
-          "addedAt": "2026-11-19T00:30:00.000Z",
-          "position": 2
-        },
-        {
           "id": "a3300000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "clubPlayerId": "c6000000-0000-4000-8000-000000000025",
           "level": "intermediate_low",
           "addedAt": "2026-11-19T00:00:00.000Z",
-          "position": 3
+          "position": 1
         },
         {
           "id": "a3300000-0000-4000-8000-000000000004",
@@ -5981,6 +6200,22 @@
           "clubPlayerId": "c6000000-0000-4000-8000-000000000023",
           "level": "intermediate_mid",
           "addedAt": "2026-11-19T00:00:00.000Z",
+          "position": 2
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000003",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
+          "level": "beginner_high",
+          "addedAt": "2026-11-19T02:00:00.000Z",
+          "position": 3
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000002",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
+          "level": null,
+          "addedAt": "2026-11-19T02:00:00.000Z",
           "position": 4
         }
       ],
@@ -6071,6 +6306,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:01.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -6089,6 +6325,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:02.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -6107,6 +6344,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:03.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -6125,6 +6363,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:04.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -6143,6 +6382,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:05.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -6206,10 +6446,17 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:07.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         }
       ],
       "noShows": [],
@@ -6254,10 +6501,17 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T09:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000022",
@@ -6272,10 +6526,17 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T09:01:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000023",
@@ -6290,6 +6551,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T09:02:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -6412,7 +6674,7 @@
     }
   },
   "roster-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -6420,8 +6682,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -6462,10 +6724,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": "2026-11-19T01:05:00.000Z",
           "leftAt": null,
           "revision": "2",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000012",
@@ -6480,10 +6749,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:01:00.000Z",
           "gamesAdjustment": 1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000013",
@@ -6498,6 +6774,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:02:00.000Z",
           "gamesAdjustment": -1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": "2026-11-19T03:30:00.000Z",
           "revision": "1",
@@ -6516,10 +6793,17 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:03:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000015",
@@ -6534,6 +6818,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:04:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -6552,6 +6837,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:07:00.000Z",
           "gamesAdjustment": 2,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -6572,6 +6858,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:06:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "2",
@@ -6580,28 +6867,12 @@
       ],
       "waitlist": [
         {
-          "id": "a3300000-0000-4000-8000-000000000003",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
-          "level": "beginner_high",
-          "addedAt": "2026-11-19T00:20:00.000Z",
-          "position": 1
-        },
-        {
-          "id": "a3300000-0000-4000-8000-000000000002",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
-          "level": null,
-          "addedAt": "2026-11-19T00:30:00.000Z",
-          "position": 2
-        },
-        {
           "id": "a3300000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "clubPlayerId": "c6000000-0000-4000-8000-000000000025",
           "level": "intermediate_low",
           "addedAt": "2026-11-19T00:00:00.000Z",
-          "position": 3
+          "position": 1
         },
         {
           "id": "a3300000-0000-4000-8000-000000000004",
@@ -6609,6 +6880,22 @@
           "clubPlayerId": "c6000000-0000-4000-8000-000000000023",
           "level": "intermediate_mid",
           "addedAt": "2026-11-19T00:00:00.000Z",
+          "position": 2
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000003",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
+          "level": "beginner_high",
+          "addedAt": "2026-11-19T02:00:00.000Z",
+          "position": 3
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000002",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
+          "level": null,
+          "addedAt": "2026-11-19T02:00:00.000Z",
           "position": 4
         }
       ],
@@ -6685,10 +6972,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": "2026-11-19T01:05:00.000Z",
           "leftAt": null,
           "revision": "2",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000012",
@@ -6703,10 +6997,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:01:00.000Z",
           "gamesAdjustment": 1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000013",
@@ -6721,6 +7022,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:02:00.000Z",
           "gamesAdjustment": -1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": "2026-11-19T03:30:00.000Z",
           "revision": "1",
@@ -6739,10 +7041,17 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:03:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000015",
@@ -6757,6 +7066,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:04:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -6775,6 +7085,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:07:00.000Z",
           "gamesAdjustment": 2,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -6795,6 +7106,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:06:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "2",
@@ -6803,28 +7115,12 @@
       ],
       "waitlist": [
         {
-          "id": "a3300000-0000-4000-8000-000000000003",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
-          "level": "beginner_high",
-          "addedAt": "2026-11-19T00:20:00.000Z",
-          "position": 1
-        },
-        {
-          "id": "a3300000-0000-4000-8000-000000000002",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
-          "level": null,
-          "addedAt": "2026-11-19T00:30:00.000Z",
-          "position": 2
-        },
-        {
           "id": "a3300000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "clubPlayerId": "c6000000-0000-4000-8000-000000000025",
           "level": "intermediate_low",
           "addedAt": "2026-11-19T00:00:00.000Z",
-          "position": 3
+          "position": 1
         },
         {
           "id": "a3300000-0000-4000-8000-000000000004",
@@ -6832,6 +7128,22 @@
           "clubPlayerId": "c6000000-0000-4000-8000-000000000023",
           "level": "intermediate_mid",
           "addedAt": "2026-11-19T00:00:00.000Z",
+          "position": 2
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000003",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
+          "level": "beginner_high",
+          "addedAt": "2026-11-19T02:00:00.000Z",
+          "position": 3
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000002",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
+          "level": null,
+          "addedAt": "2026-11-19T02:00:00.000Z",
           "position": 4
         }
       ],
@@ -6915,6 +7227,7 @@
           "placedAt": null,
           "startedAt": "2026-11-19T01:30:00.000Z",
           "endedAt": "2026-11-19T01:50:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": {
             "kind": "completed",
@@ -6946,6 +7259,7 @@
           "placedAt": "2026-11-19T03:35:00.000Z",
           "startedAt": null,
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "2"
@@ -6969,6 +7283,7 @@
           "placedAt": null,
           "startedAt": null,
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -6994,6 +7309,7 @@
           "placedAt": null,
           "startedAt": null,
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7013,6 +7329,7 @@
           "placedAt": null,
           "startedAt": "2026-11-19T02:00:00.000Z",
           "endedAt": "2026-11-19T02:03:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": {
             "kind": "invalid",
@@ -7046,6 +7363,7 @@
           "placedAt": "2026-11-19T03:45:00.000Z",
           "startedAt": "2026-11-19T03:50:00.000Z",
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [
             {
               "outId": "a7000000-0000-4000-8000-000000000011",
@@ -7115,6 +7433,7 @@
           "placedAt": null,
           "startedAt": "2026-11-13T10:00:00.000Z",
           "endedAt": "2026-11-13T10:20:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7134,6 +7453,7 @@
           "placedAt": null,
           "startedAt": "2026-11-13T11:00:00.000Z",
           "endedAt": "2026-11-13T11:20:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7153,6 +7473,7 @@
           "placedAt": null,
           "startedAt": "2026-11-13T12:00:00.000Z",
           "endedAt": "2026-11-13T12:20:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7200,6 +7521,7 @@
           "placedAt": null,
           "startedAt": "2026-10-20T10:00:00.000Z",
           "endedAt": "2026-10-20T10:20:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7219,6 +7541,7 @@
           "placedAt": null,
           "startedAt": "2026-10-20T11:00:00.000Z",
           "endedAt": "2026-10-20T11:05:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7252,6 +7575,7 @@
           "placedAt": null,
           "startedAt": "2026-11-16T10:00:00.000Z",
           "endedAt": "2026-11-16T10:20:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7373,7 +7697,7 @@
     }
   },
   "matches-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -7381,8 +7705,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -7430,6 +7754,7 @@
           "placedAt": null,
           "startedAt": "2026-11-19T01:30:00.000Z",
           "endedAt": "2026-11-19T01:50:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": {
             "kind": "completed",
@@ -7461,6 +7786,7 @@
           "placedAt": "2026-11-19T03:35:00.000Z",
           "startedAt": null,
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "2"
@@ -7484,6 +7810,7 @@
           "placedAt": null,
           "startedAt": null,
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7509,6 +7836,7 @@
           "placedAt": null,
           "startedAt": null,
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7528,6 +7856,7 @@
           "placedAt": null,
           "startedAt": "2026-11-19T02:00:00.000Z",
           "endedAt": "2026-11-19T02:03:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": {
             "kind": "invalid",
@@ -7561,6 +7890,7 @@
           "placedAt": "2026-11-19T03:45:00.000Z",
           "startedAt": "2026-11-19T03:50:00.000Z",
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [
             {
               "outId": "a7000000-0000-4000-8000-000000000011",
@@ -7622,6 +7952,7 @@
           "placedAt": null,
           "startedAt": "2026-11-19T01:30:00.000Z",
           "endedAt": "2026-11-19T01:50:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": {
             "kind": "completed",
@@ -7653,6 +7984,7 @@
           "placedAt": "2026-11-19T03:35:00.000Z",
           "startedAt": null,
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "2"
@@ -7676,6 +8008,7 @@
           "placedAt": null,
           "startedAt": null,
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7701,6 +8034,7 @@
           "placedAt": null,
           "startedAt": null,
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": null,
           "revision": "1"
@@ -7720,6 +8054,7 @@
           "placedAt": null,
           "startedAt": "2026-11-19T02:00:00.000Z",
           "endedAt": "2026-11-19T02:03:00.000Z",
+          "almostDoneAt": null,
           "substitutions": [],
           "decision": {
             "kind": "invalid",
@@ -7753,6 +8088,7 @@
           "placedAt": "2026-11-19T03:45:00.000Z",
           "startedAt": "2026-11-19T03:50:00.000Z",
           "endedAt": null,
+          "almostDoneAt": null,
           "substitutions": [
             {
               "outId": "a7000000-0000-4000-8000-000000000011",
@@ -7811,6 +8147,7 @@
         },
         "estimate": {
           "players": 6,
+          "payers": 6,
           "court": 200000,
           "shuttle": 270000,
           "entrance": 30000,
@@ -7894,6 +8231,7 @@
         },
         "estimate": {
           "players": 5,
+          "payers": 5,
           "court": 0,
           "shuttle": 0,
           "entrance": 0,
@@ -7953,6 +8291,7 @@
         },
         "estimate": {
           "players": 1,
+          "payers": 1,
           "court": 0,
           "shuttle": 0,
           "entrance": 0,
@@ -8001,6 +8340,7 @@
         },
         "estimate": {
           "players": 1,
+          "payers": 1,
           "court": 0,
           "shuttle": 305000,
           "entrance": 0,
@@ -8065,6 +8405,7 @@
         },
         "estimate": {
           "players": 3,
+          "payers": 3,
           "court": 0,
           "shuttle": 0,
           "entrance": 0,
@@ -8171,7 +8512,7 @@
     }
   },
   "cost-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -8179,8 +8520,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -8225,6 +8566,7 @@
         },
         "estimate": {
           "players": 6,
+          "payers": 6,
           "court": 200000,
           "shuttle": 270000,
           "entrance": 30000,
@@ -8298,6 +8640,7 @@
         },
         "estimate": {
           "players": 6,
+          "payers": 6,
           "court": 200000,
           "shuttle": 270000,
           "entrance": 30000,
@@ -8358,58 +8701,76 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
             "name": "No Phone Ned",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
             "name": "Una Alonzo",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 83400,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:00:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
             "name": "Bob Santos",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 40000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:01:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
             "name": "Carla Dizon",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 90000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:02:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
             "name": "Cory Only",
+            "free": false,
             "paid": {
               "amount": null,
               "at": "2026-11-19T02:03:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": 83400,
@@ -8420,6 +8781,8 @@
           "partial": 1,
           "total": 6,
           "collected": 296800,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 210200,
           "toReimburse": 6600,
           "againstCosts": -203200,
@@ -8470,43 +8833,58 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000002",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
             "name": "Bob Santos",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000005",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
             "name": "Cory Only",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000004",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
             "name": "Una Alonzo",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000001",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 20000,
                 "currency": "PHP"
               },
               "at": "2026-11-13T12:00:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000003",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
             "name": "Carla Dizon",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 0,
                 "currency": "PHP"
               },
               "at": "2026-11-13T12:01:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": 0,
@@ -8517,6 +8895,8 @@
           "partial": 0,
           "total": 5,
           "collected": 20000,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 0,
           "toReimburse": 20000,
           "againstCosts": 20000,
@@ -8557,6 +8937,8 @@
           "partial": 0,
           "total": 0,
           "collected": 0,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 0,
           "toReimburse": 0,
           "againstCosts": 0,
@@ -8579,7 +8961,10 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000007",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": 5000,
@@ -8590,6 +8975,8 @@
           "partial": 0,
           "total": 1,
           "collected": 0,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 5000,
           "toReimburse": 0,
           "againstCosts": -305000,
@@ -8626,19 +9013,28 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000021",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000022",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
             "name": "Bob Santos",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000023",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
             "name": "Una Alonzo",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": 12000,
@@ -8649,6 +9045,8 @@
           "partial": 0,
           "total": 3,
           "collected": 0,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 36000,
           "toReimburse": 0,
           "againstCosts": 0,
@@ -8742,7 +9140,7 @@
     }
   },
   "payments-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -8750,8 +9148,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -8783,58 +9181,76 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
             "name": "No Phone Ned",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
             "name": "Una Alonzo",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 83400,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:00:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
             "name": "Bob Santos",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 40000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:01:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
             "name": "Carla Dizon",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 90000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:02:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
             "name": "Cory Only",
+            "free": false,
             "paid": {
               "amount": null,
               "at": "2026-11-19T02:03:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": 83400,
@@ -8845,6 +9261,8 @@
           "partial": 1,
           "total": 6,
           "collected": 296800,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 210200,
           "toReimburse": 6600,
           "againstCosts": -203200,
@@ -8881,58 +9299,76 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
             "name": "No Phone Ned",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
             "name": "Una Alonzo",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 83400,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:00:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
             "name": "Bob Santos",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 40000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:01:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
             "name": "Carla Dizon",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 90000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:02:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
             "name": "Cory Only",
+            "free": false,
             "paid": {
               "amount": null,
               "at": "2026-11-19T02:03:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": 83400,
@@ -8943,6 +9379,8 @@
           "partial": 1,
           "total": 6,
           "collected": 296800,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 210200,
           "toReimburse": 6600,
           "againstCosts": -203200,
@@ -9045,7 +9483,7 @@
             "wins": 0,
             "games": 2,
             "losses": 2,
-            "position": 3,
+            "position": 2,
             "rosterId": "a7000000-0000-4000-8000-000000000002"
           }
         ],
@@ -9263,7 +9701,7 @@
     }
   },
   "results-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -9271,8 +9709,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -9358,12 +9796,14 @@
       "minimum": 0,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 3,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 3
       },
       "match": [
@@ -9504,12 +9944,14 @@
       "minimum": 0,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 0,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 0
       },
       "match": []
@@ -9541,12 +9983,14 @@
       "minimum": 0,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 0,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 0
       },
       "match": []
@@ -9564,12 +10008,14 @@
       "minimum": 0,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 0,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 0
       },
       "match": []
@@ -9614,12 +10060,14 @@
           "nickname": "Ace"
         }
       ],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 1,
         "join": 1,
         "joinRequests": 0,
         "dropOuts": 1,
+        "transfers": 0,
         "match": 0
       },
       "match": []
@@ -9710,7 +10158,7 @@
     }
   },
   "requests-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -9718,8 +10166,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -9749,12 +10197,14 @@
       "minimum": 0,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 3,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 3
       },
       "match": [
@@ -9881,12 +10331,14 @@
       "minimum": 0,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 3,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 3
       },
       "match": [
@@ -10031,6 +10483,7 @@
         "playersPerCourt": 8,
         "expectedPlayers": null,
         "startedAt": "2026-11-19T01:00:00.000Z",
+        "plannedBeforeStart": null,
         "finalizedAt": null,
         "seriesId": null,
         "publicSlug": "live-now",
@@ -10046,6 +10499,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "1"
       },
       "courts": [
@@ -10053,6 +10509,7 @@
           "id": "a2c00000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "label": "Court 1",
+          "position": 1,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -10062,6 +10519,7 @@
           "id": "a2c00000-0000-4000-8000-000000000002",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "label": "Court 2",
+          "position": 2,
           "startsAt": "2026-11-19T02:00:00.000Z",
           "openedEarlyAt": null,
           "openUntil": "2026-11-19T06:00:00.000Z",
@@ -10101,10 +10559,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": "2026-11-19T01:05:00.000Z",
           "leftAt": null,
           "revision": "2",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000012",
@@ -10119,10 +10584,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:01:00.000Z",
           "gamesAdjustment": 1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000013",
@@ -10137,6 +10609,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:02:00.000Z",
           "gamesAdjustment": -1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": "2026-11-19T03:30:00.000Z",
           "revision": "1",
@@ -10155,10 +10628,17 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:03:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000015",
@@ -10173,6 +10653,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:04:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10191,6 +10672,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:07:00.000Z",
           "gamesAdjustment": 2,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10211,6 +10693,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:06:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "2",
@@ -10219,28 +10702,12 @@
       ],
       "waitlist": [
         {
-          "id": "a3300000-0000-4000-8000-000000000003",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
-          "level": "beginner_high",
-          "addedAt": "2026-11-19T00:20:00.000Z",
-          "position": 1
-        },
-        {
-          "id": "a3300000-0000-4000-8000-000000000002",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
-          "level": null,
-          "addedAt": "2026-11-19T00:30:00.000Z",
-          "position": 2
-        },
-        {
           "id": "a3300000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "clubPlayerId": "c6000000-0000-4000-8000-000000000025",
           "level": "intermediate_low",
           "addedAt": "2026-11-19T00:00:00.000Z",
-          "position": 3
+          "position": 1
         },
         {
           "id": "a3300000-0000-4000-8000-000000000004",
@@ -10248,6 +10715,22 @@
           "clubPlayerId": "c6000000-0000-4000-8000-000000000023",
           "level": "intermediate_mid",
           "addedAt": "2026-11-19T00:00:00.000Z",
+          "position": 2
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000003",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
+          "level": "beginner_high",
+          "addedAt": "2026-11-19T02:00:00.000Z",
+          "position": 3
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000002",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
+          "level": null,
+          "addedAt": "2026-11-19T02:00:00.000Z",
           "position": 4
         }
       ],
@@ -10310,10 +10793,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": "2026-11-19T01:05:00.000Z",
           "leftAt": null,
           "revision": "2",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000012",
@@ -10328,10 +10818,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:01:00.000Z",
           "gamesAdjustment": 1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000013",
@@ -10346,6 +10843,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:02:00.000Z",
           "gamesAdjustment": -1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": "2026-11-19T03:30:00.000Z",
           "revision": "1",
@@ -10364,10 +10862,17 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:03:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000015",
@@ -10382,6 +10887,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:04:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10400,6 +10906,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:07:00.000Z",
           "gamesAdjustment": 2,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10420,6 +10927,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:06:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "2",
@@ -10428,28 +10936,12 @@
       ],
       "waitlist": [
         {
-          "id": "a3300000-0000-4000-8000-000000000003",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
-          "level": "beginner_high",
-          "addedAt": "2026-11-19T00:20:00.000Z",
-          "position": 1
-        },
-        {
-          "id": "a3300000-0000-4000-8000-000000000002",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
-          "level": null,
-          "addedAt": "2026-11-19T00:30:00.000Z",
-          "position": 2
-        },
-        {
           "id": "a3300000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "clubPlayerId": "c6000000-0000-4000-8000-000000000025",
           "level": "intermediate_low",
           "addedAt": "2026-11-19T00:00:00.000Z",
-          "position": 3
+          "position": 1
         },
         {
           "id": "a3300000-0000-4000-8000-000000000004",
@@ -10457,6 +10949,22 @@
           "clubPlayerId": "c6000000-0000-4000-8000-000000000023",
           "level": "intermediate_mid",
           "addedAt": "2026-11-19T00:00:00.000Z",
+          "position": 2
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000003",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
+          "level": "beginner_high",
+          "addedAt": "2026-11-19T02:00:00.000Z",
+          "position": 3
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000002",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
+          "level": null,
+          "addedAt": "2026-11-19T02:00:00.000Z",
           "position": 4
         }
       ],
@@ -10519,6 +11027,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:01.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10537,6 +11046,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:02.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10555,6 +11065,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:03.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10573,6 +11084,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:04.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10591,6 +11103,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-12T09:00:05.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10625,6 +11138,7 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": "2026-11-19T01:05:00.000Z",
           "leftAt": null,
           "revision": "2",
@@ -10643,6 +11157,7 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:01:00.000Z",
           "gamesAdjustment": 1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10661,6 +11176,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:02:00.000Z",
           "gamesAdjustment": -1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": "2026-11-19T03:30:00.000Z",
           "revision": "1",
@@ -10679,6 +11195,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:03:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10697,6 +11214,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:04:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10715,6 +11233,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:07:00.000Z",
           "gamesAdjustment": 2,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10735,6 +11254,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:06:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "2",
@@ -10743,28 +11263,12 @@
       ],
       "waitlist": [
         {
-          "id": "a3300000-0000-4000-8000-000000000003",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
-          "level": "beginner_high",
-          "addedAt": "2026-11-19T00:20:00.000Z",
-          "position": 1
-        },
-        {
-          "id": "a3300000-0000-4000-8000-000000000002",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
-          "level": null,
-          "addedAt": "2026-11-19T00:30:00.000Z",
-          "position": 2
-        },
-        {
           "id": "a3300000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "clubPlayerId": "c6000000-0000-4000-8000-000000000025",
           "level": "intermediate_low",
           "addedAt": "2026-11-19T00:00:00.000Z",
-          "position": 3
+          "position": 1
         },
         {
           "id": "a3300000-0000-4000-8000-000000000004",
@@ -10772,6 +11276,22 @@
           "clubPlayerId": "c6000000-0000-4000-8000-000000000023",
           "level": "intermediate_mid",
           "addedAt": "2026-11-19T00:00:00.000Z",
+          "position": 2
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000003",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
+          "level": "beginner_high",
+          "addedAt": "2026-11-19T02:00:00.000Z",
+          "position": 3
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000002",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
+          "level": null,
+          "addedAt": "2026-11-19T02:00:00.000Z",
           "position": 4
         }
       ],
@@ -10834,10 +11354,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": "2026-11-19T01:05:00.000Z",
           "leftAt": null,
           "revision": "2",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000012",
@@ -10852,10 +11379,17 @@
           "levelLockedAt": "2026-11-19T01:00:00.000Z",
           "confirmedAt": "2026-11-18T12:01:00.000Z",
           "gamesAdjustment": 1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000013",
@@ -10870,6 +11404,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:02:00.000Z",
           "gamesAdjustment": -1,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": "2026-11-19T03:30:00.000Z",
           "revision": "1",
@@ -10888,10 +11423,17 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:03:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
-          "hasPlayedAtClubBefore": true
+          "hasPlayedAtClubBefore": true,
+          "form": {
+            "clubWinRate": null,
+            "bestDay": false,
+            "place": 0,
+            "trend": 0
+          }
         },
         {
           "id": "a7000000-0000-4000-8000-000000000015",
@@ -10906,6 +11448,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:04:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10924,6 +11467,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:07:00.000Z",
           "gamesAdjustment": 2,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "1",
@@ -10944,6 +11488,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-18T12:06:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "2",
@@ -10952,28 +11497,12 @@
       ],
       "waitlist": [
         {
-          "id": "a3300000-0000-4000-8000-000000000003",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
-          "level": "beginner_high",
-          "addedAt": "2026-11-19T00:20:00.000Z",
-          "position": 1
-        },
-        {
-          "id": "a3300000-0000-4000-8000-000000000002",
-          "sessionId": "a3000000-0000-4000-8000-000000000001",
-          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
-          "level": null,
-          "addedAt": "2026-11-19T00:30:00.000Z",
-          "position": 2
-        },
-        {
           "id": "a3300000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "clubPlayerId": "c6000000-0000-4000-8000-000000000025",
           "level": "intermediate_low",
           "addedAt": "2026-11-19T00:00:00.000Z",
-          "position": 3
+          "position": 1
         },
         {
           "id": "a3300000-0000-4000-8000-000000000004",
@@ -10981,6 +11510,22 @@
           "clubPlayerId": "c6000000-0000-4000-8000-000000000023",
           "level": "intermediate_mid",
           "addedAt": "2026-11-19T00:00:00.000Z",
+          "position": 2
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000003",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000015",
+          "level": "beginner_high",
+          "addedAt": "2026-11-19T02:00:00.000Z",
+          "position": 3
+        },
+        {
+          "id": "a3300000-0000-4000-8000-000000000002",
+          "sessionId": "a3000000-0000-4000-8000-000000000001",
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000014",
+          "level": null,
+          "addedAt": "2026-11-19T02:00:00.000Z",
           "position": 4
         }
       ],
@@ -11052,58 +11597,76 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
             "name": "No Phone Ned",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
             "name": "Una Alonzo",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 83400,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:00:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
             "name": "Bob Santos",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 40000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:01:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
             "name": "Carla Dizon",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 90000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:02:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
             "name": "Cory Only",
+            "free": false,
             "paid": {
               "amount": null,
               "at": "2026-11-19T02:03:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": null,
@@ -11114,6 +11677,8 @@
           "partial": 0,
           "total": 6,
           "collected": 213400,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": null,
           "toReimburse": 0,
           "againstCosts": null,
@@ -11149,6 +11714,7 @@
         },
         "estimate": {
           "players": 6,
+          "payers": 6,
           "court": 200000,
           "shuttle": 270000,
           "entrance": 30000,
@@ -11195,58 +11761,76 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
             "name": "No Phone Ned",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
             "name": "Una Alonzo",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 83400,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:00:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
             "name": "Bob Santos",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 40000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:01:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
             "name": "Carla Dizon",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 90000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:02:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
             "name": "Cory Only",
+            "free": false,
             "paid": {
               "amount": null,
               "at": "2026-11-19T02:03:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": 100000,
@@ -11257,6 +11841,8 @@
           "partial": 3,
           "total": 6,
           "collected": 313400,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 286600,
           "toReimburse": 0,
           "againstCosts": -186600,
@@ -11292,6 +11878,7 @@
         },
         "estimate": {
           "players": 6,
+          "payers": 6,
           "court": 200000,
           "shuttle": 270000,
           "entrance": 30000,
@@ -11338,58 +11925,76 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
             "name": "No Phone Ned",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
             "name": "Una Alonzo",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 83400,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:00:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
             "name": "Bob Santos",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 40000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:01:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
             "name": "Carla Dizon",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 90000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:02:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
             "name": "Cory Only",
+            "free": false,
             "paid": {
               "amount": null,
               "at": "2026-11-19T02:03:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": 10000,
@@ -11400,6 +12005,8 @@
           "partial": 0,
           "total": 6,
           "collected": 223400,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 20000,
           "toReimburse": 183400,
           "againstCosts": -276600,
@@ -11422,37 +12029,55 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
             "name": "alice reyes",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
             "name": "Alice Reyes",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
             "name": "Álvaro",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
             "name": "Bob Santos",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
             "name": "Carla Dizon",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": 83400,
@@ -11463,6 +12088,8 @@
           "partial": 0,
           "total": 6,
           "collected": 0,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 500400,
           "toReimburse": 0,
           "againstCosts": -500000,
@@ -11481,7 +12108,7 @@
     "body": {
       "payments": {
         "players": [],
-        "amountDue": 475000,
+        "amountDue": 34400,
         "dueBasis": "break_even",
         "entranceFeeIncluded": 5000,
         "totals": {
@@ -11489,10 +12116,12 @@
           "partial": 0,
           "total": 0,
           "collected": 0,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 0,
           "toReimburse": 0,
-          "againstCosts": -475000,
-          "cost": 475000
+          "againstCosts": -550000,
+          "cost": 550000
         }
       }
     }
@@ -11523,19 +12152,20 @@
           ]
         },
         "estimate": {
-          "players": 1,
+          "players": 16,
+          "payers": 16,
           "court": 200000,
           "shuttle": 270000,
-          "entrance": 5000,
+          "entrance": 80000,
           "entranceFeePerHead": 5000,
-          "total": 475000,
-          "breakEven": 475000,
-          "perHead": 475000,
+          "total": 550000,
+          "breakEven": 34400,
+          "perHead": 34400,
           "isCustom": false,
-          "collect": 475000,
+          "collect": 550400,
           "result": {
             "kind": "breaks_even",
-            "amount": 0
+            "amount": 400
           }
         },
         "revision": "3",
@@ -11573,7 +12203,8 @@
           "shuttles": []
         },
         "estimate": {
-          "players": 1,
+          "players": 12,
+          "payers": 12,
           "court": 0,
           "shuttle": 0,
           "entrance": 0,
@@ -11582,10 +12213,10 @@
           "breakEven": 0,
           "perHead": 12000,
           "isCustom": true,
-          "collect": 12000,
+          "collect": 144000,
           "result": {
             "kind": "no_costs",
-            "amount": 12000
+            "amount": 144000
           }
         },
         "revision": "1",
@@ -11613,6 +12244,8 @@
           "partial": 0,
           "total": 0,
           "collected": 0,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 0,
           "toReimburse": 0,
           "againstCosts": 0,
@@ -11639,6 +12272,7 @@
         },
         "estimate": {
           "players": 6,
+          "payers": 6,
           "court": 240000,
           "shuttle": 0,
           "entrance": 0,
@@ -11674,58 +12308,76 @@
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
             "name": "No Phone Ned",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
             "name": "Una Alonzo",
-            "paid": null
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 83400,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:00:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
             "name": "Bob Santos",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 40000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:01:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
             "name": "Carla Dizon",
+            "free": false,
             "paid": {
               "amount": {
                 "amountMinor": 90000,
                 "currency": "PHP"
               },
               "at": "2026-11-19T02:02:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           },
           {
             "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
             "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
             "name": "Cory Only",
+            "free": false,
             "paid": {
               "amount": null,
               "at": "2026-11-19T02:03:00.000Z"
-            }
+            },
+            "transfer": null,
+            "refund": null
           }
         ],
         "amountDue": 40000,
@@ -11736,6 +12388,8 @@
           "partial": 0,
           "total": 6,
           "collected": 253400,
+          "waived": 0,
+          "refunded": 0,
           "stillDue": 80000,
           "toReimburse": 93400,
           "againstCosts": 13400,
@@ -11771,6 +12425,7 @@
         },
         "estimate": {
           "players": 6,
+          "payers": 6,
           "court": 84167,
           "shuttle": 270000,
           "entrance": 30000,
@@ -11830,6 +12485,7 @@
         },
         "estimate": {
           "players": 6,
+          "payers": 6,
           "court": 75833,
           "shuttle": 270000,
           "entrance": 30000,
@@ -11928,6 +12584,7 @@
         "playersPerCourt": 6,
         "expectedPlayers": 14,
         "startedAt": null,
+        "plannedBeforeStart": null,
         "finalizedAt": null,
         "seriesId": "a3500000-0000-4000-8000-000000000001",
         "publicSlug": "next-friday",
@@ -11943,6 +12600,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "4"
       },
       "courts": [
@@ -11950,6 +12610,7 @@
           "id": "a2c00000-0000-4000-8000-000000000011",
           "sessionId": "a3000000-0000-4000-8000-000000000009",
           "label": "Court 1",
+          "position": 1,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -11959,6 +12620,7 @@
           "id": "a2c00000-0000-4000-8000-000000000012",
           "sessionId": "a3000000-0000-4000-8000-000000000009",
           "label": "Court 2",
+          "position": 2,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -11981,16 +12643,105 @@
       "content-type": "application/json",
       "vary": "Cookie"
     },
-    "body": null
+    "body": {
+      "finalization": {
+        "state": "committed",
+        "stage": "checking"
+      },
+      "snapshot": {
+        "id": "a3a00000-0000-4000-8000-000000000002",
+        "version": 2,
+        "calculationVersion": "v2",
+        "standings": [
+          {
+            "name": "Alice Reyes",
+            "wins": 2,
+            "games": 2,
+            "losses": 0,
+            "position": 1,
+            "rosterId": "a7000000-0000-4000-8000-000000000001"
+          },
+          {
+            "name": "Carla Dizon",
+            "wins": 2,
+            "games": 2,
+            "losses": 0,
+            "position": 1,
+            "rosterId": "a7000000-0000-4000-8000-000000000003"
+          },
+          {
+            "name": "Bob Santos",
+            "wins": 0,
+            "games": 2,
+            "losses": 2,
+            "position": 2,
+            "rosterId": "a7000000-0000-4000-8000-000000000002"
+          }
+        ],
+        "awards": {
+          "mvp": {
+            "name": "Alice Reyes",
+            "rosterId": "a7000000-0000-4000-8000-000000000001"
+          },
+          "mostImproved": null
+        },
+        "offDay": {
+          "count": 9007199254740992,
+          "names": [
+            "Cory Only"
+          ]
+        },
+        "generatedAt": "2026-11-13T14:00:30.250Z"
+      },
+      "publication": {
+        "state": "published",
+        "publishedSlides": [
+          "standings",
+          "awards"
+        ],
+        "includeOffDay": true,
+        "publishedAt": "2026-11-13T15:00:00.500Z"
+      },
+      "exports": [
+        {
+          "id": "a3b00000-0000-4000-8000-000000000002",
+          "format": "feed",
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": true,
+          "frameCount": 3,
+          "ready": false,
+          "createdAt": "2026-11-13T17:00:00.000Z"
+        },
+        {
+          "id": "a3b00000-0000-4000-8000-000000000001",
+          "format": "story",
+          "slides": [
+            "standings"
+          ],
+          "includeOffDay": false,
+          "frameCount": 2,
+          "ready": true,
+          "createdAt": "2026-11-13T16:00:00.000Z"
+        }
+      ]
+    }
   },
   "results-club1-s4-expired-record-off": {
-    "status": 200,
+    "status": 403,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Cookie"
     },
-    "body": null
+    "body": {
+      "error": {
+        "code": "entitlement_required",
+        "message": "This club does not have an active license."
+      }
+    }
   },
   "results-club1-s4-expired": {
     "status": 403,
@@ -12067,7 +12818,7 @@
             "wins": 0,
             "games": 2,
             "losses": 2,
-            "position": 3,
+            "position": 2,
             "rosterId": "a7000000-0000-4000-8000-000000000002"
           }
         ],
@@ -12221,12 +12972,14 @@
       "minimum": 0,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 4,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 4
       },
       "match": [
@@ -12372,12 +13125,14 @@
       "minimum": 0,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 0,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 0
       },
       "match": []
@@ -12395,12 +13150,14 @@
       "minimum": 0,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 3,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 3
       },
       "match": [
@@ -12507,12 +13264,14 @@
       "minimum": 0,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 3,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 3
       },
       "match": [
@@ -12643,6 +13402,7 @@
         "playersPerCourt": 8,
         "expectedPlayers": null,
         "startedAt": "2026-11-19T01:00:00.000Z",
+        "plannedBeforeStart": null,
         "finalizedAt": null,
         "seriesId": null,
         "publicSlug": "live-now",
@@ -12658,6 +13418,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "1"
       },
       "courts": [
@@ -12665,6 +13428,7 @@
           "id": "a2c00000-0000-4000-8000-000000000001",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "label": "Court 1",
+          "position": 1,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -12674,6 +13438,7 @@
           "id": "a2c00000-0000-4000-8000-000000000002",
           "sessionId": "a3000000-0000-4000-8000-000000000001",
           "label": "Court 2",
+          "position": 2,
           "startsAt": "2026-11-19T02:00:00.000Z",
           "openedEarlyAt": null,
           "openUntil": "2026-11-19T06:00:00.000Z",
@@ -12701,12 +13466,14 @@
       "minimum": 5,
       "join": [],
       "dropOuts": [],
+      "transfers": [],
       "selfCheckIn": {},
       "counts": {
         "total": 0,
         "join": 0,
         "joinRequests": 0,
         "dropOuts": 0,
+        "transfers": 0,
         "match": 0
       },
       "match": []
@@ -12742,6 +13509,7 @@
         "playersPerCourt": 6,
         "expectedPlayers": 14,
         "startedAt": null,
+        "plannedBeforeStart": null,
         "finalizedAt": null,
         "seriesId": "a3500000-0000-4000-8000-000000000001",
         "publicSlug": "next-friday",
@@ -12757,6 +13525,9 @@
           "fun_5v5": false
         },
         "recordGames": true,
+        "levelRestriction": {
+          "kind": "all"
+        },
         "revision": "4"
       },
       "courts": [
@@ -12764,6 +13535,7 @@
           "id": "a2c00000-0000-4000-8000-000000000011",
           "sessionId": "a3000000-0000-4000-8000-000000000009",
           "label": "Court 1",
+          "position": 1,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -12773,6 +13545,7 @@
           "id": "a2c00000-0000-4000-8000-000000000012",
           "sessionId": "a3000000-0000-4000-8000-000000000009",
           "label": "Court 2",
+          "position": 2,
           "startsAt": null,
           "openedEarlyAt": null,
           "openUntil": null,
@@ -13433,7 +14206,7 @@
     }
   },
   "sessionsync-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -13441,8 +14214,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -14282,7 +15055,7 @@
     }
   },
   "donereview-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -14290,8 +15063,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -16779,6 +17552,7 @@
       "completedAt": null,
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": []
     }
   },
@@ -16993,7 +17767,7 @@
     }
   },
   "finalization-club1-not-a-uuid": {
-    "status": 500,
+    "status": 404,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
@@ -17001,8 +17775,8 @@
     },
     "body": {
       "error": {
-        "code": "internal",
-        "message": "Something went wrong."
+        "code": "not_found",
+        "message": "Not found."
       }
     }
   },
@@ -17023,6 +17797,7 @@
       "completedAt": null,
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": []
     }
   },
@@ -17043,6 +17818,7 @@
       "completedAt": null,
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": []
     }
   },
@@ -17063,6 +17839,7 @@
       "completedAt": "2026-11-13T14:05:00.250Z",
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "club_session_summaries",
@@ -17122,6 +17899,7 @@
       "completedAt": "2026-11-13T14:05:00.000Z",
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "result_snapshot",
@@ -17149,6 +17927,7 @@
       "completedAt": "2026-11-13T14:00:00.500Z",
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": []
     }
   },
@@ -17169,6 +17948,7 @@
       "completedAt": null,
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": []
     }
   },
@@ -17189,6 +17969,7 @@
       "completedAt": "2026-11-13T14:00:01.999Z",
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": []
     }
   },
@@ -17209,6 +17990,7 @@
       "completedAt": null,
       "failedStage": "slides",
       "failureCode": "snapshot_error",
+      "recordGames": true,
       "jobs": [
         {
           "kind": "club_session_summaries",
@@ -17254,6 +18036,7 @@
       "completedAt": null,
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "result_snapshot",
@@ -17287,6 +18070,7 @@
       "completedAt": null,
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "result_snapshot",
@@ -17314,6 +18098,7 @@
       "completedAt": "2026-11-13T14:05:00.000Z",
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "player_rank",
@@ -17355,6 +18140,7 @@
       "completedAt": null,
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": []
     }
   },
@@ -17375,6 +18161,7 @@
       "completedAt": null,
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "club_session_summaries",
@@ -17420,6 +18207,7 @@
       "completedAt": "2026-11-19T04:00:00.000Z",
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "club_session_summaries",
@@ -17465,6 +18253,7 @@
       "completedAt": null,
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "result_snapshot",
@@ -17504,6 +18293,7 @@
       "completedAt": "2026-11-19T04:00:00.000Z",
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "result_snapshot",
@@ -17543,6 +18333,7 @@
       "completedAt": null,
       "failedStage": "slides",
       "failureCode": "snapshot_error",
+      "recordGames": true,
       "jobs": [
         {
           "kind": "result_snapshot",
@@ -17582,6 +18373,7 @@
       "completedAt": "2026-11-19T04:00:00.000Z",
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "player_history",
@@ -17621,6 +18413,7 @@
       "completedAt": null,
       "failedStage": null,
       "failureCode": null,
+      "recordGames": true,
       "jobs": [
         {
           "kind": "result_snapshot",

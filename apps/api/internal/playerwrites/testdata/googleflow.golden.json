@@ -543,8 +543,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -560,8 +562,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -577,8 +581,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -1254,8 +1260,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -1271,8 +1279,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -1288,8 +1298,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -1963,8 +1975,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -1980,8 +1994,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -1997,8 +2013,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -2674,8 +2692,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -2691,8 +2711,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -2708,8 +2730,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -3379,8 +3403,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -3396,8 +3422,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -3413,8 +3441,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -4084,8 +4114,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -4101,8 +4133,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -4118,8 +4152,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -4789,8 +4825,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -4806,8 +4844,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -4823,8 +4863,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5506,8 +5548,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -5523,8 +5567,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -5540,8 +5586,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6218,8 +6266,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -6235,8 +6285,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -6252,8 +6304,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6930,8 +6984,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -6947,8 +7003,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -6964,8 +7022,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -7642,8 +7702,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -7659,8 +7721,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -7676,8 +7740,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -8353,8 +8419,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -8370,8 +8438,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -8387,8 +8457,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -9107,8 +9179,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -9124,8 +9198,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -9141,8 +9217,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared Person",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -9158,8 +9236,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -9175,8 +9255,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared P.",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -9873,8 +9955,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -9890,8 +9974,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -9907,8 +9993,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -10585,8 +10673,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -10602,8 +10692,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -10619,8 +10711,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -11292,8 +11386,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -11309,8 +11405,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -11326,8 +11424,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -11999,8 +12099,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -12016,8 +12118,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -12033,8 +12137,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -12705,8 +12811,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -12722,8 +12830,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -12739,8 +12849,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -13417,8 +13529,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -13434,8 +13548,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -13451,8 +13567,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -14129,8 +14247,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -14146,8 +14266,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -14163,8 +14285,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -14841,8 +14965,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -14858,8 +14984,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -14875,8 +15003,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -15552,8 +15682,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -15569,8 +15701,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -15586,8 +15720,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -16263,8 +16399,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -16280,8 +16418,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -16297,8 +16437,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -16974,8 +17116,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -16991,8 +17135,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -17008,8 +17154,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -17685,8 +17833,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -17702,8 +17852,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -17719,8 +17871,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -18396,8 +18550,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -18413,8 +18569,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -18430,8 +18588,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -19107,8 +19267,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -19124,8 +19286,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -19141,8 +19305,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -19855,8 +20021,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -19872,8 +20040,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -19889,8 +20059,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared Person",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -19906,8 +20078,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -19923,8 +20097,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared P.",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -20657,8 +20833,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -20674,8 +20852,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -20691,8 +20871,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared Person",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -20708,8 +20890,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -20725,8 +20909,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared P.",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -21416,8 +21602,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -21433,8 +21621,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -21450,8 +21640,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared Person",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -21467,8 +21659,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -21484,8 +21678,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared P.",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -22175,8 +22371,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -22192,8 +22390,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -22209,8 +22409,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared Person",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -22226,8 +22428,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -22243,8 +22447,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared P.",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -22934,8 +23140,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -22951,8 +23159,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -22968,8 +23178,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -23721,8 +23933,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -23738,8 +23952,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -23755,8 +23971,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": "+639175550401",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -23772,8 +23990,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -24540,8 +24760,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -24557,8 +24779,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -24574,8 +24798,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": "+639175550401",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -24591,8 +24817,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -25368,8 +25596,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -25385,8 +25615,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -25402,8 +25634,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Gary Guest",
           "contact_phone": "+639175550302",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -25419,8 +25653,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -25436,8 +25672,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -26128,8 +26366,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -26145,8 +26385,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -26162,8 +26404,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Gary Guest",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -26179,8 +26423,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -26196,8 +26442,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -26959,8 +27207,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -26976,8 +27226,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -26993,8 +27245,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -27010,8 +27264,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Shared Person",
           "contact_phone": "+639175550303",
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -27027,8 +27283,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -27044,8 +27302,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Shared P.",
           "contact_phone": "+639175550303",
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -27841,8 +28101,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -27858,8 +28120,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -27875,8 +28139,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -27892,8 +28158,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Shared Person",
           "contact_phone": "+639175550303",
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -27909,8 +28177,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -27926,8 +28196,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Shared P.",
           "contact_phone": "+639175550303",
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -28652,8 +28924,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -28669,8 +28943,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -28686,8 +28962,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -28703,8 +28981,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared Person",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -28720,8 +29000,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -28737,8 +29019,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Shared P.",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -29459,8 +29743,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -29476,8 +29762,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -29493,8 +29781,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -29510,8 +29800,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -30198,8 +30490,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -30215,8 +30509,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -30232,8 +30528,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -30249,8 +30547,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -30937,8 +31237,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -30954,8 +31256,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -30971,8 +31275,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -30988,8 +31294,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -31680,8 +31988,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -31697,8 +32007,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -31714,8 +32026,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -31731,8 +32045,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -32423,8 +32739,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -32440,8 +32758,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -32457,8 +32777,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Rita Record",
           "contact_phone": null,
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -32474,8 +32796,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -33261,8 +33585,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -33278,8 +33604,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -33295,8 +33623,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Gina Google",
           "contact_phone": "+639175550305",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -33312,8 +33642,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -34084,8 +34416,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -34101,8 +34435,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -34118,8 +34454,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Gina Q. Google",
           "contact_phone": "+639175550305",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -34135,8 +34473,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -34815,8 +35155,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -34832,8 +35174,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -34849,8 +35193,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -35526,8 +35872,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -35543,8 +35891,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -35560,8 +35910,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -36331,8 +36683,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -36348,8 +36702,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -36365,8 +36721,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Shared Person",
           "contact_phone": "+639175550305",
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -36382,8 +36740,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -36399,8 +36759,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Shared P.",
           "contact_phone": "+639175550305",
+          "saved_level_at": null,
           "shared_entry_id": "5e000000-0000-4000-8000-000000000001",
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -37096,8 +37458,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -37113,8 +37477,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -37130,8 +37496,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -37807,8 +38175,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -37824,8 +38194,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -37841,8 +38213,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -38630,8 +39004,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -38647,8 +39023,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -38664,8 +39042,10 @@
           "updated_at": "2026-11-20T04:00:00+00:00",
           "display_name": "Gina Google",
           "contact_phone": "+639175550305",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -38681,8 +39061,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -39353,8 +39735,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -39370,8 +39754,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -39387,8 +39773,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -40059,8 +40447,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -40076,8 +40466,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -40093,8 +40485,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -40764,8 +41158,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -40781,8 +41177,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -40798,8 +41196,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -41475,8 +41875,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -41492,8 +41894,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -41509,8 +41913,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -42186,8 +42592,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -42203,8 +42611,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -42220,8 +42630,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -42897,8 +43309,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Alice Reyes",
           "contact_phone": "+639175550001",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -42914,8 +43328,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         },
         {
@@ -42931,8 +43347,10 @@
           "updated_at": "2026-11-01T00:00:00+00:00",
           "display_name": "Dan Uy",
           "contact_phone": "+639175550004",
+          "saved_level_at": null,
           "shared_entry_id": null,
           "avatar_previous_ref": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],

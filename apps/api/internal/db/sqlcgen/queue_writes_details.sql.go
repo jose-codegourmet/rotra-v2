@@ -11,6 +11,50 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countOtherLiveRecordsOfEntry = `-- name: CountOtherLiveRecordsOfEntry :one
+SELECT count(*)::int4 FROM club_players WHERE shared_entry_id = $1 AND removed_at IS NULL AND id <> $2
+`
+
+type CountOtherLiveRecordsOfEntryParams struct {
+	EntryID  pgtype.UUID
+	ExceptID pgtype.UUID
+}
+
+func (q *Queries) CountOtherLiveRecordsOfEntry(ctx context.Context, arg CountOtherLiveRecordsOfEntryParams) (int32, error) {
+	row := q.db.QueryRow(ctx, countOtherLiveRecordsOfEntry, arg.EntryID, arg.ExceptID)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
+const detachClubPlayerFromEntry = `-- name: DetachClubPlayerFromEntry :exec
+UPDATE club_players SET shared_entry_id = NULL, revision = revision + 1, updated_at = $1 WHERE club_id = $2 AND id = $3
+`
+
+type DetachClubPlayerFromEntryParams struct {
+	Now    pgtype.Timestamptz
+	ClubID pgtype.UUID
+	ID     pgtype.UUID
+}
+
+// followClubLinks: with no email and no key left, this club's record goes back to being a guest.
+func (q *Queries) DetachClubPlayerFromEntry(ctx context.Context, arg DetachClubPlayerFromEntryParams) error {
+	_, err := q.db.Exec(ctx, detachClubPlayerFromEntry, arg.Now, arg.ClubID, arg.ID)
+	return err
+}
+
+const findOpenEntryBySocialKey = `-- name: FindOpenEntryBySocialKey :one
+SELECT id FROM shared_player_entries WHERE social_key = $1 AND claimed_player_id IS NULL AND retired_at IS NULL LIMIT 1
+`
+
+// openEntryBySocialKey (#1019): only unclaimed people are found by a link; the key is cleared when the entry is claimed or retired.
+func (q *Queries) FindOpenEntryBySocialKey(ctx context.Context, key pgtype.Text) (pgtype.UUID, error) {
+	row := q.db.QueryRow(ctx, findOpenEntryBySocialKey, key)
+	var id pgtype.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const findSavedPlayerWithPhone = `-- name: FindSavedPlayerWithPhone :one
 SELECT cp.display_name FROM club_players cp
 WHERE cp.club_id = $1 AND cp.id <> $2 AND cp.removed_at IS NULL
@@ -32,6 +76,70 @@ func (q *Queries) FindSavedPlayerWithPhone(ctx context.Context, arg FindSavedPla
 	var display_name string
 	err := row.Scan(&display_name)
 	return display_name, err
+}
+
+const getClubPlayerPresetFields = `-- name: GetClubPlayerPresetFields :one
+SELECT preset_fields FROM club_player_private_inputs WHERE club_player_id = $1
+`
+
+// The club's own details after this save (followClubLinks reads the links back from the private input).
+func (q *Queries) GetClubPlayerPresetFields(ctx context.Context, clubPlayerID pgtype.UUID) ([]byte, error) {
+	row := q.db.QueryRow(ctx, getClubPlayerPresetFields, clubPlayerID)
+	var preset_fields []byte
+	err := row.Scan(&preset_fields)
+	return preset_fields, err
+}
+
+const getSharedEntryForLinks = `-- name: GetSharedEntryForLinks :one
+SELECT id, email, social_key, claimed_player_id, retired_at FROM shared_player_entries WHERE id = $1
+`
+
+type GetSharedEntryForLinksRow struct {
+	ID              pgtype.UUID
+	Email           pgtype.Text
+	SocialKey       pgtype.Text
+	ClaimedPlayerID pgtype.UUID
+	RetiredAt       pgtype.Timestamptz
+}
+
+// followClubLinks (packages/db/src/player/shared-entry.ts): the entry the club's links are followed on.
+func (q *Queries) GetSharedEntryForLinks(ctx context.Context, id pgtype.UUID) (GetSharedEntryForLinksRow, error) {
+	row := q.db.QueryRow(ctx, getSharedEntryForLinks, id)
+	var i GetSharedEntryForLinksRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.SocialKey,
+		&i.ClaimedPlayerID,
+		&i.RetiredAt,
+	)
+	return i, err
+}
+
+const lockSocialKey = `-- name: LockSocialKey :exec
+SELECT pg_advisory_xact_lock(hashtext('social:' || $1::text))
+`
+
+// lockSocialKey (#1019): serializes everything that reads and then writes one social link key. The key is the TypeScript's.
+func (q *Queries) LockSocialKey(ctx context.Context, key string) error {
+	_, err := q.db.Exec(ctx, lockSocialKey, key)
+	return err
+}
+
+const setSharedEntrySocialKey = `-- name: SetSharedEntrySocialKey :exec
+UPDATE shared_player_entries SET social_key = $1, revision = revision + 1, updated_at = $2 WHERE id = $3
+`
+
+type SetSharedEntrySocialKeyParams struct {
+	Key pgtype.Text
+	Now pgtype.Timestamptz
+	ID  pgtype.UUID
+}
+
+// followClubLinks: the entry's link key follows this club's links (Prisma sets updated_at).
+func (q *Queries) SetSharedEntrySocialKey(ctx context.Context, arg SetSharedEntrySocialKeyParams) error {
+	_, err := q.db.Exec(ctx, setSharedEntrySocialKey, arg.Key, arg.Now, arg.ID)
+	return err
 }
 
 const updateClubPlayerDetails = `-- name: UpdateClubPlayerDetails :exec

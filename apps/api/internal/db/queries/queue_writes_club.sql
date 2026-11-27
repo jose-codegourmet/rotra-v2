@@ -123,7 +123,7 @@ SELECT count(*)::int4 FROM club_players WHERE shared_entry_id = @entry_id AND re
 
 -- name: RetireSharedEntry :exec
 -- retireEntryIfOrphan: the entry is retired and the mistyped email cleared; the RTR ID is never reused.
-UPDATE shared_player_entries SET retired_at = @now, email = NULL, revision = revision + 1, updated_at = @now WHERE id = @id;
+UPDATE shared_player_entries SET retired_at = @now, email = NULL, social_key = NULL, revision = revision + 1, updated_at = @now WHERE id = @id;
 
 -- name: GetSavedPlayerForLink :one
 SELECT cp.id, cp.removed_at, p.id AS player_id, p.profile_state AS player_profile_state

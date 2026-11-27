@@ -161,6 +161,9 @@ type newClubPlayer struct {
 	nickname string // empty is none
 	phone    string // empty is none
 	email    string // empty is none
+	// socialLink is only counted, not read: a phone needs an email or a social link (D-2026-11-23-03, #1031). The link itself
+	// (its check, the unclaimed record it makes, the player it links) is #1019, not done in Go yet.
+	socialLink string
 }
 
 // createClubPlayer creates a new guest or phone-entered player (Q-ROSTER New player). A phone is kept only as private intake
@@ -190,6 +193,9 @@ func (t *txn) createClubPlayer(operationID string, in newClubPlayer, at pgtype.T
 		if email, _ = identity.NormalizeEmail(typedEmail); email == "" {
 			return existing, nil, writes.Fail(httpapi.ErrInvalid, map[string]string{"email": newPlayerEmailError})
 		}
+	}
+	if phone != "" && email == "" && fields.JSTrim(in.socialLink) == "" {
+		return existing, nil, writes.Fail(httpapi.ErrInvalid, map[string]string{"phone": "Add an email or a social link to save a phone, or leave the phone empty."})
 	}
 	var resolution *emailResolution
 	if email != "" {

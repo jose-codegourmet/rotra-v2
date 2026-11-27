@@ -60,7 +60,7 @@ func addSourceOf(b writes.Body, operationID, level string) (addSource, error) {
 			addPlacement: placementOf(b), operationID: operationID, playerID: b.Text("playerId"), name: b.Text("name"), level: level,
 		}}, nil
 	}
-	person := newClubPlayer{name: b.Text("name"), nickname: b.Text("nickname"), email: b.Text("email")}
+	person := newClubPlayer{name: b.Text("name"), nickname: b.Text("nickname"), email: b.Text("email"), socialLink: b.Text("socialLink")}
 	if raw := fields.JSTrim(b.Text("phone")); raw != "" {
 		e164, ok := phone.Parse(raw)
 		if !ok {

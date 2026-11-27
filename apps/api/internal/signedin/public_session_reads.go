@@ -52,8 +52,15 @@ type courtNowDTO struct {
 type queuedMatchDTO struct {
 	MatchNo int64     `json:"matchNo"`
 	Format  string    `json:"format"`
+	Label   string    `json:"label"`
 	TeamA   []faceDTO `json:"teamA"`
 	TeamB   []faceDTO `json:"teamB"`
+}
+
+// levelBlockDTO is the reason a Player cannot join and the level the club knows them at.
+type levelBlockDTO struct {
+	Reason string `json:"reason"`
+	Level  string `json:"level"`
 }
 
 type accessDTO struct {
@@ -66,10 +73,15 @@ type accessDTO struct {
 	WaitlistPosition *int             `json:"waitlistPosition"`
 	JoinRequest      *joinRequestView `json:"joinRequest"`
 	IsClubMember     bool             `json:"isClubMember"`
-	FullRoster       bool             `json:"fullRoster"`
-	Participants     []participantDTO `json:"participants"`
-	CourtsNow        []courtNowDTO    `json:"courtsNow"`
-	Queue            []queuedMatchDTO `json:"queue"`
+	// LevelBlock is "Not open to your level" (D-2026-11-19-12): only a session restricted by level can block, and the block rule
+	// (levelRestrictionBlock, tasks 2.2 and 4.3) is not in Go yet, so it is null here.
+	LevelBlock   *levelBlockDTO   `json:"levelBlock"`
+	FullRoster   bool             `json:"fullRoster"`
+	Participants []participantDTO `json:"participants"`
+	Waitlist     []participantDTO `json:"waitlist"`
+	Hosts        []participantDTO `json:"hosts"`
+	CourtsNow    []courtNowDTO    `json:"courtsNow"`
+	Queue        []queuedMatchDTO `json:"queue"`
 }
 
 // readSessionAccess is readPlayerSessionAccess: what the signed-in Player sees of the session page (D-2026-11-09-02).
@@ -82,7 +94,34 @@ func (s *server) readSessionAccess(r *http.Request, q *sqlcgen.Queries, who view
 	if err != nil {
 		return nil, err
 	}
-	linked, err := rosterPeople(ctx, q, ls.roster)
+	// The waitlist in its public order, and the hosts (epic #1002): a finished session shows the rows frozen at its end.
+	waitRows, err := q.ListSessionWaitlistRows(ctx, ls.row.ID)
+	if err != nil {
+		return nil, err
+	}
+	waitlist := orderedWaitlist(waitRows)
+	ended := ls.row.State == sqlcgen.QueueSessionStateCompleted || ls.row.State == sqlcgen.QueueSessionStateInvalid
+	hostRows, err := q.ListSessionHostRows(ctx, sqlcgen.ListSessionHostRowsParams{SessionID: ls.row.ID, Ended: ended})
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]pgtype.UUID, 0, len(ls.roster)+len(waitlist)+len(hostRows))
+	for _, e := range ls.roster {
+		ids = append(ids, e.ClubPlayerID)
+	}
+	for _, w := range waitlist {
+		ids = append(ids, w.ClubPlayerID)
+	}
+	hostIDs := make([]pgtype.UUID, len(hostRows))
+	for i, h := range hostRows {
+		ids = append(ids, h.ClubPlayerID)
+		hostIDs[i] = h.ClubPlayerID
+	}
+	linked, err := peopleByID(ctx, q, ids)
+	if err != nil {
+		return nil, err
+	}
+	hostLevels, err := q.ListLatestAssessmentLevels(ctx, hostIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -90,14 +129,19 @@ func (s *server) readSessionAccess(r *http.Request, q *sqlcgen.Queries, who view
 	if err != nil {
 		return nil, err
 	}
-	fullRoster := false
-	for _, e := range ls.roster {
-		if c, ok := linked[e.ClubPlayerID]; ok && c.PlayerID.Valid && c.PlayerID == who.ID {
-			fullRoster = true
+	// pictureOf: a registered player's own picture, else the one the club set for its guest or unclaimed player.
+	pictureOf := func(clubPlayer pgtype.UUID) *string {
+		c, ok := linked[clubPlayer]
+		switch {
+		case !ok:
+			return nil
+		case c.PlayerID.Valid:
+			return publicreads.TextPtr(c.AvatarRef)
 		}
+		return publicreads.TextPtr(c.ClubAvatarRef)
 	}
-	person := func(e sqlcgen.ListSessionRosterRowsRow) participantDTO {
-		club, found := linked[e.ClubPlayerID]
+	person := func(clubPlayer pgtype.UUID, nameSnapshot string) participantDTO {
+		club, found := linked[clubPlayer]
 		registered := found && isClaimed(club)
 		isViewer := found && club.PlayerID.Valid && club.PlayerID == who.ID
 		alwaysPrivate := registered && club.ProfileVisibility.Valid && club.ProfileVisibility.ProfileVisibility == sqlcgen.ProfileVisibilityAlwaysPrivate
@@ -109,10 +153,10 @@ func (s *server) readSessionAccess(r *http.Request, q *sqlcgen.Queries, who view
 			chosenID, chosenImage = club.BannerID, club.BannerImage
 		}
 		key, image := publicreads.ResolveBanner(chosenID, chosenImage, shown)
-		p := participantDTO{BannerKey: key, BannerImageURL: image, Masked: !showFull, IsViewer: isViewer, PictureURL: publicreads.TextPtr(club.AvatarRef)}
-		p.Name = publicreads.MaskPublicName(e.NameSnapshot)
+		p := participantDTO{BannerKey: key, BannerImageURL: image, Masked: !showFull, IsViewer: isViewer}
+		p.Name = publicreads.MaskPublicName(nameSnapshot)
 		if showFull {
-			p.Name = e.NameSnapshot
+			p.Name = nameSnapshot
 		}
 		switch {
 		case unclaimed:
@@ -124,15 +168,16 @@ func (s *server) readSessionAccess(r *http.Request, q *sqlcgen.Queries, who view
 		default:
 			p.Profile = "guest"
 		}
+		return p
+	}
+	rosterPerson := func(e sqlcgen.ListSessionRosterRowsRow) participantDTO {
+		p := person(e.ClubPlayerID, e.NameSnapshot)
+		p.PictureURL = pictureOf(e.ClubPlayerID)
 		p.SkillGroup, p.LevelLabel = publicreads.PublicLevel(levelOf(e.SkillLevelID))
 		return p
 	}
-	// The participants this read returns (capped at 12 unless the Player is in the session); a face points at its entry
-	// there so it can open the same profile card.
-	listed := len(ls.roster)
-	if !fullRoster {
-		listed = min(listed, 12)
-	}
+	// A signed-in Player sees the whole roster, whether or not they hold a slot (D-2026-11-25-05); the 12-tile cap is the
+	// visitor's page only. A face points at its entry there so it can open the same profile card.
 	index := make(map[string]int, len(ls.roster))
 	byID := make(map[string]sqlcgen.ListSessionRosterRowsRow, len(ls.roster))
 	for i, e := range ls.roster {
@@ -145,15 +190,12 @@ func (s *server) readSessionAccess(r *http.Request, q *sqlcgen.Queries, who view
 		if !ok {
 			return f
 		}
-		p := person(e)
-		f = faceDTO{
-			Name: publicreads.PublicFirstName(p.Name), Level: levelOf(e.SkillLevelID),
-			PictureURL: publicreads.TextPtr(linked[e.ClubPlayerID].AvatarRef), Masked: p.Masked, IsViewer: p.IsViewer,
+		p := person(e.ClubPlayerID, e.NameSnapshot)
+		i := index[id]
+		return faceDTO{
+			Name: publicreads.PublicFirstName(p.Name), Level: levelOf(e.SkillLevelID), PictureURL: pictureOf(e.ClubPlayerID),
+			Masked: p.Masked, IsViewer: p.IsViewer, Participant: &i,
 		}
-		if i := index[id]; i < listed {
-			f.Participant = &i
-		}
-		return f
 	}
 	faces := func(ids []string) []faceDTO {
 		out := make([]faceDTO, 0, len(ids))
@@ -176,21 +218,63 @@ func (s *server) readSessionAccess(r *http.Request, q *sqlcgen.Queries, who view
 	if err != nil {
 		return nil, err
 	}
-	shownRoster := ls.roster
-	if !fullRoster {
-		shownRoster = ls.roster[:min(len(ls.roster), 12)]
-	}
 	dto := accessDTO{
 		PlayerID: who.ID.String(), Name: st.Name, Nickname: st.Nickname, RtrID: st.RtrID, PictureURL: st.PictureURL,
 		InSession: st.InSession, WaitlistPosition: st.WaitlistPosition, JoinRequest: st.JoinRequest,
-		IsClubMember: member, FullRoster: fullRoster, Participants: make([]participantDTO, 0, len(shownRoster)), CourtsNow: courts,
-		Queue: []queuedMatchDTO{},
+		IsClubMember: member, FullRoster: true, Participants: make([]participantDTO, 0, len(ls.roster)),
+		Waitlist: make([]participantDTO, 0, len(waitlist)), Hosts: []participantDTO{}, CourtsNow: courts, Queue: []queuedMatchDTO{},
 	}
-	for _, e := range shownRoster {
-		dto.Participants = append(dto.Participants, person(e))
+	for _, e := range ls.roster {
+		dto.Participants = append(dto.Participants, rosterPerson(e))
+	}
+	// The waitlist by the same signed-in name rule; the name is this club's saved name, as on the visitor's page.
+	for _, w := range waitlist {
+		p := person(w.ClubPlayerID, linked[w.ClubPlayerID].DisplayName)
+		p.PictureURL = pictureOf(w.ClubPlayerID)
+		p.SkillGroup, p.LevelLabel = publicreads.PublicLevel(levelOf(w.SkillLevelID))
+		dto.Waitlist = append(dto.Waitlist, p)
+	}
+	// Epic #1002 (#1006): the Hosts section, the same name, picture and card as Players. A finished session shows the name a
+	// host row froze with; an open one the roster name, else the saved player's.
+	assessed := map[pgtype.UUID]int16{}
+	for _, a := range hostLevels {
+		assessed[a.ClubPlayerID] = a.SkillLevelID
+	}
+	for _, host := range hostRows {
+		who, ok := linked[host.ClubPlayerID]
+		if !ok {
+			continue
+		}
+		name := host.NameSnapshot
+		level := pgtype.Int2{}
+		if a, ok := assessed[host.ClubPlayerID]; ok {
+			level = pgtype.Int2{Int16: a, Valid: true}
+		}
+		if i := slices.IndexFunc(ls.roster, func(e sqlcgen.ListSessionRosterRowsRow) bool { return e.ClubPlayerID == host.ClubPlayerID }); i >= 0 {
+			level = ls.roster[i].SkillLevelID
+			if !ended {
+				name = ls.roster[i].NameSnapshot
+			}
+		} else if !ended {
+			name = who.DisplayName
+		}
+		p := person(host.ClubPlayerID, name)
+		p.PictureURL = pictureOf(host.ClubPlayerID)
+		p.SkillGroup, p.LevelLabel = publicreads.PublicLevel(levelOf(level))
+		dto.Hosts = append(dto.Hosts, p)
 	}
 	// Only waiting lineups, in queue order (a match with no position last). No presence, court holds, games, scores,
-	// contacts or operator notes.
+	// contacts or operator notes. The match is named by who plays it (D-2026-11-19-07).
+	genderOf := func(id string) string {
+		e, ok := byID[id]
+		if !ok {
+			return ""
+		}
+		if g := linked[e.ClubPlayerID].Gender; g.Valid {
+			return string(g.PlayerGender)
+		}
+		return ""
+	}
 	waiting := make([]int, 0)
 	for i, m := range ls.matches {
 		if m.State == model.StateWaiting {
@@ -209,7 +293,10 @@ func (s *server) readSessionAccess(r *http.Request, q *sqlcgen.Queries, who view
 	})
 	for _, i := range waiting {
 		m := ls.matches[i]
-		dto.Queue = append(dto.Queue, queuedMatchDTO{MatchNo: m.MatchNo, Format: string(m.Format), TeamA: faces(m.TeamA), TeamB: faces(m.TeamB)})
+		dto.Queue = append(dto.Queue, queuedMatchDTO{
+			MatchNo: m.MatchNo, Format: string(m.Format), Label: match.Label(m.Format, m.TeamA, m.TeamB, genderOf),
+			TeamA: faces(m.TeamA), TeamB: faces(m.TeamB),
+		})
 	}
 	return dto, nil
 }
@@ -283,27 +370,33 @@ type onCourtDTO struct {
 }
 
 type myNightDTO struct {
-	PlayerID         string           `json:"playerId"`
-	Status           string           `json:"status"`
-	Stage            *string          `json:"stage"`
-	WaitlistPosition *int             `json:"waitlistPosition"`
-	StartsAt         int64            `json:"startsAt"`
-	Present          bool             `json:"present"`
-	CheckedIn        bool             `json:"checkedIn"`
-	HasLeft          bool             `json:"hasLeft"`
-	CantMakeItSent   bool             `json:"cantMakeItSent"`
-	Offline          bool             `json:"offline"`
-	Games            int64            `json:"games"`
-	Won              int              `json:"won"`
-	Lost             int              `json:"lost"`
-	Minimum          int32            `json:"minimum"`
-	InQueue          *inQueueDTO      `json:"inQueue"`
-	OnCourt          *onCourtDTO      `json:"onCourt"`
-	JoinRequest      *joinRequestView `json:"joinRequest"`
-	IsClubMember     bool             `json:"isClubMember"`
-	CanInvite        bool             `json:"canInvite"`
-	InviteCode       *string          `json:"inviteCode"`
-	MatchRequest     *matchRequestDTO `json:"matchRequest"`
+	PlayerID         string  `json:"playerId"`
+	Status           string  `json:"status"`
+	Stage            *string `json:"stage"`
+	WaitlistPosition *int    `json:"waitlistPosition"`
+	StartsAt         int64   `json:"startsAt"`
+	Present          bool    `json:"present"`
+	CheckedIn        bool    `json:"checkedIn"`
+	HasLeft          bool    `json:"hasLeft"`
+	CantMakeItSent   bool    `json:"cantMakeItSent"`
+	// CanTransfer is whether the slot can be given to someone else: a confirmed player before Start. SlotTransfer is the player's own
+	// pending transfer (#1011); slot transfers are not in Go yet (task 2.12), so there is none.
+	CanTransfer  bool             `json:"canTransfer"`
+	SlotTransfer *struct{}        `json:"slotTransfer"`
+	Offline      bool             `json:"offline"`
+	Games        int64            `json:"games"`
+	Won          int              `json:"won"`
+	Lost         int              `json:"lost"`
+	Minimum      int32            `json:"minimum"`
+	InQueue      *inQueueDTO      `json:"inQueue"`
+	OnCourt      *onCourtDTO      `json:"onCourt"`
+	JoinRequest  *joinRequestView `json:"joinRequest"`
+	IsClubMember bool             `json:"isClubMember"`
+	CanInvite    bool             `json:"canInvite"`
+	InviteCode   *string          `json:"inviteCode"`
+	MatchRequest *matchRequestDTO `json:"matchRequest"`
+	// LevelBlock is "Not open to your level" (D-2026-11-19-12); the block rule is not in Go yet (tasks 2.2 and 4.3), so it is null.
+	LevelBlock *levelBlockDTO `json:"levelBlock"`
 }
 
 // readMyNight is readMyNight: the signed-in Player's own night on this session. Own standing only: their status and
@@ -336,6 +429,7 @@ func (s *server) readMyNight(r *http.Request, q *sqlcgen.Queries, who viewer) (a
 	}
 	night := myNightDTO{PlayerID: who.ID.String(), WaitlistPosition: st.WaitlistPosition, StartsAt: msOf(ls.row.ScheduledStartAt), Minimum: ls.row.MinimumGames}
 	night.JoinRequest = st.JoinRequest
+	night.CanTransfer = hasRow && ls.row.State == sqlcgen.QueueSessionStatePrepared
 	waitlisted := !hasRow && st.WaitlistPosition != nil
 	state := ls.row.State
 	isLive := state == sqlcgen.QueueSessionStateActive || state == sqlcgen.QueueSessionStateFinalizing
@@ -491,8 +585,8 @@ type matchHistoryDTO struct {
 }
 
 // readMatchHistory is readPublicMatchHistory: a finished session's matches for the signed-in Player, newest first, with
-// the replay's courts and bounds. Null for any session that is not completed; no matches for one that does not record
-// games (D-2026-11-18-06). Until the club shares the results (a published copy) only the matches the Player played in
+// the replay's courts and bounds. Null for any session that is not completed; a session with Record games off lists its
+// matches as usual (D-2026-11-20-02). Until the club shares the results (a published copy) only the matches the Player played in
 // are listed and the court labels are empty; the total always counts every finished or invalid match.
 func (s *server) readMatchHistory(r *http.Request, q *sqlcgen.Queries, who viewer) (any, error) {
 	ctx := r.Context()
@@ -503,11 +597,7 @@ func (s *server) readMatchHistory(r *http.Request, q *sqlcgen.Queries, who viewe
 	if ls.row.State != sqlcgen.QueueSessionStateCompleted {
 		return nil, nil
 	}
-	recorded := ls.row.RecordGames
 	matches := ls.matches
-	if !recorded {
-		matches = nil
-	}
 	start := ls.row.ScheduledStartAt
 	if ls.row.StartedAt.Valid {
 		start = ls.row.StartedAt
@@ -521,14 +611,10 @@ func (s *server) readMatchHistory(r *http.Request, q *sqlcgen.Queries, who viewe
 	for _, e := range ls.rosterAll {
 		levels[e.ID.String()] = levelOf(e.SkillLevelID)
 	}
-	// The access read sends the full roster only while the Player is on the live roster.
-	fullRoster := false
+	// The access read sends the whole roster to any signed-in Player (D-2026-11-25-05).
 	indexes := map[string]int{}
 	for i, e := range ls.roster {
 		indexes[e.ID.String()] = i
-		if people[e.ID].isViewer {
-			fullRoster = true
-		}
 	}
 	face := func(id string) faceDTO {
 		uid, _ := parseUUIDString(id)
@@ -537,7 +623,7 @@ func (s *server) readMatchHistory(r *http.Request, q *sqlcgen.Queries, who viewe
 		if ok {
 			f = faceDTO{Name: publicreads.PublicFirstName(p.name), Level: levels[id], PictureURL: p.pictureURL, Masked: p.masked, IsViewer: p.isViewer}
 		}
-		if i, listed := indexes[id]; fullRoster && listed {
+		if i, listed := indexes[id]; listed {
 			f.Participant = &i
 		}
 		return f
@@ -562,14 +648,11 @@ func (s *server) readMatchHistory(r *http.Request, q *sqlcgen.Queries, who viewe
 		all = append(all, dto)
 	}
 	sort.SliceStable(all, func(i, j int) bool { return all[i].Number > all[j].Number })
-	shared := false
-	if recorded {
-		_, err := q.GetPublishedResults(ctx, ls.row.ID)
-		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return nil, err
-		}
-		shared = err == nil
+	_, err = q.GetPublishedResults(ctx, ls.row.ID)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return nil, err
 	}
+	shared := err == nil
 	out := matchHistoryDTO{Shared: shared, Total: len(all), Matches: []historyMatchDTO{}, CourtLabels: []string{}, From: record.from, To: record.to}
 	if shared {
 		out.CourtLabels = record.courtLabels

@@ -204,6 +204,39 @@ func (q *Queries) IsClubMemberWithLevel(ctx context.Context, arg IsClubMemberWit
 	return is_member, err
 }
 
+const listLatestAssessmentLevels = `-- name: ListLatestAssessmentLevels :many
+SELECT DISTINCT ON (club_player_id) club_player_id, skill_level_id
+FROM club_assessments
+WHERE club_player_id = ANY ($1::uuid[])
+ORDER BY club_player_id, assessed_at DESC
+`
+
+type ListLatestAssessmentLevelsRow struct {
+	ClubPlayerID pgtype.UUID
+	SkillLevelID int16
+}
+
+// The latest assessment level of each saved player (a host who is not on the roster).
+func (q *Queries) ListLatestAssessmentLevels(ctx context.Context, ids []pgtype.UUID) ([]ListLatestAssessmentLevelsRow, error) {
+	rows, err := q.db.Query(ctx, listLatestAssessmentLevels, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListLatestAssessmentLevelsRow
+	for rows.Next() {
+		var i ListLatestAssessmentLevelsRow
+		if err := rows.Scan(&i.ClubPlayerID, &i.SkillLevelID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listOpenMatchRequestSpots = `-- name: ListOpenMatchRequestSpots :many
 SELECT s.request_id, s.side::text AS side, s.slot_no, s.session_player_id
 FROM session_match_request_spots s
@@ -297,7 +330,10 @@ SELECT cp.id,
        p.profile_visibility,
        pb.id AS banner_id,
        pb.image AS banner_image,
-       a.rtr_id AS player_rtr_id
+       a.rtr_id AS player_rtr_id,
+       p.gender,
+       cp.display_name,
+       cp.avatar_ref AS club_avatar_ref
 FROM club_players cp
 LEFT JOIN shared_player_entries se ON se.id = cp.shared_entry_id
 LEFT JOIN players p ON p.id = cp.player_id
@@ -321,6 +357,9 @@ type ListRosterPeopleRow struct {
 	BannerID              pgtype.Text
 	BannerImage           pgtype.Text
 	PlayerRtrID           pgtype.Text
+	Gender                NullPlayerGender
+	DisplayName           string
+	ClubAvatarRef         pgtype.Text
 }
 
 // The saved players behind roster entries and what the name rules read about them: the player (picture, nickname,
@@ -349,6 +388,9 @@ func (q *Queries) ListRosterPeople(ctx context.Context, ids []pgtype.UUID) ([]Li
 			&i.BannerID,
 			&i.BannerImage,
 			&i.PlayerRtrID,
+			&i.Gender,
+			&i.DisplayName,
+			&i.ClubAvatarRef,
 		); err != nil {
 			return nil, err
 		}
@@ -469,6 +511,46 @@ func (q *Queries) ListSessionCourtUsageRows(ctx context.Context, sessionID pgtyp
 			&i.ReleasedAt,
 			&i.ReleaseOperationID,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listSessionHostRows = `-- name: ListSessionHostRows :many
+SELECT h.club_player_id, h.name_snapshot
+FROM session_hosts h
+WHERE h.session_id = $1
+  AND (($2::bool AND h.frozen_at IS NOT NULL) OR (NOT $2::bool AND h.removed_at IS NULL))
+ORDER BY h.assigned_at ASC, h.id ASC
+`
+
+type ListSessionHostRowsParams struct {
+	SessionID pgtype.UUID
+	Ended     bool
+}
+
+type ListSessionHostRowsRow struct {
+	ClubPlayerID pgtype.UUID
+	NameSnapshot string
+}
+
+// The hosts a read shows (#1008, D-2026-11-22-01): the current rows of an open session, or the rows frozen when a finished session
+// ended. Oldest first.
+func (q *Queries) ListSessionHostRows(ctx context.Context, arg ListSessionHostRowsParams) ([]ListSessionHostRowsRow, error) {
+	rows, err := q.db.Query(ctx, listSessionHostRows, arg.SessionID, arg.Ended)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSessionHostRowsRow
+	for rows.Next() {
+		var i ListSessionHostRowsRow
+		if err := rows.Scan(&i.ClubPlayerID, &i.NameSnapshot); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

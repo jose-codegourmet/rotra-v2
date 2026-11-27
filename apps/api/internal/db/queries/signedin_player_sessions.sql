@@ -42,7 +42,7 @@ ORDER BY qs.scheduled_start_at ASC, qs.id ASC;
 -- name: ListSessionWaitlistRows :many
 -- The waitlist, unordered: the order is a rule (demoted first, then arrival) applied in Go at the millisecond the
 -- TypeScript compares at.
-SELECT id, club_player_id, added_at, demoted_at, demoted_confirmed_at
+SELECT id, club_player_id, skill_level_id, added_at, demoted_at, demoted_confirmed_at
 FROM session_waitlist
 WHERE session_id = @session_id;
 

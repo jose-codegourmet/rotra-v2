@@ -331,7 +331,7 @@ func (q *Queries) ListMyShareFacts(ctx context.Context, arg ListMyShareFactsPara
 }
 
 const listSessionWaitlistRows = `-- name: ListSessionWaitlistRows :many
-SELECT id, club_player_id, added_at, demoted_at, demoted_confirmed_at
+SELECT id, club_player_id, skill_level_id, added_at, demoted_at, demoted_confirmed_at
 FROM session_waitlist
 WHERE session_id = $1
 `
@@ -339,6 +339,7 @@ WHERE session_id = $1
 type ListSessionWaitlistRowsRow struct {
 	ID                 pgtype.UUID
 	ClubPlayerID       pgtype.UUID
+	SkillLevelID       pgtype.Int2
 	AddedAt            pgtype.Timestamptz
 	DemotedAt          pgtype.Timestamptz
 	DemotedConfirmedAt pgtype.Timestamptz
@@ -358,6 +359,7 @@ func (q *Queries) ListSessionWaitlistRows(ctx context.Context, sessionID pgtype.
 		if err := rows.Scan(
 			&i.ID,
 			&i.ClubPlayerID,
+			&i.SkillLevelID,
 			&i.AddedAt,
 			&i.DemotedAt,
 			&i.DemotedConfirmedAt,

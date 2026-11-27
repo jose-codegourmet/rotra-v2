@@ -7,7 +7,10 @@ import { SegmentedControl } from '@rotra/ui/segmented-control'
 import { Select } from '@rotra/ui/select'
 import { Switch } from '@rotra/ui/switch'
 import { TextInput } from '@rotra/ui/text-input'
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
+
+/** The search applies this long after the last keystroke, so typing never reloads the list per key. */
+export const ADMIN_SEARCH_DEBOUNCE_MS = 400
 
 export type AdminPlayerFiltersProps = {
   filters: AdminPlayerListParams
@@ -30,6 +33,26 @@ export function AdminPlayerFilters({
   const [open, setOpen] = useState(defaultOpen)
   const [localView, setLocalView] = useState<'list' | 'grid'>('list')
   const panelId = useId()
+  // The field types locally; the filter (the URL and the list query) follows once typing pauses.
+  const [text, setText] = useState(f.q ?? '')
+  const applied = useRef(f.q ?? '')
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
+  useEffect(() => {
+    // Changed from outside (Clear filters, back button): show it.
+    if ((f.q ?? '') !== applied.current) {
+      applied.current = f.q ?? ''
+      setText(applied.current)
+    }
+  }, [f.q])
+  useEffect(() => {
+    if (text === applied.current) return
+    const timer = setTimeout(() => {
+      applied.current = text
+      onChangeRef.current({ q: text })
+    }, ADMIN_SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(timer)
+  }, [text])
   return (
     <section aria-label="Player filters" className="mb-2.5 flex flex-col gap-2.5">
       <div className="flex flex-wrap items-center gap-2.5">
@@ -37,8 +60,8 @@ export function AdminPlayerFilters({
           type="search"
           aria-label="Search players"
           placeholder="Search by name, RTR ID, phone or email"
-          value={f.q ?? ''}
-          onChange={(e) => onChange({ q: e.target.value })}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           className="min-w-0 flex-[1_1_240px]"
         />
         <SegmentedControl

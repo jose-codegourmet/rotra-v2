@@ -78,10 +78,11 @@ def match_sql(n, players, state='waiting', fmt='singles', pos=None, origin='manu
     for i, (sp, team) in enumerate(players):
         out.append(f"INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) "
                    f"VALUES ('a4200000-0000-4000-8000-0000000{n:02d}{i:03d}', '{CLUB1}', '{S[3]}', '{mid}', '{SP(sp)}', '{team}', 1, 'a4300000-0000-4000-8000-0000000000{n:02d}', {NOW}, {sw}, {fw}, {NOW}, {NOW})")
-    for court in courts:
+    for ci, court in enumerate(courts):
         rel = f"{NOW}, 'a4300000-0000-4000-8000-0000000000{n:02d}'" if state in ('completed', 'invalid') else 'NULL, NULL'
+        usage_id = f'a4400000-0000-4000-8000-0000000000{n:02d}' if ci == 0 else f'a4500000-0000-4000-8000-0000000{n:02d}{ci:03d}'
         out.append(f"INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES "
-                   f"('a4400000-0000-4000-8000-0000000000{n:02d}', '{CLUB1}', '{S[3]}', '{mid}', '{CT(court)}', {NOW}, 'a4300000-0000-4000-8000-0000000000{n:02d}', {rel})")
+                   f"('{usage_id}', '{CLUB1}', '{S[3]}', '{mid}', '{CT(court)}', {NOW}, 'a4300000-0000-4000-8000-0000000000{n:02d}', {rel})")
         if state in ('on_court', 'active'):
             out.append(f"INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('{CT(court)}', '{CLUB1}', '{S[3]}', '{mid}', {NOW})")
     if state in ('on_court', 'active'):
@@ -593,6 +594,148 @@ SCEN['wait_auto_court_2_closed_only_4'] = SCEN['s3_waiting_matches_auto'] + [f"U
 case('open_a_court_early_in_manual_queue_places_nothing', req('POST', f'{P}/courts/{CT(4)}/open-early'), 'closed_court_manual')
 SCEN['closed_court_manual'] = SCEN['s3_waiting_matches'] + [f"UPDATE session_courts SET starts_at = TIMESTAMPTZ '2026-11-20 00:00:00+00' WHERE id = '{CT(4)}'"]
 
+# ------------------------------------------------------------------ Arranging the courts and lineups (task 2.4)
+CT_X = lambda n: f'a2c00000-0000-4000-8000-0000000000{n:02d}'
+FOUR_COURTS = [f"INSERT INTO session_courts (id, club_id, session_id, label, position, created_at, updated_at) VALUES "
+               f"('{CT_X(21)}', '{CLUB1}', '{S[3]}', 'Court 3', 3, {NOW}, {NOW}), ('{CT_X(22)}', '{CLUB1}', '{S[3]}', 'Court 4', 4, {NOW}, {NOW})"]
+SCEN['courts4'] = FULL_HOUSE + FOUR_COURTS
+SCEN['courts4_court_2_removed'] = SCEN['courts4'] + [f"UPDATE session_courts SET removed_at = {NOW} WHERE id = '{CT(4)}'"]
+SCEN['s1_two_courts_x'] = [f"INSERT INTO session_courts (id, club_id, session_id, label, position, created_at, updated_at) VALUES ('{CT_X(23)}', '{CLUB1}', '{S[1]}', 'Court 2', 2, {NOW}, {NOW})"]
+SCEN['onc2'] = FULL_HOUSE + match_sql(1, WM[0], 'on_court', courts=[3]) + match_sql(2, WM[1], 'on_court', courts=[4]) + match_sql(3, WM[2], pos=1)
+SCEN['onc2_auto'] = SCEN['onc2'] + AUTO
+SCEN['mixed2'] = FULL_HOUSE + match_sql(1, WM[0], 'on_court', courts=[3]) + match_sql(2, WM[1], 'active', courts=[4]) + match_sql(3, WM[2], pos=1)
+SCEN['two_court'] = SCEN['courts4'] + match_sql(1, DOUBLES, 'on_court', 'doubles', courts=[3, 4]) + match_sql(2, WM[2], 'on_court', courts=[21])
+SCEN['play_unplaced'] = SCEN['play'] + [f"UPDATE matches SET placed_at = NULL WHERE id = '{M(1)}'"]
+SCEN['play_doubles_substituted'] = SCEN['play_doubles']
+
+# Clear queue
+case('clear_signed_out', post('/matches/clear', who=None), 's3_waiting_matches')
+case('clear_removes_every_waiting_match', post('/matches/clear'), 's3_waiting_matches')
+case('clear_twice_removes_nothing_the_second_time', [post('/matches/clear'), post('/matches/clear')], 's3_waiting_matches')
+case('clear_leaves_the_court_and_finished_matches', post('/matches/clear'), 'onc')
+case('clear_with_nothing_waiting', post('/matches/clear'), 'done_winner_only')
+case('clear_skips_a_removed_draft', post('/matches/clear'), 'removed')
+case('clear_in_auto_queue_places_nothing', post('/matches/clear'), 's3_waiting_matches_auto')
+case('clear_on_a_prepared_session', req('POST', f'/api/sessions/{S[1]}/matches/clear'))
+case('clear_on_another_clubs_session', req('POST', f'/api/sessions/{S[9]}/matches/clear'))
+case('clear_on_a_lapsed_clubs_live_session', req('POST', f'/api/sessions/{S[8]}/matches/clear', who=LAPSED))
+case('clear_malformed_session_id', req('POST', '/api/sessions/m/matches/clear'), 's3_waiting_matches', **MALFORMED)
+
+# Trade courts
+def trade(m, other, op=None, **kw):
+    return post(f'/matches/{m}/trade-courts', {'operationId': op or op_id(), 'withMatchId': other}, **kw)
+
+
+case('trade_signed_out', trade(M(1), M(2), who=None), 'onc2')
+case('trade_two_on_court_matches', trade(M(1), M(2)), 'onc2')
+case('trade_from_the_other_match', trade(M(2), M(1)), 'onc2')
+case('trade_two_playing_matches', trade(M(1), M(2)), 'play2')
+case('trade_an_on_court_match_with_a_playing_one', trade(M(1), M(2)), 'mixed2')
+case('trade_twice_same_operation', [trade(M(1), M(2), op_id(20)), trade(M(1), M(2), op_id(20))], 'onc2')
+case('trade_and_trade_back', [trade(M(1), M(2), op_id(21)), trade(M(1), M(2), op_id(22))], 'onc2')
+case('trade_in_auto_queue_places_nothing', trade(M(1), M(2)), 'onc2_auto')
+case('trade_with_itself', trade(M(1), M(1)), 'onc2')
+case('trade_with_a_waiting_match', trade(M(1), M(3)), 'onc2')
+case('trade_a_waiting_match', trade(M(3), M(1)), 'onc2')
+case('trade_a_two_court_match', trade(M(1), M(2)), 'two_court')
+case('trade_with_a_two_court_match', trade(M(2), M(1)), 'two_court')
+case('trade_a_finished_match', trade(M(1), M(2)), 'done')
+case('trade_with_an_unknown_match', trade(M(1), UNKNOWN), 'onc2')
+case('trade_unknown_match', trade(UNKNOWN, M(1)), 'onc2')
+case('trade_with_a_removed_draft', trade(M(1), M(2)), 'removed')
+case('trade_malformed_match_id', trade('m', M(1)), 'onc2', **MALFORMED)
+case('trade_malformed_with_match_id', trade(M(1), 'm'), 'onc2', **MALFORMED)
+case('trade_without_a_partner', post(f'/matches/{M(1)}/trade-courts', {'operationId': op_id()}), 'onc2')
+case('trade_missing_operation_id', post(f'/matches/{M(1)}/trade-courts', {'withMatchId': M(2)}), 'onc2', **BADOP)
+case('trade_on_a_prepared_session', req('POST', f'/api/sessions/{S[1]}/matches/{M(1)}/trade-courts', {'operationId': op_id(), 'withMatchId': M(2)}))
+case('trade_on_another_clubs_session', req('POST', f'/api/sessions/{S[9]}/matches/{M(1)}/trade-courts', {'operationId': op_id(), 'withMatchId': M(2)}))
+
+# Switch sides and Swap from match
+def sides(route, m, a, b, team, op=None, **kw):
+    body = {'operationId': op or op_id(), 'aId': SP(a), 'bId': SP(b)}
+    if team is not None:
+        body['aTeam'] = team
+    return post(f'/matches/{m}/{route}', body, **kw)
+
+
+for route, label in (('switch-sides', 'switch'), ('swap-from-match', 'swapfrom')):
+    case(f'{label}_signed_out', sides(route, M(1), 20, 22, 'A', who=None), 'onc_doubles')
+    case(f'{label}_on_an_on_court_doubles_match', sides(route, M(1), 20, 22, 'A'), 'onc_doubles')
+    case(f'{label}_on_a_playing_doubles_match', sides(route, M(1), 20, 22, 'A'), 'play_doubles')
+    case(f'{label}_from_the_other_team', sides(route, M(1), 22, 20, 'B'), 'play_doubles')
+    case(f'{label}_on_an_on_court_singles_match', sides(route, M(1), 20, 21, 'A'), 'onc')
+    case(f'{label}_twice_same_operation', [sides(route, M(1), 20, 22, 'A', op_id(10)), sides(route, M(1), 20, 22, 'A', op_id(10))], 'onc_doubles')
+    case(f'{label}_twice_new_operation_finds_them_switched', [sides(route, M(1), 20, 22, 'A', op_id(11)), sides(route, M(1), 20, 22, 'A', op_id(12))], 'play_doubles')
+    case(f'{label}_and_back', [sides(route, M(1), 20, 22, 'A', op_id(13)), sides(route, M(1), 20, 22, 'B', op_id(14))], 'play_doubles')
+    case(f'{label}_wrong_team_named', sides(route, M(1), 20, 22, 'B'), 'onc_doubles')
+    case(f'{label}_players_on_the_same_team', sides(route, M(1), 20, 21, 'A'), 'onc_doubles')
+    case(f'{label}_the_same_player_twice', sides(route, M(1), 20, 20, 'A'), 'onc_doubles')
+    case(f'{label}_a_player_who_is_not_in_the_match', sides(route, M(1), 20, 4, 'A'), 'onc_doubles')
+    case(f'{label}_a_player_who_was_substituted_out', [post(f'/matches/{M(1)}/substitution', {'operationId': op_id(15), 'outId': SP(22), 'inId': SP(4), 'creditTo': 'none'}), sides(route, M(1), 20, 22, 'A', op_id(16))], 'play_doubles')
+    case(f'{label}_a_waiting_match', sides(route, M(2), 22, 23, 'A'), 'onc')
+    case(f'{label}_a_finished_match', sides(route, M(1), 20, 21, 'A'), 'done')
+    case(f'{label}_unknown_match', sides(route, UNKNOWN, 20, 22, 'A'), 'onc_doubles')
+    case(f'{label}_malformed_match_id', sides(route, 'm', 20, 22, 'A'), 'onc_doubles', **MALFORMED)
+    case(f'{label}_unknown_team', sides(route, M(1), 20, 22, 'C'), 'onc_doubles')
+    case(f'{label}_no_team', sides(route, M(1), 20, 22, None), 'onc_doubles')
+    case(f'{label}_unknown_team_is_checked_before_the_match', sides(route, UNKNOWN, 20, 22, 'C'), 'onc_doubles')
+    case(f'{label}_on_a_prepared_session', req('POST', f'/api/sessions/{S[1]}/matches/{M(1)}/{route}', {'operationId': op_id(), 'aId': SP(20), 'bId': SP(22), 'aTeam': 'A'}))
+
+# Pause match
+def pause(m, op=None, **kw):
+    return post(f'/matches/{m}/pause', {'operationId': op or op_id()}, **kw)
+
+
+case('pause_signed_out', pause(M(1), who=None), 'play')
+case('pause_a_playing_match', pause(M(1)), 'play')
+case('pause_twice_answers_the_same', [pause(M(1), op_id(5)), pause(M(1), op_id(6))], 'play')
+case('pause_a_match_that_was_never_placed', pause(M(1)), 'play_unplaced')
+case('pause_a_playing_doubles_match', pause(M(1)), 'play_doubles')
+case('pause_then_start_again', [pause(M(1)), start(M(1))], 'play')
+case('pause_one_of_two_playing_matches', pause(M(2)), 'play2')
+case('pause_in_auto_queue_places_nothing', pause(M(1)), 'play_auto')
+case('pause_a_getting_ready_match', pause(M(1)), 'onc')
+case('pause_a_waiting_match', pause(M(2)), 'play')
+case('pause_a_finished_match', pause(M(1)), 'done')
+case('pause_unknown_match', pause(UNKNOWN), 'play')
+case('pause_malformed_match_id', pause('m'), 'play', **MALFORMED)
+case('pause_a_removed_draft', pause(M(2)), 'removed')
+case('pause_on_a_prepared_session', req('POST', f'/api/sessions/{S[1]}/matches/{M(1)}/pause', {'operationId': op_id()}))
+case('pause_on_another_clubs_session', req('POST', f'/api/sessions/{S[9]}/matches/{M(1)}/pause', {'operationId': op_id()}))
+
+# Reorder courts
+def order(ids, session=None, who=SMASH, **kw):
+    return req('PATCH', f'/api/sessions/{session or S[3]}/courts/order', {'courtIds': ids}, who=who, **kw)
+
+
+C3, C4, C21, C22 = CT(3), CT(4), CT_X(21), CT_X(22)
+case('order_signed_out', order([C4, C3], who=None), 's3_full_house')
+case('order_swaps_two_courts', order([C4, C3]), 's3_full_house')
+case('order_the_same_order_writes_nothing', order([C3, C4]), 's3_full_house')
+case('order_twice_the_second_writes_nothing', [order([C4, C3]), order([C4, C3])], 's3_full_house')
+case('order_last_court_first', order([C22, C3, C4, C21]), 'courts4')
+case('order_first_court_last', order([C4, C21, C22, C3]), 'courts4')
+case('order_a_middle_court_up', order([C3, C21, C4, C22]), 'courts4')
+case('order_two_neighbours_swapped', order([C3, C4, C22, C21]), 'courts4')
+case('order_reversed_is_not_one_move', order([C22, C21, C4, C3]), 'courts4')
+case('order_two_moves_name_the_first_court_that_changed', order([C4, C3, C22, C21]), 'courts4')
+case('order_leaves_a_removed_court_its_place', order([C22, C21, C3]), 'courts4_court_2_removed')
+case('order_naming_a_removed_court', order([C4, C3, C21, C22]), 'courts4_court_2_removed')
+case('order_with_a_court_missing', order([C4]), 's3_full_house')
+case('order_with_an_unknown_court', order([C4, CT(7)]), 's3_full_house')
+case('order_naming_a_court_twice', order([C3, C3]), 's3_full_house')
+case('order_an_empty_list', order([]), 's3_full_house')
+case('order_ids_that_are_not_text', order([C3, 4]), 's3_full_house')
+case('order_a_list_that_is_not_a_list', req('PATCH', f'{P}/courts/order', {'courtIds': C3}), 's3_full_house')
+case('order_without_court_ids', req('PATCH', f'{P}/courts/order', {}), 's3_full_house')
+case('order_body_not_json', req('PATCH', f'{P}/courts/order', rawBody='nope'), 's3_full_house')
+case('order_then_add_a_court_takes_the_last_place', [order([C4, C3]), req('POST', f'{P}/courts', {'courtId': CT_X(24), 'label': 'Court 3'})], 's3_full_house', redact=RAND)
+case('order_on_a_prepared_session', order([CT(1)], S[1]))
+case('order_two_courts_on_a_prepared_session', order([CT_X(23), CT(1)], S[1]), 's1_two_courts_x')
+case('order_on_another_clubs_session', order([CT(9)], S[9]))
+case('order_on_a_lapsed_clubs_live_session', order([CT(8)], S[8], who=LAPSED))
+case('order_malformed_session_id', req('PATCH', '/api/sessions/m/courts/order', {'courtIds': [C3]}), 's3_full_house', **MALFORMED)
+
 SNAPSHOT = []
 for s in BASE['snapshot']:
     s = dict(s)
@@ -602,7 +745,7 @@ for s in BASE['snapshot']:
 SNAPSHOT += [
     {'name': 'match_decisions', 'sql': "SELECT match_id, kind, winning_team, team_a_score, team_b_score, source_operation_id, confirmed_at, accepted_at, actor_club_id FROM match_decisions ORDER BY match_id", 'redact': ['accepted_at']},
     {'name': 'sync_conflicts', 'sql': "SELECT id, session_id, category, state, evidence::text AS evidence, detected_at FROM sync_conflicts ORDER BY session_id, evidence::text", 'redact': ['detected_at']},
-    {'name': 'session_courts', 'sql': "SELECT id, session_id, label, starts_at, opened_early_at, open_until, removed_at, revision::text AS revision, created_at, updated_at FROM session_courts ORDER BY session_id, id"},
+    {'name': 'session_courts', 'sql': "SELECT id, session_id, label, position, starts_at, opened_early_at, open_until, removed_at, revision::text AS revision, created_at, updated_at FROM session_courts ORDER BY session_id, id"},
 ]
 doc = {'now': BASE['now'], 'app': 'club', 'snapshotDiff': True, 'seed': 'queue.seed.sql', 'scenarios': SCEN, 'snapshot': SNAPSHOT, 'cases': cases}
 

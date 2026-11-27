@@ -910,6 +910,166 @@
    "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000003000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000004', 'A', 1, 'a4300000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
    "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000003001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000006', 'B', 1, 'a4300000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
    "UPDATE session_courts SET starts_at = TIMESTAMPTZ '2026-11-20 00:00:00+00' WHERE id = 'a2c00000-0000-4000-8000-000000000004'"
+  ],
+  "courts4": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000002', 'Gail Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000003', 'Ann Reyes', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000004', 'Ben Santos', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000005'",
+   "INSERT INTO session_courts (id, club_id, session_id, label, position, created_at, updated_at) VALUES ('a2c00000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'Court 3', 3, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00'), ('a2c00000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'Court 4', 4, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "courts4_court_2_removed": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000002', 'Gail Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000003', 'Ann Reyes', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000004', 'Ben Santos', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000005'",
+   "INSERT INTO session_courts (id, club_id, session_id, label, position, created_at, updated_at) VALUES ('a2c00000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'Court 3', 3, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00'), ('a2c00000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'Court 4', 4, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "UPDATE session_courts SET removed_at = TIMESTAMPTZ '2026-11-19 02:00:00+00' WHERE id = 'a2c00000-0000-4000-8000-000000000004'"
+  ],
+  "s1_two_courts_x": [
+   "INSERT INTO session_courts (id, club_id, session_id, label, position, created_at, updated_at) VALUES ('a2c00000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'Court 2', 2, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "onc2": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000002', 'Gail Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000003', 'Ann Reyes', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000004', 'Ben Santos', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000005'",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'on_court', 'singles', NULL, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000020', 'A', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000021', 'B', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4400000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000001', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 2, 'on_court', 'singles', NULL, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000002000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000022', 'A', 1, 'a4300000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000002001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000023', 'B', 1, 'a4300000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4400000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a2c00000-0000-4000-8000-000000000004', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000002', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 3, 'waiting', 'singles', 1, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000003', NULL, NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000003000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000004', 'A', 1, 'a4300000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000003001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000006', 'B', 1, 'a4300000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "onc2_auto": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000002', 'Gail Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000003', 'Ann Reyes', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000004', 'Ben Santos', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000005'",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'on_court', 'singles', NULL, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000020', 'A', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000021', 'B', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4400000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000001', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 2, 'on_court', 'singles', NULL, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000002000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000022', 'A', 1, 'a4300000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000002001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000023', 'B', 1, 'a4300000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4400000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a2c00000-0000-4000-8000-000000000004', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000002', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 3, 'waiting', 'singles', 1, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000003', NULL, NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000003000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000004', 'A', 1, 'a4300000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000003001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000006', 'B', 1, 'a4300000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "UPDATE queue_sessions SET court_fill_mode = 'auto' WHERE id = 'a3000000-0000-4000-8000-000000000003'"
+  ],
+  "mixed2": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000002', 'Gail Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000003', 'Ann Reyes', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000004', 'Ben Santos', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000005'",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'on_court', 'singles', NULL, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000020', 'A', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000021', 'B', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4400000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000001', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 2, 'active', 'singles', NULL, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000002000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000022', 'A', 1, 'a4300000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', true, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000002001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000023', 'B', 1, 'a4300000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', true, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4400000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a2c00000-0000-4000-8000-000000000004', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000002', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 3, 'waiting', 'singles', 1, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000003', NULL, NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000003000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000004', 'A', 1, 'a4300000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000003001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000006', 'B', 1, 'a4300000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "two_court": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000002', 'Gail Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000003', 'Ann Reyes', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000004', 'Ben Santos', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000005'",
+   "INSERT INTO session_courts (id, club_id, session_id, label, position, created_at, updated_at) VALUES ('a2c00000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'Court 3', 3, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00'), ('a2c00000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'Court 4', 4, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'on_court', 'doubles', NULL, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000020', 'A', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000021', 'A', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000022', 'B', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000023', 'B', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4400000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000001', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4500000-0000-4000-8000-000000001001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000004', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000001', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 2, 'on_court', 'singles', NULL, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000002000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000004', 'A', 1, 'a4300000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000002001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000006', 'B', 1, 'a4300000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4400000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a2c00000-0000-4000-8000-000000000021', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000002', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000006', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "play_unplaced": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000002', 'Gail Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000003', 'Ann Reyes', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000004', 'Ben Santos', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000005'",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'active', 'singles', NULL, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000020', 'A', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', true, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000021', 'B', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', true, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4400000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000001', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 2, 'waiting', 'singles', 1, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000002', NULL, NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000002000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000022', 'A', 1, 'a4300000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000002001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000023', 'B', 1, 'a4300000-0000-4000-8000-000000000002', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 3, 'waiting', 'singles', 2, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000003', NULL, NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000003000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000004', 'A', 1, 'a4300000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000003001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000006', 'B', 1, 'a4300000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', false, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "UPDATE matches SET placed_at = NULL WHERE id = 'a4000000-0000-4000-8000-000000000001'"
+  ],
+  "play_doubles_substituted": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000002', 'Gail Guest', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000003', 'Ann Reyes', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-15 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000004', 'Ben Santos', true, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-15 03:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE session_players SET present = true WHERE id = 'a7000000-0000-4000-8000-000000000005'",
+   "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, manual_protected, generation_id, source_operation_id, placed_at, started_at, ended_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'active', 'doubles', NULL, 'manual', false, NULL, 'a4100000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001000', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000020', 'A', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', true, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000021', 'A', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', true, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000022', 'B', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', true, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_participations (id, club_id, session_id, match_id, session_player_id, team, segment_no, joined_operation_id, joined_at, started_with_match, finished_with_match, created_at, updated_at) VALUES ('a4200000-0000-4000-8000-000000001003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000023', 'B', 1, 'a4300000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', true, false, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id, released_at, release_operation_id) VALUES ('a4400000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4300000-0000-4000-8000-000000000001', NULL, NULL)",
+   "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO active_player_holds (session_player_id, club_id, session_id, match_id, held_at) VALUES ('a7000000-0000-4000-8000-000000000023', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
   ]
  },
  "snapshot": [
@@ -1005,7 +1165,7 @@
   },
   {
    "name": "session_courts",
-   "sql": "SELECT id, session_id, label, starts_at, opened_early_at, open_until, removed_at, revision::text AS revision, created_at, updated_at FROM session_courts ORDER BY session_id, id"
+   "sql": "SELECT id, session_id, label, position, starts_at, opened_early_at, open_until, removed_at, revision::text AS revision, created_at, updated_at FROM session_courts ORDER BY session_id, id"
   }
  ],
  "cases": [
@@ -7755,6 +7915,2030 @@
      "method": "POST",
      "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/a2c00000-0000-4000-8000-000000000004/open-early",
      "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "clear_signed_out",
+   "scenario": "s3_waiting_matches",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/clear",
+     "who": null
+    }
+   ]
+  },
+  {
+   "name": "clear_removes_every_waiting_match",
+   "scenario": "s3_waiting_matches",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "clear_twice_removes_nothing_the_second_time",
+   "scenario": "s3_waiting_matches",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "clear_leaves_the_court_and_finished_matches",
+   "scenario": "onc",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "clear_with_nothing_waiting",
+   "scenario": "done_winner_only",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "clear_skips_a_removed_draft",
+   "scenario": "removed",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "clear_in_auto_queue_places_nothing",
+   "scenario": "s3_waiting_matches_auto",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "clear_on_a_prepared_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "clear_on_another_clubs_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "clear_on_a_lapsed_clubs_live_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000002"
+    }
+   ]
+  },
+  {
+   "name": "clear_malformed_session_id",
+   "scenario": "s3_waiting_matches",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/m/matches/clear",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_signed_out",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": null,
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000224",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_two_on_court_matches",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000225",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_from_the_other_match",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000002/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000226",
+      "withMatchId": "a4000000-0000-4000-8000-000000000001"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_two_playing_matches",
+   "scenario": "play2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000227",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_an_on_court_match_with_a_playing_one",
+   "scenario": "mixed2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000228",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_twice_same_operation",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000020",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000020",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_and_trade_back",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000021",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000022",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_in_auto_queue_places_nothing",
+   "scenario": "onc2_auto",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000229",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_with_itself",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000230",
+      "withMatchId": "a4000000-0000-4000-8000-000000000001"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_with_a_waiting_match",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000231",
+      "withMatchId": "a4000000-0000-4000-8000-000000000003"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_a_waiting_match",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000003/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000232",
+      "withMatchId": "a4000000-0000-4000-8000-000000000001"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_a_two_court_match",
+   "scenario": "two_court",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000233",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_with_a_two_court_match",
+   "scenario": "two_court",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000002/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000234",
+      "withMatchId": "a4000000-0000-4000-8000-000000000001"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_a_finished_match",
+   "scenario": "done",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000235",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_with_an_unknown_match",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000236",
+      "withMatchId": "a4000000-0000-4000-8000-0000000000ff"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_unknown_match",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-0000000000ff/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000237",
+      "withMatchId": "a4000000-0000-4000-8000-000000000001"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_with_a_removed_draft",
+   "scenario": "removed",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000238",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_malformed_match_id",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/m/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000239",
+      "withMatchId": "a4000000-0000-4000-8000-000000000001"
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_malformed_with_match_id",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000240",
+      "withMatchId": "m"
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_without_a_partner",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000241"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_missing_operation_id",
+   "scenario": "onc2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_on_a_prepared_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000242",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "trade_on_another_clubs_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/matches/a4000000-0000-4000-8000-000000000001/trade-courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000243",
+      "withMatchId": "a4000000-0000-4000-8000-000000000002"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_signed_out",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": null,
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000244",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_on_an_on_court_doubles_match",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000245",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_on_a_playing_doubles_match",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000246",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_from_the_other_team",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000247",
+      "aId": "a7000000-0000-4000-8000-000000000022",
+      "bId": "a7000000-0000-4000-8000-000000000020",
+      "aTeam": "B"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_on_an_on_court_singles_match",
+   "scenario": "onc",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000248",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000021",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_twice_same_operation",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000010",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000010",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_twice_new_operation_finds_them_switched",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000011",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000012",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_and_back",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000013",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000014",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "B"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_wrong_team_named",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000249",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "B"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_players_on_the_same_team",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000250",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000021",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_the_same_player_twice",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000251",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000020",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_a_player_who_is_not_in_the_match",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000252",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000004",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_a_player_who_was_substituted_out",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/substitution",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000015",
+      "outId": "a7000000-0000-4000-8000-000000000022",
+      "inId": "a7000000-0000-4000-8000-000000000004",
+      "creditTo": "none"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000016",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_a_waiting_match",
+   "scenario": "onc",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000002/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000253",
+      "aId": "a7000000-0000-4000-8000-000000000022",
+      "bId": "a7000000-0000-4000-8000-000000000023",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_a_finished_match",
+   "scenario": "done",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000254",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000021",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_unknown_match",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-0000000000ff/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000255",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_malformed_match_id",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/m/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000256",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_unknown_team",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000257",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "C"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_no_team",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000258",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_unknown_team_is_checked_before_the_match",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-0000000000ff/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000259",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "C"
+     }
+    }
+   ]
+  },
+  {
+   "name": "switch_on_a_prepared_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches/a4000000-0000-4000-8000-000000000001/switch-sides",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000260",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_signed_out",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": null,
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000261",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_on_an_on_court_doubles_match",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000262",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_on_a_playing_doubles_match",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000263",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_from_the_other_team",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000264",
+      "aId": "a7000000-0000-4000-8000-000000000022",
+      "bId": "a7000000-0000-4000-8000-000000000020",
+      "aTeam": "B"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_on_an_on_court_singles_match",
+   "scenario": "onc",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000265",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000021",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_twice_same_operation",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000010",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000010",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_twice_new_operation_finds_them_switched",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000011",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000012",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_and_back",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000013",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000014",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "B"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_wrong_team_named",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000266",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "B"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_players_on_the_same_team",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000267",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000021",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_the_same_player_twice",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000268",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000020",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_a_player_who_is_not_in_the_match",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000269",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000004",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_a_player_who_was_substituted_out",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/substitution",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000015",
+      "outId": "a7000000-0000-4000-8000-000000000022",
+      "inId": "a7000000-0000-4000-8000-000000000004",
+      "creditTo": "none"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000016",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_a_waiting_match",
+   "scenario": "onc",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000002/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000270",
+      "aId": "a7000000-0000-4000-8000-000000000022",
+      "bId": "a7000000-0000-4000-8000-000000000023",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_a_finished_match",
+   "scenario": "done",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000271",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000021",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_unknown_match",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-0000000000ff/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000272",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_malformed_match_id",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/m/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000273",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_unknown_team",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000274",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "C"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_no_team",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000275",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_unknown_team_is_checked_before_the_match",
+   "scenario": "onc_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-0000000000ff/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000276",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "C"
+     }
+    }
+   ]
+  },
+  {
+   "name": "swapfrom_on_a_prepared_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches/a4000000-0000-4000-8000-000000000001/swap-from-match",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000277",
+      "aId": "a7000000-0000-4000-8000-000000000020",
+      "bId": "a7000000-0000-4000-8000-000000000022",
+      "aTeam": "A"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_signed_out",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": null,
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000278"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_a_playing_match",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000279"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_twice_answers_the_same",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000005"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000006"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_a_match_that_was_never_placed",
+   "scenario": "play_unplaced",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000280"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_a_playing_doubles_match",
+   "scenario": "play_doubles",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000281"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_then_start_again",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000282"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/start",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000283"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_one_of_two_playing_matches",
+   "scenario": "play2",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000002/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000284"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_in_auto_queue_places_nothing",
+   "scenario": "play_auto",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000285"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_a_getting_ready_match",
+   "scenario": "onc",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000286"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_a_waiting_match",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000002/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000287"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_a_finished_match",
+   "scenario": "done",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000288"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_unknown_match",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-0000000000ff/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000289"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_malformed_match_id",
+   "scenario": "play",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/m/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000290"
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_a_removed_draft",
+   "scenario": "removed",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/matches/a4000000-0000-4000-8000-000000000002/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000291"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_on_a_prepared_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000292"
+     }
+    }
+   ]
+  },
+  {
+   "name": "pause_on_another_clubs_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/matches/a4000000-0000-4000-8000-000000000001/pause",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b4000000-0000-4000-8000-000000000293"
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_signed_out",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": null,
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000003"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_swaps_two_courts",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000003"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_the_same_order_writes_nothing",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000003",
+       "a2c00000-0000-4000-8000-000000000004"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_twice_the_second_writes_nothing",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000003"
+      ]
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000003"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_last_court_first",
+   "scenario": "courts4",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000022",
+       "a2c00000-0000-4000-8000-000000000003",
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000021"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_first_court_last",
+   "scenario": "courts4",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000021",
+       "a2c00000-0000-4000-8000-000000000022",
+       "a2c00000-0000-4000-8000-000000000003"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_a_middle_court_up",
+   "scenario": "courts4",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000003",
+       "a2c00000-0000-4000-8000-000000000021",
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000022"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_two_neighbours_swapped",
+   "scenario": "courts4",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000003",
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000022",
+       "a2c00000-0000-4000-8000-000000000021"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_reversed_is_not_one_move",
+   "scenario": "courts4",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000022",
+       "a2c00000-0000-4000-8000-000000000021",
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000003"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_two_moves_name_the_first_court_that_changed",
+   "scenario": "courts4",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000003",
+       "a2c00000-0000-4000-8000-000000000022",
+       "a2c00000-0000-4000-8000-000000000021"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_leaves_a_removed_court_its_place",
+   "scenario": "courts4_court_2_removed",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000022",
+       "a2c00000-0000-4000-8000-000000000021",
+       "a2c00000-0000-4000-8000-000000000003"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_naming_a_removed_court",
+   "scenario": "courts4_court_2_removed",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000003",
+       "a2c00000-0000-4000-8000-000000000021",
+       "a2c00000-0000-4000-8000-000000000022"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_with_a_court_missing",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000004"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_with_an_unknown_court",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000007"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_naming_a_court_twice",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000003",
+       "a2c00000-0000-4000-8000-000000000003"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_an_empty_list",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": []
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_ids_that_are_not_text",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000003",
+       4
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_a_list_that_is_not_a_list",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": "a2c00000-0000-4000-8000-000000000003"
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_without_court_ids",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "order_body_not_json",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "order_then_add_a_court_takes_the_last_place",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000004",
+       "a2c00000-0000-4000-8000-000000000003"
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003/courts",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtId": "a2c00000-0000-4000-8000-000000000024",
+      "label": "Court 3"
+     }
+    }
+   ],
+   "redact": {
+    "match_court_usage": [
+     "id",
+     "acquire_operation_id"
+    ]
+   }
+  },
+  {
+   "name": "order_on_a_prepared_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000001"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_two_courts_on_a_prepared_session",
+   "scenario": "s1_two_courts_x",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000023",
+       "a2c00000-0000-4000-8000-000000000001"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_on_another_clubs_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000009"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_on_a_lapsed_clubs_live_session",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000008/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000008"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "order_malformed_session_id",
+   "scenario": "s3_full_house",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/m/courts/order",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "courtIds": [
+       "a2c00000-0000-4000-8000-000000000003"
+      ]
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
     }
    ]
   }

@@ -38,6 +38,14 @@ import {
   waitMinutes,
 } from '../match/match.rules'
 import type { Match, MatchLineup } from '../match/match.types'
+import { matchCategory, matchLabel } from '../match/matchCategory.rules'
+import {
+  formFromHistory,
+  formRating,
+  isUpset,
+  winChance,
+  winChanceBreakdown,
+} from '../match/winChance.rules'
 import { courtFillModeOf, putOnCourt } from '../queue-session/courtFill'
 import {
   openSlots,
@@ -59,6 +67,8 @@ type Runner = (input: unknown, now?: number) => unknown
 type World = { roster: SessionPlayer[]; matches: Match[]; courts: SessionCourt[] }
 type EndCourts = Pick<SessionCourt, 'label' | 'startsAt' | 'openUntil' | 'removedAt'>[]
 type Session = { allowSingles: boolean; allowDoubles: boolean }
+type WinPlayers = Parameters<typeof winChance>[1]
+type WinInput = { match: Parameters<typeof winChance>[0]; players: WinPlayers; matches: Match[] }
 
 const rule = <I>(fn: (input: I, now?: number) => unknown): Runner => {
   return (input, now) => fn(input as I, now)
@@ -192,6 +202,25 @@ export const RULE_RUNNERS: Record<string, Runner> = {
   'courtfill/courtFillModeOf': rule<{ session: { courtFillMode?: CourtFillMode } }>((i) =>
     courtFillModeOf(i.session),
   ),
+  'match/matchCategory': rule<Parameters<typeof matchCategory>[0]>((i) => matchCategory(i)),
+  'match/matchLabel': rule<{
+    lineup: Parameters<typeof matchLabel>[0]
+    roster: Parameters<typeof matchLabel>[1]
+  }>((i) => matchLabel(i.lineup, i.roster)),
+  'match/winChance': rule<WinInput>((i) => winChance(i.match, i.players, i.matches)),
+  'match/winChanceBreakdown': rule<WinInput>((i) =>
+    winChanceBreakdown(i.match, i.players, i.matches),
+  ),
+  'match/formRating': rule<{
+    player: WinPlayers[number]
+    players: WinPlayers
+    matches: Match[]
+  }>((i) => formRating(i.player, i.players, i.matches)),
+  'match/isUpset': rule<{ match: Match; players: WinPlayers }>((i) => isUpset(i.match, i.players)),
+  'match/formFromHistory': rule<{
+    sessions: Parameters<typeof formFromHistory>[0]
+    tonightWeekday: number
+  }>((i) => formFromHistory(i.sessions, i.tonightWeekday)),
   'courtfill/putOnCourt': rule<{ match: Match; courtIds: string[] }>((i, now) => {
     const match = structuredClone(i.match)
     putOnCourt(match, i.courtIds, now)

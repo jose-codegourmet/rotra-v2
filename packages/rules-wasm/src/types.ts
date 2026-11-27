@@ -71,6 +71,35 @@ export type ResultInput = {
 }
 export type ResultCheck = { winner: Team; error: null } | { winner: null; error: string }
 
+/** Win chance (D-2026-11-27-02): the part of a roster row the rating reads, and what it answers. */
+export type PlayerForm = {
+  clubWinRate: number | null
+  bestDay: boolean
+  place: number
+  trend: number
+}
+export type WinChancePlayer = {
+  id: string
+  level?: string | null
+  handicapSpots?: string[] | null
+  form?: PlayerForm | null
+}
+export type WinChance = { a: number; b: number; favored: 'A' | 'B' | null; strong: boolean }
+export type WinChanceRow = { key: string; label: string; detail: string; value: number }
+export type WinChanceTeamBreakdown = {
+  players: { id: string; rows: WinChanceRow[]; rating: number }[]
+  average: number
+}
+export type WinChanceBreakdown = {
+  chance: WinChance
+  teamA: WinChanceTeamBreakdown
+  teamB: WinChanceTeamBreakdown
+  lasting: boolean
+  upset: boolean
+}
+export type MatchCategory = "Men's" | "Women's" | 'Mixed' | 'Genderless'
+export type Gender = 'male' | 'female'
+
 export type SwapTarget = Record<string, unknown> & { id?: string }
 export type Placement = { matchId: string; courtIds: string[] }
 export type Standing = Record<string, unknown>

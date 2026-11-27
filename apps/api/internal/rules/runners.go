@@ -10,6 +10,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/courts"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/match"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/model"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/winchance"
 )
 
 // Runner calls one rule from JSON, the way the case files and the WebAssembly build do: the case's
@@ -84,6 +85,11 @@ type (
 	idMatches struct {
 		ID      string        `json:"id"`
 		Matches []model.Match `json:"matches"`
+	}
+	winInput struct {
+		Match   model.Match               `json:"match"`
+		Players []winchance.SessionPlayer `json:"players"`
+		Matches []model.Match             `json:"matches"`
 	}
 	endCourts struct {
 		StartedAt        *int64        `json:"startedAt"`
@@ -201,6 +207,52 @@ func (rs Ruleset) Runners(strict bool) map[string]Runner {
 			return rs.WaitMinutes(i.Player, i.Matches, i.StartedAt, now)
 		}),
 		"match/queuedCount": plain(strict, func(i idMatches) any { return rs.QueuedCount(i.ID, i.Matches) }),
+		"match/matchCategory": plain(strict, func(i struct {
+			TeamA []string `json:"teamA"`
+			TeamB []string `json:"teamB"`
+		}) any {
+			return rs.MatchCategory(i.TeamA, i.TeamB)
+		}),
+		"match/matchLabel": plain(strict, func(i struct {
+			Lineup model.Lineup `json:"lineup"`
+			Roster []struct {
+				ID     string  `json:"id"`
+				Gender *string `json:"gender"`
+			} `json:"roster"`
+		}) any {
+			gender := map[string]string{}
+			for _, p := range i.Roster {
+				if p.Gender != nil {
+					gender[p.ID] = *p.Gender
+				}
+			}
+			return rs.MatchLabel(i.Lineup.Format, i.Lineup.TeamA, i.Lineup.TeamB, func(id string) string { return gender[id] })
+		}),
+		"match/winChance": plain(strict, func(i winInput) any {
+			return rs.WinChanceBreakdown(i.Match, i.Players, i.Matches).Chance
+		}),
+		"match/winChanceBreakdown": plain(strict, func(i winInput) any {
+			return rs.WinChanceBreakdown(i.Match, i.Players, i.Matches)
+		}),
+		"match/formRating": plain(strict, func(i struct {
+			Player  winchance.SessionPlayer   `json:"player"`
+			Players []winchance.SessionPlayer `json:"players"`
+			Matches []model.Match             `json:"matches"`
+		}) any {
+			return rs.FormRating(i.Player, i.Players, i.Matches)
+		}),
+		"match/isUpset": plain(strict, func(i struct {
+			Match   model.Match               `json:"match"`
+			Players []winchance.SessionPlayer `json:"players"`
+		}) any {
+			return rs.IsUpset(i.Match, i.Players)
+		}),
+		"match/formFromHistory": plain(strict, func(i struct {
+			Sessions       []winchance.SessionRecord `json:"sessions"`
+			TonightWeekday int                       `json:"tonightWeekday"`
+		}) any {
+			return rs.FormFromHistory(i.Sessions, i.TonightWeekday)
+		}),
 		"match/computeStandings": plain(strict, func(i struct {
 			Roster  []model.Player `json:"roster"`
 			Matches []model.Match  `json:"matches"`

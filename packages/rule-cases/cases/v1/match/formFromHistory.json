@@ -1,0 +1,198 @@
+{
+  "kind": "rule",
+  "rule": "formFromHistory",
+  "version": 1,
+  "cases": [
+    {
+      "name": "no sessions",
+      "input": {
+        "sessions": [],
+        "tonightWeekday": 2
+      },
+      "expected": {
+        "clubWinRate": null,
+        "bestDay": false,
+        "place": 0,
+        "trend": 0
+      }
+    },
+    {
+      "name": "under 10 games gives no win rate, three games give a best day",
+      "input": {
+        "sessions": [
+          {
+            "weekday": 2,
+            "wins": 2,
+            "losses": 1
+          }
+        ],
+        "tonightWeekday": 2
+      },
+      "expected": {
+        "clubWinRate": null,
+        "bestDay": true,
+        "place": 0,
+        "trend": 0
+      }
+    },
+    {
+      "name": "twelve games",
+      "input": {
+        "sessions": [
+          {
+            "weekday": 2,
+            "wins": 6,
+            "losses": 2
+          },
+          {
+            "weekday": 5,
+            "wins": 1,
+            "losses": 3
+          }
+        ],
+        "tonightWeekday": 5
+      },
+      "expected": {
+        "clubWinRate": 0.5833333333333334,
+        "bestDay": false,
+        "place": 0,
+        "trend": 0
+      }
+    },
+    {
+      "name": "best day is tonight",
+      "input": {
+        "sessions": [
+          {
+            "weekday": 2,
+            "wins": 6,
+            "losses": 2
+          },
+          {
+            "weekday": 5,
+            "wins": 1,
+            "losses": 3
+          }
+        ],
+        "tonightWeekday": 2
+      },
+      "expected": {
+        "clubWinRate": 0.5833333333333334,
+        "bestDay": true,
+        "place": 0,
+        "trend": 0
+      }
+    },
+    {
+      "name": "a best day needs three games",
+      "input": {
+        "sessions": [
+          {
+            "weekday": 4,
+            "wins": 2,
+            "losses": 0
+          }
+        ],
+        "tonightWeekday": 4
+      },
+      "expected": {
+        "clubWinRate": null,
+        "bestDay": false,
+        "place": 0,
+        "trend": 0
+      }
+    },
+    {
+      "name": "ties keep the first weekday",
+      "input": {
+        "sessions": [
+          {
+            "weekday": 1,
+            "wins": 3,
+            "losses": 0
+          },
+          {
+            "weekday": 4,
+            "wins": 3,
+            "losses": 0
+          }
+        ],
+        "tonightWeekday": 4
+      },
+      "expected": {
+        "clubWinRate": null,
+        "bestDay": false,
+        "place": 0,
+        "trend": 0
+      }
+    },
+    {
+      "name": "every weekday",
+      "input": {
+        "sessions": [
+          {
+            "weekday": 0,
+            "wins": 0,
+            "losses": 3
+          },
+          {
+            "weekday": 1,
+            "wins": 1,
+            "losses": 3
+          },
+          {
+            "weekday": 2,
+            "wins": 2,
+            "losses": 3
+          },
+          {
+            "weekday": 3,
+            "wins": 3,
+            "losses": 3
+          },
+          {
+            "weekday": 4,
+            "wins": 4,
+            "losses": 3
+          },
+          {
+            "weekday": 5,
+            "wins": 5,
+            "losses": 3
+          },
+          {
+            "weekday": 6,
+            "wins": 6,
+            "losses": 3
+          }
+        ],
+        "tonightWeekday": 6
+      },
+      "expected": {
+        "clubWinRate": 0.5,
+        "bestDay": true,
+        "place": 0,
+        "trend": 0
+      }
+    },
+    {
+      "name": "a weekday out of range is ignored",
+      "input": {
+        "sessions": [
+          {
+            "weekday": 9,
+            "wins": 5,
+            "losses": 5
+          }
+        ],
+        "tonightWeekday": 0
+      },
+      "expected": {
+        "clubWinRate": 0.5,
+        "bestDay": false,
+        "place": 0,
+        "trend": 0
+      }
+    }
+  ]
+}

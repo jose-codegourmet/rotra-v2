@@ -1,0 +1,320 @@
+{
+  "kind": "rule",
+  "rule": "isUpset",
+  "version": 1,
+  "cases": [
+    {
+      "name": "the favored pair lost",
+      "input": {
+        "match": {
+          "id": "m2",
+          "sessionId": "s",
+          "matchNo": 2,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 0,
+          "startedAt": 0,
+          "endedAt": 900000,
+          "substitutions": [],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "B",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 900000
+          }
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "the favored pair won",
+      "input": {
+        "match": {
+          "id": "m1",
+          "sessionId": "s",
+          "matchNo": 1,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 0,
+          "startedAt": 0,
+          "endedAt": 900000,
+          "substitutions": [],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 900000
+          }
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "an even game",
+      "input": {
+        "match": {
+          "id": "m2",
+          "sessionId": "s",
+          "matchNo": 2,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 0,
+          "startedAt": 0,
+          "endedAt": 900000,
+          "substitutions": [],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "B",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 900000
+          }
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "a match that is not completed",
+      "input": {
+        "match": {
+          "id": "m25",
+          "sessionId": "s",
+          "matchNo": 25,
+          "state": "on_court",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 300000,
+          "startedAt": 300000,
+          "endedAt": null,
+          "substitutions": [],
+          "decision": null
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "a completed match with no winner",
+      "input": {
+        "match": {
+          "id": "m26",
+          "sessionId": "s",
+          "matchNo": 26,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 0,
+          "startedAt": 0,
+          "endedAt": null,
+          "substitutions": [],
+          "decision": {
+            "kind": "invalid",
+            "winningTeam": null,
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 0
+          }
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "the underdog side lost",
+      "input": {
+        "match": {
+          "id": "m27",
+          "sessionId": "s",
+          "matchNo": 27,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["c", "d"],
+          "teamB": ["a", "b"],
+          "courtIds": ["c1"],
+          "placedAt": 0,
+          "startedAt": 0,
+          "endedAt": null,
+          "substitutions": [],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "A",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 0
+          }
+        },
+        "players": [
+          {
+            "id": "a",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "b",
+            "level": "intermediate_mid"
+          },
+          {
+            "id": "c",
+            "level": "intermediate_low"
+          },
+          {
+            "id": "d",
+            "level": "intermediate_low"
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "players not on the roster",
+      "input": {
+        "match": {
+          "id": "m2",
+          "sessionId": "s",
+          "matchNo": 2,
+          "state": "completed",
+          "format": "doubles",
+          "queuePosition": 0,
+          "origin": "auto",
+          "manualProtected": false,
+          "teamA": ["a", "b"],
+          "teamB": ["c", "d"],
+          "courtIds": ["c1"],
+          "placedAt": 0,
+          "startedAt": 0,
+          "endedAt": 900000,
+          "substitutions": [],
+          "decision": {
+            "kind": "completed",
+            "winningTeam": "B",
+            "teamAScore": null,
+            "teamBScore": null,
+            "confirmedAt": 900000
+          }
+        },
+        "players": []
+      },
+      "expected": false
+    }
+  ]
+}

@@ -11,11 +11,14 @@ import type {
   CourtFillMode,
   EndCourts,
   FillOptions,
+  Gender,
   Match,
+  MatchCategory,
   MatchContext,
   MatchLineup,
   MatchStatus,
   Placement,
+  PlayerForm,
   ResultCheck,
   ResultInput,
   SessionCourt,
@@ -24,6 +27,9 @@ import type {
   Standing,
   SwapTarget,
   Team,
+  WinChance,
+  WinChanceBreakdown,
+  WinChancePlayer,
 } from './types'
 
 type Ctx = Pick<MatchContext, 'roster' | 'matches' | 'courts'>
@@ -94,6 +100,36 @@ export const queuedCount = (id: string, matches: Match[]) =>
   run<number>('match/queuedCount', { id, matches })
 export const computeStandings = (roster: SessionPlayer[], matches: Match[]) =>
   run<Standing[]>('match/computeStandings', { roster, matches })
+
+// match: names and win chance
+type Genders = readonly (Gender | null | undefined)[]
+export const matchCategory = (teams: { teamA: Genders; teamB: Genders }) =>
+  run<MatchCategory>('match/matchCategory', teams)
+export const matchLabel = (
+  lineup: Pick<MatchLineup, 'format' | 'teamA' | 'teamB'>,
+  roster: readonly { id: string; gender?: Gender | null }[],
+) => run<string>('match/matchLabel', { lineup, roster })
+export const winChance = (
+  match: Pick<Match, 'teamA' | 'teamB'> & Partial<Pick<Match, 'state' | 'decision'>>,
+  players: readonly WinChancePlayer[],
+  matches: readonly Match[],
+) => run<WinChance>('match/winChance', { match, players, matches })
+export const winChanceBreakdown = (
+  match: Pick<Match, 'teamA' | 'teamB'> & Partial<Pick<Match, 'state' | 'decision'>>,
+  players: readonly WinChancePlayer[],
+  matches: readonly Match[],
+) => run<WinChanceBreakdown>('match/winChanceBreakdown', { match, players, matches })
+export const formRating = (
+  player: WinChancePlayer,
+  players: readonly WinChancePlayer[],
+  matches: readonly Match[],
+) => run<number>('match/formRating', { player, players, matches })
+export const isUpset = (match: Match, players: readonly WinChancePlayer[]) =>
+  run<boolean>('match/isUpset', { match, players })
+export const formFromHistory = (
+  sessions: readonly { weekday: number; wins: number; losses: number }[],
+  tonightWeekday: number,
+) => run<PlayerForm>('match/formFromHistory', { sessions, tonightWeekday })
 
 // courts
 export const courtOpen = (court: SessionCourt, now: number = Date.now()) =>

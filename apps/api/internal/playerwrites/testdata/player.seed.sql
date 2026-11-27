@@ -7,7 +7,7 @@
 BEGIN;
 SET LOCAL session_replication_role = replica;
 
-DELETE FROM player_notifications; DELETE FROM admin_audit_events; DELETE FROM player_social_links;
+DELETE FROM session_slot_transfers; DELETE FROM session_players; DELETE FROM player_notifications; DELETE FROM admin_audit_events; DELETE FROM player_social_links;
 DELETE FROM player_contact_change_requests; DELETE FROM club_players; DELETE FROM shared_player_entries;
 DELETE FROM player_accounts; DELETE FROM player_private_contacts; DELETE FROM player_id_allocations; DELETE FROM player_id_counters;
 DELETE FROM players; DELETE FROM club_accounts; DELETE FROM clubs; DELETE FROM profile_banners; DELETE FROM feature_flags;

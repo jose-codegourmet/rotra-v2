@@ -160,7 +160,7 @@ afterAll(async () => {
   await capture?.close()
 })
 
-for (const name of ['profile', 'privacy', 'notifications', 'clubs', 'contact', 'register', 'claim', 'google', 'googleflow']) {
+for (const name of ['profile', 'privacy', 'notifications', 'clubs', 'leavetransfers', 'contact', 'register', 'claim', 'google', 'googleflow']) {
   test(name, async () => {
     await captureWrites({ db: capture.db, testdata, name, apiDir, beforeCase: () => globalThis.__logins.clear() })
   })

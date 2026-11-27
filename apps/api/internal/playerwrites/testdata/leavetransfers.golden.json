@@ -1,0 +1,914 @@
+{
+  "leave_ends_the_pending_transfers_of_a_recipient_and_a_sender": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000004",
+          "clubId": "c9000000-0000-4000-8000-000000000001"
+        }
+      }
+    ],
+    "db": {
+      "club_players": [
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-01-02T00:00:00+00:00",
+          "nickname": "Ace",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Alice Reyes",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-03-01T00:00:00+00:00",
+          "nickname": "Danny",
+          "revision": "2",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-20T04:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "added_at": "2026-03-02T00:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-05-01T00:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        }
+      ],
+      "session_slot_transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "status": "cancelled",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": "2026-11-20T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000004",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000002",
+          "status": "cancelled",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": true,
+          "claimed_at": "2026-11-19T01:40:00+00:00",
+          "decided_at": "2026-11-20T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000002",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000004",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000001",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000003"
+        }
+      ]
+    }
+  },
+  "leave_ends_a_pending_transfer_the_player_receives": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000001",
+          "clubId": "c9000000-0000-4000-8000-000000000001"
+        }
+      }
+    ],
+    "db": {
+      "club_players": [
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-01-02T00:00:00+00:00",
+          "nickname": "Ace",
+          "revision": "2",
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "created_at": "<redacted>",
+          "removed_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-20T04:00:00+00:00",
+          "display_name": "Alice Reyes",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-03-01T00:00:00+00:00",
+          "nickname": "Danny",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "added_at": "2026-03-02T00:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-05-01T00:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        }
+      ],
+      "session_slot_transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "status": "cancelled",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": "2026-11-20T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000004",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000002",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": true,
+          "claimed_at": "2026-11-19T01:40:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000002",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000004",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000001",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000003"
+        }
+      ]
+    }
+  },
+  "leave_keeps_the_pending_transfers_of_another_club": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000004",
+          "clubId": "c9000000-0000-4000-8000-000000000001"
+        }
+      }
+    ],
+    "db": {
+      "club_players": [
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-01-02T00:00:00+00:00",
+          "nickname": "Ace",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Alice Reyes",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-03-01T00:00:00+00:00",
+          "nickname": "Danny",
+          "revision": "2",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-20T04:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "added_at": "2026-03-02T00:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        }
+      ],
+      "session_slot_transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "status": "cancelled",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": "2026-11-20T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000004",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000002",
+          "status": "cancelled",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": true,
+          "claimed_at": "2026-11-19T01:40:00+00:00",
+          "decided_at": "2026-11-20T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000002",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000004",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000001",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000003"
+        }
+      ]
+    }
+  },
+  "leave_the_other_club_ends_only_its_transfers": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000004",
+          "clubId": "c9000000-0000-4000-8000-000000000002"
+        }
+      }
+    ],
+    "db": {
+      "club_players": [
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-01-02T00:00:00+00:00",
+          "nickname": "Ace",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Alice Reyes",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-03-01T00:00:00+00:00",
+          "nickname": "Danny",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "added_at": "2026-03-02T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-20T04:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        }
+      ],
+      "session_slot_transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000004",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000002",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": true,
+          "claimed_at": "2026-11-19T01:40:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000002",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000004",
+          "status": "cancelled",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": "2026-11-20T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000001",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000003"
+        }
+      ]
+    }
+  },
+  "leave_leaves_decided_transfers_as_they_are": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000004",
+          "clubId": "c9000000-0000-4000-8000-000000000001"
+        }
+      }
+    ],
+    "db": {
+      "club_players": [
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-01-02T00:00:00+00:00",
+          "nickname": "Ace",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Alice Reyes",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-03-01T00:00:00+00:00",
+          "nickname": "Danny",
+          "revision": "2",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-20T04:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "added_at": "2026-03-02T00:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-05-01T00:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        }
+      ],
+      "session_slot_transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "status": "rejected",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": "2026-11-19T02:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000004",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000002",
+          "status": "expired",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": "2026-11-19T02:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000002",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000005",
+          "status": "cancelled",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": "2026-11-19T02:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000004",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000001"
+        }
+      ]
+    }
+  },
+  "leave_again_changes_nothing_and_keeps_the_pending_transfers": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000004",
+          "clubId": "c9000000-0000-4000-8000-000000000001"
+        }
+      }
+    ],
+    "db": {
+      "club_players": [
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-01-02T00:00:00+00:00",
+          "nickname": "Ace",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Alice Reyes",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-03-01T00:00:00+00:00",
+          "nickname": "Danny",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-06-01T00:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "added_at": "2026-03-02T00:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-05-01T00:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        }
+      ],
+      "session_slot_transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000004",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000002",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": true,
+          "claimed_at": "2026-11-19T01:40:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000002",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000004",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000001",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000003"
+        }
+      ]
+    }
+  },
+  "leave_twice_ends_them_once": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000004",
+          "clubId": "c9000000-0000-4000-8000-000000000001"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000004",
+          "clubId": "c9000000-0000-4000-8000-000000000001"
+        }
+      }
+    ],
+    "db": {
+      "club_players": [
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-01-02T00:00:00+00:00",
+          "nickname": "Ace",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Alice Reyes",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-03-01T00:00:00+00:00",
+          "nickname": "Danny",
+          "revision": "2",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-11-20T04:00:00+00:00",
+          "updated_at": "2026-11-20T04:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "added_at": "2026-03-02T00:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-05-01T00:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        }
+      ],
+      "session_slot_transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "status": "cancelled",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": "2026-11-20T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000004",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000002",
+          "status": "cancelled",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": true,
+          "claimed_at": "2026-11-19T01:40:00+00:00",
+          "decided_at": "2026-11-20T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000002",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000004",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000001",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000003"
+        }
+      ]
+    }
+  },
+  "leave_a_club_with_no_transfers": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000002",
+          "clubId": "c9000000-0000-4000-8000-000000000001"
+        }
+      }
+    ],
+    "db": {
+      "club_players": [
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-01-02T00:00:00+00:00",
+          "nickname": "Ace",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Alice Reyes",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-03-01T00:00:00+00:00",
+          "nickname": "Danny",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "added_at": "2026-03-02T00:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-05-01T00:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        }
+      ],
+      "session_slot_transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000004",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000002",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": true,
+          "claimed_at": "2026-11-19T01:40:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000002",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000004",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000001",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000003"
+        }
+      ]
+    }
+  },
+  "leave_does_not_end_the_transfers_of_another_player": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000002",
+          "clubId": "c9000000-0000-4000-8000-000000000001"
+        }
+      }
+    ],
+    "db": {
+      "club_players": [
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-01-02T00:00:00+00:00",
+          "nickname": "Ace",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Alice Reyes",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-03-01T00:00:00+00:00",
+          "nickname": "Danny",
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": null,
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        },
+        {
+          "id": "<redacted>",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "added_at": "2026-03-02T00:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000004",
+          "created_at": "<redacted>",
+          "removed_at": "2026-05-01T00:00:00+00:00",
+          "updated_at": "2026-11-01T00:00:00+00:00",
+          "display_name": "Dan Uy",
+          "shared_entry_id": null
+        }
+      ],
+      "session_slot_transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000004",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000002",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "via_link": true,
+          "claimed_at": "2026-11-19T01:40:00+00:00",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000002",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000004",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000002",
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "requested_at": "2026-11-19T01:30:00+00:00",
+          "sender_player_id": "d4000000-0000-4000-8000-000000000004",
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000001",
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000003"
+        }
+      ]
+    }
+  }
+}

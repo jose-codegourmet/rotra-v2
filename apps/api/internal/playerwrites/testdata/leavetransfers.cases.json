@@ -1,0 +1,198 @@
+{
+ "now": "2026-11-20T04:00:00.000Z",
+ "app": "player",
+ "seed": "player.seed.sql",
+ "scenarios": {
+  "base": [],
+  "gate_on": [
+   "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
+  ],
+  "alice_male": [
+   "UPDATE players SET gender = 'male' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "alice_answered": [
+   "UPDATE players SET personal_details = '{\"version\":1,\"playingStyle\":\"Smash\",\"court_position\":\"front\",\"skills\":[\"smash\"],\"skills_other\":[],\"favorite_player\":null,\"favorite_player_other\":\"\"}'::jsonb, details_version = 1 WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "alice_hidden_banner": [
+   "UPDATE players SET banner_id = 'ember' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "dan_left_smash": [
+   "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"
+  ],
+  "dan_verified": [
+   "UPDATE players SET verification_override = 'verified', verification_override_by = 'ad000000-0000-4000-8000-000000000001', verification_override_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'd4000000-0000-4000-8000-000000000004'"
+  ],
+  "alice_unverified": [
+   "UPDATE player_accounts SET google_email = NULL, google_linked_at = NULL WHERE player_id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "bob_reminder_read": [
+   "UPDATE player_accounts SET verification_reminder_read_at = TIMESTAMPTZ '2026-11-06 00:00:00+00' WHERE player_id = 'd4000000-0000-4000-8000-000000000002'"
+  ],
+  "eve_with_id": [
+   "INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence) VALUES ('d4000000-0000-4000-8000-000000000005', 'RTR-PH-CEB-102926-0005', 'c9000000-0000-4000-8000-000000000001', (SELECT id FROM location_codes WHERE country_code = 'PH' AND city_code = 'CEB'), 'PH', 'CEB', DATE '2026-10-29', 5)"
+  ],
+  "transfers": [
+   "INSERT INTO queue_sessions (id, club_id, title, scheduled_start_at, scheduled_end_at, venue_name, state, session_mode, allow_singles, allow_doubles, minimum_games, players_per_court, public_slug, accept_join_requests, always_require_request, source_command_id, updated_at) VALUES ('a3000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'Night', TIMESTAMPTZ '2026-11-21 01:00:00+00', TIMESTAMPTZ '2026-11-21 05:00:00+00', 'Hall', 'prepared', 'fair', true, true, 0, 4, 'smash-night', true, false, 'c0000000-0000-4000-8000-000000000041', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO queue_sessions (id, club_id, title, scheduled_start_at, scheduled_end_at, venue_name, state, session_mode, allow_singles, allow_doubles, minimum_games, players_per_court, public_slug, accept_join_requests, always_require_request, source_command_id, updated_at) VALUES ('a3000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000002', 'Night', TIMESTAMPTZ '2026-11-21 01:00:00+00', TIMESTAMPTZ '2026-11-21 05:00:00+00', 'Hall', 'prepared', 'fair', true, true, 0, 4, 'birdie-night', true, false, 'c0000000-0000-4000-8000-000000000042', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'Alice Reyes', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000004', 'Dan Uy', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000002', 'a3000000-0000-4000-8000-000000000002', 'e7000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000004', 'Dan Uy', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000004', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000002', 'e7000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000004', 'd4000000-0000-4000-8000-000000000002', decode('0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c', 'hex'), TIMESTAMPTZ '2026-11-19 01:40:00+00', 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000002', 'a3000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000003', 'e7000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000004', 'd4000000-0000-4000-8000-000000000001', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)"
+  ],
+  "transfers_birdie_member": [
+   "INSERT INTO queue_sessions (id, club_id, title, scheduled_start_at, scheduled_end_at, venue_name, state, session_mode, allow_singles, allow_doubles, minimum_games, players_per_court, public_slug, accept_join_requests, always_require_request, source_command_id, updated_at) VALUES ('a3000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'Night', TIMESTAMPTZ '2026-11-21 01:00:00+00', TIMESTAMPTZ '2026-11-21 05:00:00+00', 'Hall', 'prepared', 'fair', true, true, 0, 4, 'smash-night', true, false, 'c0000000-0000-4000-8000-000000000041', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO queue_sessions (id, club_id, title, scheduled_start_at, scheduled_end_at, venue_name, state, session_mode, allow_singles, allow_doubles, minimum_games, players_per_court, public_slug, accept_join_requests, always_require_request, source_command_id, updated_at) VALUES ('a3000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000002', 'Night', TIMESTAMPTZ '2026-11-21 01:00:00+00', TIMESTAMPTZ '2026-11-21 05:00:00+00', 'Hall', 'prepared', 'fair', true, true, 0, 4, 'birdie-night', true, false, 'c0000000-0000-4000-8000-000000000042', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'Alice Reyes', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000004', 'Dan Uy', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000002', 'a3000000-0000-4000-8000-000000000002', 'e7000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000004', 'Dan Uy', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000004', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000002', 'e7000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000004', 'd4000000-0000-4000-8000-000000000002', decode('0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c', 'hex'), TIMESTAMPTZ '2026-11-19 01:40:00+00', 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000002', 'a3000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000003', 'e7000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000004', 'd4000000-0000-4000-8000-000000000001', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)",
+   "UPDATE club_players SET removed_at = NULL WHERE id = 'e7000000-0000-4000-8000-000000000003'"
+  ],
+  "transfers_decided": [
+   "INSERT INTO queue_sessions (id, club_id, title, scheduled_start_at, scheduled_end_at, venue_name, state, session_mode, allow_singles, allow_doubles, minimum_games, players_per_court, public_slug, accept_join_requests, always_require_request, source_command_id, updated_at) VALUES ('a3000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'Night', TIMESTAMPTZ '2026-11-21 01:00:00+00', TIMESTAMPTZ '2026-11-21 05:00:00+00', 'Hall', 'prepared', 'fair', true, true, 0, 4, 'smash-night', true, false, 'c0000000-0000-4000-8000-000000000041', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO queue_sessions (id, club_id, title, scheduled_start_at, scheduled_end_at, venue_name, state, session_mode, allow_singles, allow_doubles, minimum_games, players_per_court, public_slug, accept_join_requests, always_require_request, source_command_id, updated_at) VALUES ('a3000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000002', 'Night', TIMESTAMPTZ '2026-11-21 01:00:00+00', TIMESTAMPTZ '2026-11-21 05:00:00+00', 'Hall', 'prepared', 'fair', true, true, 0, 4, 'birdie-night', true, false, 'c0000000-0000-4000-8000-000000000042', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'Alice Reyes', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000004', 'Dan Uy', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000002', 'a3000000-0000-4000-8000-000000000002', 'e7000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000004', 'Dan Uy', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000004', NULL, NULL, 'rejected', TIMESTAMPTZ '2026-11-19 01:30:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000002', 'e7000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000004', 'd4000000-0000-4000-8000-000000000002', NULL, NULL, 'expired', TIMESTAMPTZ '2026-11-19 01:30:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000005', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000004', NULL, NULL, 'cancelled', TIMESTAMPTZ '2026-11-19 01:30:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "transfers_dan_gone": [
+   "INSERT INTO queue_sessions (id, club_id, title, scheduled_start_at, scheduled_end_at, venue_name, state, session_mode, allow_singles, allow_doubles, minimum_games, players_per_court, public_slug, accept_join_requests, always_require_request, source_command_id, updated_at) VALUES ('a3000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'Night', TIMESTAMPTZ '2026-11-21 01:00:00+00', TIMESTAMPTZ '2026-11-21 05:00:00+00', 'Hall', 'prepared', 'fair', true, true, 0, 4, 'smash-night', true, false, 'c0000000-0000-4000-8000-000000000041', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO queue_sessions (id, club_id, title, scheduled_start_at, scheduled_end_at, venue_name, state, session_mode, allow_singles, allow_doubles, minimum_games, players_per_court, public_slug, accept_join_requests, always_require_request, source_command_id, updated_at) VALUES ('a3000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000002', 'Night', TIMESTAMPTZ '2026-11-21 01:00:00+00', TIMESTAMPTZ '2026-11-21 05:00:00+00', 'Hall', 'prepared', 'fair', true, true, 0, 4, 'birdie-night', true, false, 'c0000000-0000-4000-8000-000000000042', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'Alice Reyes', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000004', 'Dan Uy', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('a7000000-0000-4000-8000-000000000003', 'c9000000-0000-4000-8000-000000000002', 'a3000000-0000-4000-8000-000000000002', 'e7000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000004', 'Dan Uy', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000001', 'e7000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000004', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000002', 'e7000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000004', 'd4000000-0000-4000-8000-000000000002', decode('0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c', 'hex'), TIMESTAMPTZ '2026-11-19 01:40:00+00', 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('a3d00000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000002', 'a3000000-0000-4000-8000-000000000002', 'a7000000-0000-4000-8000-000000000003', 'e7000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000004', 'd4000000-0000-4000-8000-000000000001', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)",
+   "UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"
+  ]
+ },
+ "snapshot": [
+  {
+   "name": "club_players",
+   "sql": "SELECT id, club_id, player_id, display_name, nickname, shared_entry_id, added_at, removed_at, revision::text AS revision, created_at, updated_at FROM club_players ORDER BY club_id, player_id, id",
+   "redact": [
+    "id",
+    "created_at"
+   ]
+  },
+  {
+   "name": "session_slot_transfers",
+   "sql": "SELECT id, club_id, session_id, sender_session_player_id, sender_player_id, recipient_player_id, status::text AS status, requested_at, decided_at, (link_token_digest IS NOT NULL) AS via_link, claimed_at FROM session_slot_transfers ORDER BY id",
+   "redact": []
+  }
+ ],
+ "cases": [
+  {
+   "name": "leave_ends_the_pending_transfers_of_a_recipient_and_a_sender",
+   "scenario": "transfers",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_ends_a_pending_transfer_the_player_receives",
+   "scenario": "transfers",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "leave_keeps_the_pending_transfers_of_another_club",
+   "scenario": "transfers_birdie_member",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_the_other_club_ends_only_its_transfers",
+   "scenario": "transfers_birdie_member",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000002",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_leaves_decided_transfers_as_they_are",
+   "scenario": "transfers_decided",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_again_changes_nothing_and_keeps_the_pending_transfers",
+   "scenario": "transfers_dan_gone",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_twice_ends_them_once",
+   "scenario": "transfers",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000004"
+    }
+   ]
+  },
+  {
+   "name": "leave_a_club_with_no_transfers",
+   "scenario": "transfers",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000002"
+    }
+   ]
+  },
+  {
+   "name": "leave_does_not_end_the_transfers_of_another_player",
+   "scenario": "transfers",
+   "steps": [
+    {
+     "method": "DELETE",
+     "path": "/api/me/clubs/c9000000-0000-4000-8000-000000000001",
+     "who": "f4000000-0000-4000-8000-000000000002"
+    }
+   ]
+  }
+ ]
+}

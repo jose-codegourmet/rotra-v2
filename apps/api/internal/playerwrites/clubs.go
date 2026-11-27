@@ -57,15 +57,23 @@ func (s *server) joinClub(r *http.Request, p session.Principal) (writes.Result, 
 	return writes.Result{Body: membership{PlayerID: p.AccountID.String(), ClubID: clubText}}, nil
 }
 
-// leaveClub is Leave club (owner decision): it marks the player's own row removed and keeps it for history; never a hard delete.
+// leaveClub is Leave club (owner decision): it marks the player's own row removed and keeps it for history; never a hard delete, and every pending slot transfer the player is part of in the
+// club (sender, or recipient or claimant of a transfer link) is cancelled with it (#1018). The club's trusted-host row is not ended here yet.
 // Leaving again, leaving a club never joined and a club ID that is no UUID are no-ops that answer the same.
 func (s *server) leaveClub(r *http.Request, p session.Principal) (writes.Result, error) {
 	clubText := r.PathValue("clubId")
 	if club, ok := parseUUID(clubText); ok {
 		// A small transaction of its own, so the live-update event commits with the removal (B-26).
 		if err := writes.InTx(r.Context(), s.pool, func(ctx context.Context, q *sqlcgen.Queries) error {
-			if err := q.RemoveClubPlayer(ctx, sqlcgen.RemoveClubPlayerParams{Now: s.stamp(), ClubID: club, PlayerID: self(p)}); err != nil {
+			left, err := q.RemoveClubPlayer(ctx, sqlcgen.RemoveClubPlayerParams{Now: s.stamp(), ClubID: club, PlayerID: self(p)})
+			if err != nil {
 				return err
+			}
+			// #1018: leaving ends every pending slot transfer the player is part of in this club. Leaving again (no row left) touches nothing.
+			if left > 0 {
+				if err := q.CancelPlayerPendingSlotTransfers(ctx, sqlcgen.CancelPlayerPendingSlotTransfersParams{Now: s.stamp(), ClubID: club, PlayerID: self(p)}); err != nil {
+					return err
+				}
 			}
 			liveupdates.Note(ctx, club, pgtype.UUID{})
 			return nil

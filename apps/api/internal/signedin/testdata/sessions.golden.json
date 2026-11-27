@@ -56,7 +56,7 @@
           "end": "2026-11-21T13:00:00.000Z",
           "clubName": "Birdie Club",
           "status": "waitlist",
-          "waitlistPosition": 2
+          "waitlistPosition": 1
         },
         {
           "id": "b4000000-0000-4000-8000-000000000013",
@@ -182,7 +182,7 @@
           "end": "2026-11-21T13:00:00.000Z",
           "clubName": "Birdie Club",
           "status": "waitlist",
-          "waitlistPosition": 1
+          "waitlistPosition": 2
         },
         {
           "id": "b4000000-0000-4000-8000-000000000005",
@@ -301,7 +301,7 @@
           "end": "2026-11-21T13:00:00.000Z",
           "clubName": "Birdie Club",
           "status": "waitlist",
-          "waitlistPosition": 2
+          "waitlistPosition": 1
         },
         {
           "id": "b4000000-0000-4000-8000-000000000013",
@@ -512,7 +512,7 @@
           "end": "2026-11-21T13:00:00.000Z",
           "clubName": "Birdie Club",
           "status": "waitlist",
-          "waitlistPosition": 2
+          "waitlistPosition": 1
         },
         {
           "id": "b4000000-0000-4000-8000-000000000013",
@@ -625,7 +625,7 @@
           "end": "2026-11-21T13:00:00.000Z",
           "clubName": "Birdie Club",
           "status": "waitlist",
-          "waitlistPosition": 2
+          "waitlistPosition": 1
         },
         {
           "id": "b4000000-0000-4000-8000-000000000013",
@@ -781,7 +781,7 @@
           "end": "2026-11-21T13:00:00.000Z",
           "clubName": "Birdie Club",
           "status": "waitlist",
-          "waitlistPosition": 2
+          "waitlistPosition": 1
         },
         {
           "id": "b4000000-0000-4000-8000-000000000013",
@@ -920,7 +920,7 @@
           "end": "2026-11-21T13:00:00.000Z",
           "clubName": "Birdie Club",
           "status": "waitlist",
-          "waitlistPosition": 2
+          "waitlistPosition": 1
         },
         {
           "id": "b4000000-0000-4000-8000-000000000013",
@@ -1340,7 +1340,7 @@
     },
     "body": {
       "published": true,
-      "position": 2,
+      "position": 1,
       "games": {
         "b6000000-0000-4000-8000-000000000001": {
           "partners": [
@@ -1749,7 +1749,7 @@
     },
     "body": {
       "published": true,
-      "position": 2,
+      "position": 1,
       "games": {
         "b6000000-0000-4000-8000-000000000001": {
           "partners": [
@@ -1838,7 +1838,7 @@
     },
     "body": {
       "published": true,
-      "position": null,
+      "position": 1,
       "games": {
         "b6000000-0000-4000-8000-000000000001": {
           "partners": [
@@ -2517,7 +2517,7 @@
         "status": "on-waitlist",
         "playerId": "b2000000-0000-4000-8000-000000000001",
         "name": "Sam Cruz",
-        "position": 2
+        "position": 1
       }
     }
   },
@@ -2970,7 +2970,7 @@
         "status": "on-waitlist",
         "playerId": "b2000000-0000-4000-8000-000000000002",
         "name": "Tess Lopez",
-        "position": 1
+        "position": 2
       }
     }
   },

@@ -61,6 +61,7 @@ type Ruleset struct {
 	IsBookingEnded          func(c model.Court, sessionEnd, now int64) bool
 	SessionEndError         func(in courts.SessionEndInput, now int64) (string, bool)
 	SessionEndCourtConflict func(cs []model.Court, endAt, courtBase, now int64) (string, bool)
+	ExpectedFinish          func(scoring *string, minutesPlayed *int64) match.ExpectedFinish
 	// roster
 	InUnfinishedMatch func(rosterID string, matches []model.Match) bool
 	SlotCapacity      func(courts, playersPerCourt int64) int64
@@ -116,6 +117,7 @@ func V1() Ruleset {
 		IsBookingEnded:          courts.BookingEnded,
 		SessionEndError:         courts.SessionEndError,
 		SessionEndCourtConflict: courts.SessionEndCourtConflict,
+		ExpectedFinish:          match.ExpectedFinishOf,
 
 		InUnfinishedMatch: roster.InUnfinishedMatch,
 		SlotCapacity:      roster.SlotCapacity,

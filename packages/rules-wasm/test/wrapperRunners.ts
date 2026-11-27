@@ -17,6 +17,7 @@ import {
   courtOpen,
   courtsNeeded,
   creditedPlayers,
+  expectedFinish,
   formatTeamSizes,
   formFromHistory,
   formRating,
@@ -184,6 +185,9 @@ export const WRAPPER_RUNNERS: Record<string, Runner> = {
     endAt: number
     courtBase: number
   }>((i, now) => sessionEndCourtConflict(i.courts, i.endAt, i.courtBase, now as number)),
+  'courts/expectedFinish': rule<{ scoring?: string; minutesPlayed: number | null }>((i) =>
+    expectedFinish(i.scoring, i.minutesPlayed),
+  ),
 
   'roster/inUnfinishedMatch': rule<{
     rosterId: string

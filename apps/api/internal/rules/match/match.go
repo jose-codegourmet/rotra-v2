@@ -402,15 +402,19 @@ type ScoringMode struct {
 	Target int
 	Games  int
 	Deuce  bool
+	// Typical is the expected match length in minutes (D-2026-11-23-08); Long is the length past which
+	// a match is Running long.
+	Typical int
+	Long    int
 }
 
 // Scoring is the scoring table by stored key. Labels and texts live with the UI copy in TypeScript.
 var Scoring = map[string]ScoringMode{
-	"31":     {Target: 31, Games: 1, Deuce: true},
-	"31nd":   {Target: 31, Games: 1, Deuce: false},
-	"21":     {Target: 21, Games: 1, Deuce: true},
-	"21x3":   {Target: 21, Games: 3, Deuce: true},
-	"21x3nd": {Target: 21, Games: 3, Deuce: false},
+	"31":     {Target: 31, Games: 1, Deuce: true, Typical: 15, Long: 25},
+	"31nd":   {Target: 31, Games: 1, Deuce: false, Typical: 15, Long: 18},
+	"21":     {Target: 21, Games: 1, Deuce: true, Typical: 10, Long: 15},
+	"21x3":   {Target: 21, Games: 3, Deuce: true, Typical: 25, Long: 35},
+	"21x3nd": {Target: 21, Games: 3, Deuce: false, Typical: 25, Long: 30},
 }
 
 // DefaultScoring is 16/31: what a session with no (or an unknown) scoring mode reads as.

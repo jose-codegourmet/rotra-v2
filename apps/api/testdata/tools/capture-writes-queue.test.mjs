@@ -6,6 +6,7 @@
 //   club       the club's writes (invite link, venues, settings, saved players: add, delete, move, club nickname, registration link)
 //   prep       session preparation and courts (create, edit, join switches, start, delete, the court commands); run with TZ=UTC
 //   match      match control and the queue of waiting matches (place, start, send back, move, swap, replace, substitute, result, invalid, add, edit, remove, reorder, Auto queue, Regenerate)
+//   transfers  plays free, Record refund, Reject and Reject and refund of a slot transfer, payments on a slot with a history; run with TZ=UTC
 //   money      inventory, the payment switches and the cost estimate saved beside a session (Create session, Edit preparation); run with TZ=UTC
 //   visitor    the Queue visitor routes: join-request and my-request (the receipt cookie); visitor-nosecret is the same with no secret set
 //   finalize   Session done and its projection jobs (result snapshot, player history, player rank), POST and GET
@@ -129,6 +130,10 @@ test('pubjoin', async () => {
 })
 
 // Run this group with TZ=UTC too: the dates of a repeating series, saved with their cost estimates, read the zone.
+test('transfers', async () => {
+  await captureWrites({ db: capture.db, testdata, name: 'transfers', apiDir })
+})
+
 test('money', async () => {
   await captureWrites({ db: capture.db, testdata, name: 'money', apiDir })
 })

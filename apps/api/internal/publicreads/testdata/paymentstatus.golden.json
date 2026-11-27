@@ -1,0 +1,1644 @@
+{
+ "open_night_no_estimate_no_marks": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": null,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_no_estimate_with_marks": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": null,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": 40000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": 120000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": 0,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_custom_fee_with_marks": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 90000,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": 40000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": 120000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_break_even_with_marks": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 43600,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": 40000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": 120000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": 43600,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_a_marks_of_a_released_and_a_no_show_are_not_listed": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 90000,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_free_players_are_left_out": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 90000,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": 40000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": 120000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_a_free_player_with_a_mark_is_listed": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 90000,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": 40000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": 120000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_break_even_leaves_free_players_out_of_the_split": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 55500,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": 40000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": 120000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": 55500,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_everyone_free": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 610000,
+    "rows": []
+   }
+  }
+ },
+ "open_night_a_slot_that_came_by_transfer_counts_its_carried_cash": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 90000,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "V*** V***",
+      "receivedMinor": 50000,
+      "waivedMinor": 40000,
+      "viaTransfer": true
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_a_slot_that_came_by_transfer_adds_the_holders_own_cash": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 90000,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "V*** V***",
+      "receivedMinor": 60000,
+      "waivedMinor": 40000,
+      "viaTransfer": true
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_a_slot_that_came_by_transfer_with_nothing_paid": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 90000,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "V*** V***",
+      "receivedMinor": 50000,
+      "waivedMinor": 40000,
+      "viaTransfer": true
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_a_refund_comes_off_the_cash_kept": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 90000,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": 0,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": 120000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_a_refund_without_a_fee_set": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": null,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": 0,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": 120000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": 0,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_a_refunded_legacy_mark": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 90000,
+    "rows": [
+     {
+      "name": "A*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "A*** R***",
+      "receivedMinor": 90000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "b*** s***",
+      "receivedMinor": 40000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "C*** D***",
+      "receivedMinor": 120000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "G*** G***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M*** J***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Player",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Ü*** Ç***",
+      "receivedMinor": 0,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "X***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "Z*** Z***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "日*** 太***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "open_night_a_record_with_no_one_on_the_roster": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 90000,
+    "rows": []
+   }
+  }
+ },
+ "open_night_the_estimate_follows_the_slots_when_the_roster_is_empty": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 50000,
+    "rows": []
+   }
+  }
+ },
+ "active_night": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 50000,
+    "rows": [
+     {
+      "name": "L*** L***",
+      "receivedMinor": 50000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "O*** O***",
+      "receivedMinor": 50000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "P*** P***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "active_night_no_marks": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": null,
+    "rows": [
+     {
+      "name": "L*** L***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "O*** O***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "P*** P***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "done_and_published": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": null,
+    "rows": [
+     {
+      "name": "A*** R***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** S***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "T*** N***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "T*** N***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "done_and_published_with_marks": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": 30000,
+    "rows": [
+     {
+      "name": "A*** R***",
+      "receivedMinor": 30000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "J*** A***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "M***",
+      "receivedMinor": 5000,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "S*** S***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "T*** N***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     },
+     {
+      "name": "T*** N***",
+      "receivedMinor": null,
+      "waivedMinor": 0,
+      "viaTransfer": false
+     }
+    ]
+   }
+  }
+ },
+ "cancelled_night_reveals_nothing": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": null
+  }
+ },
+ "invalid_night_reveals_nothing": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": null
+  }
+ },
+ "empty_session": {
+  "status": 200,
+  "headers": {
+   "cache-control": "public, max-age=0, must-revalidate",
+   "content-type": "application/json"
+  },
+  "body": {
+   "paymentStatus": {
+    "amountDue": null,
+    "rows": []
+   }
+  }
+ },
+ "done_page_removed_is_not_found": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "unknown_slug_is_not_found": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "uppercase_slug_is_not_found": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "slug_too_short_is_not_found": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ },
+ "slug_with_a_quote_is_not_found": {
+  "status": 404,
+  "headers": {
+   "cache-control": "private, no-store",
+   "content-type": "application/json",
+   "vary": "Cookie"
+  },
+  "body": {
+   "error": {
+    "code": "not_found",
+    "message": "Not found."
+   }
+  }
+ }
+}

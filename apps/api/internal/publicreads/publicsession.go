@@ -575,15 +575,28 @@ func resultsWithPictures(raw []byte, roster []sqlcgen.ListPublicSessionRosterRow
 }
 
 // publicAmountDue is amountDuePerHead of estimateFor (Details > Payment, D-2026-11-25-05): the amount each player pays, never the cost lines.
-// Nil with no estimate saved. The head count is the roster, else the expected players, else the slots. Free roster players
-// (D-2026-11-27-01) are not read yet: the Go cost rule has no free players (task 2.12).
+// Nil with no estimate saved. The head count is the roster, else the expected players, else the slots, and free roster players
+// (D-2026-11-27-01) leave it.
 func publicAmountDue(ctx context.Context, q *sqlcgen.Queries, s sqlcgen.GetPublicSessionBySlugRow, courts, roster int) (*int64, error) {
+	r, err := publicEstimate(ctx, q, s, courts, roster)
+	if err != nil || r == nil {
+		return nil, err
+	}
+	return sessioncost.AmountDue(r), nil
+}
+
+// publicEstimate is estimateFor's estimate of a session read by its slug: nil with no estimate saved.
+func publicEstimate(ctx context.Context, q *sqlcgen.Queries, s sqlcgen.GetPublicSessionBySlugRow, courts, roster int) (*sessioncost.Result, error) {
 	est, err := q.GetQueueCostEstimate(ctx, s.ID)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, fmt.Errorf("reading cost estimate: %w", err)
+	}
+	free, err := q.CountQueueFreeRoster(ctx, s.ID)
+	if err != nil {
+		return nil, fmt.Errorf("reading free players: %w", err)
 	}
 	lines, err := q.ListQueueShuttlePlanLines(ctx, s.ID)
 	if err != nil {
@@ -617,8 +630,8 @@ func publicAmountDue(ctx context.Context, q *sqlcgen.Queries, s sqlcgen.GetPubli
 		players = int64(courts) * int64(s.PlayersPerCourt)
 	}
 	minutes := max(0, int64(math.Floor(float64(s.ScheduledEndAt.Time.UnixMilli()-s.ScheduledStartAt.Time.UnixMilli())/60000+0.5)))
-	r := sessioncost.Estimate(in, sessioncost.Context{Courts: int64(courts), DurationMinutes: minutes, Players: players, Items: items})
-	return sessioncost.AmountDue(&r), nil
+	r := sessioncost.Estimate(in, sessioncost.Context{Courts: int64(courts), DurationMinutes: minutes, Players: players, FreePlayers: int64(free), Items: items})
+	return &r, nil
 }
 
 // sharePositionsOf is sharePositions applied to a stored copy of any shape: a row is spread into a new object (so a string row becomes its

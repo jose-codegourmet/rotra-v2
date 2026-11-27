@@ -20100,5 +20100,2236 @@
         }
       ]
     }
+  },
+  "cost-club1-s1-free-two": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "cost": {
+        "input": {
+          "courtFeePerCourtHour": 25000,
+          "entranceFeePerHead": 5000,
+          "paymentMode": "break_even",
+          "customFeePerHead": null,
+          "shuttles": [
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+              "tubes": 2
+            },
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+              "tubes": 1
+            }
+          ]
+        },
+        "estimate": {
+          "players": 6,
+          "payers": 4,
+          "court": 200000,
+          "shuttle": 270000,
+          "entrance": 30000,
+          "entranceFeePerHead": 5000,
+          "total": 500000,
+          "breakEven": 125000,
+          "perHead": 125000,
+          "isCustom": false,
+          "collect": 500000,
+          "result": {
+            "kind": "breaks_even",
+            "amount": 0
+          }
+        },
+        "revision": "3",
+        "courts": 2,
+        "durationMinutes": 240,
+        "shuttleLines": [
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+            "tubes": 2,
+            "name": "Yonex AS50"
+          },
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+            "tubes": 1,
+            "name": "RSL Grade 3"
+          }
+        ]
+      }
+    }
+  },
+  "payments-club1-s1-free-two": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+            "name": "No Phone Ned",
+            "free": true,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": true,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 83400,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+            "name": "Bob Santos",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 40000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:01:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+            "name": "Carla Dizon",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 90000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:02:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+            "name": "Cory Only",
+            "free": false,
+            "paid": {
+              "amount": null,
+              "at": "2026-11-19T02:03:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          }
+        ],
+        "amountDue": 125000,
+        "dueBasis": "break_even",
+        "entranceFeeIncluded": 5000,
+        "totals": {
+          "paid": 1,
+          "partial": 3,
+          "total": 4,
+          "collected": 338400,
+          "waived": 0,
+          "refunded": 0,
+          "stillDue": 161600,
+          "toReimburse": 0,
+          "againstCosts": -161600,
+          "cost": 500000,
+          "free": 2
+        }
+      }
+    }
+  },
+  "cost-club1-s1-free-with-a-mark": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "cost": {
+        "input": {
+          "courtFeePerCourtHour": 25000,
+          "entranceFeePerHead": 5000,
+          "paymentMode": "break_even",
+          "customFeePerHead": null,
+          "shuttles": [
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+              "tubes": 2
+            },
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+              "tubes": 1
+            }
+          ]
+        },
+        "estimate": {
+          "players": 6,
+          "payers": 4,
+          "court": 200000,
+          "shuttle": 270000,
+          "entrance": 30000,
+          "entranceFeePerHead": 5000,
+          "total": 500000,
+          "breakEven": 125000,
+          "perHead": 125000,
+          "isCustom": false,
+          "collect": 500000,
+          "result": {
+            "kind": "breaks_even",
+            "amount": 0
+          }
+        },
+        "revision": "3",
+        "courts": 2,
+        "durationMinutes": 240,
+        "shuttleLines": [
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+            "tubes": 2,
+            "name": "Yonex AS50"
+          },
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+            "tubes": 1,
+            "name": "RSL Grade 3"
+          }
+        ]
+      }
+    }
+  },
+  "payments-club1-s1-free-with-a-mark": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+            "name": "No Phone Ned",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": true,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 83400,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+            "name": "Bob Santos",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 40000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:01:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+            "name": "Carla Dizon",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 90000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:02:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+            "name": "Cory Only",
+            "free": false,
+            "paid": {
+              "amount": null,
+              "at": "2026-11-19T02:03:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          }
+        ],
+        "amountDue": 125000,
+        "dueBasis": "break_even",
+        "entranceFeeIncluded": 5000,
+        "totals": {
+          "paid": 1,
+          "partial": 3,
+          "total": 5,
+          "collected": 338400,
+          "waived": 0,
+          "refunded": 0,
+          "stillDue": 286600,
+          "toReimburse": 0,
+          "againstCosts": -161600,
+          "cost": 500000,
+          "free": 1
+        }
+      }
+    }
+  },
+  "cost-club1-s1-all-free": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "cost": {
+        "input": {
+          "courtFeePerCourtHour": 25000,
+          "entranceFeePerHead": 5000,
+          "paymentMode": "break_even",
+          "customFeePerHead": null,
+          "shuttles": [
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+              "tubes": 2
+            },
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+              "tubes": 1
+            }
+          ]
+        },
+        "estimate": {
+          "players": 6,
+          "payers": 1,
+          "court": 200000,
+          "shuttle": 270000,
+          "entrance": 30000,
+          "entranceFeePerHead": 5000,
+          "total": 500000,
+          "breakEven": 500000,
+          "perHead": 500000,
+          "isCustom": false,
+          "collect": 500000,
+          "result": {
+            "kind": "breaks_even",
+            "amount": 0
+          }
+        },
+        "revision": "3",
+        "courts": 2,
+        "durationMinutes": 240,
+        "shuttleLines": [
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+            "tubes": 2,
+            "name": "Yonex AS50"
+          },
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+            "tubes": 1,
+            "name": "RSL Grade 3"
+          }
+        ]
+      }
+    }
+  },
+  "payments-club1-s1-all-free": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+            "name": "No Phone Ned",
+            "free": true,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": true,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 83400,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+            "name": "Bob Santos",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 40000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:01:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+            "name": "Carla Dizon",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 90000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:02:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+            "name": "Cory Only",
+            "free": false,
+            "paid": {
+              "amount": null,
+              "at": "2026-11-19T02:03:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          }
+        ],
+        "amountDue": 500000,
+        "dueBasis": "break_even",
+        "entranceFeeIncluded": 5000,
+        "totals": {
+          "paid": 1,
+          "partial": 3,
+          "total": 4,
+          "collected": 713400,
+          "waived": 0,
+          "refunded": 0,
+          "stillDue": 1286600,
+          "toReimburse": 0,
+          "againstCosts": 213400,
+          "cost": 500000,
+          "free": 2
+        }
+      }
+    }
+  },
+  "cost-club1-s1-free-custom": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "cost": {
+        "input": {
+          "courtFeePerCourtHour": 25000,
+          "entranceFeePerHead": 5000,
+          "paymentMode": "custom",
+          "customFeePerHead": 100000,
+          "shuttles": [
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+              "tubes": 2
+            },
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+              "tubes": 1
+            }
+          ]
+        },
+        "estimate": {
+          "players": 6,
+          "payers": 4,
+          "court": 200000,
+          "shuttle": 270000,
+          "entrance": 30000,
+          "entranceFeePerHead": 5000,
+          "total": 500000,
+          "breakEven": 125000,
+          "perHead": 100000,
+          "isCustom": true,
+          "collect": 400000,
+          "result": {
+            "kind": "loss",
+            "amount": 100000
+          }
+        },
+        "revision": "3",
+        "courts": 2,
+        "durationMinutes": 240,
+        "shuttleLines": [
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+            "tubes": 2,
+            "name": "Yonex AS50"
+          },
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+            "tubes": 1,
+            "name": "RSL Grade 3"
+          }
+        ]
+      }
+    }
+  },
+  "payments-club1-s1-free-custom": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+            "name": "No Phone Ned",
+            "free": true,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": true,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 83400,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+            "name": "Bob Santos",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 40000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:01:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+            "name": "Carla Dizon",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 90000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:02:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+            "name": "Cory Only",
+            "free": false,
+            "paid": {
+              "amount": null,
+              "at": "2026-11-19T02:03:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          }
+        ],
+        "amountDue": 100000,
+        "dueBasis": "custom",
+        "entranceFeeIncluded": 5000,
+        "totals": {
+          "paid": 1,
+          "partial": 3,
+          "total": 4,
+          "collected": 313400,
+          "waived": 0,
+          "refunded": 0,
+          "stillDue": 86600,
+          "toReimburse": 0,
+          "againstCosts": -186600,
+          "cost": 500000,
+          "free": 2
+        }
+      }
+    }
+  },
+  "payments-club1-s1-free-no-estimate": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+            "name": "No Phone Ned",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": true,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 83400,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+            "name": "Bob Santos",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 40000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:01:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+            "name": "Carla Dizon",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 90000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:02:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+            "name": "Cory Only",
+            "free": false,
+            "paid": {
+              "amount": null,
+              "at": "2026-11-19T02:03:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          }
+        ],
+        "amountDue": null,
+        "dueBasis": "break_even",
+        "entranceFeeIncluded": null,
+        "totals": {
+          "paid": 4,
+          "partial": 0,
+          "total": 5,
+          "collected": 213400,
+          "waived": 0,
+          "refunded": 0,
+          "stillDue": null,
+          "toReimburse": 0,
+          "againstCosts": null,
+          "cost": null,
+          "free": 1
+        }
+      }
+    }
+  },
+  "cost-club1-s9-free": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "cost": {
+        "input": {
+          "courtFeePerCourtHour": null,
+          "entranceFeePerHead": null,
+          "paymentMode": "custom",
+          "customFeePerHead": 12000,
+          "shuttles": []
+        },
+        "estimate": {
+          "players": 3,
+          "payers": 2,
+          "court": 0,
+          "shuttle": 0,
+          "entrance": 0,
+          "entranceFeePerHead": 0,
+          "total": 0,
+          "breakEven": 0,
+          "perHead": 12000,
+          "isCustom": true,
+          "collect": 24000,
+          "result": {
+            "kind": "no_costs",
+            "amount": 24000
+          }
+        },
+        "revision": "1",
+        "courts": 2,
+        "durationMinutes": 240,
+        "shuttleLines": []
+      }
+    }
+  },
+  "payments-club1-s9-free": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000021",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000022",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+            "name": "Bob Santos",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000023",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": true,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          }
+        ],
+        "amountDue": 12000,
+        "dueBasis": "custom",
+        "entranceFeeIncluded": 0,
+        "totals": {
+          "paid": 0,
+          "partial": 0,
+          "total": 2,
+          "collected": 0,
+          "waived": 0,
+          "refunded": 0,
+          "stillDue": 24000,
+          "toReimburse": 0,
+          "againstCosts": 0,
+          "cost": 0,
+          "free": 1
+        }
+      }
+    }
+  },
+  "cost-club1-s1-free-off-roster": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "cost": {
+        "input": {
+          "courtFeePerCourtHour": 25000,
+          "entranceFeePerHead": 5000,
+          "paymentMode": "break_even",
+          "customFeePerHead": null,
+          "shuttles": [
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+              "tubes": 2
+            },
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+              "tubes": 1
+            }
+          ]
+        },
+        "estimate": {
+          "players": 6,
+          "payers": 6,
+          "court": 200000,
+          "shuttle": 270000,
+          "entrance": 30000,
+          "entranceFeePerHead": 5000,
+          "total": 500000,
+          "breakEven": 83400,
+          "perHead": 83400,
+          "isCustom": false,
+          "collect": 500400,
+          "result": {
+            "kind": "breaks_even",
+            "amount": 400
+          }
+        },
+        "revision": "3",
+        "courts": 2,
+        "durationMinutes": 240,
+        "shuttleLines": [
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+            "tubes": 2,
+            "name": "Yonex AS50"
+          },
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+            "tubes": 1,
+            "name": "RSL Grade 3"
+          }
+        ]
+      }
+    }
+  },
+  "payments-club1-s1-transfer-part-paid": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+            "name": "No Phone Ned",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 83400,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+            "name": "Carla Dizon",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 90000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:02:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+            "name": "Cory Only",
+            "free": false,
+            "paid": {
+              "amount": null,
+              "at": "2026-11-19T02:03:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000090",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000031",
+            "name": "Gina Claimed No Contact",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 40000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:20:00.000Z"
+            },
+            "transfer": {
+              "waivedMinor": 43400,
+              "steps": [
+                {
+                  "transferId": "a3d00000-0000-4000-8000-000000000001",
+                  "fromName": "Bob Santos",
+                  "toName": "Gina Claimed No Contact",
+                  "viaLink": false,
+                  "paidByGiverMinor": 40000,
+                  "slotPaidMinor": 40000,
+                  "waivedMinor": 43400,
+                  "amountDueMinor": 83400,
+                  "approvedAt": "2026-11-19T02:20:00.000Z"
+                }
+              ]
+            },
+            "refund": null
+          }
+        ],
+        "amountDue": 83400,
+        "dueBasis": "break_even",
+        "entranceFeeIncluded": 5000,
+        "totals": {
+          "paid": 4,
+          "partial": 0,
+          "total": 6,
+          "collected": 296800,
+          "waived": 43400,
+          "refunded": 0,
+          "stillDue": 166800,
+          "toReimburse": 6600,
+          "againstCosts": -203200,
+          "cost": 500000
+        }
+      }
+    }
+  },
+  "cost-club1-s1-transfer-part-paid": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "cost": {
+        "input": {
+          "courtFeePerCourtHour": 25000,
+          "entranceFeePerHead": 5000,
+          "paymentMode": "break_even",
+          "customFeePerHead": null,
+          "shuttles": [
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+              "tubes": 2
+            },
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+              "tubes": 1
+            }
+          ]
+        },
+        "estimate": {
+          "players": 6,
+          "payers": 6,
+          "court": 200000,
+          "shuttle": 270000,
+          "entrance": 30000,
+          "entranceFeePerHead": 5000,
+          "total": 500000,
+          "breakEven": 83400,
+          "perHead": 83400,
+          "isCustom": false,
+          "collect": 500400,
+          "result": {
+            "kind": "breaks_even",
+            "amount": 400
+          }
+        },
+        "revision": "3",
+        "courts": 2,
+        "durationMinutes": 240,
+        "shuttleLines": [
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+            "tubes": 2,
+            "name": "Yonex AS50"
+          },
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+            "tubes": 1,
+            "name": "RSL Grade 3"
+          }
+        ]
+      }
+    }
+  },
+  "payments-club1-s1-transfer-then-cash": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+            "name": "No Phone Ned",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 83400,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+            "name": "Carla Dizon",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 90000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:02:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+            "name": "Cory Only",
+            "free": false,
+            "paid": {
+              "amount": null,
+              "at": "2026-11-19T02:03:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000090",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000031",
+            "name": "Gina Claimed No Contact",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 50000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:40:00.000Z"
+            },
+            "transfer": {
+              "waivedMinor": 43400,
+              "steps": [
+                {
+                  "transferId": "a3d00000-0000-4000-8000-000000000001",
+                  "fromName": "Bob Santos",
+                  "toName": "Gina Claimed No Contact",
+                  "viaLink": false,
+                  "paidByGiverMinor": 40000,
+                  "slotPaidMinor": 40000,
+                  "waivedMinor": 43400,
+                  "amountDueMinor": 83400,
+                  "approvedAt": "2026-11-19T02:20:00.000Z"
+                }
+              ]
+            },
+            "refund": null
+          }
+        ],
+        "amountDue": 83400,
+        "dueBasis": "break_even",
+        "entranceFeeIncluded": 5000,
+        "totals": {
+          "paid": 4,
+          "partial": 0,
+          "total": 6,
+          "collected": 306800,
+          "waived": 43400,
+          "refunded": 0,
+          "stillDue": 166800,
+          "toReimburse": 6600,
+          "againstCosts": -193200,
+          "cost": 500000
+        }
+      }
+    }
+  },
+  "payments-club1-s1-transfer-unpaid-slot": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+            "name": "No Phone Ned",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 83400,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000012",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+            "name": "Bob Santos",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 40000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:01:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+            "name": "Cory Only",
+            "free": false,
+            "paid": {
+              "amount": null,
+              "at": "2026-11-19T02:03:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000090",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000031",
+            "name": "Gina Claimed No Contact",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:20:00.000Z"
+            },
+            "transfer": {
+              "waivedMinor": 83400,
+              "steps": [
+                {
+                  "transferId": "a3d00000-0000-4000-8000-000000000001",
+                  "fromName": "Carla Dizon",
+                  "toName": "Gina Claimed No Contact",
+                  "viaLink": false,
+                  "paidByGiverMinor": 0,
+                  "slotPaidMinor": 0,
+                  "waivedMinor": 83400,
+                  "amountDueMinor": 83400,
+                  "approvedAt": "2026-11-19T02:20:00.000Z"
+                }
+              ]
+            },
+            "refund": null
+          }
+        ],
+        "amountDue": 83400,
+        "dueBasis": "break_even",
+        "entranceFeeIncluded": 5000,
+        "totals": {
+          "paid": 3,
+          "partial": 1,
+          "total": 6,
+          "collected": 206800,
+          "waived": 83400,
+          "refunded": 0,
+          "stillDue": 210200,
+          "toReimburse": 0,
+          "againstCosts": -293200,
+          "cost": 500000
+        }
+      }
+    }
+  },
+  "payments-club1-s1-transfer-chain": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+            "name": "No Phone Ned",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 83400,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+            "name": "Carla Dizon",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 90000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:02:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+            "name": "Cory Only",
+            "free": false,
+            "paid": {
+              "amount": null,
+              "at": "2026-11-19T02:03:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000091",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000032",
+            "name": "Frank No Id",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 40000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:45:00.000Z"
+            },
+            "transfer": {
+              "waivedMinor": 43400,
+              "steps": [
+                {
+                  "transferId": "a3d00000-0000-4000-8000-000000000001",
+                  "fromName": "Bob Santos",
+                  "toName": "Gina Claimed No Contact",
+                  "viaLink": false,
+                  "paidByGiverMinor": 40000,
+                  "slotPaidMinor": 40000,
+                  "waivedMinor": 43400,
+                  "amountDueMinor": 83400,
+                  "approvedAt": "2026-11-19T02:20:00.000Z"
+                },
+                {
+                  "transferId": "a3d00000-0000-4000-8000-000000000002",
+                  "fromName": "Gina Claimed No Contact",
+                  "toName": "Frank No Id",
+                  "viaLink": false,
+                  "paidByGiverMinor": 0,
+                  "slotPaidMinor": 40000,
+                  "waivedMinor": 0,
+                  "amountDueMinor": 83400,
+                  "approvedAt": "2026-11-19T02:45:00.000Z"
+                }
+              ]
+            },
+            "refund": null
+          }
+        ],
+        "amountDue": 83400,
+        "dueBasis": "break_even",
+        "entranceFeeIncluded": 5000,
+        "totals": {
+          "paid": 4,
+          "partial": 0,
+          "total": 6,
+          "collected": 296800,
+          "waived": 43400,
+          "refunded": 0,
+          "stillDue": 166800,
+          "toReimburse": 6600,
+          "againstCosts": -203200,
+          "cost": 500000
+        }
+      }
+    }
+  },
+  "payments-club1-s1-transfer-fee-rose": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000018",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+            "name": "No Phone Ned",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000015",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000011",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 83400,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000013",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+            "name": "Carla Dizon",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 90000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:02:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000014",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000021",
+            "name": "Cory Only",
+            "free": false,
+            "paid": {
+              "amount": null,
+              "at": "2026-11-19T02:03:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000090",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000031",
+            "name": "Gina Claimed No Contact",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 40000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:20:00.000Z"
+            },
+            "transfer": {
+              "waivedMinor": 43400,
+              "steps": [
+                {
+                  "transferId": "a3d00000-0000-4000-8000-000000000001",
+                  "fromName": "Bob Santos",
+                  "toName": "Gina Claimed No Contact",
+                  "viaLink": false,
+                  "paidByGiverMinor": 40000,
+                  "slotPaidMinor": 40000,
+                  "waivedMinor": 43400,
+                  "amountDueMinor": 83400,
+                  "approvedAt": "2026-11-19T02:20:00.000Z"
+                }
+              ]
+            },
+            "refund": null
+          }
+        ],
+        "amountDue": 90000,
+        "dueBasis": "break_even",
+        "entranceFeeIncluded": 5000,
+        "totals": {
+          "paid": 2,
+          "partial": 2,
+          "total": 6,
+          "collected": 303400,
+          "waived": 43400,
+          "refunded": 0,
+          "stillDue": 193200,
+          "toReimburse": 0,
+          "againstCosts": -236600,
+          "cost": 540000
+        }
+      }
+    }
+  },
+  "cost-club1-s1-transfer-fee-rose": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "cost": {
+        "input": {
+          "courtFeePerCourtHour": 30000,
+          "entranceFeePerHead": 5000,
+          "paymentMode": "break_even",
+          "customFeePerHead": null,
+          "shuttles": [
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+              "tubes": 2
+            },
+            {
+              "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+              "tubes": 1
+            }
+          ]
+        },
+        "estimate": {
+          "players": 6,
+          "payers": 6,
+          "court": 240000,
+          "shuttle": 270000,
+          "entrance": 30000,
+          "entranceFeePerHead": 5000,
+          "total": 540000,
+          "breakEven": 90000,
+          "perHead": 90000,
+          "isCustom": false,
+          "collect": 540000,
+          "result": {
+            "kind": "breaks_even",
+            "amount": 0
+          }
+        },
+        "revision": "3",
+        "courts": 2,
+        "durationMinutes": 240,
+        "shuttleLines": [
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000001",
+            "tubes": 2,
+            "name": "Yonex AS50"
+          },
+          {
+            "inventoryItemId": "a0200000-0000-4000-8000-000000000002",
+            "tubes": 1,
+            "name": "RSL Grade 3"
+          }
+        ]
+      }
+    }
+  },
+  "payments-club1-s9-cancelled-refunded": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000023",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000021",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T01:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": {
+              "amount": {
+                "amountMinor": 70000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            }
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000022",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+            "name": "Bob Santos",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 30000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T01:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          }
+        ],
+        "amountDue": 12000,
+        "dueBasis": "custom",
+        "entranceFeeIncluded": 0,
+        "totals": {
+          "paid": 1,
+          "partial": 0,
+          "total": 3,
+          "collected": 30000,
+          "waived": 0,
+          "refunded": 70000,
+          "stillDue": 24000,
+          "toReimburse": 18000,
+          "againstCosts": 30000,
+          "cost": 0
+        }
+      }
+    }
+  },
+  "cost-club1-s9-cancelled-refunded": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "cost": {
+        "input": {
+          "courtFeePerCourtHour": null,
+          "entranceFeePerHead": null,
+          "paymentMode": "custom",
+          "customFeePerHead": 12000,
+          "shuttles": []
+        },
+        "estimate": {
+          "players": 3,
+          "payers": 3,
+          "court": 0,
+          "shuttle": 0,
+          "entrance": 0,
+          "entranceFeePerHead": 0,
+          "total": 0,
+          "breakEven": 0,
+          "perHead": 12000,
+          "isCustom": true,
+          "collect": 36000,
+          "result": {
+            "kind": "no_costs",
+            "amount": 36000
+          }
+        },
+        "revision": "1",
+        "courts": 2,
+        "durationMinutes": 240,
+        "shuttleLines": []
+      }
+    }
+  },
+  "payments-club1-s9-cancelled-all-refunded": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000023",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000021",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T01:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": {
+              "amount": {
+                "amountMinor": 70000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            }
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000022",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+            "name": "Bob Santos",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 0,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T01:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": {
+              "amount": {
+                "amountMinor": 30000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T02:00:00.000Z"
+            }
+          }
+        ],
+        "amountDue": 12000,
+        "dueBasis": "custom",
+        "entranceFeeIncluded": 0,
+        "totals": {
+          "paid": 0,
+          "partial": 0,
+          "total": 3,
+          "collected": 0,
+          "waived": 0,
+          "refunded": 100000,
+          "stillDue": 36000,
+          "toReimburse": 0,
+          "againstCosts": 0,
+          "cost": 0
+        }
+      }
+    }
+  },
+  "payments-club1-s9-cancelled-not-refunded": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "payments": {
+        "players": [
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000023",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+            "name": "Una Alonzo",
+            "free": false,
+            "paid": null,
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000021",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "name": "Alice Reyes",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 70000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T01:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          },
+          {
+            "sessionPlayerId": "a7000000-0000-4000-8000-000000000022",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+            "name": "Bob Santos",
+            "free": false,
+            "paid": {
+              "amount": {
+                "amountMinor": 30000,
+                "currency": "PHP"
+              },
+              "at": "2026-11-19T01:00:00.000Z"
+            },
+            "transfer": null,
+            "refund": null
+          }
+        ],
+        "amountDue": 12000,
+        "dueBasis": "custom",
+        "entranceFeeIncluded": 0,
+        "totals": {
+          "paid": 2,
+          "partial": 0,
+          "total": 3,
+          "collected": 100000,
+          "waived": 0,
+          "refunded": 0,
+          "stillDue": 12000,
+          "toReimburse": 76000,
+          "againstCosts": 100000,
+          "cost": 0
+        }
+      }
+    }
+  },
+  "requests-club1-s9-transfers-pending": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000009",
+      "minimum": 5,
+      "join": [],
+      "dropOuts": [
+        {
+          "id": "a3600000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000009",
+          "pid": "a7000000-0000-4000-8000-000000000021",
+          "playerId": "d4000000-0000-4000-8000-000000000001",
+          "at": "2026-11-18T12:00:00.000Z",
+          "status": "open",
+          "decision": null,
+          "closedAt": null,
+          "name": "Alice Reyes",
+          "nickname": "Ace"
+        }
+      ],
+      "transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000009",
+          "pid": "a7000000-0000-4000-8000-000000000021",
+          "senderName": "Alice Reyes",
+          "senderNickname": null,
+          "recipientPlayerId": "d4000000-0000-4000-8000-000000000007",
+          "recipientName": "Gina Claimed No Contact",
+          "recipientRtrId": "RTR-PH-CEB-102926-0013",
+          "recipientWaitlistPosition": null,
+          "suggestedLevel": null,
+          "viaLink": false,
+          "payment": {
+            "amountDueMinor": 12000,
+            "paidMinor": 30000,
+            "priorWaivedMinor": 0,
+            "waivedMinor": 0
+          },
+          "at": "2026-11-19T02:00:00.000Z"
+        }
+      ],
+      "selfCheckIn": {},
+      "counts": {
+        "total": 2,
+        "join": 2,
+        "joinRequests": 0,
+        "dropOuts": 1,
+        "transfers": 1,
+        "match": 0
+      },
+      "match": []
+    }
+  },
+  "requests-club1-s9-transfers-pending-link-waitlisted": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000009",
+      "minimum": 5,
+      "join": [],
+      "dropOuts": [
+        {
+          "id": "a3600000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000009",
+          "pid": "a7000000-0000-4000-8000-000000000021",
+          "playerId": "d4000000-0000-4000-8000-000000000001",
+          "at": "2026-11-18T12:00:00.000Z",
+          "status": "open",
+          "decision": null,
+          "closedAt": null,
+          "name": "Alice Reyes",
+          "nickname": "Ace"
+        }
+      ],
+      "transfers": [
+        {
+          "id": "a3d00000-0000-4000-8000-000000000002",
+          "sessionId": "a3000000-0000-4000-8000-000000000009",
+          "pid": "a7000000-0000-4000-8000-000000000022",
+          "senderName": "Bob Santos",
+          "senderNickname": "Bobby",
+          "recipientPlayerId": "d4000000-0000-4000-8000-000000000004",
+          "recipientName": "Dan Uy",
+          "recipientRtrId": "RTR-PH-CEB-102926-0004",
+          "recipientWaitlistPosition": 1,
+          "suggestedLevel": "intermediate_low",
+          "viaLink": true,
+          "payment": {
+            "amountDueMinor": 12000,
+            "paidMinor": 83400,
+            "priorWaivedMinor": 0,
+            "waivedMinor": 0
+          },
+          "at": "2026-11-19T01:00:00.000Z"
+        },
+        {
+          "id": "a3d00000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000009",
+          "pid": "a7000000-0000-4000-8000-000000000021",
+          "senderName": "Alice Reyes",
+          "senderNickname": null,
+          "recipientPlayerId": "d4000000-0000-4000-8000-000000000007",
+          "recipientName": "Gina Claimed No Contact",
+          "recipientRtrId": "RTR-PH-CEB-102926-0013",
+          "recipientWaitlistPosition": null,
+          "suggestedLevel": null,
+          "viaLink": false,
+          "payment": {
+            "amountDueMinor": 12000,
+            "paidMinor": 0,
+            "priorWaivedMinor": 0,
+            "waivedMinor": 12000
+          },
+          "at": "2026-11-19T02:00:00.000Z"
+        }
+      ],
+      "selfCheckIn": {},
+      "counts": {
+        "total": 3,
+        "join": 3,
+        "joinRequests": 0,
+        "dropOuts": 1,
+        "transfers": 2,
+        "match": 0
+      },
+      "match": []
+    }
+  },
+  "requests-club1-s9-unclaimed-link-not-listed": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000009",
+      "minimum": 5,
+      "join": [],
+      "dropOuts": [
+        {
+          "id": "a3600000-0000-4000-8000-000000000001",
+          "sessionId": "a3000000-0000-4000-8000-000000000009",
+          "pid": "a7000000-0000-4000-8000-000000000021",
+          "playerId": "d4000000-0000-4000-8000-000000000001",
+          "at": "2026-11-18T12:00:00.000Z",
+          "status": "open",
+          "decision": null,
+          "closedAt": null,
+          "name": "Alice Reyes",
+          "nickname": "Ace"
+        }
+      ],
+      "transfers": [],
+      "selfCheckIn": {},
+      "counts": {
+        "total": 1,
+        "join": 1,
+        "joinRequests": 0,
+        "dropOuts": 1,
+        "transfers": 0,
+        "match": 0
+      },
+      "match": []
+    }
+  },
+  "requests-club1-s1-transfers-after-start": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000001",
+      "minimum": 0,
+      "join": [],
+      "dropOuts": [],
+      "transfers": [],
+      "selfCheckIn": {},
+      "counts": {
+        "total": 3,
+        "join": 0,
+        "joinRequests": 0,
+        "dropOuts": 0,
+        "transfers": 0,
+        "match": 3
+      },
+      "match": [
+        {
+          "id": "a3700000-0000-4000-8000-000000000002",
+          "format": "singles",
+          "at": "2026-11-19T03:45:00.000Z",
+          "requester": {
+            "rosterId": "a7000000-0000-4000-8000-000000000012",
+            "name": "Bob Santos",
+            "nickname": null,
+            "level": "intermediate_mid",
+            "games": 1,
+            "where": {
+              "kind": "court",
+              "courtLabels": "Court 1"
+            }
+          },
+          "partners": [],
+          "opponents": [
+            null
+          ]
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000001",
+          "format": "doubles",
+          "at": "2026-11-19T03:50:00.000Z",
+          "requester": {
+            "rosterId": "a7000000-0000-4000-8000-000000000011",
+            "name": "Alice Reyes",
+            "nickname": "Ace",
+            "level": "advanced_low",
+            "games": 1,
+            "where": {
+              "kind": "queue",
+              "position": 2
+            }
+          },
+          "partners": [
+            {
+              "rosterId": "a7000000-0000-4000-8000-000000000012",
+              "name": "Bob Santos",
+              "nickname": null,
+              "level": "intermediate_mid",
+              "games": 1,
+              "where": {
+                "kind": "court",
+                "courtLabels": "Court 1"
+              }
+            }
+          ],
+          "opponents": [
+            {
+              "rosterId": "a7000000-0000-4000-8000-000000000013",
+              "name": "Carla Dizon",
+              "nickname": "CD",
+              "level": "intermediate_mid",
+              "games": 1,
+              "where": {
+                "kind": "court",
+                "courtLabels": "Court 2"
+              }
+            },
+            null
+          ]
+        },
+        {
+          "id": "a3700000-0000-4000-8000-000000000005",
+          "format": "fun_1v2",
+          "at": "2026-11-19T03:56:00.000Z",
+          "requester": {
+            "rosterId": "a7000000-0000-4000-8000-000000000018",
+            "name": "No Phone Ned",
+            "nickname": null,
+            "level": "intermediate_low",
+            "games": 0,
+            "where": {
+              "kind": "court",
+              "courtLabels": "Court 2"
+            }
+          },
+          "partners": [],
+          "opponents": [
+            {
+              "rosterId": "a7000000-0000-4000-8000-000000000013",
+              "name": "Carla Dizon",
+              "nickname": "CD",
+              "level": "intermediate_mid",
+              "games": 1,
+              "where": {
+                "kind": "court",
+                "courtLabels": "Court 2"
+              }
+            },
+            null
+          ]
+        }
+      ]
+    }
+  },
+  "requests-club1-s9-transfer-sender-released": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "sessionId": "a3000000-0000-4000-8000-000000000009",
+      "minimum": 5,
+      "join": [],
+      "dropOuts": [],
+      "transfers": [],
+      "selfCheckIn": {},
+      "counts": {
+        "total": 0,
+        "join": 0,
+        "joinRequests": 0,
+        "dropOuts": 0,
+        "transfers": 0,
+        "match": 0
+      },
+      "match": []
+    }
   }
 }

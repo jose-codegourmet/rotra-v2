@@ -452,6 +452,104 @@
    "UPDATE session_finalizations SET state = 'committed' WHERE session_id = 'a3000000-0000-4000-8000-000000000004'",
    "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, attempts, next_attempt_at, last_error_code, completed_at, created_at, updated_at) VALUES ('a8400000-0000-4000-8000-000000000001', 'result_snapshot', 1, 'finalization', 'a3000000-0000-4000-8000-000000000004', 'pending', 0, TIMESTAMPTZ '2026-11-19 03:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-13 14:00:00+00', now())",
    "UPDATE club_entitlements SET effective_access_ends_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE club_id = 'c9000000-0000-4000-8000-000000000001'"
+  ],
+  "money_free_two": [
+   "UPDATE session_players SET is_free = true WHERE id IN ('a7000000-0000-4000-8000-000000000015', 'a7000000-0000-4000-8000-000000000018')"
+  ],
+  "money_free_with_a_mark": [
+   "UPDATE session_players SET is_free = true WHERE id IN ('a7000000-0000-4000-8000-000000000011', 'a7000000-0000-4000-8000-000000000015')"
+  ],
+  "money_all_free": [
+   "UPDATE session_players SET is_free = true WHERE id IN ('a7000000-0000-4000-8000-000000000011', 'a7000000-0000-4000-8000-000000000012', 'a7000000-0000-4000-8000-000000000013', 'a7000000-0000-4000-8000-000000000014', 'a7000000-0000-4000-8000-000000000015', 'a7000000-0000-4000-8000-000000000018')"
+  ],
+  "money_free_custom": [
+   "UPDATE session_players SET is_free = true WHERE id IN ('a7000000-0000-4000-8000-000000000015', 'a7000000-0000-4000-8000-000000000018')",
+   "UPDATE session_cost_estimates SET payment_mode = 'custom', custom_fee_per_head_minor = 100000 WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "money_free_no_estimate": [
+   "UPDATE session_players SET is_free = true WHERE id IN ('a7000000-0000-4000-8000-000000000015')",
+   "DELETE FROM session_cost_estimates WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "money_free_prepared": [
+   "UPDATE session_players SET is_free = true WHERE id = 'a7000000-0000-4000-8000-000000000023'"
+  ],
+  "money_free_released": [
+   "UPDATE session_players SET is_free = true WHERE id IN ('a7000000-0000-4000-8000-000000000016', 'a7000000-0000-4000-8000-000000000017')"
+  ],
+  "money_transfer_paid_part": [
+   "INSERT INTO club_players (id, club_id, player_id, display_name, added_at, revision, updated_at) VALUES ('c6000000-0000-4000-8000-000000000031', 'c9000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000007', 'Gina Claimed No Contact', TIMESTAMPTZ '2026-11-19 00:00:00+00', 1, now())",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) SELECT 'a7000000-0000-4000-8000-000000000090', club_id, session_id, 'c6000000-0000-4000-8000-000000000031', 'd4000000-0000-4000-8000-000000000007', 'Gina Claimed No Contact', present, present_changed_at, skill_level_id, confirmed_at, joined_at, now() FROM session_players WHERE id = 'a7000000-0000-4000-8000-000000000012'",
+   "UPDATE session_players SET level_locked_at = NULL, assessment_id = NULL, released_at = TIMESTAMPTZ '2026-11-19 02:30:00+00', release_reason = 'transferred' WHERE id = 'a7000000-0000-4000-8000-000000000012'",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000012', 'c6000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000007', 'c6000000-0000-4000-8000-000000000031', 'a7000000-0000-4000-8000-000000000090', false, 'approved', TIMESTAMPTZ '2026-11-19 02:10:00+00', TIMESTAMPTZ '2026-11-19 02:20:00+00', 83400, 40000, 0, 43400, 'PHP')"
+  ],
+  "money_transfer_then_cash": [
+   "INSERT INTO club_players (id, club_id, player_id, display_name, added_at, revision, updated_at) VALUES ('c6000000-0000-4000-8000-000000000031', 'c9000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000007', 'Gina Claimed No Contact', TIMESTAMPTZ '2026-11-19 00:00:00+00', 1, now())",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) SELECT 'a7000000-0000-4000-8000-000000000090', club_id, session_id, 'c6000000-0000-4000-8000-000000000031', 'd4000000-0000-4000-8000-000000000007', 'Gina Claimed No Contact', present, present_changed_at, skill_level_id, confirmed_at, joined_at, now() FROM session_players WHERE id = 'a7000000-0000-4000-8000-000000000012'",
+   "UPDATE session_players SET level_locked_at = NULL, assessment_id = NULL, released_at = TIMESTAMPTZ '2026-11-19 02:30:00+00', release_reason = 'transferred' WHERE id = 'a7000000-0000-4000-8000-000000000012'",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000012', 'c6000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000007', 'c6000000-0000-4000-8000-000000000031', 'a7000000-0000-4000-8000-000000000090', false, 'approved', TIMESTAMPTZ '2026-11-19 02:10:00+00', TIMESTAMPTZ '2026-11-19 02:20:00+00', 83400, 40000, 0, 43400, 'PHP')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000090', 'c9000000-0000-4000-8000-000000000001', 10000, 'PHP', TIMESTAMPTZ '2026-11-19 02:40:00+00', 'a3900000-0000-4000-8000-0000000000a1', 'c9000000-0000-4000-8000-000000000001')"
+  ],
+  "money_transfer_unpaid": [
+   "DELETE FROM session_payment_marks WHERE session_player_id = 'a7000000-0000-4000-8000-000000000013'",
+   "INSERT INTO club_players (id, club_id, player_id, display_name, added_at, revision, updated_at) VALUES ('c6000000-0000-4000-8000-000000000031', 'c9000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000007', 'Gina Claimed No Contact', TIMESTAMPTZ '2026-11-19 00:00:00+00', 1, now())",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) SELECT 'a7000000-0000-4000-8000-000000000090', club_id, session_id, 'c6000000-0000-4000-8000-000000000031', 'd4000000-0000-4000-8000-000000000007', 'Gina Claimed No Contact', present, present_changed_at, skill_level_id, confirmed_at, joined_at, now() FROM session_players WHERE id = 'a7000000-0000-4000-8000-000000000013'",
+   "UPDATE session_players SET level_locked_at = NULL, assessment_id = NULL, released_at = TIMESTAMPTZ '2026-11-19 02:30:00+00', release_reason = 'transferred' WHERE id = 'a7000000-0000-4000-8000-000000000013'",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000013', 'c6000000-0000-4000-8000-000000000004', 'd4000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000007', 'c6000000-0000-4000-8000-000000000031', 'a7000000-0000-4000-8000-000000000090', false, 'approved', TIMESTAMPTZ '2026-11-19 02:10:00+00', TIMESTAMPTZ '2026-11-19 02:20:00+00', 83400, 0, 0, 83400, 'PHP')"
+  ],
+  "money_transfer_chain": [
+   "INSERT INTO club_players (id, club_id, player_id, display_name, added_at, revision, updated_at) VALUES ('c6000000-0000-4000-8000-000000000031', 'c9000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000007', 'Gina Claimed No Contact', TIMESTAMPTZ '2026-11-19 00:00:00+00', 1, now())",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) SELECT 'a7000000-0000-4000-8000-000000000090', club_id, session_id, 'c6000000-0000-4000-8000-000000000031', 'd4000000-0000-4000-8000-000000000007', 'Gina Claimed No Contact', present, present_changed_at, skill_level_id, confirmed_at, joined_at, now() FROM session_players WHERE id = 'a7000000-0000-4000-8000-000000000012'",
+   "UPDATE session_players SET level_locked_at = NULL, assessment_id = NULL, released_at = TIMESTAMPTZ '2026-11-19 02:30:00+00', release_reason = 'transferred' WHERE id = 'a7000000-0000-4000-8000-000000000012'",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000012', 'c6000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000007', 'c6000000-0000-4000-8000-000000000031', 'a7000000-0000-4000-8000-000000000090', false, 'approved', TIMESTAMPTZ '2026-11-19 02:10:00+00', TIMESTAMPTZ '2026-11-19 02:20:00+00', 83400, 40000, 0, 43400, 'PHP')",
+   "INSERT INTO club_players (id, club_id, player_id, display_name, added_at, revision, updated_at) VALUES ('c6000000-0000-4000-8000-000000000032', 'c9000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000006', 'Frank No Id', TIMESTAMPTZ '2026-11-19 00:00:00+00', 1, now())",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) SELECT 'a7000000-0000-4000-8000-000000000091', club_id, session_id, 'c6000000-0000-4000-8000-000000000032', 'd4000000-0000-4000-8000-000000000006', 'Frank No Id', present, present_changed_at, skill_level_id, confirmed_at, joined_at, now() FROM session_players WHERE id = 'a7000000-0000-4000-8000-000000000090'",
+   "UPDATE session_players SET level_locked_at = NULL, assessment_id = NULL, released_at = TIMESTAMPTZ '2026-11-19 02:50:00+00', release_reason = 'transferred' WHERE id = 'a7000000-0000-4000-8000-000000000090'",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency) VALUES ('a3d00000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000090', 'c6000000-0000-4000-8000-000000000031', 'd4000000-0000-4000-8000-000000000007', 'd4000000-0000-4000-8000-000000000006', 'c6000000-0000-4000-8000-000000000032', 'a7000000-0000-4000-8000-000000000091', false, 'approved', TIMESTAMPTZ '2026-11-19 02:10:00+00', TIMESTAMPTZ '2026-11-19 02:45:00+00', 83400, 40000, 43400, 0, 'PHP')"
+  ],
+  "money_transfer_fee_rose": [
+   "INSERT INTO club_players (id, club_id, player_id, display_name, added_at, revision, updated_at) VALUES ('c6000000-0000-4000-8000-000000000031', 'c9000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000007', 'Gina Claimed No Contact', TIMESTAMPTZ '2026-11-19 00:00:00+00', 1, now())",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) SELECT 'a7000000-0000-4000-8000-000000000090', club_id, session_id, 'c6000000-0000-4000-8000-000000000031', 'd4000000-0000-4000-8000-000000000007', 'Gina Claimed No Contact', present, present_changed_at, skill_level_id, confirmed_at, joined_at, now() FROM session_players WHERE id = 'a7000000-0000-4000-8000-000000000012'",
+   "UPDATE session_players SET level_locked_at = NULL, assessment_id = NULL, released_at = TIMESTAMPTZ '2026-11-19 02:30:00+00', release_reason = 'transferred' WHERE id = 'a7000000-0000-4000-8000-000000000012'",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, status, requested_at, decided_at, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000012', 'c6000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000007', 'c6000000-0000-4000-8000-000000000031', 'a7000000-0000-4000-8000-000000000090', false, 'approved', TIMESTAMPTZ '2026-11-19 02:10:00+00', TIMESTAMPTZ '2026-11-19 02:20:00+00', 83400, 40000, 0, 43400, 'PHP')",
+   "UPDATE session_cost_estimates SET court_fee_per_court_hour_minor = 30000 WHERE session_id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "money_refund_cancelled": [
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 70000, 'PHP', TIMESTAMPTZ '2026-11-19 01:00:00+00', 'a3900000-0000-4000-8000-0000000000b1', 'c9000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 30000, 'PHP', TIMESTAMPTZ '2026-11-19 01:00:00+00', 'a3900000-0000-4000-8000-0000000000b2', 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE queue_sessions SET state = 'cancelled', cancelled_at = TIMESTAMPTZ '2026-11-19 01:30:00+00', cancel_reason = 'Rain' WHERE id = 'a3000000-0000-4000-8000-000000000009'",
+   "INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, amount_minor, refunded_at) VALUES ('a3e00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000021', 'session_cancelled', 70000, TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "money_refund_everyone": [
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 70000, 'PHP', TIMESTAMPTZ '2026-11-19 01:00:00+00', 'a3900000-0000-4000-8000-0000000000b1', 'c9000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 30000, 'PHP', TIMESTAMPTZ '2026-11-19 01:00:00+00', 'a3900000-0000-4000-8000-0000000000b2', 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE queue_sessions SET state = 'cancelled', cancelled_at = TIMESTAMPTZ '2026-11-19 01:30:00+00', cancel_reason = 'Rain' WHERE id = 'a3000000-0000-4000-8000-000000000009'",
+   "INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, amount_minor, refunded_at) VALUES ('a3e00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000021', 'session_cancelled', 70000, TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, amount_minor, refunded_at) VALUES ('a3e00000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000022', 'session_cancelled', 30000, TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "money_cancelled_with_marks": [
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 70000, 'PHP', TIMESTAMPTZ '2026-11-19 01:00:00+00', 'a3900000-0000-4000-8000-0000000000b1', 'c9000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 30000, 'PHP', TIMESTAMPTZ '2026-11-19 01:00:00+00', 'a3900000-0000-4000-8000-0000000000b2', 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE queue_sessions SET state = 'cancelled', cancelled_at = TIMESTAMPTZ '2026-11-19 01:30:00+00', cancel_reason = 'Rain' WHERE id = 'a3000000-0000-4000-8000-000000000009'"
+  ],
+  "money_transfers_pending": [
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000021', 'c6000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000007', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 30000, 'PHP', TIMESTAMPTZ '2026-11-19 01:00:00+00', 'a3900000-0000-4000-8000-0000000000b1', 'c9000000-0000-4000-8000-000000000001')"
+  ],
+  "money_transfers_pending_link": [
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000021', 'c6000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000007', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at) VALUES ('a3d00000-0000-4000-8000-000000000002', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000022', 'c6000000-0000-4000-8000-000000000003', 'd4000000-0000-4000-8000-000000000002', 'd4000000-0000-4000-8000-000000000004', decode('0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a', 'hex'), TIMESTAMPTZ '2026-11-19 03:30:00+00', 'pending', TIMESTAMPTZ '2026-11-19 01:00:00+00')",
+   "UPDATE club_players SET player_id = 'd4000000-0000-4000-8000-000000000004' WHERE id = 'c6000000-0000-4000-8000-000000000025'",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000022', 'c9000000-0000-4000-8000-000000000001', 83400, 'PHP', TIMESTAMPTZ '2026-11-19 01:00:00+00', 'a3900000-0000-4000-8000-0000000000b2', 'c9000000-0000-4000-8000-000000000001')"
+  ],
+  "money_transfers_unclaimed_link": [
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000021', 'c6000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', NULL, decode('0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a', 'hex'), NULL, 'pending', TIMESTAMPTZ '2026-11-19 01:00:00+00')"
+  ],
+  "money_transfers_after_start": [
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a7000000-0000-4000-8000-000000000011', 'c6000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000007', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "money_transfers_sender_released": [
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at) VALUES ('a3d00000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000009', 'a7000000-0000-4000-8000-000000000021', 'c6000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000001', 'd4000000-0000-4000-8000-000000000007', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-19 00:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000021'"
   ]
  },
  "cases": [
@@ -3915,6 +4013,174 @@
    "who": "c7000000-0000-4000-8000-000000000001",
    "scenario": "fin_pending_expired",
    "noDrive": true
+  },
+  {
+   "name": "cost-club1-s1-free-two",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_free_two"
+  },
+  {
+   "name": "payments-club1-s1-free-two",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_free_two"
+  },
+  {
+   "name": "cost-club1-s1-free-with-a-mark",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_free_with_a_mark"
+  },
+  {
+   "name": "payments-club1-s1-free-with-a-mark",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_free_with_a_mark"
+  },
+  {
+   "name": "cost-club1-s1-all-free",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_all_free"
+  },
+  {
+   "name": "payments-club1-s1-all-free",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_all_free"
+  },
+  {
+   "name": "cost-club1-s1-free-custom",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_free_custom"
+  },
+  {
+   "name": "payments-club1-s1-free-custom",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_free_custom"
+  },
+  {
+   "name": "payments-club1-s1-free-no-estimate",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_free_no_estimate"
+  },
+  {
+   "name": "cost-club1-s9-free",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_free_prepared"
+  },
+  {
+   "name": "payments-club1-s9-free",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_free_prepared"
+  },
+  {
+   "name": "cost-club1-s1-free-off-roster",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_free_released"
+  },
+  {
+   "name": "payments-club1-s1-transfer-part-paid",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfer_paid_part"
+  },
+  {
+   "name": "cost-club1-s1-transfer-part-paid",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfer_paid_part"
+  },
+  {
+   "name": "payments-club1-s1-transfer-then-cash",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfer_then_cash"
+  },
+  {
+   "name": "payments-club1-s1-transfer-unpaid-slot",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfer_unpaid"
+  },
+  {
+   "name": "payments-club1-s1-transfer-chain",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfer_chain"
+  },
+  {
+   "name": "payments-club1-s1-transfer-fee-rose",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfer_fee_rose"
+  },
+  {
+   "name": "cost-club1-s1-transfer-fee-rose",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfer_fee_rose"
+  },
+  {
+   "name": "payments-club1-s9-cancelled-refunded",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_refund_cancelled"
+  },
+  {
+   "name": "cost-club1-s9-cancelled-refunded",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/cost",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_refund_cancelled"
+  },
+  {
+   "name": "payments-club1-s9-cancelled-all-refunded",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_refund_everyone"
+  },
+  {
+   "name": "payments-club1-s9-cancelled-not-refunded",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/payments",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_cancelled_with_marks"
+  },
+  {
+   "name": "requests-club1-s9-transfers-pending",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfers_pending"
+  },
+  {
+   "name": "requests-club1-s9-transfers-pending-link-waitlisted",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfers_pending_link"
+  },
+  {
+   "name": "requests-club1-s9-unclaimed-link-not-listed",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfers_unclaimed_link"
+  },
+  {
+   "name": "requests-club1-s1-transfers-after-start",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfers_after_start"
+  },
+  {
+   "name": "requests-club1-s9-transfer-sender-released",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009/requests",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "money_transfers_sender_released"
   }
  ]
 }

@@ -1,6 +1,7 @@
 package signedin
 
 import (
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/payment"
 	"testing"
 	"time"
 
@@ -67,33 +68,46 @@ func TestExperienceMonthsCountUpByWholeUTCMonths(t *testing.T) {
 func TestEstimateSessionCostRoundsLikeTheTypeScript(t *testing.T) {
 	price := map[string]int32{"a": 95000, "b": 80000}
 	in := costInput{CourtFeePerCourtHour: ptr32(25000), EntranceFeePerHead: ptr32(5000), PaymentMode: "break_even", Shuttles: []shuttleLineIn{{"a", 2}, {"b", 1}, {"gone", 4}}}
-	got := estimateSessionCost(in, 2, 240, 6, price)
+	got := estimateSessionCost(in, 2, 240, 6, 0, price)
 	if got.Court != 200000 || got.Shuttle != 270000 || got.Entrance != 30000 || got.Total != 500000 || got.BreakEven != 83400 || got.Collect != 500400 || got.Result.Kind != "breaks_even" || got.Result.Amount != 400 {
 		t.Errorf("break even: %+v", got)
 	}
 	// The court fee is half-up to the centavo, and no players counts as one.
-	if c := estimateSessionCost(costInput{CourtFeePerCourtHour: ptr32(1), PaymentMode: "break_even"}, 1, 30, 0, nil); c.Court != 1 || c.Players != 1 {
+	if c := estimateSessionCost(costInput{CourtFeePerCourtHour: ptr32(1), PaymentMode: "break_even"}, 1, 30, 0, 0, nil); c.Court != 1 || c.Players != 1 {
 		t.Errorf("rounding: %+v", c)
 	}
+	// D-2026-11-27-01: two of six play free, so the break-even is over four payers and the estimate says so.
+	if f := estimateSessionCost(in, 2, 240, 6, 2, price); f.Players != 6 || f.Payers != 4 || f.BreakEven != 125000 || f.Collect != 500000 {
+		t.Errorf("free players: %+v", f)
+	}
 	custom := costInput{PaymentMode: "custom", CustomFeePerHead: ptr32(100000), CourtFeePerCourtHour: ptr32(1000)}
-	if r := estimateSessionCost(custom, 1, 60, 2, nil); r.Result.Kind != "profit" || r.PerHead != 100000 || !r.IsCustom {
+	if r := estimateSessionCost(custom, 1, 60, 2, 0, nil); r.Result.Kind != "profit" || r.PerHead != 100000 || !r.IsCustom {
 		t.Errorf("profit: %+v", r)
 	}
 	custom.CustomFeePerHead = nil
-	if r := estimateSessionCost(custom, 1, 60, 2, nil); r.Result.Kind != "loss" || r.Result.Amount != 1000 {
+	if r := estimateSessionCost(custom, 1, 60, 2, 0, nil); r.Result.Kind != "loss" || r.Result.Amount != 1000 {
 		t.Errorf("loss: %+v", r)
 	}
-	if r := estimateSessionCost(costInput{PaymentMode: "break_even"}, 1, 60, 2, nil); r.Result.Kind != "no_costs" || r.BreakEven != 0 {
+	if r := estimateSessionCost(costInput{PaymentMode: "break_even"}, 1, 60, 2, 0, nil); r.Result.Kind != "no_costs" || r.BreakEven != 0 {
 		t.Errorf("no costs: %+v", r)
 	}
 }
 
 func ptr32(v int32) *int32 { return &v }
 
+// markList is a list of own marks by the amount received (nil: an older mark that meant paid in full).
+func markList(amounts ...*int32) []payment.Mark {
+	out := make([]payment.Mark, len(amounts))
+	for i, a := range amounts {
+		out[i] = payment.Mark{Amount: int64Ptr(a)}
+	}
+	return out
+}
+
 func TestPaymentTotals(t *testing.T) {
 	due, cost := int64(1000), int64(5000)
 	// paid in full, partial, over (reimburse), a legacy mark with no amount (counts as due), nothing received
-	got := paymentTotals([]*int32{ptr32(1000), ptr32(400), ptr32(1500), nil, ptr32(0)}, 7, &due, &cost)
+	got := paymentTotals(markList(ptr32(1000), ptr32(400), ptr32(1500), nil, ptr32(0)), 7, &due, &cost, 0)
 	if got.Paid != 3 || got.Partial != 1 || got.Total != 7 || got.Collected != 3900 || got.ToReimburse != 500 {
 		t.Errorf("with a fee: %+v", got)
 	}
@@ -101,7 +115,7 @@ func TestPaymentTotals(t *testing.T) {
 	if got.StillDue == nil || *got.StillDue != 2*1000+600+1000 || got.AgainstCosts == nil || *got.AgainstCosts != 3900-5000 {
 		t.Errorf("still due %v against %v", got.StillDue, got.AgainstCosts)
 	}
-	none := paymentTotals([]*int32{ptr32(10), nil}, 3, nil, nil)
+	none := paymentTotals(markList(ptr32(10), nil), 3, nil, nil, 0)
 	if none.Paid != 2 || none.StillDue != nil || none.AgainstCosts != nil || none.Collected != 10 {
 		t.Errorf("no fee set: %+v", none)
 	}

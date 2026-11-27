@@ -1,9 +1,11 @@
 package signedin
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"sort"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -13,6 +15,8 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/collate"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/payment"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/sessioncost"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/slotledger"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/slotmoney"
 )
 
 // GET /api/sessions/{sessionId}/cost and /payments (Q-MONEY). Ports of readSessionCost and readSessionPayments in
@@ -47,6 +51,7 @@ type costResultKind struct {
 // costResult is SessionCostResult.
 type costResult struct {
 	Players            int64          `json:"players"`
+	Payers             int64          `json:"payers"`
 	Court              int64          `json:"court"`
 	Shuttle            int64          `json:"shuttle"`
 	Entrance           int64          `json:"entrance"`
@@ -69,7 +74,7 @@ func int64Ptr(v *int32) *int64 {
 
 // estimateSessionCost is estimateSessionCost (rules/sessioncost): the DTO of the estimate of an input, the courts and minutes it is for,
 // the players and the club's prices.
-func estimateSessionCost(in costInput, courts, durationMinutes, players int64, price map[string]int32) costResult {
+func estimateSessionCost(in costInput, courts, durationMinutes, players, free int64, price map[string]int32) costResult {
 	input := sessioncost.Input{
 		CourtFeePerCourtHour: int64Ptr(in.CourtFeePerCourtHour), EntranceFeePerHead: int64Ptr(in.EntranceFeePerHead),
 		PaymentMode: in.PaymentMode, CustomFeePerHead: int64Ptr(in.CustomFeePerHead),
@@ -81,9 +86,9 @@ func estimateSessionCost(in costInput, courts, durationMinutes, players int64, p
 	for _, line := range in.Shuttles {
 		input.Shuttles = append(input.Shuttles, sessioncost.ShuttleLine{InventoryItemID: line.InventoryItemID, Tubes: int64(line.Tubes)})
 	}
-	r := sessioncost.Estimate(input, sessioncost.Context{Courts: courts, DurationMinutes: durationMinutes, Players: players, Items: items})
+	r := sessioncost.Estimate(input, sessioncost.Context{Courts: courts, DurationMinutes: durationMinutes, Players: players, FreePlayers: free, Items: items})
 	return costResult{
-		Players: r.Players, Court: r.Court, Shuttle: r.Shuttle, Entrance: r.Entrance, EntranceFeePerHead: r.EntranceFeePerHead, Total: r.Total,
+		Players: r.Players, Payers: r.Payers, Court: r.Court, Shuttle: r.Shuttle, Entrance: r.Entrance, EntranceFeePerHead: r.EntranceFeePerHead, Total: r.Total,
 		BreakEven: r.BreakEven, PerHead: r.PerHead, IsCustom: r.IsCustom, Collect: r.Collect, Result: costResultKind{Kind: r.Outcome.Kind, Amount: r.Outcome.Amount},
 	}
 }
@@ -104,7 +109,10 @@ type costEstimate struct {
 }
 
 func (s *server) estimateFor(r *http.Request, q *sqlcgen.Queries, club pgtype.UUID, sess sqlcgen.ListQueueSessionsRow) (costEstimate, error) {
-	ctx := r.Context()
+	return s.estimateForCtx(r.Context(), q, club, sess)
+}
+
+func (s *server) estimateForCtx(ctx context.Context, q *sqlcgen.Queries, club pgtype.UUID, sess sqlcgen.ListQueueSessionsRow) (costEstimate, error) {
 	duration := sessionMinutes(sess.ScheduledStartAt, sess.ScheduledEndAt)
 	none := costEstimate{DurationMinutes: duration, ShuttleLines: []shuttleLineOut{}}
 	est, err := q.GetQueueCostEstimate(ctx, sess.ID)
@@ -143,11 +151,20 @@ func (s *server) estimateFor(r *http.Request, q *sqlcgen.Queries, club pgtype.UU
 			n++
 		}
 	}
+	// Before anyone joins: the expected count, else the slots (the form's "follows your slots"), never 1 player.
 	players := int64(sess.RosterCount)
 	if players == 0 && sess.ExpectedPlayers.Valid {
 		players = int64(sess.ExpectedPlayers.Int32)
 	}
-	result := estimateSessionCost(in, n, duration, players, price)
+	if players == 0 {
+		players = n * int64(sess.PlayersPerCourt)
+	}
+	// D-2026-11-27-01: free roster players leave the break-even head count.
+	free, err := q.CountQueueFreeRoster(ctx, sess.ID)
+	if err != nil {
+		return none, err
+	}
+	result := estimateSessionCost(in, n, duration, players, int64(free), price)
 	rev := httpapi.ToDecimalString(est.Revision)
 	out := costEstimate{Input: &in, Estimate: &result, Revision: &rev, Courts: n, DurationMinutes: duration, ShuttleLines: []shuttleLineOut{}}
 	for _, l := range in.Shuttles {
@@ -186,10 +203,19 @@ type paidMark struct {
 }
 
 type paymentPlayer struct {
-	SessionPlayerID string    `json:"sessionPlayerId"`
-	ClubPlayerID    string    `json:"clubPlayerId"`
-	Name            string    `json:"name"`
-	Paid            *paidMark `json:"paid"`
+	SessionPlayerID string              `json:"sessionPlayerId"`
+	ClubPlayerID    string              `json:"clubPlayerId"`
+	Name            string              `json:"name"`
+	Free            bool                `json:"free"`
+	Paid            *paidMark           `json:"paid"`
+	Transfer        *slotmoney.Transfer `json:"transfer"`
+	Refund          *refundMark         `json:"refund"`
+}
+
+// refundMark is the manual full refund recorded for a player (#1014); paid.amount is net of it.
+type refundMark struct {
+	Amount *httpapi.Money `json:"amount"`
+	At     string         `json:"at"`
 }
 
 type paymentTotalsDTO struct {
@@ -197,22 +223,21 @@ type paymentTotalsDTO struct {
 	Partial      int64  `json:"partial"`
 	Total        int64  `json:"total"`
 	Collected    int64  `json:"collected"`
+	Waived       int64  `json:"waived"`
+	Refunded     int64  `json:"refunded"`
 	StillDue     *int64 `json:"stillDue"`
 	ToReimburse  int64  `json:"toReimburse"`
 	AgainstCosts *int64 `json:"againstCosts"`
 	Cost         *int64 `json:"cost"`
+	Free         int64  `json:"free,omitempty"` // only while someone plays free, so the totals of a session with none keep their shape
 }
 
-// paymentTotals is paymentTotals (rules/payment): marks holds one received amount (null: the current amount due) per marked player.
-func paymentTotals(marks []*int32, total int64, amountDue *int64, cost *int64) paymentTotalsDTO {
-	list := make([]payment.Mark, len(marks))
-	for i, m := range marks {
-		list[i] = payment.Mark{Amount: int64Ptr(m)}
-	}
-	t := payment.ComputeTotals(list, total, amountDue, cost)
+// paymentTotals is paymentTotals (rules/payment): marks holds one entry per marked player (cash net of a refund, waivers, the refund).
+func paymentTotals(marks []payment.Mark, total int64, amountDue *int64, cost *int64, free int64) paymentTotalsDTO {
+	t := payment.ComputeTotals(marks, total, amountDue, cost, free)
 	return paymentTotalsDTO{
-		Paid: t.Paid, Partial: t.Partial, Total: t.Total, Collected: t.Collected, StillDue: t.StillDue, ToReimburse: t.ToReimburse,
-		AgainstCosts: t.AgainstCosts, Cost: t.Cost,
+		Paid: t.Paid, Partial: t.Partial, Total: t.Total, Collected: t.Collected, Waived: t.Waived, Refunded: t.Refunded, StillDue: t.StillDue,
+		ToReimburse: t.ToReimburse, AgainstCosts: t.AgainstCosts, Cost: t.Cost, Free: t.Free,
 	}
 }
 
@@ -236,10 +261,6 @@ func (s *server) queuePayments(r *http.Request, q *sqlcgen.Queries, club pgtype.
 	if err != nil {
 		return nil, err
 	}
-	marks, err := q.ListQueuePaymentMarks(ctx, row.ID)
-	if err != nil {
-		return nil, err
-	}
 	est, err := s.estimateFor(r, q, club, row)
 	if err != nil {
 		return nil, err
@@ -258,22 +279,70 @@ func (s *server) queuePayments(r *http.Request, q *sqlcgen.Queries, club pgtype.
 	if est.Input != nil {
 		basis = est.Input.PaymentMode
 	}
-	byEntry := map[pgtype.UUID]sqlcgen.ListQueuePaymentMarksRow{}
-	for _, m := range marks {
-		byEntry[m.SessionPlayerID] = m
+	freeRows, err := q.ListMoneyFreeRoster(ctx, row.ID)
+	if err != nil {
+		return nil, err
 	}
-	players := []paymentPlayer{}
-	var counted []*int32
-	var total int64
+	isFree := map[pgtype.UUID]bool{}
+	for _, id := range freeRows {
+		isFree[id] = true
+	}
+	// #1013: each live entry's own mark (unless frozen into a transfer it sent) plus the cash and waivers an approved transfer carried
+	// into it. Senders are off the roster: cash counts once.
+	ledger, err := slotmoney.Load(ctx, q, row.ID)
+	if err != nil {
+		return nil, err
+	}
+	type entry struct {
+		e       sqlcgen.ListQueueRosterRow
+		payment slotledger.EntryPayment
+	}
+	var entries []entry
 	for _, e := range roster {
 		if e.NoShowAt.Valid {
 			continue // off the live roster
 		}
-		total++
-		p := paymentPlayer{SessionPlayerID: e.ID.String(), ClubPlayerID: e.ClubPlayerID.String(), Name: e.NameSnapshot}
-		if m, ok := byEntry[e.ID]; ok {
-			p.Paid = &paidMark{Amount: moneyOrNil(m.AmountMinor, m.Currency), At: httpapi.ToIso(m.MarkedAt.Time)}
-			counted = append(counted, int4Ptr(m.AmountMinor))
+		entries = append(entries, entry{e, ledger.PaymentOf(e.ID, amountDue)})
+	}
+	players := []paymentPlayer{}
+	var marks []payment.Mark
+	var total, free int64
+	for _, en := range entries {
+		e, pay := en.e, en.payment
+		// D-2026-11-27-01: plays free (owes nothing, left out of the split and the totals) while no cash was recorded.
+		isFreeNow := isFree[e.ID] && pay.Mark == nil
+		p := paymentPlayer{SessionPlayerID: e.ID.String(), ClubPlayerID: e.ClubPlayerID.String(), Name: e.NameSnapshot, Free: isFreeNow}
+		if isFreeNow {
+			free++
+		} else {
+			total++
+		}
+		if pay.Mark != nil {
+			var own *slotmoney.Mark
+			if !pay.Frozen {
+				if m, ok := ledger.MarkOf(e.ID); ok {
+					own = &m
+				}
+			}
+			transfer := ledger.TransferOf(pay, isoOfMillis)
+			var approvedAt int64
+			if n := len(pay.Chain); n > 0 {
+				approvedAt = *pay.Chain[n-1].DecidedAt
+			}
+			at := int64(0)
+			currency := "PHP"
+			if own != nil {
+				at, currency = own.MarkedAt.Time.UnixMilli(), own.Currency
+			}
+			if transfer != nil {
+				at = max(at, approvedAt)
+			}
+			p.Paid = &paidMark{Amount: moneyOfPtr(pay.Mark.Amount, currency), At: isoOfMillis(at)}
+			p.Transfer = transfer
+			marks = append(marks, payment.Mark{Amount: pay.Mark.Amount, Waived: pay.Mark.Waived, Refunded: pay.Refunded})
+		}
+		if rf, ok := ledger.RefundOf(e.ID); ok {
+			p.Refund = &refundMark{Amount: &httpapi.Money{AmountMinor: rf.Amount, Currency: rf.Currency}, At: httpapi.ToIso(rf.RefundedAt.Time)}
 		}
 		players = append(players, p)
 	}
@@ -291,5 +360,15 @@ func (s *server) queuePayments(r *http.Request, q *sqlcgen.Queries, club pgtype.
 		DueBasis         string           `json:"dueBasis"`
 		EntranceIncluded *int64           `json:"entranceFeeIncluded"`
 		Totals           paymentTotalsDTO `json:"totals"`
-	}{players, amountDue, basis, entranceIncluded, paymentTotals(counted, total, amountDue, cost)}}, nil
+	}{players, amountDue, basis, entranceIncluded, paymentTotals(marks, total, amountDue, cost, free)}}, nil
 }
+
+func moneyOfPtr(amount *int64, currency string) *httpapi.Money {
+	if amount == nil {
+		return nil
+	}
+	return &httpapi.Money{AmountMinor: *amount, Currency: currency}
+}
+
+// isoOfMillis is toIso of a time held in milliseconds.
+func isoOfMillis(ms int64) string { return httpapi.ToIso(time.UnixMilli(ms)) }

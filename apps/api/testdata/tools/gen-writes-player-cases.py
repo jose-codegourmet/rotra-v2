@@ -38,7 +38,7 @@ seed = """-- Fictional clubs, players, accounts, banners, notifications and cont
 BEGIN;
 SET LOCAL session_replication_role = replica;
 
-DELETE FROM player_notifications; DELETE FROM admin_audit_events; DELETE FROM player_social_links;
+DELETE FROM session_slot_transfers; DELETE FROM session_players; DELETE FROM player_notifications; DELETE FROM admin_audit_events; DELETE FROM player_social_links;
 DELETE FROM player_contact_change_requests; DELETE FROM club_players; DELETE FROM shared_player_entries;
 DELETE FROM player_accounts; DELETE FROM player_private_contacts; DELETE FROM player_id_allocations; DELETE FROM player_id_counters;
 DELETE FROM players; DELETE FROM club_accounts; DELETE FROM clubs; DELETE FROM profile_banners; DELETE FROM feature_flags;
@@ -205,10 +205,10 @@ def mk(file_cases):
     return lambda name, steps, scenario="base", now=None, redact=None: file_cases.append(
         {k: v for k, v in {"name": name, "scenario": scenario, "now": now, "steps": steps, "redact": redact}.items() if v is not None})
 
-def write(name, snapshot, cases):
+def write(name, snapshot, cases, scenarios=None):
     names = [c["name"] for c in cases]
     assert len(names) == len(set(names)), "duplicate case names in %s" % name
-    doc = {"now": NOW, "app": "player", "seed": "player.seed.sql", "scenarios": SCENARIOS, "snapshot": snapshot, "cases": cases}
+    doc = {"now": NOW, "app": "player", "seed": "player.seed.sql", "scenarios": scenarios or SCENARIOS, "snapshot": snapshot, "cases": cases}
     with open(os.path.join(OUT, name + ".cases.json"), "w") as f:
         json.dump(doc, f, indent=1, ensure_ascii=False)
         f.write("\n")
@@ -1279,3 +1279,51 @@ with open(os.path.join(OUT, "googleflow.cases.json"), "w") as f:
     json.dump(flow_doc, f, indent=1, ensure_ascii=False)
     f.write("\n")
 print("ok googleflow")
+
+# ---------------------------------------------------------------- leaving a club ends the pending slot transfers (#1018, task 2.12)
+# Smash Club (1) has a prepared session with Alice's and Dan's entries and Bob's (a player of another club); Birdie Club (2) has one with Dan's old entry.
+# Transfers: t1 Alice to Dan, t2 Dan to Bob (a claimed link), t3 Bob to Alice (decided), t4 Dan to Alice in Birdie Club.
+SMASH_S, BIRDIE_S = "a3000000-0000-4000-8000-000000000001", "a3000000-0000-4000-8000-000000000002"
+SP = lambda n: "a7000000-0000-4000-8000-%012d" % n
+TRN = lambda n: "a3d00000-0000-4000-8000-%012d" % n
+def session_row(sid, club, slug):
+    return ("INSERT INTO queue_sessions (id, club_id, title, scheduled_start_at, scheduled_end_at, venue_name, state, session_mode, allow_singles, allow_doubles, minimum_games, players_per_court, "
+            "public_slug, accept_join_requests, always_require_request, source_command_id, updated_at) VALUES "
+            "('%s', '%s', 'Night', TIMESTAMPTZ '2026-11-21 01:00:00+00', TIMESTAMPTZ '2026-11-21 05:00:00+00', 'Hall', 'prepared', 'fair', true, true, 0, 4, '%s', true, false, '%s', %s)" % (sid, club, slug, "c0000000-0000-4000-8000-0000000000%02d" % (int(sid[-2:]) + 40), TS))
+def entry_row(n, sid, club, cp, player, name):
+    return ("INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES "
+            "('%s', '%s', '%s', '%s', '%s', '%s', %s, 3, %s, %s, %s)" % (SP(n), club, sid, cp, player, name, TS, TS, TS, TS))
+def transfer_row(n, sid, club, sender_entry, sender_cp, sender, recipient, status="pending", link=False):
+    digest = "decode('%s', 'hex')" % ("0c" * 32) if link else "NULL"
+    claimed = "TIMESTAMPTZ '2026-11-19 01:40:00+00'" if link else "NULL"
+    decided = "NULL" if status == "pending" else "TIMESTAMPTZ '2026-11-19 02:00:00+00'"
+    extra_cols = extra_vals = ""
+    if status == "approved":
+        extra_cols = ", recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency"
+        extra_vals = ", 'e7000000-0000-4000-8000-000000000002', '%s', false, 90000, 0, 0, 90000, 'PHP'" % SP(2)
+    return ("INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at%s) VALUES "
+            "('%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, %s, '%s', TIMESTAMPTZ '2026-11-19 01:30:00+00', %s%s)" % (extra_cols, TRN(n), club, sid, SP(sender_entry), sender_cp, sender, recipient, digest, claimed, status, decided, extra_vals))
+ALICE_CP, DAN_CP, DAN_OLD_CP = "e7000000-0000-4000-8000-000000000001", "e7000000-0000-4000-8000-000000000002", "e7000000-0000-4000-8000-000000000003"
+leave_base = [session_row(SMASH_S, SMASH, "smash-night"), session_row(BIRDIE_S, BIRDIE, "birdie-night"),
+              entry_row(1, SMASH_S, SMASH, ALICE_CP, ALICE, "Alice Reyes"), entry_row(2, SMASH_S, SMASH, DAN_CP, DAN, "Dan Uy"), entry_row(3, BIRDIE_S, BIRDIE, DAN_OLD_CP, DAN, "Dan Uy"),
+              transfer_row(1, SMASH_S, SMASH, 1, ALICE_CP, ALICE, DAN), transfer_row(2, SMASH_S, SMASH, 2, DAN_CP, DAN, BOB, link=True),
+              transfer_row(4, BIRDIE_S, BIRDIE, 3, DAN_OLD_CP, DAN, ALICE)]
+leave_scen = dict(SCENARIOS)
+leave_scen["transfers"] = leave_base
+leave_scen["transfers_birdie_member"] = leave_base + ["UPDATE club_players SET removed_at = NULL WHERE id = '%s'" % DAN_OLD_CP]
+leave_scen["transfers_decided"] = [x for x in leave_base if "transfer_row" not in x] and leave_base[:5] + [transfer_row(1, SMASH_S, SMASH, 1, ALICE_CP, ALICE, DAN, status="rejected"), transfer_row(2, SMASH_S, SMASH, 2, DAN_CP, DAN, BOB, status="expired"),
+                                                                                                           transfer_row(5, SMASH_S, SMASH, 1, ALICE_CP, ALICE, DAN, status="cancelled")]
+leave_scen["transfers_dan_gone"] = leave_base + ["UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = '%s'" % DAN_CP]
+TRANSFERS = {"name": "session_slot_transfers", "sql": "SELECT id, club_id, session_id, sender_session_player_id, sender_player_id, recipient_player_id, status::text AS status, requested_at, decided_at, (link_token_digest IS NOT NULL) AS via_link, claimed_at FROM session_slot_transfers ORDER BY id", "redact": []}
+leave_cases = []
+case = mk(leave_cases)
+case("leave_ends_the_pending_transfers_of_a_recipient_and_a_sender", [leave(D_S, SMASH)], scenario="transfers")
+case("leave_ends_a_pending_transfer_the_player_receives", [leave(A_S, SMASH)], scenario="transfers")
+case("leave_keeps_the_pending_transfers_of_another_club", [leave(D_S, SMASH)], scenario="transfers_birdie_member")
+case("leave_the_other_club_ends_only_its_transfers", [leave(D_S, BIRDIE)], scenario="transfers_birdie_member")
+case("leave_leaves_decided_transfers_as_they_are", [leave(D_S, SMASH)], scenario="transfers_decided")
+case("leave_again_changes_nothing_and_keeps_the_pending_transfers", [leave(D_S, SMASH)], scenario="transfers_dan_gone")
+case("leave_twice_ends_them_once", [leave(D_S, SMASH), leave(D_S, SMASH)], scenario="transfers")
+case("leave_a_club_with_no_transfers", [leave(B_S, SMASH)], scenario="transfers")
+case("leave_does_not_end_the_transfers_of_another_player", [leave(B_S, SMASH)], scenario="transfers")
+write("leavetransfers", [MEMBERS, TRANSFERS], leave_cases, leave_scen)

@@ -70,10 +70,16 @@ SELECT full_name, nickname FROM players WHERE id = @id;
 INSERT INTO club_players (id, club_id, player_id, display_name, nickname, added_at, created_at, updated_at)
 VALUES (@id, @club_id, @player_id, @display_name, @nickname, @now, @now, @now);
 
--- name: RemoveClubPlayer :exec
--- leaveMyClub: the row stays for history.
+-- name: RemoveClubPlayer :execrows
+-- leaveMyClub: the row stays for history. The count says whether the player was in the club.
 UPDATE club_players SET removed_at = @now, revision = revision + 1, updated_at = @now
 WHERE club_id = @club_id AND player_id = @player_id AND removed_at IS NULL;
+
+-- name: CancelPlayerPendingSlotTransfers :exec
+-- leaveMyClub (#1018): every pending slot transfer the player is part of in this club (sender, or recipient or claimant of a link)
+-- becomes cancelled, which also ends its link.
+UPDATE session_slot_transfers SET status = 'cancelled', decided_at = @now
+WHERE club_id = @club_id AND status = 'pending' AND (sender_player_id = @player_id OR recipient_player_id = @player_id);
 
 -- name: GetPlayerGenderState :one
 -- setMyGender: tx.player.findUniqueOrThrow, no lock.

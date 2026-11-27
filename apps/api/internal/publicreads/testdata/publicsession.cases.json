@@ -16,7 +16,8 @@
   "DELETE FROM session_cost_estimates WHERE session_id::text LIKE 'e4000000-%'",
   "DELETE FROM inventory_items WHERE id::text LIKE 'f5000000-%'",
   "UPDATE queue_sessions SET level_restriction = 'all', beginner_slots = NULL, intermediate_slots = NULL, advanced_slots = NULL, expected_players = NULL",
-  "UPDATE session_publications SET public_results = jsonb_set(public_results, '{standings}', '[{\"name\":5,\"wins\":1},{\"position\":3},\"str\",[1],{\"name\":\"Alice Reyes\",\"pictureUrl\":\"old\",\"participant\":99},1.50,1e2,{\"name\":\"Mika\",\"extra\":{\"deep\":[1,{\"k\":null}]}}]'::jsonb) WHERE id = 'e7000000-0000-4000-8000-000000000009'"
+  "UPDATE session_publications SET public_results = jsonb_set(public_results, '{standings}', '[{\"name\":5,\"wins\":1},{\"position\":3},\"str\",[1],{\"name\":\"Alice Reyes\",\"pictureUrl\":\"old\",\"participant\":99},1.50,1e2,{\"name\":\"Mika\",\"extra\":{\"deep\":[1,{\"k\":null}]}}]'::jsonb) WHERE id = 'e7000000-0000-4000-8000-000000000009'",
+  "UPDATE session_players SET is_free = false WHERE id::text LIKE 'e5000000-%'"
  ],
  "scenarios": {
   "base": [],
@@ -101,6 +102,42 @@
    "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
    "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 9000, now())",
    "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000004', 'f5000000-0000-4000-8000-000000000001', 2, 0)"
+  ],
+  "estimate_break_even_two_free": [
+   "UPDATE session_players SET released_at = NULL, release_reason = NULL WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND id NOT IN ('e5000000-0000-4000-8000-00000000000f', 'e5000000-0000-4000-8000-000000000010', 'e5000000-0000-4000-8000-000000000011')",
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000001', 2, 0)",
+   "UPDATE session_players SET is_free = true WHERE id IN ('e5000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002')"
+  ],
+  "estimate_break_even_free_off_the_roster": [
+   "UPDATE session_players SET released_at = NULL, release_reason = NULL WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND id NOT IN ('e5000000-0000-4000-8000-00000000000f', 'e5000000-0000-4000-8000-000000000010', 'e5000000-0000-4000-8000-000000000011')",
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000001', 2, 0)",
+   "UPDATE session_players SET is_free = true WHERE id IN ('e5000000-0000-4000-8000-00000000000f', 'e5000000-0000-4000-8000-000000000010', 'e5000000-0000-4000-8000-000000000011')"
+  ],
+  "estimate_break_even_everyone_free": [
+   "UPDATE session_players SET released_at = NULL, release_reason = NULL WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND id NOT IN ('e5000000-0000-4000-8000-00000000000f', 'e5000000-0000-4000-8000-000000000010', 'e5000000-0000-4000-8000-000000000011')",
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000001', 2, 0)",
+   "UPDATE session_players SET is_free = true WHERE id IN ('e5000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e5000000-0000-4000-8000-000000000041', 'e5000000-0000-4000-8000-000000000040', 'e5000000-0000-4000-8000-000000000005', 'e5000000-0000-4000-8000-000000000006', 'e5000000-0000-4000-8000-000000000007', 'e5000000-0000-4000-8000-000000000008', 'e5000000-0000-4000-8000-000000000009', 'e5000000-0000-4000-8000-00000000000a', 'e5000000-0000-4000-8000-00000000000b', 'e5000000-0000-4000-8000-00000000000c', 'e5000000-0000-4000-8000-00000000000d', 'e5000000-0000-4000-8000-00000000000e')"
+  ],
+  "estimate_custom_two_free": [
+   "UPDATE session_players SET released_at = NULL, release_reason = NULL WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND id NOT IN ('e5000000-0000-4000-8000-00000000000f', 'e5000000-0000-4000-8000-000000000010', 'e5000000-0000-4000-8000-000000000011')",
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 12000, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000001', 2, 0)",
+   "UPDATE session_players SET is_free = true WHERE id IN ('e5000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002')"
+  ],
+  "estimate_break_even_free_with_an_empty_roster": [
+   "UPDATE session_players SET released_at = NULL, release_reason = NULL WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND id NOT IN ('e5000000-0000-4000-8000-00000000000f', 'e5000000-0000-4000-8000-000000000010', 'e5000000-0000-4000-8000-000000000011')",
+   "INSERT INTO inventory_items (id, club_id, name, category, stock, unit_cost_minor, updated_at) VALUES ('f5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'Tube', 'shuttlecocks', 10, 40000, now())",
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, now())",
+   "INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('f4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'f5000000-0000-4000-8000-000000000001', 2, 0)",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-03 00:00:00+00', release_reason = 'removed' WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND released_at IS NULL AND no_show_at IS NULL",
+   "UPDATE session_players SET is_free = true WHERE id IN ('e5000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002')"
   ]
  },
  "cases": [
@@ -403,6 +440,31 @@
    "name": "estimate_on_a_finished_session",
    "scenario": "hosts_and_estimate_on_a_finished_session",
    "path": "/api/public-sessions/done-published"
+  },
+  {
+   "name": "estimate_break_even_two_free",
+   "scenario": "estimate_break_even_two_free",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "estimate_break_even_free_off_the_roster",
+   "scenario": "estimate_break_even_free_off_the_roster",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "estimate_break_even_everyone_free",
+   "scenario": "estimate_break_even_everyone_free",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "estimate_custom_two_free",
+   "scenario": "estimate_custom_two_free",
+   "path": "/api/public-sessions/open-night"
+  },
+  {
+   "name": "estimate_free_players_do_not_count_with_an_empty_roster",
+   "scenario": "estimate_break_even_free_with_an_empty_roster",
+   "path": "/api/public-sessions/open-night"
   }
  ]
 }

@@ -1,0 +1,304 @@
+{
+ "reset": [
+  "UPDATE session_publications SET state = 'details', deleted_at = NULL, published_snapshot_id = NULL, published_slides = ARRAY[]::result_slide[], include_off_day = false, public_results = NULL, published_at = NULL WHERE id = 'e7000000-0000-4000-8000-000000000008'",
+  "UPDATE session_publications SET state = 'published', deleted_at = NULL, published_snapshot_id = 'ec000000-0000-4000-8000-000000000001', published_slides = ARRAY['standings','awards']::result_slide[], include_off_day = true, public_results = '{\"standings\":[{\"position\":1,\"name\":\"Alice Reyes\",\"wins\":5,\"losses\":1,\"games\":6},{\"position\":2,\"name\":\"Mika\",\"wins\":4,\"losses\":2,\"games\":6},{\"position\":3,\"name\":\"Twin Name\",\"wins\":3,\"losses\":3,\"games\":6},{\"position\":4,\"name\":\"Jose Adrian\",\"wins\":2.0,\"losses\":4,\"games\":6},{\"position\":5,\"name\":\"Not On Roster\",\"wins\":1,\"losses\":5,\"games\":6},{\"position\":6,\"name\":\"alice reyes\",\"wins\":0,\"losses\":6,\"games\":6}],\"awards\":{\"mvp\":{\"name\":\"Alice Reyes\"},\"mostImproved\":{\"name\":\"Mika\",\"priorSessions\":3}},\"offDay\":[{\"name\":\"Solo Sam\",\"priorSessions\":2},{\"name\":\"Twin Name\",\"priorSessions\":0}]}'::jsonb, published_at = TIMESTAMPTZ '2026-11-14 17:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000001'",
+  "UPDATE session_publications SET state = 'details', deleted_at = NULL WHERE id = 'e7000000-0000-4000-8000-000000000002'",
+  "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-02 00:00:00+00', release_reason = 'demoted' WHERE id = 'e5000000-0000-4000-8000-00000000000f'",
+  "UPDATE session_players SET released_at = NULL, release_reason = NULL, no_show_at = NULL WHERE id IN ('e5000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002')",
+  "INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, updated_at) VALUES ('e6000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000012', 1, TIMESTAMPTZ '2026-11-02 10:00:00+00', TIMESTAMPTZ '2026-11-01 00:00:00+00') ON CONFLICT DO NOTHING",
+  "UPDATE queue_sessions SET updated_at = TIMESTAMPTZ '2026-11-10 08:00:00.123456+00', title = 'Open Night' WHERE id = 'e4000000-0000-4000-8000-000000000001'",
+  "UPDATE queue_sessions SET state = 'active', finalized_at = NULL WHERE id = 'e4000000-0000-4000-8000-00000000000c'",
+  "UPDATE clubs SET name = 'Rally Club', logo_ref = 'https://example.test/club1.png' WHERE id = 'e1000000-0000-4000-8000-000000000001'",
+  "DELETE FROM session_hosts WHERE id::text LIKE 'f1000000-%'",
+  "DELETE FROM club_assessments WHERE id::text LIKE 'f2000000-%'",
+  "DELETE FROM club_players WHERE id::text LIKE 'f3000000-%'",
+  "DELETE FROM session_shuttle_plan_lines WHERE id::text LIKE 'f4000000-%'",
+  "DELETE FROM session_cost_estimates WHERE session_id::text LIKE 'e4000000-%'",
+  "DELETE FROM inventory_items WHERE id::text LIKE 'f5000000-%'",
+  "UPDATE queue_sessions SET level_restriction = 'all', beginner_slots = NULL, intermediate_slots = NULL, advanced_slots = NULL, expected_players = NULL",
+  "UPDATE session_publications SET public_results = jsonb_set(public_results, '{standings}', '[{\"name\":5,\"wins\":1},{\"position\":3},\"str\",[1],{\"name\":\"Alice Reyes\",\"pictureUrl\":\"old\",\"participant\":99},1.50,1e2,{\"name\":\"Mika\",\"extra\":{\"deep\":[1,{\"k\":null}]}}]'::jsonb) WHERE id = 'e7000000-0000-4000-8000-000000000009'",
+  "DELETE FROM session_payment_refunds WHERE session_id::text LIKE 'e4000000-%'",
+  "DELETE FROM session_slot_transfers WHERE session_id::text LIKE 'e4000000-%'",
+  "DELETE FROM session_payment_marks WHERE session_id::text LIKE 'e4000000-%'",
+  "DELETE FROM session_players WHERE id = 'e5000000-0000-4000-8000-00000000005a'",
+  "UPDATE session_players SET is_free = false WHERE id::text LIKE 'e5000000-%'",
+  "UPDATE session_players SET name_snapshot = 'Smile Lee' WHERE id = 'e5000000-0000-4000-8000-000000000006'",
+  "UPDATE session_players SET released_at = NULL, release_reason = NULL WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND id NOT IN ('e5000000-0000-4000-8000-00000000000f', 'e5000000-0000-4000-8000-000000000010', 'e5000000-0000-4000-8000-000000000011')"
+ ],
+ "scenarios": {
+  "base": [],
+  "open_night_no_estimate_no_marks": [],
+  "open_night_no_estimate_with_marks": [
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 40000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000041', 'e1000000-0000-4000-8000-000000000001', 120000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000040', 'e1000000-0000-4000-8000-000000000001', NULL, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001')"
+  ],
+  "open_night_custom_fee_with_marks": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 90000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 40000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000041', 'e1000000-0000-4000-8000-000000000001', 120000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000040', 'e1000000-0000-4000-8000-000000000001', NULL, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001')"
+  ],
+  "open_night_break_even_with_marks": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 40000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000041', 'e1000000-0000-4000-8000-000000000001', 120000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000040', 'e1000000-0000-4000-8000-000000000001', NULL, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001')"
+  ],
+  "open_night_a_marks_of_a_released_and_a_no_show_are_not_listed": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 90000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-00000000000f', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000005', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000011', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000006', 'e1000000-0000-4000-8000-000000000001')"
+  ],
+  "open_night_free_players_are_left_out": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 90000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 40000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000041', 'e1000000-0000-4000-8000-000000000001', 120000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000040', 'e1000000-0000-4000-8000-000000000001', NULL, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001')",
+   "UPDATE session_players SET is_free = true WHERE id IN ('e5000000-0000-4000-8000-000000000005', 'e5000000-0000-4000-8000-000000000006')"
+  ],
+  "open_night_a_free_player_with_a_mark_is_listed": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 90000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 40000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000041', 'e1000000-0000-4000-8000-000000000001', 120000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000040', 'e1000000-0000-4000-8000-000000000001', NULL, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001')",
+   "UPDATE session_players SET is_free = true WHERE id IN ('e5000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000005')"
+  ],
+  "open_night_break_even_leaves_free_players_out_of_the_split": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 40000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000041', 'e1000000-0000-4000-8000-000000000001', 120000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000040', 'e1000000-0000-4000-8000-000000000001', NULL, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001')",
+   "UPDATE session_players SET is_free = true WHERE id IN ('e5000000-0000-4000-8000-000000000005', 'e5000000-0000-4000-8000-000000000006', 'e5000000-0000-4000-8000-000000000007')"
+  ],
+  "open_night_everyone_free": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "UPDATE session_players SET is_free = true WHERE id IN ('e5000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e5000000-0000-4000-8000-000000000041', 'e5000000-0000-4000-8000-000000000040', 'e5000000-0000-4000-8000-000000000005', 'e5000000-0000-4000-8000-000000000006', 'e5000000-0000-4000-8000-000000000007', 'e5000000-0000-4000-8000-000000000008', 'e5000000-0000-4000-8000-000000000009', 'e5000000-0000-4000-8000-00000000000a', 'e5000000-0000-4000-8000-00000000000b', 'e5000000-0000-4000-8000-00000000000c', 'e5000000-0000-4000-8000-00000000000d', 'e5000000-0000-4000-8000-00000000000e')"
+  ],
+  "open_night_a_slot_that_came_by_transfer_counts_its_carried_cash": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 90000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 50000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-01 12:00:00+00', release_reason = 'transferred' WHERE id = 'e5000000-0000-4000-8000-000000000001'",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('e5000000-0000-4000-8000-00000000005a', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000013', NULL, 'Vic Visitor', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 10:00:01+00', TIMESTAMPTZ '2026-11-01 10:00:01+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, status, requested_at, decided_at, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency) VALUES ('e0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000001', 'e2000000-0000-4000-8000-000000000001', 'e2000000-0000-4000-8000-000000000006', 'approved', TIMESTAMPTZ '2026-11-01 11:30:00+00', TIMESTAMPTZ '2026-11-01 12:00:00+00', 'e3000000-0000-4000-8000-000000000013', 'e5000000-0000-4000-8000-00000000005a', false, 90000, 50000, 0, 40000, 'PHP')"
+  ],
+  "open_night_a_slot_that_came_by_transfer_adds_the_holders_own_cash": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 90000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 50000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-01 12:00:00+00', release_reason = 'transferred' WHERE id = 'e5000000-0000-4000-8000-000000000001'",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('e5000000-0000-4000-8000-00000000005a', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000013', NULL, 'Vic Visitor', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 10:00:01+00', TIMESTAMPTZ '2026-11-01 10:00:01+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, status, requested_at, decided_at, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency) VALUES ('e0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000001', 'e2000000-0000-4000-8000-000000000001', 'e2000000-0000-4000-8000-000000000006', 'approved', TIMESTAMPTZ '2026-11-01 11:30:00+00', TIMESTAMPTZ '2026-11-01 12:00:00+00', 'e3000000-0000-4000-8000-000000000013', 'e5000000-0000-4000-8000-00000000005a', false, 90000, 50000, 0, 40000, 'PHP')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-00000000005a', 'e1000000-0000-4000-8000-000000000001', 10000, 'PHP', TIMESTAMPTZ '2026-11-01 12:30:00+00', 'b0000000-0000-4000-8000-000000000007', 'e1000000-0000-4000-8000-000000000001')"
+  ],
+  "open_night_a_slot_that_came_by_transfer_with_nothing_paid": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 90000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-01 12:00:00+00', release_reason = 'transferred' WHERE id = 'e5000000-0000-4000-8000-000000000001'",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present_changed_at, skill_level_id, confirmed_at, joined_at, updated_at) VALUES ('e5000000-0000-4000-8000-00000000005a', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000013', NULL, 'Vic Visitor', TIMESTAMPTZ '2026-11-01 00:00:00+00', 3, TIMESTAMPTZ '2026-11-01 10:00:01+00', TIMESTAMPTZ '2026-11-01 10:00:01+00', TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, status, requested_at, decided_at, recipient_club_player_id, recipient_session_player_id, recipient_was_waitlisted, amount_due_minor, amount_paid_minor, prior_waived_minor, waived_minor, currency) VALUES ('e0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e3000000-0000-4000-8000-000000000001', 'e2000000-0000-4000-8000-000000000001', 'e2000000-0000-4000-8000-000000000006', 'approved', TIMESTAMPTZ '2026-11-01 11:30:00+00', TIMESTAMPTZ '2026-11-01 12:00:00+00', 'e3000000-0000-4000-8000-000000000013', 'e5000000-0000-4000-8000-00000000005a', false, 90000, 50000, 0, 40000, 'PHP')"
+  ],
+  "open_night_a_refund_comes_off_the_cash_kept": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 90000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 40000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000041', 'e1000000-0000-4000-8000-000000000001', 120000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000040', 'e1000000-0000-4000-8000-000000000001', NULL, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, amount_minor, refunded_at) VALUES ('e8000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'session_cancelled', 40000, TIMESTAMPTZ '2026-11-01 13:00:00+00')"
+  ],
+  "open_night_a_refund_without_a_fee_set": [
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 40000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000041', 'e1000000-0000-4000-8000-000000000001', 120000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000040', 'e1000000-0000-4000-8000-000000000001', NULL, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, amount_minor, refunded_at) VALUES ('e8000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'session_cancelled', 40000, TIMESTAMPTZ '2026-11-01 13:00:00+00')"
+  ],
+  "open_night_a_refunded_legacy_mark": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 90000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 90000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 40000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000041', 'e1000000-0000-4000-8000-000000000001', 120000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000003', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000040', 'e1000000-0000-4000-8000-000000000001', NULL, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_payment_refunds (id, club_id, session_id, session_player_id, reason, amount_minor, refunded_at) VALUES ('e8000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000001', 'e4000000-0000-4000-8000-000000000001', 'e5000000-0000-4000-8000-000000000040', 'session_cancelled', 90000, TIMESTAMPTZ '2026-11-01 13:00:00+00')"
+  ],
+  "open_night_a_record_with_no_one_on_the_roster": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'custom', 90000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-03 00:00:00+00', release_reason = 'removed' WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND released_at IS NULL AND no_show_at IS NULL"
+  ],
+  "open_night_the_estimate_follows_the_slots_when_the_roster_is_empty": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000001', 'e1000000-0000-4000-8000-000000000001', 30000, 5000, 'break_even', NULL, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-03 00:00:00+00', release_reason = 'removed' WHERE session_id = 'e4000000-0000-4000-8000-000000000001' AND released_at IS NULL AND no_show_at IS NULL"
+  ],
+  "active_night": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000002', 'e1000000-0000-4000-8000-000000000002', 30000, 5000, 'custom', 50000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000002', 'e5000000-0000-4000-8000-000000000012', 'e1000000-0000-4000-8000-000000000002', 50000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000008', 'e1000000-0000-4000-8000-000000000002')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000002', 'e5000000-0000-4000-8000-000000000013', 'e1000000-0000-4000-8000-000000000002', NULL, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-000000000009', 'e1000000-0000-4000-8000-000000000002')"
+  ],
+  "active_night_no_marks": [],
+  "done_and_published": [],
+  "done_and_published_with_marks": [
+   "INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, updated_at) VALUES ('e4000000-0000-4000-8000-000000000004', 'e1000000-0000-4000-8000-00000000000e', 30000, 5000, 'custom', 30000, TIMESTAMPTZ '2026-11-01 00:00:00+00')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000004', 'e5000000-0000-4000-8000-000000000018', 'e1000000-0000-4000-8000-00000000000e', 30000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-00000000000a', 'e1000000-0000-4000-8000-00000000000e')",
+   "INSERT INTO session_payment_marks (session_id, session_player_id, club_id, amount_minor, currency, marked_at, source_operation_id, actor_club_id) VALUES ('e4000000-0000-4000-8000-000000000004', 'e5000000-0000-4000-8000-000000000019', 'e1000000-0000-4000-8000-00000000000e', 5000, 'PHP', TIMESTAMPTZ '2026-11-01 11:00:00+00', 'b0000000-0000-4000-8000-00000000000b', 'e1000000-0000-4000-8000-00000000000e')"
+  ],
+  "cancelled_night_reveals_nothing": [],
+  "invalid_night_reveals_nothing": [],
+  "empty_session": [],
+  "done_page_removed_is_not_found": [],
+  "unknown_slug_is_not_found": [],
+  "uppercase_slug_is_not_found": [],
+  "slug_too_short_is_not_found": [],
+  "slug_with_a_quote_is_not_found": []
+ },
+ "cases": [
+  {
+   "name": "open_night_no_estimate_no_marks",
+   "scenario": "open_night_no_estimate_no_marks",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_no_estimate_with_marks",
+   "scenario": "open_night_no_estimate_with_marks",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_custom_fee_with_marks",
+   "scenario": "open_night_custom_fee_with_marks",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_break_even_with_marks",
+   "scenario": "open_night_break_even_with_marks",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_a_marks_of_a_released_and_a_no_show_are_not_listed",
+   "scenario": "open_night_a_marks_of_a_released_and_a_no_show_are_not_listed",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_free_players_are_left_out",
+   "scenario": "open_night_free_players_are_left_out",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_a_free_player_with_a_mark_is_listed",
+   "scenario": "open_night_a_free_player_with_a_mark_is_listed",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_break_even_leaves_free_players_out_of_the_split",
+   "scenario": "open_night_break_even_leaves_free_players_out_of_the_split",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_everyone_free",
+   "scenario": "open_night_everyone_free",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_a_slot_that_came_by_transfer_counts_its_carried_cash",
+   "scenario": "open_night_a_slot_that_came_by_transfer_counts_its_carried_cash",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_a_slot_that_came_by_transfer_adds_the_holders_own_cash",
+   "scenario": "open_night_a_slot_that_came_by_transfer_adds_the_holders_own_cash",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_a_slot_that_came_by_transfer_with_nothing_paid",
+   "scenario": "open_night_a_slot_that_came_by_transfer_with_nothing_paid",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_a_refund_comes_off_the_cash_kept",
+   "scenario": "open_night_a_refund_comes_off_the_cash_kept",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_a_refund_without_a_fee_set",
+   "scenario": "open_night_a_refund_without_a_fee_set",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_a_refunded_legacy_mark",
+   "scenario": "open_night_a_refunded_legacy_mark",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_a_record_with_no_one_on_the_roster",
+   "scenario": "open_night_a_record_with_no_one_on_the_roster",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "open_night_the_estimate_follows_the_slots_when_the_roster_is_empty",
+   "scenario": "open_night_the_estimate_follows_the_slots_when_the_roster_is_empty",
+   "path": "/api/public-sessions/open-night/payment-status"
+  },
+  {
+   "name": "active_night",
+   "scenario": "active_night",
+   "path": "/api/public-sessions/active-night/payment-status"
+  },
+  {
+   "name": "active_night_no_marks",
+   "scenario": "active_night_no_marks",
+   "path": "/api/public-sessions/active-night/payment-status"
+  },
+  {
+   "name": "done_and_published",
+   "scenario": "done_and_published",
+   "path": "/api/public-sessions/done-published/payment-status"
+  },
+  {
+   "name": "done_and_published_with_marks",
+   "scenario": "done_and_published_with_marks",
+   "path": "/api/public-sessions/done-published/payment-status"
+  },
+  {
+   "name": "cancelled_night_reveals_nothing",
+   "scenario": "cancelled_night_reveals_nothing",
+   "path": "/api/public-sessions/cancelled-night/payment-status"
+  },
+  {
+   "name": "invalid_night_reveals_nothing",
+   "scenario": "invalid_night_reveals_nothing",
+   "path": "/api/public-sessions/invalid-night/payment-status"
+  },
+  {
+   "name": "empty_session",
+   "scenario": "empty_session",
+   "path": "/api/public-sessions/empty-session/payment-status"
+  },
+  {
+   "name": "done_page_removed_is_not_found",
+   "scenario": "done_page_removed_is_not_found",
+   "path": "/api/public-sessions/done-deleted-page/payment-status"
+  },
+  {
+   "name": "unknown_slug_is_not_found",
+   "scenario": "unknown_slug_is_not_found",
+   "path": "/api/public-sessions/no-such-session/payment-status"
+  },
+  {
+   "name": "uppercase_slug_is_not_found",
+   "scenario": "uppercase_slug_is_not_found",
+   "path": "/api/public-sessions/OPEN-NIGHT/payment-status"
+  },
+  {
+   "name": "slug_too_short_is_not_found",
+   "scenario": "slug_too_short_is_not_found",
+   "path": "/api/public-sessions/abc/payment-status"
+  },
+  {
+   "name": "slug_with_a_quote_is_not_found",
+   "scenario": "slug_with_a_quote_is_not_found",
+   "path": "/api/public-sessions/x%27%3B%20DROP/payment-status"
+  }
+ ]
+}

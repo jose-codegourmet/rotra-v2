@@ -71,14 +71,14 @@ VALUES (@id, @club_id, @session_id, @inventory_item_id, @tubes, @position);
 
 -- name: ListMoneyLiveRoster :many
 -- liveRoster: the entries not released and not marked No show, in slot order.
-SELECT id, club_id, session_id, released_at, no_show_at
+SELECT id, club_id, session_id, released_at, no_show_at, is_free, name_snapshot, club_player_id
 FROM session_players
 WHERE session_id = @session_id AND released_at IS NULL AND no_show_at IS NULL
 ORDER BY confirmed_at ASC, id ASC;
 
 -- name: GetMoneySessionPlayer :one
 -- The roster entry of a club player in a session (released ones too).
-SELECT id, club_id, session_id, released_at, no_show_at
+SELECT id, club_id, session_id, released_at, no_show_at, is_free, name_snapshot, club_player_id
 FROM session_players
 WHERE session_id = @session_id AND club_player_id = @club_player_id;
 

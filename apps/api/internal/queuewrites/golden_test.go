@@ -60,6 +60,11 @@ func TestPublishResultsGolden(t *testing.T) { writetest.Replay(t, "testdata", "p
 // ids of a shuttle plan line (a version 7 UUID) are pinned by their version. A race whose winner is not decided is in race_money_test.go.
 func TestMoneyGolden(t *testing.T) { writetest.Replay(t, "testdata", "money", build) }
 
+// Plays free (D-2026-11-27-01), Record refund (#1014), Reject and Reject and refund of a slot transfer (#1011, #1014), the payment writes on a slot
+// with a history (#1013) and Start and Cancel session closing the pending transfers (task 2.12). Cases from gen-writes-queue-transfers-cases.py,
+// captured with TZ=UTC.
+func TestTransfersGolden(t *testing.T) { writetest.Replay(t, "testdata", "transfers", build) }
+
 // Session done and the projection jobs it drives, POST and GET /api/sessions/{id}/finalization. The stream list, the job list and a few
 // arrays the TypeScript reads with no order are compared as sets (the cases name them with "unordered").
 func TestFinalizeGolden(t *testing.T) { writetest.Replay(t, "testdata", "finalize", buildWithReads) }

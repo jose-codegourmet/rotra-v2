@@ -184,6 +184,10 @@ EXTRA3 = os.path.join(HERE, "gen-signedin-queue-cases-finalization.py")
 if os.path.exists(EXTRA3):
     exec(open(EXTRA3).read())
 
+EXTRA4 = os.path.join(HERE, "gen-signedin-queue-cases-money.py")
+if os.path.exists(EXTRA4):
+    exec(open(EXTRA4).read())
+
 names = [c["name"] for c in cases]
 assert len(names) == len(set(names)), "duplicate case names: " + ", ".join(n for n in names if names.count(n) > 1)
 with open(OUT, "w") as f:

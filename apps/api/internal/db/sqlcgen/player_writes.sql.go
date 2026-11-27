@@ -11,6 +11,24 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const cancelPlayerPendingSlotTransfers = `-- name: CancelPlayerPendingSlotTransfers :exec
+UPDATE session_slot_transfers SET status = 'cancelled', decided_at = $1
+WHERE club_id = $2 AND status = 'pending' AND (sender_player_id = $3 OR recipient_player_id = $3)
+`
+
+type CancelPlayerPendingSlotTransfersParams struct {
+	Now      pgtype.Timestamptz
+	ClubID   pgtype.UUID
+	PlayerID pgtype.UUID
+}
+
+// leaveMyClub (#1018): every pending slot transfer the player is part of in this club (sender, or recipient or claimant of a link)
+// becomes cancelled, which also ends its link.
+func (q *Queries) CancelPlayerPendingSlotTransfers(ctx context.Context, arg CancelPlayerPendingSlotTransfersParams) error {
+	_, err := q.db.Exec(ctx, cancelPlayerPendingSlotTransfers, arg.Now, arg.ClubID, arg.PlayerID)
+	return err
+}
+
 const clubExists = `-- name: ClubExists :one
 SELECT id FROM clubs WHERE id = $1
 `
@@ -244,7 +262,7 @@ func (q *Queries) MarkVerificationReminderRead(ctx context.Context, arg MarkVeri
 	return err
 }
 
-const removeClubPlayer = `-- name: RemoveClubPlayer :exec
+const removeClubPlayer = `-- name: RemoveClubPlayer :execrows
 UPDATE club_players SET removed_at = $1, revision = revision + 1, updated_at = $1
 WHERE club_id = $2 AND player_id = $3 AND removed_at IS NULL
 `
@@ -255,10 +273,13 @@ type RemoveClubPlayerParams struct {
 	PlayerID pgtype.UUID
 }
 
-// leaveMyClub: the row stays for history.
-func (q *Queries) RemoveClubPlayer(ctx context.Context, arg RemoveClubPlayerParams) error {
-	_, err := q.db.Exec(ctx, removeClubPlayer, arg.Now, arg.ClubID, arg.PlayerID)
-	return err
+// leaveMyClub: the row stays for history. The count says whether the player was in the club.
+func (q *Queries) RemoveClubPlayer(ctx context.Context, arg RemoveClubPlayerParams) (int64, error) {
+	result, err := q.db.Exec(ctx, removeClubPlayer, arg.Now, arg.ClubID, arg.PlayerID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
 const reviveClubPlayer = `-- name: ReviveClubPlayer :exec

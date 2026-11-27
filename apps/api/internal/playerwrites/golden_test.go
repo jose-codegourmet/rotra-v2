@@ -15,4 +15,7 @@ func TestProfileGolden(t *testing.T)       { writetest.Replay(t, "testdata", "pr
 func TestPrivacyGolden(t *testing.T)       { writetest.Replay(t, "testdata", "privacy", build) }
 func TestNotificationsGolden(t *testing.T) { writetest.Replay(t, "testdata", "notifications", build) }
 func TestClubsGolden(t *testing.T)         { writetest.Replay(t, "testdata", "clubs", build) }
-func TestContactGolden(t *testing.T)       { writetest.Replay(t, "testdata", "contact", build) }
+
+// Leave club ends the pending slot transfers the player is part of (#1018, task 2.12).
+func TestLeaveTransfersGolden(t *testing.T) { writetest.Replay(t, "testdata", "leavetransfers", build) }
+func TestContactGolden(t *testing.T)        { writetest.Replay(t, "testdata", "contact", build) }

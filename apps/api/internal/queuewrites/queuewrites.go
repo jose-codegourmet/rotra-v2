@@ -114,6 +114,7 @@ func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerResultsPublication(rt)
 	s.registerInventory(rt)
 	s.registerPayments(rt)
+	s.registerTransfers(rt)
 	s.registerFinalization(rt)
 	s.registerVisitor(rt)
 	s.registerHosts(rt)

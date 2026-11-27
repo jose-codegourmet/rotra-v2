@@ -66,7 +66,7 @@ func (s *server) queueResults(r *http.Request, q *sqlcgen.Queries, club pgtype.U
 	if err != nil {
 		return nil, err
 	}
-	if sess.State == sqlcgen.QueueSessionStateInvalid || !sess.RecordGames {
+	if sess.State == sqlcgen.QueueSessionStateInvalid {
 		return nil, nil // a null body
 	}
 	if err := s.requireSessionAccess(ctx, q, club, sess); err != nil {

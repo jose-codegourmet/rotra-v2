@@ -416,11 +416,6 @@
       "source": "saved",
       "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
       "level": "intermediate_low"
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]
@@ -1165,11 +1160,6 @@
      "who": "c7000000-0000-4000-8000-000000000001",
      "body": {
       "level": "advanced_low"
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]
@@ -3159,12 +3149,7 @@
      "method": "POST",
      "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/waitlist/a3300000-0000-4000-8000-000000000001/slot",
      "who": "c7000000-0000-4000-8000-000000000001",
-     "body": {},
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
-     }
+     "body": {}
     }
    ]
   },

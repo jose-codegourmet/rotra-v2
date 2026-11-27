@@ -624,11 +624,6 @@
      "who": "c7000000-0000-4000-8000-000000000001",
      "body": {
       "level": "intermediate_low"
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]
@@ -644,11 +639,6 @@
      "body": {
       "operationId": "x",
       "level": "intermediate_low"
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]

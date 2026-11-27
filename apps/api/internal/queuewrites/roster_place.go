@@ -30,7 +30,7 @@ type placed struct {
 
 // opUUID reads an operation id where the TypeScript hands it to Prisma as a uuid (a source operation id, a notification
 // source): a malformed one is invalid here, a 500 there.
-func opUUID(op string) (pgtype.UUID, error) { return parseOperationID(op, "operationId") }
+func opUUID(op string) (pgtype.UUID, error) { return parseOperationID(op) }
 
 // rosterNamesFor is rosterNamesFor: the names a Queue Master read shows for a saved player (D-2026-11-18-03), or none.
 func (t *txn) rosterNamesFor(clubPlayerID pgtype.UUID) (nickname, club *string, err error) {

@@ -58,7 +58,7 @@ def case(name, steps, scenario='base', **kw):
 
 
 MALFORMED = {'allow500': True, 'goExpects': {'status': 404, 'code': 'not_found'}}
-BADOP = {'allow500': True, 'goExpects': {'status': 422, 'code': 'invalid'}}
+BADOP = {}  # the TypeScript answers 404 for a malformed id anywhere (isMalformedId, main #1108); Go does the same
 NOSUBJECT = {'goExpects': {'status': 401, 'code': 'unauthenticated'}}
 
 # ---------------------------------------------------------------- POST /api/join-requests/{id}/confirm and /decline

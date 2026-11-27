@@ -162,7 +162,7 @@ func (t *txn) validate(in writes.Body) (validated, error) {
 	}
 	venueID, ok := writes.ParseUUID(venueText)
 	if !ok {
-		return validated{}, errTypeError // Prisma refuses a venue id that is no uuid
+		return validated{}, errNotAUUID // Prisma refuses a venue id that is no uuid
 	}
 	venue, err := t.q.GetClubVenue(t.ctx, sqlcgen.GetClubVenueParams{ClubID: t.club, ID: venueID})
 	missingVenue := errors.Is(err, pgx.ErrNoRows)
@@ -703,7 +703,7 @@ func (t *txn) reconcileCourts(commandID string, v validated) error {
 		if c.id != "" {
 			id, ok := writes.ParseUUID(c.id)
 			if !ok {
-				return errTypeError // Prisma refuses a court id that is no uuid
+				return errNotAUUID // Prisma refuses a court id that is no uuid
 			}
 			if _, err := t.q.EditSessionCourt(t.ctx, sqlcgen.EditSessionCourtParams{
 				Label: fields.JSTrim(c.label), Position: pgtype.Int4{Int32: int32(n + 1), Valid: true}, StartsAt: nullableTimestamp(planned), OpenUntil: nullableTimestamp(openUntil), Now: t.stamp(),

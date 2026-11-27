@@ -27,8 +27,6 @@ func (s *server) registerResultsPublication(rt *signedin.Router) {
 	rt.Handle("POST /api/sessions/{sessionId}/results/publication", store.AudienceClub, s.club(s.publishResults))
 }
 
-const noResultSlides = "This session has no result slides yet."
-
 type publishAnswer struct {
 	Slides        []string `json:"slides"`
 	IncludeOffDay bool     `json:"includeOffDay"`
@@ -130,7 +128,7 @@ func (s *server) publishResults(r *http.Request, club pgtype.UUID) (writes.Resul
 	}
 	commandText := body.Text("commandId")
 	out, err := s.inSession(r.Context(), club, r.PathValue("sessionId"), func(t *txn) (any, error) {
-		command, err := parseOperationID(commandText, "commandId")
+		command, err := parseOperationID(commandText)
 		if err != nil {
 			return nil, err
 		}
@@ -146,10 +144,6 @@ func (s *server) publishResults(r *http.Request, club pgtype.UUID) (writes.Resul
 		}
 		if t.sess.State != sqlcgen.QueueSessionStateCompleted {
 			return nil, writes.Fail(httpapi.ErrInvalid, map[string]string{"state": "Finish the session before publishing results."})
-		}
-		// Record games off: nothing to publish, whatever rows exist (no publication row is written).
-		if !t.sess.RecordGames {
-			return nil, writes.Fail(httpapi.ErrInvalid, map[string]string{"results": noResultSlides})
 		}
 		snapshot, err := t.q.GetQueueLatestSnapshot(t.ctx, t.sess.ID)
 		if errors.Is(err, pgx.ErrNoRows) {

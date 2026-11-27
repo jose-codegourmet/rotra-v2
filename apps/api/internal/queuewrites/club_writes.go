@@ -32,8 +32,10 @@ import (
 // errLogoPending is the club logo write (updateClubLogo): an upload to storage, which is out of this track's scope.
 var errLogoPending = errors.New("queuewrites: saving the club logo is not ported (uploads are out of scope)")
 
-// errBadUUID is an id the TypeScript hands to Prisma as a uuid and Prisma refuses (a 500).
-var errBadUUID = errors.New("queuewrites: an id is no uuid")
+// errNotAUUID is an id the TypeScript hands to Postgres as a uuid and Postgres refuses (22P02): it names nothing, so the
+// answer is 404, not 500 (isMalformedId, packages/db/src/service/handler.ts; main #1108). A value that is no text or
+// number, or no enum, stays a 500 (errTypeError).
+var errNotAUUID = writes.Fail(httpapi.ErrNotFound, nil)
 
 const (
 	inviteAttempts = 5
@@ -170,7 +172,7 @@ func (s *server) saveVenue(r *http.Request, club pgtype.UUID) (writes.Result, er
 	}
 	out, err := s.inClub(r.Context(), club, func(t *txn) (any, error) {
 		if !ok {
-			return nil, errBadUUID
+			return nil, errNotAUUID
 		}
 		existing, err := t.q.GetClubVenueByID(t.ctx, id)
 		found := err == nil
@@ -369,7 +371,7 @@ func (s *server) addSavedPlayer(r *http.Request, club pgtype.UUID) (writes.Resul
 				return nil, err
 			}
 		}
-		person := newClubPlayer{name: body.Text("name"), nickname: body.Text("nickname"), email: body.Text("email"), phone: e164}
+		person := newClubPlayer{name: body.Text("name"), nickname: body.Text("nickname"), email: body.Text("email"), socialLink: body.Text("socialLink"), phone: e164}
 		cp, words, err := t.createClubPlayer(operationID, person, t.stamp())
 		if err != nil {
 			return nil, err
@@ -545,7 +547,7 @@ func (s *server) moveSavedPlayer(r *http.Request, club pgtype.UUID) (writes.Resu
 	targetID, targetOK := writes.ParseUUID(body.Text("intoClubPlayerId"))
 	out, err := s.inClub(r.Context(), club, func(t *txn) (any, error) {
 		if !movedOK || !targetOK {
-			return nil, errBadUUID // Prisma refuses an id that is no uuid
+			return nil, errNotAUUID // Prisma refuses an id that is no uuid
 		}
 		return t.moveSaved(movedID, targetID, email)
 	})
@@ -655,7 +657,7 @@ func (s *server) issueClaimLink(r *http.Request, club pgtype.UUID) (writes.Resul
 	id, ok := writes.ParseUUID(r.PathValue("clubPlayerId"))
 	out, err := s.inClub(r.Context(), club, func(t *txn) (any, error) {
 		if !ok {
-			return nil, errBadUUID
+			return nil, errNotAUUID
 		}
 		row, err := t.q.GetSavedPlayerForLink(t.ctx, sqlcgen.GetSavedPlayerForLinkParams{ClubID: t.club, ID: id})
 		if errors.Is(err, pgx.ErrNoRows) || (err == nil && row.RemovedAt.Valid) {

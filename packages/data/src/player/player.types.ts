@@ -202,8 +202,7 @@ export type PlayerProfile = {
   gender?: Gender | null
   /**
    * Getting-to-know answers (D-2026-11-19-11), all public and skippable; unset reads as nothing
-   * answered. Real mode leaves them unset until their storage is decided (`players.personal_details`
-   * JSONB or columns, D-2026-11-19-11).
+   * answered. Real mode reads them from `players.personal_details` (D-2026-11-19-11).
    */
   /** Where you play: front, back or all-round. */
   playStyle?: CourtPosition | null

@@ -16,13 +16,14 @@ import { mockStore, readMockState } from '../mock/store'
 import { isProfileBannerShown, resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { PROFILE_BANNER_NOT_PICKABLE } from '../profile-banner/profileBanner.rules'
 import { isProfileCharacterShown, profileCharacterImage } from '../profile-character/fetchers'
-import { isRealDataMode, NOT_CONNECTED_MESSAGE } from '../real/mode'
+import { isRealDataMode } from '../real/mode'
 import {
   realFindPlayerByRtrId,
   realGetMyProfile,
   realGetPlayerGames,
   realGetPlayerProfile,
   realGetPlayerRank,
+  realSaveMyOnboardingAnswers,
   realSetMyGender,
   realSetMyProfileBanner,
   realSetMyProfilePicture,
@@ -365,13 +366,12 @@ export async function setMyGender(gender: Gender | null): Promise<PlayerProfile>
 /**
  * Saves the signed-in player's getting-to-know answers (D-2026-11-19-11): where you play, shots,
  * favourite player. Every answer may be empty. At most 6 own shots, 24 characters each, none that
- * repeats the list or another own shot. Mock mode only: the real storage shape is open (#1089,
- * D-2026-11-19-11).
+ * repeats the list or another own shot. Real mode keeps them in `players.personal_details`.
  */
 export async function saveMyOnboardingAnswers(input: OnboardingAnswers): Promise<PlayerProfile> {
-  if (isRealDataMode()) throw new MockError('permission', NOT_CONNECTED_MESSAGE)
   const checked = normalizeOnboardingAnswers(input)
   if (checked.error !== undefined) throw new MockError('conflict', checked.error)
+  if (isRealDataMode()) return realSaveMyOnboardingAnswers(checked.answers)
   await delay(900)
   if (getConnectivity() === 'offline')
     throw new MockError('offline', "You're offline. Reconnect and try again.")

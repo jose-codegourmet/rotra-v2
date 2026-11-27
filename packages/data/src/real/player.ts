@@ -1,6 +1,7 @@
 import { type PersonalProfileValues, personalProfileSchema } from '@rotra/schema/personal-details'
 import type { MockSession, SignInInput } from '../auth/auth.types'
 import { MockError } from '../mock/errors'
+import type { OnboardingAnswers } from '../player/onboardingAnswers.rules'
 import type { PlayerPictureChoice } from '../player/picture'
 import type {
   PlayerProfile,
@@ -190,9 +191,8 @@ export async function realGetMyAccount(signal?: AbortSignal) {
 }
 
 /**
- * Strict like the mock: phone, email, the RTR ID or rank in the input are rejected.
- * The real profile read carries no getting-to-know answers yet: their storage shape is open
- * (D-2026-11-19-11), so those optional fields stay unset. Gender saves through realSetMyGender.
+ * Strict like the mock: phone, email, the RTR ID or rank in the input are rejected. Gender saves
+ * through realSetMyGender, the getting-to-know answers through realSaveMyOnboardingAnswers.
  */
 export async function realUpdateMyProfile(input: PersonalProfileValues) {
   const values = personalProfileSchema.parse(input)
@@ -231,6 +231,17 @@ export async function realSetMyGender(gender: 'male' | 'female' | null) {
   const { profile, revision } = await realRequest<{ profile: PlayerProfile; revision: string }>(
     '/api/me/gender',
     { method: 'POST', body: { gender, expectedRevision: loadedRevision } },
+  )
+  loadedRevision = revision
+  return profile
+}
+
+/** The getting-to-know answers (D-2026-11-19-11), already checked by the caller. */
+export async function realSaveMyOnboardingAnswers(answers: OnboardingAnswers) {
+  if (!loadedRevision) await realGetMyAccount()
+  const { profile, revision } = await realRequest<{ profile: PlayerProfile; revision: string }>(
+    '/api/me/onboarding-answers',
+    { method: 'POST', body: { answers, expectedRevision: loadedRevision } },
   )
   loadedRevision = revision
   return profile

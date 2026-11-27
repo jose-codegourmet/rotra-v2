@@ -26,9 +26,14 @@ SELECT s.id,
        s.allow_doubles,
        s.minimum_games,
        s.players_per_court,
+       s.expected_players,
        s.accept_join_requests,
        s.always_require_request,
        s.record_games,
+       s.level_restriction,
+       s.beginner_slots,
+       s.intermediate_slots,
+       s.advanced_slots,
        s.updated_at,
        s.public_slug,
        c.id   AS club_id,
@@ -60,9 +65,14 @@ type GetPublicSessionBySlugRow struct {
 	AllowDoubles         bool
 	MinimumGames         int32
 	PlayersPerCourt      int16
+	ExpectedPlayers      pgtype.Int4
 	AcceptJoinRequests   bool
 	AlwaysRequireRequest bool
 	RecordGames          bool
+	LevelRestriction     LevelRestriction
+	BeginnerSlots        pgtype.Int4
+	IntermediateSlots    pgtype.Int4
+	AdvancedSlots        pgtype.Int4
 	UpdatedAt            pgtype.Timestamptz
 	PublicSlug           string
 	ClubID               pgtype.UUID
@@ -95,9 +105,14 @@ func (q *Queries) GetPublicSessionBySlug(ctx context.Context, slug string) (GetP
 		&i.AllowDoubles,
 		&i.MinimumGames,
 		&i.PlayersPerCourt,
+		&i.ExpectedPlayers,
 		&i.AcceptJoinRequests,
 		&i.AlwaysRequireRequest,
 		&i.RecordGames,
+		&i.LevelRestriction,
+		&i.BeginnerSlots,
+		&i.IntermediateSlots,
+		&i.AdvancedSlots,
 		&i.UpdatedAt,
 		&i.PublicSlug,
 		&i.ClubID,
@@ -169,10 +184,75 @@ func (q *Queries) ListPublicSessionCourts(ctx context.Context, sessionID pgtype.
 	return items, nil
 }
 
+const listPublicSessionHosts = `-- name: ListPublicSessionHosts :many
+SELECT h.club_player_id,
+       h.name_snapshot,
+       cp.display_name,
+       (p.id IS NOT NULL)::bool AS has_profile,
+       p.avatar_ref AS profile_avatar_ref,
+       cp.avatar_ref AS saved_avatar_ref,
+       COALESCE((SELECT a.skill_level_id FROM club_assessments a WHERE a.club_player_id = cp.id ORDER BY a.assessed_at DESC, a.id ASC LIMIT 1), -1)::smallint AS assessed_level_id
+FROM session_hosts h
+JOIN queue_sessions s ON s.id = h.session_id
+JOIN club_players cp ON cp.id = h.club_player_id AND cp.club_id = s.club_id
+LEFT JOIN players p ON p.id = cp.player_id
+WHERE h.session_id = $1
+  AND (($2::bool AND h.frozen_at IS NOT NULL) OR (NOT $2::bool AND h.removed_at IS NULL))
+ORDER BY h.assigned_at ASC, h.id ASC
+`
+
+type ListPublicSessionHostsParams struct {
+	SessionID pgtype.UUID
+	Ended     bool
+}
+
+type ListPublicSessionHostsRow struct {
+	ClubPlayerID     pgtype.UUID
+	NameSnapshot     string
+	DisplayName      string
+	HasProfile       bool
+	ProfileAvatarRef pgtype.Text
+	SavedAvatarRef   pgtype.Text
+	AssessedLevelID  int16
+}
+
+// The Hosts section (epic #1002, #1006): the current rows of an open session, or the rows frozen when a finished session ended, oldest
+// first. A host whose saved player is not the club's own is left out. The picture follows the profile when there is one.
+func (q *Queries) ListPublicSessionHosts(ctx context.Context, arg ListPublicSessionHostsParams) ([]ListPublicSessionHostsRow, error) {
+	rows, err := q.db.Query(ctx, listPublicSessionHosts, arg.SessionID, arg.Ended)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListPublicSessionHostsRow
+	for rows.Next() {
+		var i ListPublicSessionHostsRow
+		if err := rows.Scan(
+			&i.ClubPlayerID,
+			&i.NameSnapshot,
+			&i.DisplayName,
+			&i.HasProfile,
+			&i.ProfileAvatarRef,
+			&i.SavedAvatarRef,
+			&i.AssessedLevelID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listPublicSessionRoster = `-- name: ListPublicSessionRoster :many
 SELECT sp.name_snapshot,
+       sp.club_player_id,
        sp.skill_level_id,
-       p.avatar_ref,
+       (p.id IS NOT NULL)::bool AS has_profile,
+       p.avatar_ref AS profile_avatar_ref,
+       cp.avatar_ref AS saved_avatar_ref,
        (p.id IS NOT NULL AND p.profile_state <> 'unclaimed' AND p.profile_visibility <> 'public')::bool AS result_masked
 FROM session_players sp
 JOIN queue_sessions s ON s.id = sp.session_id
@@ -185,10 +265,13 @@ ORDER BY sp.confirmed_at ASC, sp.id ASC
 `
 
 type ListPublicSessionRosterRow struct {
-	NameSnapshot string
-	SkillLevelID pgtype.Int2
-	AvatarRef    pgtype.Text
-	ResultMasked bool
+	NameSnapshot     string
+	ClubPlayerID     pgtype.UUID
+	SkillLevelID     pgtype.Int2
+	HasProfile       bool
+	ProfileAvatarRef pgtype.Text
+	SavedAvatarRef   pgtype.Text
+	ResultMasked     bool
 }
 
 // The live roster in slot order: not released and not a no show. The club player is looked up inside the
@@ -205,8 +288,11 @@ func (q *Queries) ListPublicSessionRoster(ctx context.Context, sessionID pgtype.
 		var i ListPublicSessionRosterRow
 		if err := rows.Scan(
 			&i.NameSnapshot,
+			&i.ClubPlayerID,
 			&i.SkillLevelID,
-			&i.AvatarRef,
+			&i.HasProfile,
+			&i.ProfileAvatarRef,
+			&i.SavedAvatarRef,
 			&i.ResultMasked,
 		); err != nil {
 			return nil, err
@@ -225,8 +311,11 @@ SELECT w.id,
        w.added_at,
        w.demoted_at,
        w.demoted_confirmed_at,
+       w.club_player_id,
        cp.display_name AS club_player_display_name,
-       p.avatar_ref
+       (p.id IS NOT NULL)::bool AS has_profile,
+       p.avatar_ref AS profile_avatar_ref,
+       cp.avatar_ref AS saved_avatar_ref
 FROM session_waitlist w
 JOIN queue_sessions s ON s.id = w.session_id
 LEFT JOIN club_players cp ON cp.id = w.club_player_id AND cp.club_id = s.club_id
@@ -240,8 +329,11 @@ type ListPublicSessionWaitlistRow struct {
 	AddedAt               pgtype.Timestamptz
 	DemotedAt             pgtype.Timestamptz
 	DemotedConfirmedAt    pgtype.Timestamptz
+	ClubPlayerID          pgtype.UUID
 	ClubPlayerDisplayName pgtype.Text
-	AvatarRef             pgtype.Text
+	HasProfile            bool
+	ProfileAvatarRef      pgtype.Text
+	SavedAvatarRef        pgtype.Text
 }
 
 // The waitlist, unordered: the order is a rule of the page (demoted first, then arrival) and is applied in Go
@@ -261,8 +353,11 @@ func (q *Queries) ListPublicSessionWaitlist(ctx context.Context, sessionID pgtyp
 			&i.AddedAt,
 			&i.DemotedAt,
 			&i.DemotedConfirmedAt,
+			&i.ClubPlayerID,
 			&i.ClubPlayerDisplayName,
-			&i.AvatarRef,
+			&i.HasProfile,
+			&i.ProfileAvatarRef,
+			&i.SavedAvatarRef,
 		); err != nil {
 			return nil, err
 		}

@@ -16,11 +16,19 @@ SELECT p.id,
        p.experience_recorded_at,
        p.personal_details,
        p.profile_state = 'unclaimed' AS is_unclaimed,
+       p.gender,
+       (p.profile_state = 'claimed' AND ac.player_id IS NOT NULL)::boolean AS has_account,
+       ac.google_email,
+       pc.email AS contact_email,
+       pc.phone_e164 AS contact_phone,
+       COALESCE(p.verification_override = 'verified', false)::boolean AS verified_override,
        pb.id    AS banner_row_id,
        pb.image AS banner_image
 FROM players p
 JOIN player_id_allocations a ON a.player_id = p.id
 LEFT JOIN profile_banners pb ON pb.id = p.banner_id
+LEFT JOIN player_accounts ac ON ac.player_id = p.id
+LEFT JOIN player_private_contacts pc ON pc.player_id = p.id
 WHERE p.id = @player_id;
 
 -- name: ListPlayerSocialLinks :many
@@ -152,6 +160,7 @@ SELECT qs.id,
        c.name AS club_name,
        qs.finalized_at,
        qs.public_slug,
+       qs.record_games,
        sp.published_at
 FROM queue_sessions qs
 JOIN clubs c ON c.id = qs.club_id
@@ -179,3 +188,15 @@ SELECT f.session_id,
        (row_number() OVER (PARTITION BY f.session_id, f.session_player_id ORDER BY f.played_at ASC, f.match_id ASC))::int AS game_number
 FROM player_match_facts f
 WHERE f.session_id = ANY (@session_ids::uuid[]);
+
+-- name: ListPlayerHostClubIDs :many
+-- readHostClubIds: the clubs where the player is a current trusted host: a current trusted-host row on a current saved player linked to
+-- the player, or on a deleted record the Queue Master moved into that linked record (the Same person step).
+SELECT DISTINCT t.club_id
+FROM club_trusted_hosts t
+JOIN club_players cp ON cp.club_id = t.club_id AND cp.id = t.club_player_id
+WHERE t.removed_at IS NULL
+  AND ((cp.player_id = @player_id AND cp.removed_at IS NULL)
+    OR (cp.removed_at IS NOT NULL AND EXISTS (
+          SELECT 1 FROM club_players l
+          WHERE l.club_id = cp.club_id AND l.id = cp.linked_to_club_player_id AND l.player_id = @player_id AND l.removed_at IS NULL)));

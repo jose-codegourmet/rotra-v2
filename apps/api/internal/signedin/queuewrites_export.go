@@ -93,11 +93,10 @@ func CountedGamesByEntry(ctx context.Context, q *sqlcgen.Queries, session pgtype
 }
 
 // Session is sessionDto on the wire.
-// Session is sessionDto as a write answers it: the read DTO and plannedBeforeStart, the planned window at Start (Back to preparation puts it
-// back; owner, November 25, 2026). The reads do not carry it yet: their goldens are recaptured with the Phase 3 columns.
+// Session is sessionDto as a write answers it: the same shape the reads send, with plannedBeforeStart, the planned window at Start
+// (Back to preparation puts it back; owner, November 25, 2026).
 type Session struct {
 	queueSessionDTO
-	PlannedBeforeStart *PlannedWindow `json:"plannedBeforeStart"`
 }
 
 // PlannedWindow is the planned start and end a session had when it started.
@@ -127,11 +126,10 @@ func SessionOf(r sqlcgen.LockQueueSessionRow) Session {
 		v := r.ExpectedPlayers.Int32
 		d.ExpectedPlayers = &v
 	}
-	out := Session{queueSessionDTO: d}
 	if r.PlannedStartBeforeStartAt.Valid && r.PlannedEndBeforeStartAt.Valid {
-		out.PlannedBeforeStart = &PlannedWindow{StartAt: httpapi.ToIso(r.PlannedStartBeforeStartAt.Time), EndAt: httpapi.ToIso(r.PlannedEndBeforeStartAt.Time)}
+		d.PlannedBeforeStart = &PlannedWindow{StartAt: httpapi.ToIso(r.PlannedStartBeforeStartAt.Time), EndAt: httpapi.ToIso(r.PlannedEndBeforeStartAt.Time)}
 	}
-	return out
+	return Session{queueSessionDTO: d}
 }
 
 // CourtOf is courtDto for a session court row.

@@ -199,6 +199,18 @@ func (q *Queries) GetSessionFinalization(ctx context.Context, sessionID pgtype.U
 	return i, err
 }
 
+const getSessionRecordGames = `-- name: GetSessionRecordGames :one
+SELECT record_games FROM queue_sessions WHERE id = $1
+`
+
+// statusDto: Record games (D-2026-11-20-02) of the session a finalization is for; false = not ranked.
+func (q *Queries) GetSessionRecordGames(ctx context.Context, id pgtype.UUID) (bool, error) {
+	row := q.db.QueryRow(ctx, getSessionRecordGames, id)
+	var record_games bool
+	err := row.Scan(&record_games)
+	return record_games, err
+}
+
 const insertClubSessionSummary = `-- name: InsertClubSessionSummary :exec
 INSERT INTO club_session_player_summaries (id, club_id, session_id, session_player_id, club_player_id, player_id_snapshot, full_games, standard_games, fun_games, wins, losses,
   skill_level_snapshot_id, summary_version, projected_at)

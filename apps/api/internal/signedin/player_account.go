@@ -93,6 +93,7 @@ type myClubDTO struct {
 	Name      string                  `json:"name"`
 	Initials  publicreads.UTF16String `json:"initials"`
 	LogoURL   *string                 `json:"logoUrl"`
+	IsHost    bool                    `json:"isHost"`
 	JoinedVia string                  `json:"joinedVia"`
 }
 
@@ -102,6 +103,14 @@ func (s *server) myClubs() http.Handler {
 		if err != nil {
 			return nil, err
 		}
+		hosts, err := q.ListPlayerHostClubIDs(r.Context(), who.ID)
+		if err != nil {
+			return nil, err
+		}
+		isHost := map[pgtype.UUID]bool{}
+		for _, h := range hosts {
+			isHost[h] = true
+		}
 		clubs := make([]myClubDTO, 0, len(rows))
 		for _, c := range rows {
 			via := "club_added"
@@ -109,7 +118,7 @@ func (s *server) myClubs() http.Handler {
 				via = "session_link"
 			}
 			clubs = append(clubs, myClubDTO{
-				ID: c.ID.String(), Name: c.Name, Initials: publicreads.ClubInitials(c.Name), LogoURL: textPtr(c.LogoRef), JoinedVia: via,
+				ID: c.ID.String(), Name: c.Name, Initials: publicreads.ClubInitials(c.Name), LogoURL: textPtr(c.LogoRef), IsHost: isHost[c.ID], JoinedVia: via,
 			})
 		}
 		return struct {

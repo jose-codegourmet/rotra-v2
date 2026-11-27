@@ -12,12 +12,18 @@
         "rtrId": "RTR-PH-CEB-102926-0001",
         "fullName": "Alice Reyes",
         "nickname": "Ace",
+        "gender": null,
         "picture": "https://example.test/alice.png",
         "bannerId": "night",
         "profileVisibility": "public",
         "showProfileStats": false,
         "showWeeklyPerformance": false,
         "playingStyle": "Aggressive net player",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 3,
         "experienceMonths": 0,
         "socialLinks": {
@@ -45,12 +51,18 @@
         "rtrId": "RTR-PH-CEB-102926-0001",
         "fullName": "Alice Reyes",
         "nickname": "Ace",
+        "gender": null,
         "picture": "https://example.test/alice.png",
         "bannerId": "night",
         "profileVisibility": "public",
         "showProfileStats": false,
         "showWeeklyPerformance": false,
         "playingStyle": "Aggressive net player",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 3,
         "experienceMonths": 0,
         "socialLinks": {
@@ -78,12 +90,18 @@
         "rtrId": "RTR-PH-CEB-102926-0001",
         "fullName": "Alice Reyes",
         "nickname": "Ace",
+        "gender": null,
         "picture": "https://example.test/alice.png",
         "bannerId": "night",
         "profileVisibility": "public",
         "showProfileStats": false,
         "showWeeklyPerformance": false,
         "playingStyle": "Aggressive net player",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 3,
         "experienceMonths": 0,
         "socialLinks": {
@@ -124,12 +142,18 @@
         "playerId": "d1000000-0000-4000-8000-000000000003",
         "fullName": "C*** D***",
         "nickname": null,
+        "gender": null,
         "picture": "https://example.test/carla.png",
         "bannerId": "ember",
         "profileVisibility": "always_private",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": null,
         "experienceMonths": null,
         "socialLinks": {
@@ -156,12 +180,18 @@
         "playerId": "d1000000-0000-4000-8000-000000000004",
         "fullName": "😀*** S*** L***",
         "nickname": null,
+        "gender": null,
         "picture": null,
         "bannerId": null,
         "profileVisibility": "always_private",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": null,
         "experienceMonths": null,
         "socialLinks": {
@@ -203,12 +233,18 @@
         "rtrId": "RTR-PH-CEB-102926-0006",
         "fullName": "Frank Uy",
         "nickname": "Ace",
+        "gender": null,
         "picture": null,
         "bannerId": "b0000000-0000-4000-8000-000000000001",
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 0,
         "experienceMonths": 11,
         "socialLinks": {
@@ -236,12 +272,18 @@
         "rtrId": "RTR-PH-CEB-102926-0007",
         "fullName": "Gina Dela Cruz",
         "nickname": null,
+        "gender": null,
         "picture": null,
         "bannerId": null,
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 8,
         "experienceMonths": 9,
         "socialLinks": {
@@ -269,12 +311,18 @@
         "rtrId": "RTR-PH-CEB-102926-0008",
         "fullName": "Hal Tan",
         "nickname": "",
+        "gender": null,
         "picture": null,
         "bannerId": null,
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 0,
         "experienceMonths": 11,
         "socialLinks": {
@@ -302,12 +350,18 @@
         "rtrId": "RTR-PH-CEB-102926-0009",
         "fullName": "Ida Lim",
         "nickname": null,
+        "gender": null,
         "picture": null,
         "bannerId": null,
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": null,
         "experienceMonths": null,
         "socialLinks": {
@@ -335,12 +389,18 @@
         "rtrId": "RTR-PH-CEB-102926-0010",
         "fullName": "Jon Ünï Çödé",
         "nickname": "Jo",
+        "gender": null,
         "picture": "https://example.test/jon.png",
         "bannerId": "dusk",
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "Doubles specialist",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 0,
         "experienceMonths": 0,
         "socialLinks": {
@@ -451,12 +511,18 @@
         "playerId": "d1000000-0000-4000-8000-000000000001",
         "fullName": "A*** R***",
         "nickname": null,
+        "gender": null,
         "picture": "https://example.test/alice.png",
         "bannerId": "night",
         "profileVisibility": "always_private",
         "showProfileStats": false,
         "showWeeklyPerformance": false,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": null,
         "experienceMonths": null,
         "socialLinks": {
@@ -498,12 +564,18 @@
         "rtrId": "RTR-PH-CEB-102926-0001",
         "fullName": "Alice Reyes",
         "nickname": "Ace",
+        "gender": null,
         "picture": "https://example.test/alice.png",
         "bannerId": "night",
         "profileVisibility": "public",
         "showProfileStats": false,
         "showWeeklyPerformance": false,
         "playingStyle": "Aggressive net player",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 3,
         "experienceMonths": 0,
         "socialLinks": {
@@ -531,12 +603,18 @@
         "rtrId": "RTR-PH-CEB-102926-0003",
         "fullName": "Carla Dizon",
         "nickname": "CD",
+        "gender": null,
         "picture": "https://example.test/carla.png",
         "bannerId": "ember",
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "Defensive",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 1,
         "experienceMonths": 2,
         "socialLinks": {
@@ -564,12 +642,18 @@
         "rtrId": "RTR-PH-CEB-102926-0001",
         "fullName": "Alice Reyes",
         "nickname": "Ace",
+        "gender": null,
         "picture": "https://example.test/alice.png",
         "bannerId": "night",
         "profileVisibility": "public",
         "showProfileStats": false,
         "showWeeklyPerformance": false,
         "playingStyle": "Aggressive net player",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 3,
         "experienceMonths": 0,
         "socialLinks": {
@@ -597,12 +681,18 @@
         "rtrId": "RTR-PH-CEB-102926-0001",
         "fullName": "Alice Reyes",
         "nickname": "Ace",
+        "gender": null,
         "picture": "https://example.test/alice.png",
         "bannerId": "night",
         "profileVisibility": "public",
         "showProfileStats": false,
         "showWeeklyPerformance": false,
         "playingStyle": "Aggressive net player",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 3,
         "experienceMonths": 0,
         "socialLinks": {
@@ -630,12 +720,18 @@
         "rtrId": "RTR-PH-CEB-102926-0007",
         "fullName": "Gina Dela Cruz",
         "nickname": null,
+        "gender": null,
         "picture": null,
         "bannerId": null,
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 8,
         "experienceMonths": 9,
         "socialLinks": {
@@ -663,12 +759,18 @@
         "rtrId": "RTR-PH-CEB-102926-0007",
         "fullName": "Gina Dela Cruz",
         "nickname": null,
+        "gender": null,
         "picture": null,
         "bannerId": null,
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 8,
         "experienceMonths": 9,
         "socialLinks": {
@@ -696,12 +798,18 @@
         "rtrId": "RTR-PH-CEB-102926-0007",
         "fullName": "Gina Dela Cruz",
         "nickname": null,
+        "gender": null,
         "picture": null,
         "bannerId": null,
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 8,
         "experienceMonths": 9,
         "socialLinks": {
@@ -729,12 +837,18 @@
         "rtrId": "RTR-PH-CEB-102926-0007",
         "fullName": "Gina Dela Cruz",
         "nickname": null,
+        "gender": null,
         "picture": null,
         "bannerId": null,
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 8,
         "experienceMonths": 9,
         "socialLinks": {
@@ -762,12 +876,18 @@
         "rtrId": "RTR-PH-CEB-102926-0007",
         "fullName": "Gina Dela Cruz",
         "nickname": null,
+        "gender": null,
         "picture": null,
         "bannerId": null,
         "profileVisibility": "public",
         "showProfileStats": true,
         "showWeeklyPerformance": true,
         "playingStyle": "",
+        "playStyle": null,
+        "shots": [],
+        "shotsOther": [],
+        "favoritePlayer": null,
+        "favoritePlayerOther": "",
         "experienceYears": 8,
         "experienceMonths": 9,
         "socialLinks": {
@@ -1014,25 +1134,29 @@
           "id": "e1000000-0000-4000-8000-000000000001",
           "name": "Smash Club",
           "initials": "SC",
-          "logoUrl": "https://example.test/smash.png"
+          "logoUrl": "https://example.test/smash.png",
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000002",
           "name": "  😀 Birdie Club",
           "initials": "\ud83dB",
-          "logoUrl": null
+          "logoUrl": null,
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000003",
           "name": "ßeta Smash",
           "initials": "SSS",
-          "logoUrl": "https://example.test/beta.png"
+          "logoUrl": "https://example.test/beta.png",
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000005",
           "name": "Dink Squad  League",
           "initials": "DS",
-          "logoUrl": null
+          "logoUrl": null,
+          "isHost": false
         }
       ]
     },
@@ -1052,25 +1176,29 @@
           "id": "e1000000-0000-4000-8000-000000000001",
           "name": "Smash Club",
           "initials": "SC",
-          "logoUrl": "https://example.test/smash.png"
+          "logoUrl": "https://example.test/smash.png",
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000002",
           "name": "  😀 Birdie Club",
           "initials": "\ud83dB",
-          "logoUrl": null
+          "logoUrl": null,
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000003",
           "name": "ßeta Smash",
           "initials": "SSS",
-          "logoUrl": "https://example.test/beta.png"
+          "logoUrl": "https://example.test/beta.png",
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000005",
           "name": "Dink Squad  League",
           "initials": "DS",
-          "logoUrl": null
+          "logoUrl": null,
+          "isHost": false
         }
       ]
     }
@@ -1087,19 +1215,22 @@
           "id": "e1000000-0000-4000-8000-000000000001",
           "name": "Smash Club",
           "initials": "SC",
-          "logoUrl": "https://example.test/smash.png"
+          "logoUrl": "https://example.test/smash.png",
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000003",
           "name": "ßeta Smash",
           "initials": "SSS",
-          "logoUrl": "https://example.test/beta.png"
+          "logoUrl": "https://example.test/beta.png",
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000002",
           "name": "  😀 Birdie Club",
           "initials": "\ud83dB",
-          "logoUrl": null
+          "logoUrl": null,
+          "isHost": false
         }
       ]
     }
@@ -1160,13 +1291,15 @@
           "id": "e1000000-0000-4000-8000-000000000005",
           "name": "Dink Squad  League",
           "initials": "DS",
-          "logoUrl": null
+          "logoUrl": null,
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000006",
           "name": "solo",
           "initials": "S",
-          "logoUrl": null
+          "logoUrl": null,
+          "isHost": false
         }
       ]
     }
@@ -1211,19 +1344,22 @@
           "id": "e1000000-0000-4000-8000-000000000002",
           "name": "  😀 Birdie Club",
           "initials": "\ud83dB",
-          "logoUrl": null
+          "logoUrl": null,
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000003",
           "name": "ßeta Smash",
           "initials": "SSS",
-          "logoUrl": "https://example.test/beta.png"
+          "logoUrl": "https://example.test/beta.png",
+          "isHost": false
         },
         {
           "id": "e1000000-0000-4000-8000-000000000005",
           "name": "Dink Squad  League",
           "initials": "DS",
-          "logoUrl": null
+          "logoUrl": null,
+          "isHost": false
         }
       ]
     }
@@ -1260,7 +1396,8 @@
           "id": "e1000000-0000-4000-8000-000000000001",
           "name": "Smash Club",
           "initials": "SC",
-          "logoUrl": "https://example.test/smash.png"
+          "logoUrl": "https://example.test/smash.png",
+          "isHost": false
         }
       ]
     }
@@ -1640,6 +1777,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-12T10:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000012",
@@ -1674,7 +1812,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "15–21"
+              "score": "15–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000011",
@@ -1711,7 +1856,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -1721,6 +1873,7 @@
           "clubName": "ßeta Smash",
           "finishedAt": "2026-11-11T08:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000031",
@@ -1741,7 +1894,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–10"
+              "score": "21–10",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -1751,6 +1911,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-10T14:00:00.123Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000004",
@@ -1801,7 +1962,14 @@
               ],
               "counting": "fun",
               "result": "won",
-              "score": "11–9"
+              "score": "11–9",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000003",
@@ -1838,7 +2006,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": null
+              "score": null,
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000002",
@@ -1859,7 +2034,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "18–21"
+              "score": "18–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000001",
@@ -1896,7 +2078,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–15"
+              "score": "21–15",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -1918,6 +2107,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-12T10:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000012",
@@ -1952,7 +2142,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "15–21"
+              "score": "15–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000011",
@@ -1989,7 +2186,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -1999,6 +2203,7 @@
           "clubName": "ßeta Smash",
           "finishedAt": "2026-11-11T08:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000031",
@@ -2019,7 +2224,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–10"
+              "score": "21–10",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -2029,6 +2241,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-10T14:00:00.123Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000004",
@@ -2079,7 +2292,14 @@
               ],
               "counting": "fun",
               "result": "won",
-              "score": "11–9"
+              "score": "11–9",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000003",
@@ -2116,7 +2336,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": null
+              "score": null,
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000002",
@@ -2137,7 +2364,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "18–21"
+              "score": "18–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000001",
@@ -2174,7 +2408,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–15"
+              "score": "21–15",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -2196,6 +2437,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-12T10:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000012",
@@ -2230,7 +2472,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "15–21"
+              "score": "15–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000011",
@@ -2267,7 +2516,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -2290,6 +2546,7 @@
           "clubName": "ßeta Smash",
           "finishedAt": "2026-11-11T08:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000031",
@@ -2310,7 +2567,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–10"
+              "score": "21–10",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -2345,6 +2609,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-12T10:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000012",
@@ -2379,7 +2644,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "15–21"
+              "score": "15–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000011",
@@ -2416,7 +2688,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -2426,6 +2705,7 @@
           "clubName": "ßeta Smash",
           "finishedAt": "2026-11-11T08:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000031",
@@ -2446,7 +2726,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–10"
+              "score": "21–10",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -2456,6 +2743,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-10T14:00:00.123Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000004",
@@ -2506,7 +2794,14 @@
               ],
               "counting": "fun",
               "result": "won",
-              "score": "11–9"
+              "score": "11–9",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000003",
@@ -2543,7 +2838,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": null
+              "score": null,
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000002",
@@ -2564,7 +2866,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "18–21"
+              "score": "18–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000001",
@@ -2601,7 +2910,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–15"
+              "score": "21–15",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -2623,6 +2939,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-12T10:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000012",
@@ -2657,7 +2974,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "15–21"
+              "score": "15–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000011",
@@ -2694,7 +3018,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -2704,6 +3035,7 @@
           "clubName": "ßeta Smash",
           "finishedAt": "2026-11-11T08:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000031",
@@ -2724,7 +3056,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–10"
+              "score": "21–10",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -2734,6 +3073,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-10T14:00:00.123Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000004",
@@ -2784,7 +3124,14 @@
               ],
               "counting": "fun",
               "result": "won",
-              "score": "11–9"
+              "score": "11–9",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000003",
@@ -2821,7 +3168,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": null
+              "score": null,
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000002",
@@ -2842,7 +3196,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "18–21"
+              "score": "18–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000001",
@@ -2879,7 +3240,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–15"
+              "score": "21–15",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -2901,6 +3269,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-12T10:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000012",
@@ -2935,7 +3304,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "15–21"
+              "score": "15–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000011",
@@ -2972,7 +3348,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -2982,6 +3365,7 @@
           "clubName": "ßeta Smash",
           "finishedAt": "2026-11-11T08:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000031",
@@ -3002,7 +3386,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–10"
+              "score": "21–10",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -3012,6 +3403,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-10T14:00:00.123Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000004",
@@ -3062,7 +3454,14 @@
               ],
               "counting": "fun",
               "result": "won",
-              "score": "11–9"
+              "score": "11–9",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000003",
@@ -3099,7 +3498,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": null
+              "score": null,
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000002",
@@ -3120,7 +3526,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "18–21"
+              "score": "18–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000001",
@@ -3157,7 +3570,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–15"
+              "score": "21–15",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -3179,6 +3599,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-12T10:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000012",
@@ -3213,7 +3634,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "15–21"
+              "score": "15–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000011",
@@ -3250,7 +3678,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -3260,6 +3695,7 @@
           "clubName": "ßeta Smash",
           "finishedAt": "2026-11-11T08:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000031",
@@ -3280,7 +3716,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–10"
+              "score": "21–10",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -3290,6 +3733,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-10T14:00:00.123Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000004",
@@ -3340,7 +3784,14 @@
               ],
               "counting": "fun",
               "result": "won",
-              "score": "11–9"
+              "score": "11–9",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000003",
@@ -3377,7 +3828,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": null
+              "score": null,
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000002",
@@ -3398,7 +3856,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "18–21"
+              "score": "18–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000001",
@@ -3435,7 +3900,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–15"
+              "score": "21–15",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -3458,6 +3930,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-12T10:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000012",
@@ -3492,7 +3965,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "15–21"
+              "score": "15–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000011",
@@ -3529,7 +4009,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -3585,6 +4072,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-10T14:00:00.123Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000004",
@@ -3635,7 +4123,14 @@
               ],
               "counting": "fun",
               "result": "lost",
-              "score": "9–11"
+              "score": "9–11",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000003",
@@ -3672,7 +4167,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": null
+              "score": null,
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -3694,6 +4196,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-13T09:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000061",
@@ -3714,7 +4217,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -3769,6 +4279,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-12T10:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000012",
@@ -3803,7 +4314,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "15–21"
+              "score": "15–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000011",
@@ -3840,7 +4358,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -3850,6 +4375,7 @@
           "clubName": "ßeta Smash",
           "finishedAt": "2026-11-11T08:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000031",
@@ -3870,7 +4396,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–10"
+              "score": "21–10",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -3880,6 +4413,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-10T14:00:00.123Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000004",
@@ -3930,7 +4464,14 @@
               ],
               "counting": "fun",
               "result": "won",
-              "score": "11–9"
+              "score": "11–9",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000003",
@@ -3967,7 +4508,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": null
+              "score": null,
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000002",
@@ -3988,7 +4536,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "18–21"
+              "score": "18–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000001",
@@ -4025,7 +4580,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–15"
+              "score": "21–15",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }
@@ -4047,6 +4609,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-12T10:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000012",
@@ -4081,7 +4644,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "15–21"
+              "score": "15–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000011",
@@ -4118,7 +4688,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–19"
+              "score": "21–19",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -4128,6 +4705,7 @@
           "clubName": "ßeta Smash",
           "finishedAt": "2026-11-11T08:00:00.000Z",
           "sessionPageUrl": null,
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000031",
@@ -4148,7 +4726,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–10"
+              "score": "21–10",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         },
@@ -4158,6 +4743,7 @@
           "clubName": "Smash Club",
           "finishedAt": "2026-11-10T14:00:00.123Z",
           "sessionPageUrl": "/s/friday-night",
+          "ranked": true,
           "games": [
             {
               "id": "f3000000-0000-4000-8000-000000000004",
@@ -4208,7 +4794,14 @@
               ],
               "counting": "fun",
               "result": "won",
-              "score": "11–9"
+              "score": "11–9",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000003",
@@ -4245,7 +4838,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": null
+              "score": null,
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000002",
@@ -4266,7 +4866,14 @@
               ],
               "counting": "counted",
               "result": "lost",
-              "score": "18–21"
+              "score": "18–21",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             },
             {
               "id": "f3000000-0000-4000-8000-000000000001",
@@ -4303,7 +4910,14 @@
               ],
               "counting": "counted",
               "result": "won",
-              "score": "21–15"
+              "score": "21–15",
+              "winChance": {
+                "a": 50,
+                "b": 50,
+                "favored": null,
+                "strong": false
+              },
+              "upset": false
             }
           ]
         }

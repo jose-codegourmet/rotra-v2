@@ -121,9 +121,10 @@ SELECT to_jsonb(r)::jsonb AS row FROM public.rotra_sales_club_months(@club_id::u
 
 -- name: ListAdminPlayerRows :many
 -- readAdminPlayerDirectory, the players with an allocated RTR ID. A null id lists them all.
-SELECT p.id, p.full_name, p.nickname, p.avatar_ref, p.profile_state, p.hide_phone_from_clubs, p.revision,
+SELECT p.id, p.full_name, p.nickname, p.avatar_ref, p.profile_state, p.hide_phone_from_clubs, p.revision, p.gender,
        (pc.player_id IS NOT NULL)::boolean AS has_contact, pc.phone_e164, pc.email,
-       acc.claimed_at,
+       acc.claimed_at, (acc.player_id IS NOT NULL)::boolean AS has_account, acc.google_email,
+       COALESCE(p.verification_override = 'verified', false)::boolean AS verified_override,
        al.rtr_id, al.creating_club_id, al.city_code, loc.display_name AS city_name,
        (rc.player_id IS NOT NULL)::boolean AS has_rank, rc.recent_standard_match_count, rc.leaderboard_eligible,
        sl.display_order AS level_order, sl.label AS level_label, pv.recent_standard_match_threshold

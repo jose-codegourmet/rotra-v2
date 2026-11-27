@@ -14,14 +14,14 @@ const dots = "••• ••"
 func TestGetRecordLink(t *testing.T) {
 	e := newEnv(t)
 	club := e.club(t, "Lahug Smash Club")
-	token, _ := e.recordLink(t, club, recordOpts{name: "Ana Reyes", nickname: "Nana", phone: "+639185550177", email: "ana@club.test"})
+	token, cp := e.recordLink(t, club, recordOpts{name: "Ana Reyes", nickname: "Nana", phone: "+639185550177", email: "ana@club.test"})
 	w := e.get(token)
 	if w.Code != http.StatusOK {
 		t.Fatalf("%d %s", w.Code, w.Body.String())
 	}
 	wantJSON(t, w, obj{"link": obj{
 		"status": "valid", "clubName": "Lahug Smash Club",
-		"preview": obj{"playerId": nil, "fullName": "Ana Reyes", "nickname": "Nana", "rtrId": nil, "picture": nil, "maskedPhone": "+63 918 " + dots + "77"},
+		"preview": obj{"playerId": nil, "fullName": "Ana Reyes", "nickname": "Nana", "rtrId": nil, "picture": nil, "pictureSeedId": cp.String(), "maskedPhone": "+63 918 " + dots + "77"},
 		"preset": obj{
 			"fullName": "Ana Reyes", "nickname": "Nana", "email": "ana@club.test", "playingStyle": "",
 			"experienceYears": "", "experienceMonths": "", "facebook": "", "instagram": "", "youtube": "", "linkedin": "",
@@ -42,11 +42,11 @@ func TestGetRecordLink(t *testing.T) {
 // empty masked phone, an empty email.
 func TestGetRecordLinkWithoutContacts(t *testing.T) {
 	e := newEnv(t)
-	token, _ := e.recordLink(t, e.club(t, "Club"), recordOpts{noInput: true})
+	token, cp := e.recordLink(t, e.club(t, "Club"), recordOpts{noInput: true})
 	w := e.get(token)
 	wantJSON(t, w, obj{"link": obj{
 		"status": "valid", "clubName": "Club",
-		"preview": obj{"playerId": nil, "fullName": "Ana Reyes", "nickname": nil, "rtrId": nil, "picture": nil, "maskedPhone": ""},
+		"preview": obj{"playerId": nil, "fullName": "Ana Reyes", "nickname": nil, "rtrId": nil, "picture": nil, "pictureSeedId": cp.String(), "maskedPhone": ""},
 		"preset": obj{
 			"fullName": "Ana Reyes", "nickname": "", "email": "", "playingStyle": "",
 			"experienceYears": "", "experienceMonths": "", "facebook": "", "instagram": "", "youtube": "", "linkedin": "",

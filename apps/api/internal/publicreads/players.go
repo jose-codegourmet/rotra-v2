@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/answers"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -55,22 +56,25 @@ type socialLinks struct {
 // profileDTO is PlayerProfile on the wire. Contacts, account and claim fields never appear. A masked profile
 // (./masking.go) has no RTR ID, and only an unclaimed player carries the club that saved them.
 type profileDTO struct {
-	PlayerID              string      `json:"playerId"`
-	RtrID                 *string     `json:"rtrId,omitempty"`
-	FullName              string      `json:"fullName"`
-	Nickname              *string     `json:"nickname"`
-	Picture               *string     `json:"picture"`
-	BannerID              *string     `json:"bannerId"`
-	ProfileVisibility     string      `json:"profileVisibility"`
-	UnclaimedSavedBy      *string     `json:"unclaimedSavedBy,omitempty"`
-	ShowProfileStats      bool        `json:"showProfileStats"`
-	ShowWeeklyPerformance bool        `json:"showWeeklyPerformance"`
-	PlayingStyle          string      `json:"playingStyle"`
-	ExperienceYears       *int64      `json:"experienceYears"`
-	ExperienceMonths      *int64      `json:"experienceMonths"`
-	SocialLinks           socialLinks `json:"socialLinks"`
-	BannerKey             string      `json:"bannerKey"`
-	BannerImageURL        *string     `json:"bannerImageUrl"`
+	PlayerID              string  `json:"playerId"`
+	RtrID                 *string `json:"rtrId,omitempty"`
+	FullName              string  `json:"fullName"`
+	Nickname              *string `json:"nickname"`
+	Picture               *string `json:"picture"`
+	BannerID              *string `json:"bannerId"`
+	ProfileVisibility     string  `json:"profileVisibility"`
+	UnclaimedSavedBy      *string `json:"unclaimedSavedBy,omitempty"`
+	ShowProfileStats      bool    `json:"showProfileStats"`
+	ShowWeeklyPerformance bool    `json:"showWeeklyPerformance"`
+	PlayingStyle          string  `json:"playingStyle"`
+	Gender                *string `json:"gender"`
+	Verified              *bool   `json:"verified,omitempty"`
+	answers.Answers
+	ExperienceYears  *int64      `json:"experienceYears"`
+	ExperienceMonths *int64      `json:"experienceMonths"`
+	SocialLinks      socialLinks `json:"socialLinks"`
+	BannerKey        string      `json:"bannerKey"`
+	BannerImageURL   *string     `json:"bannerImageUrl"`
 }
 
 // profileWithPlaces is the profile page read: the profile and the lists the player is in the top 50 of.
@@ -213,6 +217,7 @@ func profileFrom(row sqlcgen.GetPublicProfileRow, links []sqlcgen.ListPlayerSoci
 		ProfileVisibility:     string(visibility),
 		ShowProfileStats:      row.ShowProfileStats,
 		ShowWeeklyPerformance: row.ShowWeeklyPerformance,
+		Answers:               answers.Empty(),
 	}
 	dto.BannerKey, dto.BannerImageURL = resolveBanner(row.BannerRowID, row.BannerImage, shown)
 	if masked {
@@ -221,12 +226,23 @@ func profileFrom(row sqlcgen.GetPublicProfileRow, links []sqlcgen.ListPlayerSoci
 	}
 	rtr := row.RtrID
 	dto.RtrID = &rtr
+	// Public (D-2026-11-19-01): an always-private profile hides it with the name. Null is not added.
+	if row.Gender.Valid {
+		g := string(row.Gender.PlayerGender)
+		dto.Gender = &g
+	}
+	// D-2026-11-23-07: the result only; absent for an unclaimed player, who has no account.
+	if row.HasAccount {
+		v := answers.Verified(row.GoogleEmail.String, row.ContactEmail.String, row.ContactPhone.String, row.VerifiedOverride)
+		dto.Verified = &v
+	}
 	if saver != nil {
 		dto.FullName, dto.Nickname = saver.DisplayName, textPtr(saver.Nickname)
 		club := saver.ClubName
 		dto.UnclaimedSavedBy = &club
 	}
 	dto.PlayingStyle = playingStyleOf(row.PersonalDetails)
+	dto.Answers = answers.Of(row.PersonalDetails)
 	if months, ok := currentExperienceMonths(row.ExperienceMonths, row.ExperienceRecordedAt, now); ok {
 		years, rest := months/12, months%12
 		dto.ExperienceYears, dto.ExperienceMonths = &years, &rest

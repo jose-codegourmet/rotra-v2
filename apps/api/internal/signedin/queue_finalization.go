@@ -63,6 +63,13 @@ func (s *server) queueFinalization(r *http.Request, q *sqlcgen.Queries, club pgt
 		v := string(f.FailedStage.FinalizationStage)
 		failedStage = &v
 	}
+	recordGames, err := q.GetSessionRecordGames(ctx, id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		recordGames, err = true, nil
+	}
+	if err != nil {
+		return nil, err
+	}
 	return struct {
 		SessionID   string               `json:"sessionId"`
 		CommandID   string               `json:"commandId"`
@@ -73,9 +80,11 @@ func (s *server) queueFinalization(r *http.Request, q *sqlcgen.Queries, club pgt
 		CompletedAt *string              `json:"completedAt"`
 		FailedStage *string              `json:"failedStage"`
 		FailureCode *string              `json:"failureCode"`
+		RecordGames bool                 `json:"recordGames"`
 		Jobs        []finalizationJobDTO `json:"jobs"`
 	}{
-		SessionID: f.SessionID.String(), CommandID: f.CommandID.String(), State: string(f.State), Stage: string(f.Stage),
+		RecordGames: recordGames,
+		SessionID:   f.SessionID.String(), CommandID: f.CommandID.String(), State: string(f.State), Stage: string(f.Stage),
 		Accepted: f.CommittedAt.Valid, CommittedAt: isoPtr(f.CommittedAt), CompletedAt: isoPtr(f.CompletedAt),
 		FailedStage: failedStage, FailureCode: textPtr(f.FailureCode), Jobs: jobs,
 	}, nil

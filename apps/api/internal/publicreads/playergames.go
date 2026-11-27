@@ -42,12 +42,14 @@ type gameDTO struct {
 }
 
 type historySession struct {
-	ID             string    `json:"id"`
-	Title          string    `json:"title"`
-	ClubName       string    `json:"clubName"`
-	FinishedAt     *string   `json:"finishedAt"`
-	SessionPageURL *string   `json:"sessionPageUrl"`
-	Games          []gameDTO `json:"games"`
+	ID             string  `json:"id"`
+	Title          string  `json:"title"`
+	ClubName       string  `json:"clubName"`
+	FinishedAt     *string `json:"finishedAt"`
+	SessionPageURL *string `json:"sessionPageUrl"`
+	// Ranked is false for a session run with Record games off: its games read not_ranked.
+	Ranked bool      `json:"ranked"`
+	Games  []gameDTO `json:"games"`
 }
 
 type gamesBody struct {
@@ -230,7 +232,7 @@ func readHistory(ctx context.Context, q *sqlcgen.Queries, facts []historyFact, v
 		gamesOf[f.SessionID] = append(gamesOf[f.SessionID], gameDTO{
 			ID: f.MatchID.String(), Format: string(f.Format), SessionGameNumber: number(f.SessionPlayerID),
 			Partners: partners, Opponents: opponents, PartnerPlayers: partnerPlayers, OpponentPlayers: opponentPlayers,
-			Counting: counting(f.FullParticipation, f.StandardMatch), Result: result(f.Team, f.WinningTeam),
+			Counting: counting(f.FullParticipation, f.StandardMatch, bySession[f.SessionID].RecordGames), Result: result(f.Team, f.WinningTeam),
 			Score: score(f.Team, f.TeamAScore, f.TeamBScore),
 		})
 	}
@@ -241,7 +243,7 @@ func readHistory(ctx context.Context, q *sqlcgen.Queries, facts []historyFact, v
 		if !ok {
 			continue
 		}
-		hs := historySession{ID: s.ID.String(), Title: s.Title, ClubName: s.ClubName, Games: gamesOf[sid]}
+		hs := historySession{ID: s.ID.String(), Title: s.Title, ClubName: s.ClubName, Ranked: s.RecordGames, Games: gamesOf[sid]}
 		if s.FinalizedAt.Valid {
 			iso := httpapi.ToIso(s.FinalizedAt.Time)
 			hs.FinishedAt = &iso
@@ -284,14 +286,18 @@ func courtPlayer(entries map[pgtype.UUID]sqlcgen.ListSessionEntriesRow, id pgtyp
 	return c
 }
 
-func counting(fullParticipation, standard bool) string {
+// counting is the game's `counting`: a full standard game of a session run with Record games off is not_ranked (D-2026-11-20-02): it
+// shows with its win or loss but stays out of every count that reads counted.
+func counting(fullParticipation, standard, recordGames bool) string {
 	switch {
 	case !fullParticipation:
 		return "partial"
-	case standard:
+	case !standard:
+		return "fun"
+	case recordGames:
 		return "counted"
 	}
-	return "fun"
+	return "not_ranked"
 }
 
 func result(team, winner sqlcgen.TeamSide) string {

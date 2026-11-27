@@ -197,3 +197,7 @@ FROM session_players sp
 JOIN club_players cp ON cp.club_id = sp.club_id AND cp.id = sp.club_player_id
 WHERE sp.session_id = @session_id AND cp.player_id IS NOT NULL
 ORDER BY 1;
+
+-- name: GetSessionRecordGames :one
+-- statusDto: Record games (D-2026-11-20-02) of the session a finalization is for; false = not ranked.
+SELECT record_games FROM queue_sessions WHERE id = @id;

@@ -589,9 +589,10 @@ func (q *Queries) ListAdminPlayerClubRecords(ctx context.Context, playerIds []pg
 
 const listAdminPlayerRows = `-- name: ListAdminPlayerRows :many
 
-SELECT p.id, p.full_name, p.nickname, p.avatar_ref, p.profile_state, p.hide_phone_from_clubs, p.revision,
+SELECT p.id, p.full_name, p.nickname, p.avatar_ref, p.profile_state, p.hide_phone_from_clubs, p.revision, p.gender,
        (pc.player_id IS NOT NULL)::boolean AS has_contact, pc.phone_e164, pc.email,
-       acc.claimed_at,
+       acc.claimed_at, (acc.player_id IS NOT NULL)::boolean AS has_account, acc.google_email,
+       COALESCE(p.verification_override = 'verified', false)::boolean AS verified_override,
        al.rtr_id, al.creating_club_id, al.city_code, loc.display_name AS city_name,
        (rc.player_id IS NOT NULL)::boolean AS has_rank, rc.recent_standard_match_count, rc.leaderboard_eligible,
        sl.display_order AS level_order, sl.label AS level_label, pv.recent_standard_match_threshold
@@ -615,10 +616,14 @@ type ListAdminPlayerRowsRow struct {
 	ProfileState                 PlayerProfileState
 	HidePhoneFromClubs           bool
 	Revision                     int64
+	Gender                       NullPlayerGender
 	HasContact                   bool
 	PhoneE164                    pgtype.Text
 	Email                        pgtype.Text
 	ClaimedAt                    pgtype.Timestamptz
+	HasAccount                   bool
+	GoogleEmail                  pgtype.Text
+	VerifiedOverride             bool
 	RtrID                        string
 	CreatingClubID               pgtype.UUID
 	CityCode                     string
@@ -650,10 +655,14 @@ func (q *Queries) ListAdminPlayerRows(ctx context.Context, playerID pgtype.UUID)
 			&i.ProfileState,
 			&i.HidePhoneFromClubs,
 			&i.Revision,
+			&i.Gender,
 			&i.HasContact,
 			&i.PhoneE164,
 			&i.Email,
 			&i.ClaimedAt,
+			&i.HasAccount,
+			&i.GoogleEmail,
+			&i.VerifiedOverride,
 			&i.RtrID,
 			&i.CreatingClubID,
 			&i.CityCode,

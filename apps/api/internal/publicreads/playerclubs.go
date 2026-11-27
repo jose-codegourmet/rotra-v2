@@ -9,6 +9,7 @@ import (
 	"unicode/utf16"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
@@ -20,6 +21,8 @@ type clubDTO struct {
 	Name     string      `json:"name"`
 	Initials utf16String `json:"initials"`
 	LogoURL  *string     `json:"logoUrl"`
+	// IsHost is whether the player is a current trusted host there (the Host badge, #1007).
+	IsHost bool `json:"isHost"`
 }
 
 // clubs answers GET /api/players/{playerId}/clubs: the clubs the player is currently saved in. It follows the
@@ -50,8 +53,16 @@ func (p *players) clubs(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return fmt.Errorf("listing clubs: %w", err)
 		}
+		hosts, err := q.ListPlayerHostClubIDs(r.Context(), id)
+		if err != nil {
+			return fmt.Errorf("listing host clubs: %w", err)
+		}
+		isHost := map[pgtype.UUID]bool{}
+		for _, h := range hosts {
+			isHost[h] = true
+		}
 		for _, c := range rows {
-			body.Clubs = append(body.Clubs, clubDTO{ID: c.ID.String(), Name: c.Name, Initials: clubInitials(c.Name), LogoURL: textPtr(c.LogoRef)})
+			body.Clubs = append(body.Clubs, clubDTO{ID: c.ID.String(), Name: c.Name, Initials: clubInitials(c.Name), LogoURL: textPtr(c.LogoRef), IsHost: isHost[c.ID]})
 		}
 		return nil
 	})

@@ -207,7 +207,7 @@ func (s *server) rosterOf(ctx context.Context, q *sqlcgen.Queries, club pgtype.U
 	for i, w := range orderedQueueWaitlist(waitRows) {
 		out.Waitlist = append(out.Waitlist, queueWaitlistDTO{
 			ID: w.ID.String(), SessionID: w.SessionID.String(), ClubPlayerID: w.ClubPlayerID.String(), Level: levelOf(w.SkillLevelID),
-			AddedAt: httpapi.ToIso(w.AddedAt.Time), Position: i + 1,
+			AddedAt: httpapi.ToIso(effectiveJoin(w.DemotedAt, w.AddedAt)), Position: i + 1,
 		})
 	}
 	for _, j := range reqs {
@@ -219,4 +219,12 @@ func (s *server) rosterOf(ctx context.Context, q *sqlcgen.Queries, club pgtype.U
 		})
 	}
 	return out, nil
+}
+
+// effectiveJoin is `demotedAt ?? addedAt`: when they joined the waitlist (the move time for a player moved off the roster).
+func effectiveJoin(demoted, added pgtype.Timestamptz) time.Time {
+	if demoted.Valid {
+		return demoted.Time
+	}
+	return added.Time
 }

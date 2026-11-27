@@ -144,6 +144,31 @@ func (q *Queries) LockSocialKey(ctx context.Context, key string) error {
 	return err
 }
 
+const renameLiveEntries = `-- name: RenameLiveEntries :exec
+UPDATE session_players sp SET name_snapshot = $1, revision = sp.revision + 1, updated_at = $2
+WHERE sp.club_id = $3 AND sp.club_player_id = $4 AND sp.released_at IS NULL AND sp.no_show_at IS NULL
+  AND sp.session_id IN (SELECT id FROM queue_sessions WHERE state IN ('prepared', 'active'))
+`
+
+type RenameLiveEntriesParams struct {
+	Name         string
+	Now          pgtype.Timestamptz
+	ClubID       pgtype.UUID
+	ClubPlayerID pgtype.UUID
+}
+
+// Rename club player: the new name on the player's live roster entries (not released, not a no show) in this club's prepared or active
+// sessions. Finished sessions keep the name they finished with.
+func (q *Queries) RenameLiveEntries(ctx context.Context, arg RenameLiveEntriesParams) error {
+	_, err := q.db.Exec(ctx, renameLiveEntries,
+		arg.Name,
+		arg.Now,
+		arg.ClubID,
+		arg.ClubPlayerID,
+	)
+	return err
+}
+
 const setClubPlayerSavedLevel = `-- name: SetClubPlayerSavedLevel :exec
 UPDATE club_players SET saved_skill_level_id = $1::smallint, saved_level_at = $2::timestamptz, revision = revision + 1, updated_at = $3
 WHERE club_id = $4 AND id = $5

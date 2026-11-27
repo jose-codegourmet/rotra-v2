@@ -112,6 +112,22 @@
   "una_link_only": [
    "UPDATE shared_player_entries SET email = NULL, social_key = 'facebook.com/una' WHERE id = 'a6000000-0000-4000-8000-000000000007'",
    "INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, preset_fields, state, captured_at, created_at, updated_at) VALUES ('c6000000-0000-4000-8000-000000000005', 'c9000000-0000-4000-8000-000000000001', NULL, '{\"version\":1,\"playingStyle\":\"\",\"experienceMonths\":null,\"experienceRecordedAt\":null,\"socialLinks\":{\"facebook\":\"fb.com/una\"}}'::jsonb, 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
+  ],
+  "gus_no_show_on_s1": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, created_at, updated_at) VALUES ('a3300000-0000-4000-8000-000000000101', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000002', 'c6000000-0000-4000-8000-000000000001', 3, TIMESTAMPTZ '2026-11-17 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO session_join_requests (id, club_id, session_id, name, stated_band, placement, status, requested_at, club_player_id, created_at, updated_at, revision) VALUES ('a3400000-0000-4000-8000-000000000030', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'Gus Guest', 'unsure', 'slot', 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'c6000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, state, issued_at, expires_at, created_at, updated_at, revision) VALUES ('a8000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', decode('00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff', 'hex'), 'active', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-26 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000005', 'c6000000-0000-4000-8000-000000000001', 'Gus Old', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-16 00:00:00+00', 'removed', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE session_players SET no_show_at = TIMESTAMPTZ '2026-11-19 01:00:00+00' WHERE released_at IS NULL AND club_player_id = 'c6000000-0000-4000-8000-000000000001'"
+  ],
+  "gus_on_an_invalid_session": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000020', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', 'Gus Guest', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_waitlist (id, club_id, session_id, club_player_id, skill_level_id, added_at, created_at, updated_at) VALUES ('a3300000-0000-4000-8000-000000000101', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000002', 'c6000000-0000-4000-8000-000000000001', 3, TIMESTAMPTZ '2026-11-17 00:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00')",
+   "INSERT INTO session_join_requests (id, club_id, session_id, name, stated_band, placement, status, requested_at, club_player_id, created_at, updated_at, revision) VALUES ('a3400000-0000-4000-8000-000000000030', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'Gus Guest', 'unsure', 'slot', 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'c6000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO club_player_claim_links (id, club_id, club_player_id, token_digest, state, issued_at, expires_at, created_at, updated_at, revision) VALUES ('a8000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000001', decode('00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff', 'hex'), 'active', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-26 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000021', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000005', 'c6000000-0000-4000-8000-000000000001', 'Gus Old', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-16 00:00:00+00', 'removed', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE queue_sessions SET state = 'invalid', invalid_reason = 'Test' WHERE id IN (SELECT session_id FROM session_players WHERE club_player_id = 'c6000000-0000-4000-8000-000000000001')"
   ]
  },
  "snapshot": [
@@ -1330,6 +1346,527 @@
       "socialLinks": {
        "facebook": "fb.com/una"
       }
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": null,
+     "body": {
+      "fullName": "Gus Renamed"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_a_player_subject_is_not_a_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Renamed"
+     },
+     "goExpects": {
+      "status": 401,
+      "code": "unauthenticated"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "rename_without_a_body",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001"
+    }
+   ]
+  },
+  {
+   "name": "rename_a_guest",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Renamed",
+      "nickname": "Gussy"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_a_guest_spaces_are_collapsed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "   Gus   \t Renamed  ",
+      "nickname": "  Big   Gus "
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_an_empty_nickname_removes_it",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_a_blank_nickname_removes_it",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "   "
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_without_a_nickname_removes_it",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_nickname_not_text_removes_it",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_an_unclaimed_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Alonzo B.",
+      "nickname": "U"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_nickname_of_24_characters",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "nnnnnnnnnnnnnnnnnnnnnnnn"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_nickname_of_25_characters",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "nnnnnnnnnnnnnnnnnnnnnnnnn"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_nickname_too_long_before_collapsing_is_fine",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Guest",
+      "nickname": "n                                                            n"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_name_of_60_characters",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_name_of_61_characters",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_name_of_2_characters",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Jo"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_name_of_1_character",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "J"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_blank_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "   "
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_name_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_without_a_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "nickname": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_name_is_checked_before_the_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-0000000000ff/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "J"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_nickname_is_checked_before_the_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-0000000000ff/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Jo Jo",
+      "nickname": "nnnnnnnnnnnnnnnnnnnnnnnnn"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_a_registered_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000003/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Ann R"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_a_deleted_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000006/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Rex Rex"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_unknown_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-0000000000ff/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Xan Xu"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_other_clubs_player",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000030/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Xan Xu"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_malformed_id",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/m/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Xan Xu"
+     },
+     "allow500": true,
+     "goExpects": {
+      "status": 404,
+      "code": "not_found"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_lapsed_club",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000020/name",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "fullName": "Larry Lapsed"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_twice",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus One"
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Two",
+      "nickname": "G2"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_changes_the_name_on_live_entries",
+   "scenario": "gus_everywhere",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Renamed"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_leaves_a_released_entry_alone",
+   "scenario": "gus_released_on_s1",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Renamed"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_changes_every_live_entry_of_two_players",
+   "scenario": "gus_and_una_on_s1",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Renamed"
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000005/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Una Renamed"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_leaves_a_no_show_entry_alone",
+   "scenario": "gus_no_show_on_s1",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Renamed"
+     }
+    }
+   ]
+  },
+  {
+   "name": "rename_leaves_an_invalid_sessions_entry_alone",
+   "scenario": "gus_on_an_invalid_session",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/club/players/c6000000-0000-4000-8000-000000000001/name",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "fullName": "Gus Renamed"
      }
     }
    ]

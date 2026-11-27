@@ -120,6 +120,53 @@ case('edit_link_only_adds_an_email_and_clears_the_link', edit(UNA, {'fullName': 
 case('edit_link_only_adds_an_email_twice', [edit(UNA, {'fullName': 'Una Alonzo', 'email': 'first.una@example.test', 'socialLinks': LINK}), edit(UNA, {'fullName': 'Una Alonzo', 'email': 'second.una@example.test', 'socialLinks': LINK})], scenario='una_link_only')
 case('edit_an_unclaimed_player_with_an_email_ignores_a_typed_one', edit(UNA, {'fullName': 'Una Alonzo', 'email': 'other@example.test', 'socialLinks': LINK}))
 
+
+# ------------------------------------------------------------------ Rename (PATCH club/players/{id}/name, D-2026-11-26-07), task 2.7 follow-up
+def rename(cp, body=None, who=SMASH, **kw):
+    s = {'method': 'PATCH', 'path': f'/api/club/players/{cp if isinstance(cp, str) else CP(cp)}/name', 'who': who}
+    if body is not None:
+        s['body'] = body
+    s.update(kw)
+    return s
+
+
+SCEN_ROSTER_NAMES = None
+case('rename_signed_out', rename(GUS, {'fullName': 'Gus Renamed'}, who=None))
+case('rename_a_player_subject_is_not_a_club', rename(GUS, {'fullName': 'Gus Renamed'}, who=PLAYER_SUBJECT, **NOSUBJECT))
+case('rename_body_not_json', rename(GUS, rawBody='nope'))
+case('rename_without_a_body', rename(GUS))
+case('rename_a_guest', rename(GUS, {'fullName': 'Gus Renamed', 'nickname': 'Gussy'}))
+case('rename_a_guest_spaces_are_collapsed', rename(GUS, {'fullName': '   Gus   \t Renamed  ', 'nickname': '  Big   Gus '}))
+case('rename_an_empty_nickname_removes_it', rename(GUS, {'fullName': 'Gus Guest', 'nickname': ''}))
+case('rename_a_blank_nickname_removes_it', rename(GUS, {'fullName': 'Gus Guest', 'nickname': '   '}))
+case('rename_without_a_nickname_removes_it', rename(GUS, {'fullName': 'Gus Guest'}))
+case('rename_nickname_not_text_removes_it', rename(GUS, {'fullName': 'Gus Guest', 'nickname': 5}))
+case('rename_an_unclaimed_player', rename(UNA, {'fullName': 'Una Alonzo B.', 'nickname': 'U'}))
+case('rename_nickname_of_24_characters', rename(GUS, {'fullName': 'Gus Guest', 'nickname': 'n' * 24}))
+case('rename_nickname_of_25_characters', rename(GUS, {'fullName': 'Gus Guest', 'nickname': 'n' * 25}))
+case('rename_nickname_too_long_before_collapsing_is_fine', rename(GUS, {'fullName': 'Gus Guest', 'nickname': 'n' + ' ' * 60 + 'n'}))
+case('rename_name_of_60_characters', rename(GUS, {'fullName': 'a' * 60}))
+case('rename_name_of_61_characters', rename(GUS, {'fullName': 'a' * 61}))
+case('rename_name_of_2_characters', rename(GUS, {'fullName': 'Jo'}))
+case('rename_name_of_1_character', rename(GUS, {'fullName': 'J'}))
+case('rename_blank_name', rename(GUS, {'fullName': '   '}))
+case('rename_name_not_text', rename(GUS, {'fullName': 5}))
+case('rename_without_a_name', rename(GUS, {'nickname': 'x'}))
+case('rename_name_is_checked_before_the_player', rename('c6000000-0000-4000-8000-0000000000ff', {'fullName': 'J'}))
+case('rename_nickname_is_checked_before_the_player', rename('c6000000-0000-4000-8000-0000000000ff', {'fullName': 'Jo Jo', 'nickname': 'n' * 25}))
+case('rename_a_registered_player', rename(ANN, {'fullName': 'Ann R'}))
+case('rename_a_deleted_player', rename(6, {'fullName': 'Rex Rex'}))
+case('rename_unknown_player', rename('c6000000-0000-4000-8000-0000000000ff', {'fullName': 'Xan Xu'}))
+case('rename_other_clubs_player', rename(30, {'fullName': 'Xan Xu'}))
+case('rename_malformed_id', rename('m', {'fullName': 'Xan Xu'}), **MALFORMED)
+case('rename_lapsed_club', rename(20, {'fullName': 'Larry Lapsed'}, who=LAPSED))
+case('rename_twice', [rename(GUS, {'fullName': 'Gus One'}), rename(GUS, {'fullName': 'Gus Two', 'nickname': 'G2'})])
+case('rename_changes_the_name_on_live_entries', rename(GUS, {'fullName': 'Gus Renamed'}), scenario='gus_everywhere')
+case('rename_leaves_a_released_entry_alone', rename(GUS, {'fullName': 'Gus Renamed'}), scenario='gus_released_on_s1')
+case('rename_changes_every_live_entry_of_two_players', [rename(GUS, {'fullName': 'Gus Renamed'}), rename(UNA, {'fullName': 'Una Renamed'})], scenario='gus_and_una_on_s1')
+case('rename_leaves_a_no_show_entry_alone', rename(GUS, {'fullName': 'Gus Renamed'}), scenario='gus_no_show_on_s1')
+case('rename_leaves_an_invalid_sessions_entry_alone', rename(GUS, {'fullName': 'Gus Renamed'}), scenario='gus_on_an_invalid_session')
+
 SCEN = dict(BASE['scenarios'])
 SCEN['una_has_a_phone'] = [f"INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, created_at, updated_at) VALUES ('{CP(UNA)}', '{CLUB1}', '+639175550111', 'pending', {NOW}, {NOW}, {NOW})"]
 SCEN['rex_has_that_phone_and_is_deleted'] = [f"INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, created_at, updated_at) VALUES ('{CP(6)}', '{CLUB1}', '+639175550199', 'pending', {NOW}, {NOW}, {NOW})"]
@@ -137,6 +184,9 @@ SCEN['una_link_only'] = [
     "UPDATE shared_player_entries SET email = NULL, social_key = 'facebook.com/una' WHERE id = 'a6000000-0000-4000-8000-000000000007'",
     f"INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, preset_fields, state, captured_at, created_at, updated_at) VALUES ('{CP(UNA)}', '{CLUB1}', NULL, "
     f"'{{\"version\":1,\"playingStyle\":\"\",\"experienceMonths\":null,\"experienceRecordedAt\":null,\"socialLinks\":{{\"facebook\":\"fb.com/una\"}}}}'::jsonb, 'pending', {NOW}, {NOW}, {NOW})"]
+
+SCEN['gus_no_show_on_s1'] = BASE['scenarios']['gus_everywhere'] + ["UPDATE session_players SET no_show_at = TIMESTAMPTZ '2026-11-19 01:00:00+00' WHERE released_at IS NULL AND club_player_id = 'c6000000-0000-4000-8000-000000000001'"]
+SCEN['gus_on_an_invalid_session'] = BASE['scenarios']['gus_everywhere'] + ["UPDATE queue_sessions SET state = 'invalid', invalid_reason = 'Test' WHERE id IN (SELECT session_id FROM session_players WHERE club_player_id = 'c6000000-0000-4000-8000-000000000001')"]
 SNAPSHOT = []
 for s in BASE['snapshot']:
     s = dict(s)

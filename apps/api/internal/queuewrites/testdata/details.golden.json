@@ -6498,5 +6498,2696 @@
       "player_claim_links": [],
       "player_claim_links (removed)": []
     }
+  },
+  "rename_signed_out": {
+    "steps": [
+      {
+        "status": 401,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "unauthenticated",
+            "message": "Sign in to continue."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_a_player_subject_is_not_a_club": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "wrong_account",
+            "message": "This account cannot use this app."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_body_not_json": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_without_a_body": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_a_guest": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Renamed",
+          "nickname": "Gussy",
+          "message": "Details saved · Gus Renamed"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gussy",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Renamed",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_a_guest_spaces_are_collapsed": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Renamed",
+          "nickname": "Big Gus",
+          "message": "Details saved · Gus Renamed"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Big Gus",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Renamed",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_an_empty_nickname_removes_it": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Guest",
+          "nickname": null,
+          "message": "Details saved · Gus Guest"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_a_blank_nickname_removes_it": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Guest",
+          "nickname": null,
+          "message": "Details saved · Gus Guest"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_without_a_nickname_removes_it": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Guest",
+          "nickname": null,
+          "message": "Details saved · Gus Guest"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_nickname_not_text_removes_it": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Guest",
+          "nickname": null,
+          "message": "Details saved · Gus Guest"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_an_unclaimed_player": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "fullName": "Una Alonzo B.",
+          "nickname": "U",
+          "message": "Details saved · Una Alonzo B."
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "U",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Alonzo B.",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_nickname_of_24_characters": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Guest",
+          "nickname": "nnnnnnnnnnnnnnnnnnnnnnnn",
+          "message": "Details saved · Gus Guest"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "nnnnnnnnnnnnnnnnnnnnnnnn",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_nickname_of_25_characters": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "nickname": "Use 24 characters or fewer."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_nickname_too_long_before_collapsing_is_fine": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Guest",
+          "nickname": "n n",
+          "message": "Details saved · Gus Guest"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "n n",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_name_of_60_characters": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "nickname": null,
+          "message": "Details saved · aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_name_of_61_characters": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "fullName": "Keep the full name to 60 characters or fewer."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_name_of_2_characters": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Jo",
+          "nickname": null,
+          "message": "Details saved · Jo"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Jo",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_name_of_1_character": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "fullName": "Enter the full name, at least 2 characters."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_blank_name": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "fullName": "Enter the full name, at least 2 characters."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_name_not_text": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "fullName": "Enter the full name, at least 2 characters."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_without_a_name": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "fullName": "Enter the full name, at least 2 characters."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_name_is_checked_before_the_player": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "fullName": "Enter the full name, at least 2 characters."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_nickname_is_checked_before_the_player": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "nickname": "Use 24 characters or fewer."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_a_registered_player": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "player": "This player registered, so they keep their own details."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_a_deleted_player": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_unknown_player": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_other_clubs_player": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_malformed_id": {
+    "steps": [
+      {
+        "status": 404,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "not_found",
+            "message": "Not found."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_lapsed_club": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "entitlement_required",
+            "message": "This club does not have an active license."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_twice": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus One",
+          "nickname": null,
+          "message": "Details saved · Gus One"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Two",
+          "nickname": "G2",
+          "message": "Details saved · Gus Two"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "G2",
+          "revision": "3",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Two",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_changes_the_name_on_live_entries": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Renamed",
+          "nickname": null,
+          "message": "Details saved · Gus Renamed"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000020",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-15T00:00:00+00:00",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Gus Renamed",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T02:00:00+00:00",
+          "assessment_operation_id": null
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000020",
+          "present": false,
+          "revision": "1",
+          "joined_at": "2026-11-15T00:00:00+00:00",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T02:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T02:00:00+00:00",
+          "assessment_operation_id": null
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Renamed",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_leaves_a_released_entry_alone": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Renamed",
+          "nickname": null,
+          "message": "Details saved · Gus Renamed"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Renamed",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_changes_every_live_entry_of_two_players": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Renamed",
+          "nickname": null,
+          "message": "Details saved · Gus Renamed"
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000005",
+          "fullName": "Una Renamed",
+          "nickname": null,
+          "message": "Details saved · Una Renamed"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000020",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-15T00:00:00+00:00",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Gus Renamed",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T02:00:00+00:00",
+          "assessment_operation_id": null
+        },
+        {
+          "id": "a7000000-0000-4000-8000-000000000022",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-15T02:00:00+00:00",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-15T02:00:00+00:00",
+          "name_snapshot": "Una Renamed",
+          "club_player_id": "c6000000-0000-4000-8000-000000000005",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T02:00:00+00:00",
+          "assessment_operation_id": null
+        }
+      ],
+      "session_players (removed)": [
+        {
+          "id": "a7000000-0000-4000-8000-000000000020",
+          "present": false,
+          "revision": "1",
+          "joined_at": "2026-11-15T00:00:00+00:00",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T02:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T02:00:00+00:00",
+          "assessment_operation_id": null
+        },
+        {
+          "id": "a7000000-0000-4000-8000-000000000022",
+          "present": false,
+          "revision": "1",
+          "joined_at": "2026-11-15T02:00:00+00:00",
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T02:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-15T02:00:00+00:00",
+          "name_snapshot": "Una Alonzo",
+          "club_player_id": "c6000000-0000-4000-8000-000000000005",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T02:00:00+00:00",
+          "assessment_operation_id": null
+        }
+      ],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Renamed",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        },
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Una Renamed",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        },
+        {
+          "id": "c6000000-0000-4000-8000-000000000005",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-29T03:00:00+00:00",
+          "nickname": "Una",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "display_name": "Una Alonzo",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_leaves_a_no_show_entry_alone": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Renamed",
+          "nickname": null,
+          "message": "Details saved · Gus Renamed"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Renamed",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "rename_leaves_an_invalid_sessions_entry_alone": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+          "fullName": "Gus Renamed",
+          "nickname": null,
+          "message": "Details saved · Gus Renamed"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gus Renamed",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": "Gus",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-10-01T00:00:00+00:00",
+          "display_name": "Gus Guest",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
   }
 }

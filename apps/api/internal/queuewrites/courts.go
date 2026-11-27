@@ -92,7 +92,7 @@ func (s *server) addCourt(r *http.Request, club pgtype.UUID) (writes.Result, err
 		}
 		courtID, ok := writes.ParseUUID(body.Text("courtId"))
 		if !ok {
-			return nil, errTypeError // Prisma refuses a court id that is no uuid
+			return nil, errNotAUUID // Prisma refuses a court id that is no uuid
 		}
 		existing, err := t.q.GetSessionCourt(t.ctx, courtID)
 		if err == nil {

@@ -285,7 +285,7 @@ func (t *txn) writeCost(values *costValues, found bool, courtFee, entranceFee, c
 		}
 		id, ok := writes.ParseUUID(text)
 		if !ok {
-			return errTypeError // ... and one that is no uuid
+			return errNotAUUID // ... and one that is no uuid
 		}
 		if !seen[text] {
 			seen[text] = true

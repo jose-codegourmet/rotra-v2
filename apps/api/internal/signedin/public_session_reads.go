@@ -73,8 +73,8 @@ type accessDTO struct {
 	WaitlistPosition *int             `json:"waitlistPosition"`
 	JoinRequest      *joinRequestView `json:"joinRequest"`
 	IsClubMember     bool             `json:"isClubMember"`
-	// LevelBlock is "Not open to your level" (D-2026-11-19-12): only a session restricted by level can block, and the block rule
-	// (levelRestrictionBlock, tasks 2.2 and 4.3) is not in Go yet, so it is null here.
+	// LevelBlock is "Not open to your level" (D-2026-11-19-12): only a session restricted by level can block, and only a Player
+	// who holds no slot (playerLevelBlock).
 	LevelBlock   *levelBlockDTO   `json:"levelBlock"`
 	FullRoster   bool             `json:"fullRoster"`
 	Participants []participantDTO `json:"participants"`
@@ -223,6 +223,11 @@ func (s *server) readSessionAccess(r *http.Request, q *sqlcgen.Queries, who view
 		InSession: st.InSession, WaitlistPosition: st.WaitlistPosition, JoinRequest: st.JoinRequest,
 		IsClubMember: member, FullRoster: true, Participants: make([]participantDTO, 0, len(ls.roster)),
 		Waitlist: make([]participantDTO, 0, len(waitlist)), Hosts: []participantDTO{}, CourtsNow: courts, Queue: []queuedMatchDTO{},
+	}
+	if !st.InSession {
+		if dto.LevelBlock, err = playerLevelBlock(ctx, q, ls, who.ID); err != nil {
+			return nil, err
+		}
 	}
 	for _, e := range ls.roster {
 		dto.Participants = append(dto.Participants, rosterPerson(e))
@@ -395,7 +400,7 @@ type myNightDTO struct {
 	CanInvite    bool             `json:"canInvite"`
 	InviteCode   *string          `json:"inviteCode"`
 	MatchRequest *matchRequestDTO `json:"matchRequest"`
-	// LevelBlock is "Not open to your level" (D-2026-11-19-12); the block rule is not in Go yet (tasks 2.2 and 4.3), so it is null.
+	// LevelBlock is "Not open to your level" (D-2026-11-19-12), while the Player holds no slot or waitlist place.
 	LevelBlock *levelBlockDTO `json:"levelBlock"`
 }
 
@@ -549,6 +554,11 @@ func (s *server) readMyNight(r *http.Request, q *sqlcgen.Queries, who viewer) (a
 	}
 	if night.IsClubMember, err = isClubMember(ctx, q, ls.row.ClubID, who.ID); err != nil {
 		return nil, err
+	}
+	if !st.InSession {
+		if night.LevelBlock, err = playerLevelBlock(ctx, q, ls, who.ID); err != nil {
+			return nil, err
+		}
 	}
 	night.CanInvite = state == sqlcgen.QueueSessionStatePrepared && ls.row.AcceptJoinRequests && (hasRow || waitlisted)
 	if night.MatchRequest, err = readOpenMatchRequest(ctx, q, ls, who); err != nil {

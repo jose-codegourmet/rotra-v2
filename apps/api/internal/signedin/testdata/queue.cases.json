@@ -150,6 +150,15 @@
   "notice_player_released": [
    "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-19 00:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000021'"
   ],
+  "s9_restricted_beginners": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a3000000-0000-4000-8000-000000000009'"
+  ],
+  "s9_restricted_beginners_intermediate": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners_intermediate' WHERE id = 'a3000000-0000-4000-8000-000000000009'"
+  ],
+  "s9_restricted_per_level": [
+   "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 3, intermediate_slots = 2, advanced_slots = 1 WHERE id = 'a3000000-0000-4000-8000-000000000009'"
+  ],
   "sync_open_stream_live": [
    "INSERT INTO device_session_streams (id, club_id, session_id, device_id, generation_no, downloaded_revision, contiguous_sequence, highest_received_sequence, sealed_final_sequence, sealed_at, sealed_digest, state, enrolled_at, updated_at, revision) VALUES ('a8100000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'a8000000-0000-4000-8000-000000000001', 1, 1, 0, 0, NULL, NULL, NULL, 'open', TIMESTAMPTZ '2026-11-19 01:00:00+00', now(), 1)"
   ],
@@ -2863,6 +2872,42 @@
    "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/requests",
    "who": "c7000000-0000-4000-8000-000000000002",
    "scenario": "requests_close_stale"
+  },
+  {
+   "name": "sessions-club1-restricted-beginners",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "s9_restricted_beginners"
+  },
+  {
+   "name": "session-club1-s9-restricted-beginners",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "s9_restricted_beginners"
+  },
+  {
+   "name": "sessions-club1-restricted-beginners-intermediate",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "s9_restricted_beginners_intermediate"
+  },
+  {
+   "name": "session-club1-s9-restricted-beginners-intermediate",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "s9_restricted_beginners_intermediate"
+  },
+  {
+   "name": "sessions-club1-restricted-per-level",
+   "path": "/api/sessions",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "s9_restricted_per_level"
+  },
+  {
+   "name": "session-club1-s9-restricted-per-level",
+   "path": "/api/sessions/a3000000-0000-4000-8000-000000000009",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "s9_restricted_per_level"
   },
   {
    "name": "sync-signed-out",

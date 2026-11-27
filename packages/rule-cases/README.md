@@ -35,11 +35,6 @@ schema/command-case.schema.json  JSON Schema for a command case file (go-writes-
   committed JSON Schema files match the Zod shapes in `@rotra/schema/rule-cases`.
 - Go tests read it through the `rulecases` helper (track phase 4).
 
-**Go copy pending.** `v1/courts/expectedFinish.json` (#1067) is a new rule written in TypeScript first
-(`@rotra/schema/scoring`). The `@rotra/data` and `@rotra/schema` tests read it; the Go tests and the
-WebAssembly wrapper test skip it by name (`GoCopyPending` in `apps/api/internal/rulecases`,
-`GO_COPY_PENDING` in `packages/rules-wasm/test/rulesWasm.test.ts`) until its Go copy lands.
-`v1/roster/levelRestrictionBlock.json` (#1076, session level restrictions, D-2026-11-19-12) is pending the
-same way; its TypeScript is `@rotra/data` `session-roster/levelRestriction.rules.ts`.
+**Go copy pending.** None now: every rule with cases has its Go copy (`GoCopyPending` in `apps/api/internal/rulecases` and `GO_COPY_PENDING` in `packages/rules-wasm/test/rulesWasm.test.ts` are empty). A new rule written in TypeScript first lists itself there until its Go copy lands.
 
 Editing a case: change the JSON in the same PR as the rule change (`v1` is edited in place until the swap).

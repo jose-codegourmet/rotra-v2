@@ -402,7 +402,8 @@ SELECT id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id
        cancelled_at, cancel_reason, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
        expected_players, queue_revision, started_at, finalized_at, series_id, start_license_term_id, public_slug, accept_join_requests,
        always_require_request, court_fill_mode, record_games, request_formats::text[] AS request_formats, source_command_id,
-       created_at, updated_at, revision, planned_start_before_start_at, planned_end_before_start_at
+       created_at, updated_at, revision, planned_start_before_start_at, planned_end_before_start_at,
+       level_restriction, beginner_slots, intermediate_slots, advanced_slots
 FROM queue_sessions WHERE id = $1
 `
 
@@ -444,6 +445,10 @@ type GetQueueSessionRow struct {
 	Revision                  int64
 	PlannedStartBeforeStartAt pgtype.Timestamptz
 	PlannedEndBeforeStartAt   pgtype.Timestamptz
+	LevelRestriction          LevelRestriction
+	BeginnerSlots             pgtype.Int4
+	IntermediateSlots         pgtype.Int4
+	AdvancedSlots             pgtype.Int4
 }
 
 // The session as it is now, with the columns of LockQueueSession (a write reads its session again after it changed it).
@@ -488,6 +493,10 @@ func (q *Queries) GetQueueSession(ctx context.Context, id pgtype.UUID) (GetQueue
 		&i.Revision,
 		&i.PlannedStartBeforeStartAt,
 		&i.PlannedEndBeforeStartAt,
+		&i.LevelRestriction,
+		&i.BeginnerSlots,
+		&i.IntermediateSlots,
+		&i.AdvancedSlots,
 	)
 	return i, err
 }
@@ -977,7 +986,8 @@ SELECT id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id
        cancelled_at, cancel_reason, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
        expected_players, queue_revision, started_at, finalized_at, series_id, start_license_term_id, public_slug, accept_join_requests,
        always_require_request, court_fill_mode, record_games, request_formats::text[] AS request_formats, source_command_id,
-       created_at, updated_at, revision, planned_start_before_start_at, planned_end_before_start_at
+       created_at, updated_at, revision, planned_start_before_start_at, planned_end_before_start_at,
+       level_restriction, beginner_slots, intermediate_slots, advanced_slots
 FROM queue_sessions WHERE club_id = $1 AND id = $2 FOR UPDATE
 `
 
@@ -1024,6 +1034,10 @@ type LockQueueSessionRow struct {
 	Revision                  int64
 	PlannedStartBeforeStartAt pgtype.Timestamptz
 	PlannedEndBeforeStartAt   pgtype.Timestamptz
+	LevelRestriction          LevelRestriction
+	BeginnerSlots             pgtype.Int4
+	IntermediateSlots         pgtype.Int4
+	AdvancedSlots             pgtype.Int4
 }
 
 // Queue writes (go-writes-queue): the session lock and the roster commands of packages/db/src/queue/session-roster.ts and
@@ -1072,6 +1086,10 @@ func (q *Queries) LockQueueSession(ctx context.Context, arg LockQueueSessionPara
 		&i.Revision,
 		&i.PlannedStartBeforeStartAt,
 		&i.PlannedEndBeforeStartAt,
+		&i.LevelRestriction,
+		&i.BeginnerSlots,
+		&i.IntermediateSlots,
+		&i.AdvancedSlots,
 	)
 	return i, err
 }

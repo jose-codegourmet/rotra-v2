@@ -10,6 +10,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/courts"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/match"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/model"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/roster"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/winchance"
 )
 
@@ -297,6 +298,12 @@ func (rs Ruleset) Runners(strict bool) map[string]Runner {
 		}, now int64) any {
 			return orNull(rs.SessionEndCourtConflict(i.Courts, i.EndAt, i.CourtBase, now))
 		}),
+		"courts/expectedFinish": plain(strict, func(i struct {
+			Scoring       *string `json:"scoring"`
+			MinutesPlayed *int64  `json:"minutesPlayed"`
+		}) any {
+			return rs.ExpectedFinish(i.Scoring, i.MinutesPlayed)
+		}),
 
 		"roster/inUnfinishedMatch": plain(strict, func(i struct {
 			RosterID string        `json:"rosterId"`
@@ -315,6 +322,18 @@ func (rs Ruleset) Runners(strict bool) map[string]Runner {
 			RosterCount int64 `json:"rosterCount"`
 		}) any {
 			return rs.OpenSlots(i.Capacity, i.RosterCount)
+		}),
+
+		"roster/levelRestrictionBlock": plain(strict, func(i struct {
+			Restriction *roster.LevelRestriction `json:"restriction"`
+			Band        *string                  `json:"band"`
+			Taken       roster.LevelSlots        `json:"taken"`
+		}) any {
+			band := ""
+			if i.Band != nil {
+				band = *i.Band
+			}
+			return orNull(rs.LevelRestrictionBlock(i.Restriction, band, i.Taken))
 		}),
 
 		"courtfill/autoFillPlacements": clocked(strict, func(i struct {

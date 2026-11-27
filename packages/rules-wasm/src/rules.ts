@@ -10,6 +10,7 @@ import { engine } from './engine'
 import type {
   CourtFillMode,
   EndCourts,
+  ExpectedFinish,
   FillOptions,
   Gender,
   Match,
@@ -158,6 +159,8 @@ export const sessionEndCourtConflict = (
   courtBase: number,
   now: number,
 ) => run<string | null>('courts/sessionEndCourtConflict', { courts, endAt, courtBase }, now)
+export const expectedFinish = (scoring: string | null | undefined, minutesPlayed: number | null) =>
+  run<ExpectedFinish>('courts/expectedFinish', { scoring, minutesPlayed })
 
 // roster
 export const inUnfinishedMatch = (
@@ -168,6 +171,15 @@ export const slotCapacity = (courts: number, playersPerCourt: number) =>
   run<number>('roster/slotCapacity', { courts, playersPerCourt })
 export const openSlots = (capacity: number, rosterCount: number) =>
   run<number>('roster/openSlots', { capacity, rosterCount })
+/** The shapes of @rotra/schema/level-restriction, kept local so the wrapper has no schema dependency. */
+export type LevelBand = 'beginner' | 'intermediate' | 'advanced'
+export type LevelSlots = Record<LevelBand, number>
+export type LevelRestriction = { kind: string; slots?: LevelSlots }
+export const levelRestrictionBlock = (
+  restriction: LevelRestriction | null,
+  band: LevelBand | null,
+  taken?: Partial<LevelSlots>,
+) => run<string | null>('roster/levelRestrictionBlock', { restriction, band, taken })
 
 // court fill
 /** The whole court fill in ONE call (per-match `canPlace` calls cost far more across the boundary). */

@@ -9,7 +9,8 @@ SELECT id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id
        cancelled_at, cancel_reason, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
        expected_players, queue_revision, started_at, finalized_at, series_id, start_license_term_id, public_slug, accept_join_requests,
        always_require_request, court_fill_mode, record_games, request_formats::text[] AS request_formats, source_command_id,
-       created_at, updated_at, revision, planned_start_before_start_at, planned_end_before_start_at
+       created_at, updated_at, revision, planned_start_before_start_at, planned_end_before_start_at,
+       level_restriction, beginner_slots, intermediate_slots, advanced_slots
 FROM queue_sessions WHERE club_id = @club_id AND id = @id FOR UPDATE;
 
 -- name: GetQueueSession :one
@@ -18,7 +19,8 @@ SELECT id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id
        cancelled_at, cancel_reason, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
        expected_players, queue_revision, started_at, finalized_at, series_id, start_license_term_id, public_slug, accept_join_requests,
        always_require_request, court_fill_mode, record_games, request_formats::text[] AS request_formats, source_command_id,
-       created_at, updated_at, revision, planned_start_before_start_at, planned_end_before_start_at
+       created_at, updated_at, revision, planned_start_before_start_at, planned_end_before_start_at,
+       level_restriction, beginner_slots, intermediate_slots, advanced_slots
 FROM queue_sessions WHERE id = @id;
 
 -- name: TouchQueueSession :exec

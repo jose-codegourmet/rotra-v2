@@ -24,11 +24,11 @@ SELECT count(*)::int4 FROM queue_sessions WHERE club_id = @club_id AND series_id
 INSERT INTO queue_sessions (id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address,
                             session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
                             expected_players, request_formats, record_games, series_id, public_slug, source_command_id,
-                            created_at, updated_at)
+                            level_restriction, beginner_slots, intermediate_slots, advanced_slots, created_at, updated_at)
 VALUES (@id, @club_id, @title, @notes, @scheduled_start_at, @scheduled_end_at, @venue_id, @venue_name, @venue_address,
         @session_mode, @allow_singles, @allow_doubles, @minimum_games, @minimum_is_calculated, @players_per_court,
         @expected_players, CAST(@request_formats::text[] AS match_format[]), @record_games, @series_id, @public_slug, @source_command_id,
-        @now, @now);
+        @level_restriction::level_restriction, @beginner_slots, @intermediate_slots, @advanced_slots, @now, @now);
 
 -- name: UpdateQueueSessionPreparation :exec
 -- updateQueueSession: Edit preparation. A request_formats or record_games that is null keeps the stored value.
@@ -39,6 +39,10 @@ SET title = @title, notes = @notes, venue_id = @venue_id, venue_name = @venue_na
     minimum_is_calculated = @minimum_is_calculated, expected_players = @expected_players, players_per_court = @players_per_court,
     request_formats = COALESCE(CAST(sqlc.narg('request_formats')::text[] AS match_format[]), request_formats),
     record_games = COALESCE(sqlc.narg('record_games')::boolean, record_games),
+    level_restriction = CASE WHEN @set_level_restriction::boolean THEN @level_restriction::level_restriction ELSE level_restriction END,
+    beginner_slots = CASE WHEN @set_level_restriction::boolean THEN @beginner_slots ELSE beginner_slots END,
+    intermediate_slots = CASE WHEN @set_level_restriction::boolean THEN @intermediate_slots ELSE intermediate_slots END,
+    advanced_slots = CASE WHEN @set_level_restriction::boolean THEN @advanced_slots ELSE advanced_slots END,
     revision = revision + 1, updated_at = @now
 WHERE id = @id;
 

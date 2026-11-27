@@ -431,6 +431,46 @@ case('bp_parallel_twice', {'parallel': [req('POST', BP(S[3]), {'expectedRevision
 
 # ---------------------------------------------------------------- scenarios
 NOW = "TIMESTAMPTZ '2026-11-19 02:00:00+00'"
+# ---- Restrictions (D-2026-11-19-12, task 2.2): which levels may take a slot, saved on create and edit
+LR = lambda **kw: {'levelRestriction': kw}
+PL2 = {'playersPerCourt': 2}  # two courts of two: four slots
+case('create_restriction_default_is_all', create(1, form()))
+case('create_restriction_all', create(1, form(**LR(kind='all'))))
+case('create_restriction_beginners', create(1, form(**LR(kind='beginners'))))
+case('create_restriction_beginners_intermediate', create(1, form(**LR(kind='beginners-intermediate'))))
+case('create_restriction_per_level', create(1, form(**PL2, **LR(kind='per-level', slots={'beginner': 2, 'intermediate': 1, 'advanced': 1}))))
+case('create_restriction_per_level_with_zero_slots', create(1, form(**PL2, **LR(kind='per-level', slots={'beginner': 0, 'intermediate': 4, 'advanced': 0}))))
+case('create_restriction_per_level_uses_the_club_default_per_court', create(1, form(**LR(kind='per-level', slots={'beginner': 4, 'intermediate': 4, 'advanced': 0}))))
+case('create_restriction_slots_ignored_with_another_pick', create(1, form(**LR(kind='beginners', slots={'beginner': 9, 'intermediate': 9, 'advanced': 9}))))
+case('create_restriction_null_is_all', create(1, form(levelRestriction=None)))
+case('create_restriction_unknown_kind', create(1, form(**LR(kind='experts'))))
+case('create_restriction_without_a_kind', create(1, form(**LR(slots={'beginner': 1}))))
+case('create_restriction_not_an_object', create(1, form(levelRestriction='beginners')))
+case('create_restriction_a_list', create(1, form(levelRestriction=['all'])))
+case('create_restriction_slots_add_up_to_less', create(1, form(**PL2, **LR(kind='per-level', slots={'beginner': 1, 'intermediate': 1, 'advanced': 1}))))
+case('create_restriction_slots_add_up_to_more', create(1, form(**PL2, **LR(kind='per-level', slots={'beginner': 2, 'intermediate': 2, 'advanced': 2}))))
+case('create_restriction_slots_one_court', create(1, form(**PL2, courts=[{'label': 'Court 1'}], **LR(kind='per-level', slots={'beginner': 1, 'intermediate': 1, 'advanced': 1}))))
+case('create_restriction_slots_missing_reads_zero_each', create(1, form(**PL2, **LR(kind='per-level'))))
+case('create_restriction_slot_not_whole', create(1, form(**PL2, **LR(kind='per-level', slots={'beginner': 1.5, 'intermediate': 1.5, 'advanced': 1}))))
+case('create_restriction_slot_negative', create(1, form(**PL2, **LR(kind='per-level', slots={'beginner': -1, 'intermediate': 3, 'advanced': 2}))))
+case('create_restriction_slot_text', create(1, form(**PL2, **LR(kind='per-level', slots={'beginner': '2', 'intermediate': 1, 'advanced': 1}))))
+case('create_restriction_slots_null', create(1, form(**PL2, **LR(kind='per-level', slots=None))))
+case('create_restriction_slots_missing_a_band', create(1, form(**PL2, **LR(kind='per-level', slots={'beginner': 2, 'intermediate': 2}))))
+case('create_restriction_bad_slots_win_over_a_bad_kind', create(1, form(**LR(kind='experts', slots={'beginner': -1, 'intermediate': 0, 'advanced': 0}))))
+case('create_restriction_a_series_gets_the_same_pick', create(1, form(repeat='weekly', occurrences=3, **LR(kind='beginners'))))
+case('edit_restriction_beginners', edit(S[1], s1_form(**LR(kind='beginners')), '5'))
+case('edit_restriction_per_level', edit(S[1], s1_form(**LR(kind='per-level', slots={'beginner': 1, 'intermediate': 1, 'advanced': 0})), '5'))
+case('edit_restriction_slots_must_add_up', edit(S[1], s1_form(**LR(kind='per-level', slots={'beginner': 1, 'intermediate': 1, 'advanced': 1})), '5'))
+case('edit_restriction_slots_not_whole', edit(S[1], s1_form(**LR(kind='per-level', slots={'beginner': 1.5, 'intermediate': 0.5, 'advanced': 0})), '5'))
+case('edit_restriction_unknown_kind', edit(S[1], s1_form(**LR(kind='experts')), '5'))
+case('edit_restriction_follows_a_new_court_count', edit(S[1], s1_form(courts=[{'id': CT(1), 'label': 'Court 1'}, {'label': 'Court 2'}], **LR(kind='per-level', slots={'beginner': 2, 'intermediate': 2, 'advanced': 0})), '5'))
+case('edit_restriction_left_out_keeps_the_stored_pick', edit(S[1], s1_form(), '5'), scenario='s1_beginners_only')
+case('edit_restriction_null_keeps_the_stored_pick', edit(S[1], s1_form(levelRestriction=None), '5'), scenario='s1_beginners_only')
+case('edit_restriction_back_to_all', edit(S[1], s1_form(**LR(kind='all')), '5'), scenario='s1_per_level')
+case('edit_restriction_per_level_to_beginners_drops_the_slots', edit(S[1], s1_form(**LR(kind='beginners')), '5'), scenario='s1_per_level')
+case('edit_restriction_refused_keeps_the_stored_pick', edit(S[1], s1_form(**LR(kind='per-level', slots={'beginner': 5, 'intermediate': 0, 'advanced': 0})), '5'), scenario='s1_beginners_only')
+case('start_a_restricted_session', req('POST', ST(S[1]), {'expectedRevision': '5'}), scenario='s1_per_level_today')
+
 SCEN = dict(BASE['scenarios'])
 
 
@@ -461,6 +501,8 @@ YESTERDAY = upd('queue_sessions', "scheduled_start_at = TIMESTAMPTZ '2026-11-18 
 TODAY = "scheduled_start_at = TIMESTAMPTZ '2026-11-19 03:00:00+00', scheduled_end_at = TIMESTAMPTZ '2026-11-19 07:00:00+00'"
 s1_today = [S3_GONE, upd('queue_sessions', TODAY, f"id = '{S[1]}'")]
 SCEN.update({
+    's1_beginners_only': [f"UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = '{S[1]}'"],
+    's1_per_level': [f"UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0 WHERE id = '{S[1]}'"],
     's1_at_smash_hall': [upd('queue_sessions', f"venue_id = '{V1}', venue_name = 'Smash Hall'", f"id = '{S[1]}'")],
     's1_at_smash_hall_s5_overlaps': [upd('queue_sessions', f"venue_id = '{V1}', venue_name = 'Smash Hall'", f"id = '{S[1]}'"),
                                       upd('queue_sessions', f"scheduled_start_at = TIMESTAMPTZ '2026-11-20 05:00:00+00', scheduled_end_at = TIMESTAMPTZ '2026-11-20 06:00:00+00', venue_id = '{V2}', venue_name = 'Court Two'", f"id = '{S[5]}'")],
@@ -520,6 +562,7 @@ def match_used_court(n, court):
             f"INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, released_at, acquire_operation_id, release_operation_id) VALUES ('a4500000-0000-4000-8000-0000000000{n:02d}', '{CLUB1}', '{S[3]}', '{mid}', '{court}', {NOW}, TIMESTAMPTZ '2026-11-19 02:30:00+00', 'a4600000-0000-4000-8000-0000000000{n:02d}', 'a4700000-0000-4000-8000-0000000000{n:02d}')"]
 
 
+SCEN['s1_per_level_today'] = [*SCEN['s1_today'], *SCEN['s1_per_level']]
 SCEN['court3_hosted_a_match'] = match_used_court(1, CT(3))
 SCEN['court3_held_by_a_match'] = match_on_court(1, CT(3))
 SCEN['s3_on_court_match'] = match_on_court(1, CT(3), state='on_court', started=False)
@@ -532,7 +575,7 @@ for s in BASE['snapshot']:
         s['sql'] = ("SELECT id, club_id, title, notes, state, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address, session_mode, allow_singles, allow_doubles, "
                     "minimum_games, minimum_is_calculated, players_per_court, expected_players, queue_revision::text AS queue_revision, started_at, series_id, start_license_term_id, "
                     "public_slug, accept_join_requests, always_require_request, court_fill_mode, record_games, request_formats::text AS request_formats, source_command_id, "
-                    "planned_start_before_start_at, planned_end_before_start_at, revision::text AS revision, created_at, updated_at FROM queue_sessions ORDER BY id")
+                    "planned_start_before_start_at, planned_end_before_start_at, level_restriction::text AS level_restriction, beginner_slots, intermediate_slots, advanced_slots, revision::text AS revision, created_at, updated_at FROM queue_sessions ORDER BY id")
     if s['name'] == 'session_players':
         s['sql'] = s['sql'].replace('no_show_at, revision::text', 'no_show_at, games_adjustment, revision::text')
     SNAPSHOT.append(s)

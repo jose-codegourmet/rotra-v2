@@ -34,12 +34,15 @@ type rosterOperation struct {
 	rosterID    string
 	requestID   string
 	level       string
+	// allowOutsideLevels is Confirm again after the level restriction warning, on an acceptRequest (D-2026-11-19-12).
+	allowOutsideLevels bool
 }
 
 func placementOf(b writes.Body) addPlacement {
 	over, _ := b.Bool("allowOverfill")
 	wait, _ := b.Bool("toWaitlist")
-	return addPlacement{allowOverfill: over, toWaitlist: wait}
+	outside, _ := b.Bool("allowOutsideLevels")
+	return addPlacement{allowOverfill: over, toWaitlist: wait, allowOutsideLevels: outside}
 }
 
 // addSource is what an add names: a saved player, a Player Information profile, or a new player (the default).
@@ -92,6 +95,7 @@ func operationOf(raw any) (rosterOperation, error) {
 		op.op, op.rosterID = "remove", b.Text("rosterId")
 	case "acceptRequest":
 		op.op, op.requestID = "acceptRequest", b.Text("requestId")
+		op.allowOutsideLevels, _ = b.Bool("allowOutsideLevels")
 	case "declineRequest":
 		op.op, op.requestID = "declineRequest", b.Text("requestId")
 	default:
@@ -184,7 +188,7 @@ func (t *txn) runRosterOperation(op rosterOperation) (map[string]any, error) {
 			return nil, err
 		}
 	case "acceptRequest":
-		c, err := t.confirmJoinRequestIn(requestAccept{operationID: op.operationID, requestID: op.requestID, level: op.level})
+		c, err := t.confirmJoinRequestIn(requestAccept{operationID: op.operationID, requestID: op.requestID, level: op.level, allowOutsideLevels: op.allowOutsideLevels})
 		if err != nil {
 			return nil, err
 		}

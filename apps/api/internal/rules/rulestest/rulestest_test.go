@@ -12,8 +12,8 @@ import (
 
 func TestRunAreaCountsFilesAndCases(t *testing.T) {
 	got := RunArea(t, 1, "roster")
-	if got.Files != 3 || got.Cases != 13 {
-		t.Errorf("roster: %+v, want 3 files and 13 cases", got)
+	if got.Files != 4 || got.Cases != 34 {
+		t.Errorf("roster: %+v, want 4 files and 34 cases", got)
 	}
 }
 

@@ -1,5 +1,7 @@
 // Test support: the rule name -> wrapper call mapping, the same inputs as
 // packages/data/src/rule-cases/runners.ts but calling the WebAssembly wrapper instead of TypeScript.
+
+import type { LevelBand, LevelRestriction, LevelSlots } from '../src/rules'
 import {
   autoFillPlacements,
   canMoveCourt,
@@ -17,6 +19,7 @@ import {
   courtOpen,
   courtsNeeded,
   creditedPlayers,
+  expectedFinish,
   formatTeamSizes,
   formFromHistory,
   formRating,
@@ -29,6 +32,7 @@ import {
   isBookingEnded,
   isPartial,
   isUpset,
+  levelRestrictionBlock,
   matchCategory,
   matchLabel,
   matchStatus,
@@ -184,11 +188,19 @@ export const WRAPPER_RUNNERS: Record<string, Runner> = {
     endAt: number
     courtBase: number
   }>((i, now) => sessionEndCourtConflict(i.courts, i.endAt, i.courtBase, now as number)),
+  'courts/expectedFinish': rule<{ scoring?: string; minutesPlayed: number | null }>((i) =>
+    expectedFinish(i.scoring, i.minutesPlayed),
+  ),
 
   'roster/inUnfinishedMatch': rule<{
     rosterId: string
     matches: Pick<Match, 'state' | 'teamA' | 'teamB'>[]
   }>((i) => inUnfinishedMatch(i.rosterId, i.matches)),
+  'roster/levelRestrictionBlock': rule<{
+    restriction: LevelRestriction | null
+    band: LevelBand | null
+    taken?: Partial<LevelSlots>
+  }>((i) => levelRestrictionBlock(i.restriction, i.band, i.taken)),
   'roster/slotCapacity': rule<{ courts: number; playersPerCourt: number }>((i) =>
     slotCapacity(i.courts, i.playersPerCourt),
   ),

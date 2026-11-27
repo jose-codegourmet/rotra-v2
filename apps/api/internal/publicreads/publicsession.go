@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/levelrestriction"
 	"io"
 	"log/slog"
 	"math"
@@ -44,33 +45,33 @@ type publicSessions struct {
 
 // publicSessionDTO is the allowlisted PublicSessionPage, key for key in the order the TypeScript builds it.
 type publicSessionDTO struct {
-	Slug             string               `json:"slug"`
-	Status           string               `json:"status"`
-	Title            string               `json:"title"`
-	Start            int64                `json:"start"`
-	End              int64                `json:"end"`
-	Club             publicSessionClub    `json:"club"`
-	Venue            publicSessionVenue   `json:"venue"`
-	Courts           []string             `json:"courts"`
-	Formats          publicSessionFormats `json:"formats"`
-	Mode             string               `json:"mode"`
-	LevelRestriction levelRestriction     `json:"levelRestriction"`
-	Minimum          int32                `json:"minimum"`
-	Notes            *string              `json:"notes"`
-	ParticipantCount int                  `json:"participantCount"`
-	Participants     []publicPerson       `json:"participants"`
-	SkillMix         publicSkillMix       `json:"skillMix"`
-	Hosts            []publicPerson       `json:"hosts"`
-	Waitlist         []publicPerson       `json:"waitlist"`
-	OpenSlots        int                  `json:"openSlots"`
-	SlotBudget       int                  `json:"slotBudget"`
-	AcceptJoin       bool                 `json:"acceptJoinRequests"`
-	AlwaysRequire    bool                 `json:"alwaysRequireRequest"`
-	AmountDue        *int64               `json:"amountDuePerPlayer"`
-	RecordGames      bool                 `json:"recordGames"`
-	LastSyncedAt     int64                `json:"lastSyncedAt"`
-	HasPending       bool                 `json:"hasPendingChanges"`
-	Results          *orderedObject       `json:"results"`
+	Slug             string                `json:"slug"`
+	Status           string                `json:"status"`
+	Title            string                `json:"title"`
+	Start            int64                 `json:"start"`
+	End              int64                 `json:"end"`
+	Club             publicSessionClub     `json:"club"`
+	Venue            publicSessionVenue    `json:"venue"`
+	Courts           []string              `json:"courts"`
+	Formats          publicSessionFormats  `json:"formats"`
+	Mode             string                `json:"mode"`
+	LevelRestriction levelrestriction.Wire `json:"levelRestriction"`
+	Minimum          int32                 `json:"minimum"`
+	Notes            *string               `json:"notes"`
+	ParticipantCount int                   `json:"participantCount"`
+	Participants     []publicPerson        `json:"participants"`
+	SkillMix         publicSkillMix        `json:"skillMix"`
+	Hosts            []publicPerson        `json:"hosts"`
+	Waitlist         []publicPerson        `json:"waitlist"`
+	OpenSlots        int                   `json:"openSlots"`
+	SlotBudget       int                   `json:"slotBudget"`
+	AcceptJoin       bool                  `json:"acceptJoinRequests"`
+	AlwaysRequire    bool                  `json:"alwaysRequireRequest"`
+	AmountDue        *int64                `json:"amountDuePerPlayer"`
+	RecordGames      bool                  `json:"recordGames"`
+	LastSyncedAt     int64                 `json:"lastSyncedAt"`
+	HasPending       bool                  `json:"hasPendingChanges"`
+	Results          *orderedObject        `json:"results"`
 }
 
 type publicSessionClub struct {
@@ -290,7 +291,7 @@ func sessionPage(s sqlcgen.GetPublicSessionBySlugRow, labels []string, roster []
 		Venue:   publicSessionVenue{Name: s.VenueName.String, Address: textPtr(s.VenueAddress)},
 		Courts:  labels,
 		Formats: publicSessionFormats{Singles: s.AllowSingles, Doubles: s.AllowDoubles},
-		Mode:    string(s.SessionMode), LevelRestriction: restrictionOf(s), Minimum: s.MinimumGames, Notes: textPtr(s.Notes),
+		Mode:    string(s.SessionMode), LevelRestriction: levelrestriction.Of(s.LevelRestriction, s.BeginnerSlots, s.IntermediateSlots, s.AdvancedSlots), Minimum: s.MinimumGames, Notes: textPtr(s.Notes),
 		ParticipantCount: len(roster), Participants: participants, SkillMix: skillMix(levels), Hosts: hosts, Waitlist: people,
 		OpenSlots: max(0, capacity-len(roster)), SlotBudget: capacity,
 		AcceptJoin: s.AcceptJoinRequests && takesRequests, AlwaysRequire: s.AlwaysRequireRequest,
@@ -571,30 +572,6 @@ func resultsWithPictures(raw []byte, roster []sqlcgen.ListPublicSessionRosterRow
 		out.vals["awards"] = spread
 	}
 	return out, nil
-}
-
-// levelRestriction is LevelRestriction on the wire (levelRestrictionDto): the kind, and the slots per level for Slots per level.
-type levelRestriction struct {
-	Kind  string      `json:"kind"`
-	Slots *levelSlots `json:"slots,omitempty"`
-}
-
-type levelSlots struct {
-	Beginner     int32 `json:"beginner"`
-	Intermediate int32 `json:"intermediate"`
-	Advanced     int32 `json:"advanced"`
-}
-
-func restrictionOf(s sqlcgen.GetPublicSessionBySlugRow) levelRestriction {
-	switch s.LevelRestriction {
-	case sqlcgen.LevelRestrictionBeginners:
-		return levelRestriction{Kind: "beginners"}
-	case sqlcgen.LevelRestrictionBeginnersIntermediate:
-		return levelRestriction{Kind: "beginners-intermediate"}
-	case sqlcgen.LevelRestrictionSlotsPerBand:
-		return levelRestriction{Kind: "per-level", Slots: &levelSlots{Beginner: s.BeginnerSlots.Int32, Intermediate: s.IntermediateSlots.Int32, Advanced: s.AdvancedSlots.Int32}}
-	}
-	return levelRestriction{Kind: "all"}
 }
 
 // publicAmountDue is amountDuePerHead of estimateFor (Details > Payment, D-2026-11-25-05): the amount each player pays, never the cost lines.

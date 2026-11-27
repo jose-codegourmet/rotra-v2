@@ -1,12 +1,6 @@
 'use client'
 
-import { useClubPlayerDetails } from '@rotra/data/club-player/useClubPlayerDetails'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
-import { useRemoveClubPlayerPicture } from '@rotra/data/club-player/useRemoveClubPlayerPicture'
-import { useRenameClubPlayer } from '@rotra/data/club-player/useRenameClubPlayer'
-import { useSetClubNickname } from '@rotra/data/club-player/useSetClubNickname'
-import { useSetClubPlayerPicture } from '@rotra/data/club-player/useSetClubPlayerPicture'
-import { useUseClubPlayerPreviousPicture } from '@rotra/data/club-player/useUseClubPlayerPreviousPicture'
 import {
   activeMatchFor,
   allPlayers,
@@ -27,12 +21,10 @@ import {
 } from '@rotra/data/match/queue.rules'
 import { useMakeMatch } from '@rotra/data/match/useMakeMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
-import { MockError } from '@rotra/data/mock/errors'
 import { PLAYING_LEVELS } from '@rotra/data/player/types'
 import { selfCheckInMark } from '@rotra/data/public-session/rules'
 import { slotCapacity } from '@rotra/data/queue-session/queueSession.rules'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
-import { sameHandicap } from '@rotra/data/session-roster/handicap'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
 import { useFillOpenSlots } from '@rotra/data/session-roster/useFillOpenSlots'
 import { useGiveSlot } from '@rotra/data/session-roster/useGiveSlot'
@@ -44,16 +36,12 @@ import {
 import { useRemoveFromWaitlist } from '@rotra/data/session-roster/useRemoveFromWaitlist'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { useSetGamesPlayed } from '@rotra/data/session-roster/useSetGamesPlayed'
-import { useSetHandicap } from '@rotra/data/session-roster/useSetHandicap'
-import { useSetPresence } from '@rotra/data/session-roster/useSetPresence'
 import { useSetPresenceMany } from '@rotra/data/session-roster/useSetPresenceMany'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ConfirmMakeMatchSheet } from '@rotra/ui/confirm-make-match-sheet'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
-import { EditLivePlayerSheet } from '@rotra/ui/edit-live-player-sheet'
-import type { EditLivePlayerFormValues } from '@rotra/ui/edit-live-player-sheet/schema'
 import { EmptyState } from '@rotra/ui/empty-state'
 import { NoShowPanel } from '@rotra/ui/no-show-panel'
 import { PlayerPoolCard, type PlayerPoolCardStatus } from '@rotra/ui/player-pool-card'
@@ -74,6 +62,7 @@ import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
 import { useState } from 'react'
 import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
+import { EditPlayer } from '@/app/(operator)/_components/edit-player/EditPlayer'
 import { OverfillConfirm } from '@/app/(operator)/_components/overfill-confirm/OverfillConfirm'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import type { ConsoleViewProps } from '@/app/(operator)/sessions/[sessionId]/_components/session-console/SessionConsole'
@@ -134,8 +123,6 @@ const time = (at: number) =>
   new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong. Try again.'
-const pictureMessage = (error: unknown) =>
-  error instanceof MockError ? (error.fieldErrors?.picture ?? error.message) : errorMessage(error)
 
 /**
  * Q-POOL, the console's Players view: "Players" with "P present of R" and Add late player (the
@@ -147,9 +134,8 @@ const pictureMessage = (error: unknown) =>
  * with no sort menu under the Waitlist filter, which also has Not here for away players), and the
  * footer line. Set games for all… and each card's Current button open SetGamesSheet on
  * useSetGamesPlayed (#717); games is the adjusted count (gamesPlayed). Each card's pencil opens
- * EditLivePlayerSheet (D-EDIT-LIVE-PLAYER): Save changes applies only what changed through the
- * rename (unclaimed and guest) or club nickname (registered), games played and presence hooks (the picture applies at once, as Edit details)
- * and toasts “Changes saved · NAME” or “No changes”. There is no Move to waitlist on a live card.
+ * the EditPlayer container (D-EDIT-LIVE-PLAYER, mode live: Club nickname, Games played,
+ * Availability and Handicap only). There is no Move to waitlist on a live card.
  * Admit player on a full roster asks OverfillConfirm first. Pictures on
  * waitlist rows open profiles through onOpenProfile; the Present switch uses a shared optimistic 800 ms presence batch, retaining pending cards in their
  * filter and reporting one summary with the unique waiting-match attention count.
@@ -180,13 +166,6 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const fillOpenSlots = useFillOpenSlots()
   const removeFromWaitlist = useRemoveFromWaitlist()
   const setGamesPlayed = useSetGamesPlayed()
-  const setHandicap = useSetHandicap()
-  const setPresenceOne = useSetPresence()
-  const setClubNickname = useSetClubNickname()
-  const renameClubPlayer = useRenameClubPlayer()
-  const setPicture = useSetClubPlayerPicture()
-  const removePicture = useRemoveClubPlayerPicture()
-  const previousPicture = useUseClubPlayerPreviousPicture()
   const noShows = useSessionNoShows(sessionId)
   const markNoShow = useMarkNoShow()
   const undoNoShow = useUndoNoShow()
@@ -200,9 +179,6 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const [setGamesError, setSetGamesError] = useState<string | undefined>()
   /** Edit player (D-EDIT-LIVE-PLAYER): the roster id whose sheet is open */
   const [editFor, setEditFor] = useState<string | null>(null)
-  const [editError, setEditError] = useState<string | undefined>()
-  const [editPending, setEditPending] = useState(false)
-  const [pictureError, setPictureError] = useState<string | undefined>()
   const [show, setShow] = useState<PlayerPoolShow>('available')
   const [sort, setSort] = useState<PlayerPoolSort>(DEFAULT_PLAYER_POOL_SORT)
   const [held, setHeld] = useState<{ filter: PlayerPoolShow; ids: string[] } | null>(null)
@@ -212,13 +188,6 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const [draft, setDraft] = useState<ReturnType<typeof previewMakeMatch> | null>(null)
   const [arranged, setArranged] = useState(false)
   const [makeError, setMakeError] = useState<string | undefined>()
-
-  // Only an unclaimed player has a club-set picture to edit here.
-  const editRow = roster.data?.roster.find((p) => p.id === editFor)
-  const editClub = clubPlayers.data?.players.find((p) => p.id === editRow?.clubPlayerId)
-  const pictureDetails = useClubPlayerDetails(
-    editClub?.identity === 'unclaimed' ? editClub.id : null,
-  )
 
   const options = {
     onSuccess: (result: { message: string }) => toast(result.message),
@@ -417,101 +386,10 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
   const editPlayer = rosterList.find((p) => p.id === editFor)
   const editRowData = editPlayer ? rows.find((r) => r.player.id === editPlayer.id) : undefined
   const editClubPlayer = editPlayer ? byClubPlayer(editPlayer.clubPlayerId) : undefined
-  const editKind =
-    editClubPlayer?.identity === 'registered'
-      ? 'registered'
-      : editClubPlayer?.identity === 'unclaimed'
-        ? 'unclaimed'
-        : 'guest'
-  const editClubNickname = editPlayer?.clubNickname ?? editClubPlayer?.clubNickname ?? null
-  // An unclaimed or guest player has one nickname (the club's own); a registered one has a Club nickname.
-  const editNickname =
-    editKind === 'registered'
-      ? editClubNickname
-      : (editClubPlayer?.nickname ?? editPlayer?.nicknameSnapshot ?? null)
   const openEdit = (rosterId: string) => {
-    setEditError(undefined)
-    setPictureError(undefined)
     void setPresence.flush().then(() => setEditFor(rosterId))
   }
-  const closeEdit = () => {
-    setEditFor(null)
-    setEditError(undefined)
-    setPictureError(undefined)
-  }
-  /** Save changes: only what changed, each through the hook its own screen uses */
-  const saveEdit = async (values: EditLivePlayerFormValues) => {
-    if (!editPlayer || !editRowData || editPending) return
-    setEditError(undefined)
-    setEditPending(true)
-    let changed = false
-    let savedName = editPlayer.nameSnapshot
-    try {
-      if (editKind !== 'registered') {
-        const fullName = (values.fullName ?? editPlayer.nameSnapshot).replace(/\s+/g, ' ').trim()
-        const nickname = values.nickname.replace(/\s+/g, ' ').trim()
-        if (fullName !== editPlayer.nameSnapshot || nickname !== (editNickname ?? '')) {
-          const renamed = await renameClubPlayer.mutateAsync({
-            clubPlayerId: editPlayer.clubPlayerId,
-            fullName,
-            nickname,
-          })
-          savedName = renamed.data.fullName
-          changed = true
-        }
-      }
-      if (editKind === 'registered' && values.nickname !== (editClubNickname ?? '')) {
-        await setClubNickname.mutateAsync({
-          clubPlayerId: editPlayer.clubPlayerId,
-          clubNickname: values.nickname,
-        })
-        changed = true
-      }
-      if (values.games !== editRowData.games) {
-        await setGamesPlayed.mutateAsync({
-          sessionId,
-          rosterId: editPlayer.id,
-          games: values.games,
-          operationId: crypto.randomUUID(),
-        })
-        changed = true
-      }
-      // Handicap · tonight (D-2026-11-25-03): the whole set, only when it changed.
-      if (!sameHandicap(values.spots, editPlayer.handicapSpots ?? [])) {
-        await setHandicap.mutateAsync({
-          sessionId,
-          rosterId: editPlayer.id,
-          spots: values.spots,
-          operationId: crypto.randomUUID(),
-        })
-        changed = true
-      }
-      if (values.present !== editPlayer.present) {
-        await setPresence.flush()
-        await setPresenceOne.mutateAsync({
-          sessionId,
-          rosterId: editPlayer.id,
-          present: values.present,
-        })
-        changed = true
-      }
-    } catch (error) {
-      setEditError(
-        error instanceof MockError
-          ? (error.fieldErrors?.fullName ?? error.message)
-          : errorMessage(error),
-      )
-      setEditPending(false)
-      return
-    }
-    setEditPending(false)
-    closeEdit()
-    toast(changed ? `Changes saved · ${savedName}` : 'No changes')
-  }
-  const pictureCallbacks = (message: string) => ({
-    onSuccess: () => toast(`${message} · ${editPlayer?.nameSnapshot ?? ''}`),
-    onError: (error: unknown) => setPictureError(pictureMessage(error)),
-  })
+  const closeEdit = () => setEditFor(null)
   const editMatch = editRowData?.playing
     ? {
         status:
@@ -805,63 +683,16 @@ export function PlayersView({ sessionId, now, onOpenProfile }: PlayersViewProps)
         turning someone off never ends their current game.
       </p>
       {editPlayer && editRowData ? (
-        <EditLivePlayerSheet
-          open
-          shownName={
-            editClubNickname?.trim() || editPlayer.nicknameSnapshot || editPlayer.nameSnapshot
-          }
-          fullName={editPlayer.nameSnapshot}
-          kind={editKind}
-          level={editPlayer.level}
+        <EditPlayer
+          sessionId={sessionId}
+          mode="live"
+          entry={editPlayer}
+          clubPlayer={editClubPlayer}
           photoUrl={photoFor(editPlayer)}
+          games={editRowData.games}
           match={editMatch}
-          clubNickname={editNickname}
-          accountNickname={editClubPlayer?.nickname ?? null}
-          games={Math.min(99, editRowData.games)}
-          present={editPlayer.present}
-          handicapSpots={editPlayer.handicapSpots}
-          picture={
-            editKind === 'unclaimed' && pictureDetails.data?.picture && editClubPlayer
-              ? {
-                  playerId: editClubPlayer.playerId ?? editClubPlayer.id,
-                  picture: pictureDetails.data.picture,
-                  onChange: (choice) => {
-                    setPictureError(undefined)
-                    setPicture.mutate(
-                      choice.kind === 'photo'
-                        ? { clubPlayerId: editClubPlayer.id, kind: 'photo', file: choice.file }
-                        : {
-                            clubPlayerId: editClubPlayer.id,
-                            kind: 'character',
-                            characterId: choice.characterId,
-                          },
-                      pictureCallbacks('Picture updated'),
-                    )
-                  },
-                  onRemove: () => {
-                    setPictureError(undefined)
-                    removePicture.mutate(
-                      { clubPlayerId: editClubPlayer.id },
-                      pictureCallbacks('Using initials'),
-                    )
-                  },
-                  onUsePrevious: () => {
-                    setPictureError(undefined)
-                    previousPicture.mutate(
-                      { clubPlayerId: editClubPlayer.id },
-                      pictureCallbacks('Previous picture restored'),
-                    )
-                  },
-                  pending:
-                    setPicture.isPending || removePicture.isPending || previousPicture.isPending,
-                  error: pictureError,
-                }
-              : undefined
-          }
-          isPending={editPending}
-          error={editError}
-          onSave={(values) => void saveEdit(values)}
-          onCancel={closeEdit}
+          flushPresence={setPresence.flush}
+          onClose={closeEdit}
         />
       ) : null}
       {setGamesFor ? (

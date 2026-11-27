@@ -900,7 +900,8 @@ export async function setHandicap(
   input: { operationId: string; rosterId: string; spots: unknown[] },
 ) {
   return rosterCommand(context, sessionId, async (tx, session) => {
-    requireState(session, ['active'], 'Start the session first.')
+    // Mockup change 2026-11-27: the handicap can be set while preparing too; it clears when the session ends.
+    requireState(session, ['prepared', 'active'], 'This session has ended.')
     if (!input.spots.every(isHandicapSpot))
       throw new ServiceError('invalid', { spots: 'Choose spots on the figure.' })
     const entry = await liveEntry(tx, sessionId, input.rosterId)

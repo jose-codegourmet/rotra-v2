@@ -1,15 +1,12 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { ClubPlayerPictureState } from '@rotra/data/club-player/types'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import type { HandicapSpot } from '@rotra/data/session-roster/handicap'
-import { FULL_NAME_MAX } from '@rotra/schema/name'
 import { NICKNAME_MAX } from '@rotra/schema/personal-details'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
-import { type ClubPictureChoice, ClubPictureField } from '@rotra/ui/club-picture-field'
 import { cn } from '@rotra/ui/cn'
 import { CountStepper } from '@rotra/ui/count-stepper'
 import { Field } from '@rotra/ui/field'
@@ -32,20 +29,14 @@ import {
 
 export type EditLivePlayerKind = 'registered' | 'unclaimed' | 'guest'
 
-export type EditLivePlayerPicture = {
-  /** Club player id: seeds the eight characters */
-  playerId: string
-  picture: ClubPlayerPictureState
-  /** Picture changes apply at once (as Edit details): the container calls the picture mutation */
-  onChange: (choice: ClubPictureChoice) => void
-  onRemove: () => void
-  onUsePrevious: () => void
-  pending?: boolean
-  error?: string
-}
-
 export type EditLivePlayerSheetProps = {
   open: boolean
+  /**
+   * `live` (default): the Players card during the session: Profile, Tonight and Handicap.
+   * `preparing` (mockup change 2026-11-27): the Roster and levels card before Start: Profile and
+   * Handicap only, no Tonight section and no tonight chip; games and presence are left as they are.
+   */
+  mode?: 'live' | 'preparing'
   /** The one name the card shows: the club nickname, else the account nickname, else the full name */
   shownName: string
   /** The player's full name; shown under the shown name when it differs */
@@ -70,8 +61,6 @@ export type EditLivePlayerSheetProps = {
   present: boolean
   /** Handicap · tonight (D-2026-11-25-03): the spots marked now; omit for none */
   handicapSpots?: readonly HandicapSpot[]
-  /** Unclaimed players only: the picture editor from Edit details */
-  picture?: EditLivePlayerPicture
   /** Save changes: the parent saves and closes on success; nothing is claimed as saved here */
   onSave: (values: EditLivePlayerFormValues) => void
   /** Cancel, Escape, the scrim and × */
@@ -110,14 +99,16 @@ function Section({ id, title, children }: { id: string; title: string; children:
 /**
  * D-EDIT-LIVE-PLAYER (owner comments, November 19, 2026): **Edit NAME** from the pencil on a live
  * Players card. A header (picture in its level ring, the shown name, the full name when it
- * differs, chips for level, account kind and tonight's state), a **Profile** section that always
- * shows (Full name: editable for unclaimed and guest, read-only for registered; Club nickname for
- * everyone; the picture editor for unclaimed players), a **Tonight** section (Games played with "Now N", Availability Present · Not here) and a
- * **Handicap · tonight** section (D-2026-11-25-03: HandicapPicker).
+ * differs, chips for level, account kind and tonight's state), a **Profile** section with the Club
+ * nickname, a **Tonight** section (Games played with "Now N", Availability Present · Not here) and a
+ * **Handicap · tonight** section (D-2026-11-25-03: HandicapPicker). Mockup change 2026-11-27: the
+ * Queue Master edits only these four; the full name and picture are not edited here. In the
+ * `preparing` mode (Roster and levels pencil) the Tonight section and chip are left out.
  * Cancel / Save changes; no confirmation step.
  */
 export function EditLivePlayerSheet({
   open,
+  mode = 'live',
   shownName,
   fullName,
   kind,
@@ -129,15 +120,13 @@ export function EditLivePlayerSheet({
   games,
   present,
   handicapSpots = NO_SPOTS,
-  picture,
   onSave,
   onCancel,
   isPending = false,
   error,
 }: EditLivePlayerSheetProps) {
   const formId = useId()
-  // The club edits the full name of the profiles it made; a registered player's name is their own.
-  const editableName = kind !== 'registered'
+  const live = mode === 'live'
   const profileId = useId()
   const nightId = useId()
   const handicapId = useId()
@@ -145,7 +134,6 @@ export function EditLivePlayerSheet({
   const form = useForm<EditLivePlayerFormInput, unknown, EditLivePlayerFormValues>({
     resolver: zodResolver(editLivePlayerSchema),
     defaultValues: editLivePlayerDefaultValues({
-      fullName: editableName ? fullName : undefined,
       clubNickname,
       games,
       present,
@@ -157,20 +145,18 @@ export function EditLivePlayerSheet({
     if (open)
       form.reset(
         editLivePlayerDefaultValues({
-          fullName: editableName ? fullName : undefined,
           clubNickname,
           games,
           present,
           spots: handicapSpots,
         }),
       )
-  }, [open, editableName, fullName, clubNickname, games, present, handicapSpots, form.reset])
+  }, [open, clubNickname, games, present, handicapSpots, form.reset])
 
   const band = level ? (level.split('_')[0] as 'beginner' | 'intermediate' | 'advanced') : 'none'
   const watched = form.watch()
-  const fullNameError = form.formState.errors.fullName?.message
   const nicknameError = form.formState.errors.nickname?.message
-  const tonight = match ? (
+  const tonight = !live ? null : match ? (
     <Chip tone="accent">
       {match.status === 'oncourt' ? 'On court' : 'Playing'} · {match.courtLabel}
     </Chip>
@@ -206,8 +192,8 @@ export function EditLivePlayerSheet({
         className="flex min-w-0 flex-col gap-3.5"
         onSubmit={form.handleSubmit((values) => {
           if (isPending) return
-          // A registered player's name is read-only: it is never part of the saved values.
-          onSave(editableName ? values : { ...values, fullName: undefined })
+          // Preparing: games and presence are not on the sheet, so they stay as they are.
+          onSave(live ? values : { ...values, games, present })
         })}
       >
         <div className={cn('flex min-w-0 items-center gap-3.5', RING[band])}>
@@ -235,38 +221,6 @@ export function EditLivePlayerSheet({
         {error ? <Notice tone="error">{error}</Notice> : null}
 
         <Section id={profileId} title="Profile">
-          {editableName ? (
-            <Field
-              label="Full name"
-              error={fullNameError}
-              hint={
-                fullNameError
-                  ? undefined
-                  : 'Shown on courts, the queue and the public page. Fixes spelling for the profile your club made.'
-              }
-            >
-              <Controller
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    value={field.value ?? ''}
-                    disabled={isPending}
-                    maxLength={FULL_NAME_MAX}
-                    autoComplete="off"
-                  />
-                )}
-              />
-            </Field>
-          ) : (
-            <Field
-              label="Full name"
-              hint={`Only ${shownName} can change this, in the ROTRA Player app. Use Club nickname for what your club calls them.`}
-            >
-              <TextInput value={fullName} readOnly />
-            </Field>
-          )}
           <Field
             label="Club nickname (optional)"
             error={nicknameError}
@@ -295,75 +249,65 @@ export function EditLivePlayerSheet({
               )}
             />
           </Field>
-          {kind === 'unclaimed' && picture ? (
-            <ClubPictureField
-              playerId={picture.playerId}
-              name={fullName}
-              picture={picture.picture}
-              onChange={picture.onChange}
-              onRemove={picture.onRemove}
-              onUsePrevious={picture.onUsePrevious}
-              pending={picture.pending || isPending}
-              error={picture.error}
-            />
-          ) : null}
         </Section>
 
-        <Section id={nightId} title="Tonight">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex min-w-0 flex-col gap-0.5">
-              <b id={gamesLabelId} className="text-sm">
-                Games played
-              </b>
-              <span className="text-[13px] text-fg2">
-                Now {games}
-                {watched.games !== games ? ` · will be ${watched.games}` : ''}
-              </span>
+        {live ? (
+          <Section id={nightId} title="Tonight">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <b id={gamesLabelId} className="text-sm">
+                  Games played
+                </b>
+                <span className="text-[13px] text-fg2">
+                  Now {games}
+                  {watched.games !== games ? ` · will be ${watched.games}` : ''}
+                </span>
+              </div>
+              <Controller
+                control={form.control}
+                name="games"
+                render={({ field }) => (
+                  <CountStepper
+                    ref={field.ref}
+                    value={field.value}
+                    min={EDIT_LIVE_GAMES_MIN}
+                    max={EDIT_LIVE_GAMES_MAX}
+                    onChange={field.onChange}
+                    decrementLabel="One game fewer"
+                    incrementLabel="One game more"
+                    disabled={isPending}
+                    size="lg"
+                  />
+                )}
+              />
             </div>
-            <Controller
-              control={form.control}
-              name="games"
-              render={({ field }) => (
-                <CountStepper
-                  ref={field.ref}
-                  value={field.value}
-                  min={EDIT_LIVE_GAMES_MIN}
-                  max={EDIT_LIVE_GAMES_MAX}
-                  onChange={field.onChange}
-                  decrementLabel="One game fewer"
-                  incrementLabel="One game more"
-                  disabled={isPending}
-                  size="lg"
-                />
-              )}
-            />
-          </div>
-          <span className="-mt-1.5 text-xs text-fg2">{GAMES_COPY}</span>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <b className="text-sm">Availability</b>
-            <Controller
-              control={form.control}
-              name="present"
-              render={({ field }) => (
-                <SegmentedControl
-                  aria-label="Availability"
-                  value={field.value ? 'present' : 'away'}
-                  onChange={(value) => field.onChange(value === 'present')}
-                  disabled={isPending}
-                  options={[
-                    { value: 'present', label: 'Present' },
-                    { value: 'away', label: 'Not here' },
-                  ]}
-                />
-              )}
-            />
-          </div>
-          {!watched.present && match ? (
-            <span className="-mt-1.5 text-xs text-fg2">
-              {shownName} is in a match now. Marking them not here doesn't take them off it.
-            </span>
-          ) : null}
-        </Section>
+            <span className="-mt-1.5 text-xs text-fg2">{GAMES_COPY}</span>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <b className="text-sm">Availability</b>
+              <Controller
+                control={form.control}
+                name="present"
+                render={({ field }) => (
+                  <SegmentedControl
+                    aria-label="Availability"
+                    value={field.value ? 'present' : 'away'}
+                    onChange={(value) => field.onChange(value === 'present')}
+                    disabled={isPending}
+                    options={[
+                      { value: 'present', label: 'Present' },
+                      { value: 'away', label: 'Not here' },
+                    ]}
+                  />
+                )}
+              />
+            </div>
+            {!watched.present && match ? (
+              <span className="-mt-1.5 text-xs text-fg2">
+                {shownName} is in a match now. Marking them not here doesn't take them off it.
+              </span>
+            ) : null}
+          </Section>
+        ) : null}
 
         <Section id={handicapId} title="Handicap · tonight">
           <Controller

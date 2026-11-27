@@ -1724,7 +1724,10 @@ button.gm-pl:hover .avatar, button.gm-pl:focus-visible .avatar { box-shadow: 0 0
 .pc3-edit { position: absolute; top: -9px; right: -9px; z-index: 2; }
 .pc3-edit .btn { width: 28px; min-width: 28px; height: 28px; min-height: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 16%, var(--elev)); color: var(--accent); border: 1.5px solid var(--accent); box-shadow: 0 2px 8px rgba(0, 0, 0, .3); transition: background .15s, color .15s, border-color .15s, transform .15s; }
 .pc3-edit .btn svg { width: 14px; height: 14px; }
-.pc3-edit .btn:hover, .pc3-edit .btn:focus-visible { background: var(--accent); color: var(--on-accent); border-color: var(--accent); transform: scale(1.08); }
+/* Mockup change 2026-11-27: Roster and levels › the card's pencil, the same green round button as the live player card. */
+.rv-edit { width: 28px; min-width: 28px; height: 28px; min-height: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; flex: none; background: color-mix(in srgb, var(--accent) 16%, var(--elev)); color: var(--accent); border: 1.5px solid var(--accent); transition: background .15s, color .15s, border-color .15s, transform .15s; }
+.rv-edit svg { width: 14px; height: 14px; }
+.pc3-edit .btn:hover, .pc3-edit .btn:focus-visible, .rv-edit:hover, .rv-edit:focus-visible { background: var(--accent); color: var(--on-accent); border-color: var(--accent); transform: scale(1.08); }
 .pc3 > .pc3-top { padding-right: 10px; }
 .pc3-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; } .pc3-acts { display: inline-flex; align-items: center; gap: 2px; flex: none; }
 .selbar { position: sticky; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); z-index: 14; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: var(--r); background: var(--elev); border: 1px solid var(--accent); box-shadow: 0 12px 30px rgba(0, 0, 0, .35); }
@@ -5487,6 +5490,8 @@ const rvLevel = (r, p, live) => `<div class="lvcol">${live ? `<b>${esc(lvLabel(r
 const rvSugg = (p) => `<span class="small muted">${p.sugg != null ? `Suggestion: ${esc(lvLabel(p.sugg))}` : 'No suggestion'}</span>`;
 // #735 (proposed): an admitted player steps down to the waitlist; level and paid mark stay on the record.
 const rvStepDown = (r, p) => `<button class="btn xs" data-act="stepDown" data-pid="${r.pid}" aria-label="Move ${esc(p.name)} to the waitlist">Move to waitlist</button>`;
+// Mockup change 2026-11-27: before the session starts, the pencil opens Edit player with Club nickname and Handicap only.
+const rvEdit = (r, p) => `<button class="btn xs rv-edit" data-act="openEditLive" data-pid="${r.pid}" aria-label="Edit ${esc(p.name)}" title="Edit player">${I.edit}</button>`;
 const rvRemove = (r, p) => `<button class="btn xs ghost icon-btn" data-act="removeRoster" data-pid="${r.pid}" aria-label="Remove ${esc(p.name)} from roster">${I.x}</button>`;
 // D-2026-11-09-03: "Checked in themselves" while the player's own check-in stands; "Left" after I'm leaving, until Present is set again.
 const selfMark = (r) => (r.present && r.selfCheckedIn ? `<span class="small muted row" style="gap:4px;flex-wrap:nowrap">${I.check} Checked in themselves · ${fmtTime(r.selfCheckedInAt || r.presentAt || Date.now())}</span>` : !r.present && r.selfLeft ? `<span class="small muted">Left · ${fmtTime(r.leftAt || Date.now())}</span>` : '');
@@ -5497,7 +5502,7 @@ function rvRow(s, r, live) {
   return `<div class="prow">
         <div class="li" style="padding:0">${faceBtn(p)}<div class="main"><div class="pn">${nameB(p)}</div><div class="row" style="gap:6px">${identChip(p)}${rvSugg(p)}</div></div></div>
         ${rvLevel(r, p, live)}
-        ${live ? rvAway(r) : `<div class="row" style="justify-content:flex-end">${rvStepDown(r, p)}${rvRemove(r, p)}</div>`}
+        ${live ? rvAway(r) : `<div class="row" style="justify-content:flex-end">${rvStepDown(r, p)}${rvEdit(r, p)}${rvRemove(r, p)}</div>`}
       </div>`;
 }
 function rvCard(s, r, live) {
@@ -5506,7 +5511,7 @@ function rvCard(s, r, live) {
   // #704: before Start session there is no Present switch or text; presence shows only once the session has started.
   const pres = live ? `<span class="rv-pres-t">${r.present ? 'Present' : 'Away'}</span>` : '';
   return `<article class="rv-card ${r.present ? 'is-present' : ''}" aria-label="${esc(p.name)}">
-        <div class="rv-top">${faceBtn(p)}<div class="main">${nameB(p)}</div>${live ? '' : rvRemove(r, p)}</div>
+        <div class="rv-top">${faceBtn(p)}<div class="main">${nameB(p)}</div>${live ? '' : `${rvEdit(r, p)}${rvRemove(r, p)}`}</div>
         ${live ? `<div class="rv-pres">${pres}</div>` : ''}${selfMark(r) ? `<div class="rv-meta small muted">${selfMark(r)}</div>` : ''}
         <div class="rv-lv lv-${band}">${rvLevel(r, p, live)}</div>
         <div class="rv-meta small muted">${identChip(p)}<span class="rv-paid ${paid ? 'ok' : ''}">${paid ? `${I.check} Paid` : 'Not paid'}</span>${rvSugg(p)}</div>
@@ -7249,15 +7254,17 @@ const SHEETS = {
       inv ? `<button class="btn" data-act="closeSheet">Close</button>${navigator.share ? '<button class="btn primary" data-act="shareInvite">Share</button>' : '<button class="btn primary" data-act="downloadSessionQr">Download image</button>'}`
         : `<button class="btn" data-act="closeSheet">Close</button><button class="btn" data-act="downloadSessionQr">Share</button><button class="btn primary" data-act="downloadSessionQr">Download image</button>`);
   },
-  // Owner artifact comment, November 19, 2026: the live card's pencil opens one Edit player form: club nickname (registered),
-  // picture (unclaimed), games played and availability. "Set games for all…" keeps D-SET-GAMES.
+  // Owner artifact comment, November 19, 2026: the live card's pencil opens one Edit player form. Mockup change 2026-11-27
+  // (owner): the Queue Master edits only Club nickname, Games played, Availability and Handicap; full name and picture are
+  // not edited here. Before the session starts (Roster and levels) the same sheet shows Club nickname and Handicap only.
+  // "Set games for all…" keeps D-SET-GAMES.
   editLive(sh) {
-    const s = cur(), r = R(s, sh.pid), p = P(sh.pid);
+    const s = cur(), r = R(s, sh.pid), p = P(sh.pid), prep = s && s.status === 'prepared';
     if (!Array.isArray(sh.hc)) sh.hc = hcOf(r);
     if (!r || !p) return sheetShell('Edit player', '<p>This player is no longer on the roster.</p>', '<button class="btn" data-act="closeSheet">Close</button>');
     const busy = busyOf(s, p.id), now = gamesOf(s, p.id), shown = clubNickOf(p) || p.nick || p.name;
     const who = { registered: 'Registered', unclaimed: 'Unclaimed', guest: 'Guest' }[p.identity] || '';
-    const tonight = busy ? chip(`${busy.status === 'oncourt' ? 'On court' : 'Playing'} · ${esc(courtsOf(s, busy))}`, 'ok') : r.present ? chip('Present') : chip('Not here', 'warn');
+    const tonight = prep ? '' : busy ? chip(`${busy.status === 'oncourt' ? 'On court' : 'Playing'} · ${esc(courtsOf(s, busy))}`, 'ok') : r.present ? chip('Present') : chip('Not here', 'warn');
     const head = `<div class="el-head lv-${rvBand(r)}">${avatar(p)}<div class="main"><span class="el-name">${esc(shown)}</span>${shown !== p.name ? `<span class="small muted">${esc(p.name)}</span>` : ''}
         <div class="row">${chip(esc(lvLabel(r.level)))}${chip(who)}${tonight}</div></div></div>`;
     // Owner artifact comment, November 26, 2026 ("hey club nickname"): every player has a Club nickname field. Unclaimed and
@@ -7266,25 +7273,19 @@ const SHEETS = {
         <span class="hint">What your club calls them. Only your club sees it. Empty uses ${p.nick ? `“${esc(p.nick)}”, the nickname on their ROTRA account` : 'the name on their ROTRA account'}.</span></label>`
       : `<label class="field"><span>Club nickname (optional)</span><input class="input" id="el-nick" data-bind="ui.sheet.nick" value="${esc(sh.nick)}" maxlength="30" autocomplete="off">
         <span class="hint">What your club calls them, shown above the full name. They have no ROTRA account yet, so this is their only nickname. Empty shows the full name.</span></label>`;
-    // Owner artifact comment, November 26, 2026 ("there should be edit name field"): the club edits the full name of the
-    // profiles it made (unclaimed, guest). A registered player's name is their own, so it shows read-only, with the club nickname as the club's label.
-    const nameF = p.identity === 'registered'
-      ? `<label class="field"><span>Full name</span><input class="input" value="${esc(p.name)}" readonly aria-describedby="el-name-h"><span class="hint" id="el-name-h">Only ${esc(short(p.id))} can change this, in the ROTRA Player app. Use Club nickname for what your club calls them.</span></label>`
-      : `<label class="field"><span>Full name</span><input class="input" id="el-name" data-bind="ui.sheet.name" value="${esc(sh.name ?? p.name)}" maxlength="60" autocomplete="off" ${sh.nameErr ? 'aria-invalid="true" aria-describedby="el-name-e"' : ''}>${sh.nameErr ? `<span class="err" id="el-name-e">${esc(sh.nameErr)}</span>` : `<span class="hint">Shown on courts, the queue and the public page. Fixes spelling for the profile your club made.</span>`}</label>`;
-    const pic = p.identity === 'unclaimed' ? picEditor(p) : '';
-    const profile = `<section class="el-sec" aria-labelledby="el-prof-h"><h3 id="el-prof-h">Profile</h3>${nameF}${nick}${pic}</section>`;
+    const profile = `<section class="el-sec" aria-labelledby="el-prof-h"><h3 id="el-prof-h">Profile</h3>${nick}</section>`;
     return sheetShell(`Edit ${esc(shown)}`, `${head}${profile}
-      <section class="el-sec" aria-labelledby="el-night-h"><h3 id="el-night-h">Tonight</h3>
+      ${prep ? '' : `<section class="el-sec" aria-labelledby="el-night-h"><h3 id="el-night-h">Tonight</h3>
         <div class="el-line"><div><b id="el-games-l">Games played</b><span class="small muted">Now ${now}${sh.games !== now ? ` · will be ${sh.games}` : ''}</span></div>
           <div class="el-step"><button class="btn sm icon-btn" data-act="elGames" data-d="-1" aria-label="One game fewer" ${sh.games <= 0 ? 'disabled' : ''}>−</button><b class="tnum" aria-live="polite" aria-labelledby="el-games-l">${sh.games}</b><button class="btn sm icon-btn" data-act="elGames" data-d="1" aria-label="One game more" ${sh.games >= 99 ? 'disabled' : ''}>+</button></div></div>
         <span class="hint" style="margin-top:-6px">Auto Queue, Catch Up and fewest-games sorting use the new count right away.</span>
         <div class="el-line"><b id="el-av-l">Availability</b>
           <div class="seg" role="group" aria-labelledby="el-av-l">${[[true, 'Present'], [false, 'Not here']].map(([v, l]) => `<button type="button" aria-pressed="${sh.present === v}" data-act="elPresent" data-v="${v}">${l}</button>`).join('')}</div></div>
-        ${!sh.present && busy ? `<span class="hint" style="margin-top:-6px">${esc(short(p.id))} is in a match now. Marking them not here doesn't take them off it.</span>` : ''}</section>
+        ${!sh.present && busy ? `<span class="hint" style="margin-top:-6px">${esc(short(p.id))} is in a match now. Marking them not here doesn't take them off it.</span>` : ''}</section>`}
       <section class="el-sec" aria-labelledby="el-hc-h"><h3 id="el-hc-h">Handicap · tonight</h3>
         ${hcFigure(sh.hc, short(p.id))}
         <div class="row" style="gap:8px" aria-live="polite">${sh.hc.length ? HC_SPOTS.filter((x) => sh.hc.includes(x.k)).map((x) => `<span class="ex-chip hc-chip"><b>${x.label}</b><button type="button" class="btn xs ghost icon-btn" data-act="hcToggle" data-k="${x.k}" aria-label="Clear ${x.label.toLowerCase()}" title="Remove">${I.x}</button></span>`).join('') : chip('No handicap')}</div>
-        <span class="hint" style="margin-top:-6px">Tap a spot to mark it, tap again to clear. Generate matches rests ${esc(short(p.id))} after 1 game in a row (Hard mode: 2). Only you see it, and it clears when the session ends.</span></section>`,
+        <span class="hint" style="margin-top:-6px">Tap a spot to mark it, tap again to clear. Generate matches rests ${esc(short(p.id))} after 1 game in a row (Hard mode: 2). Only you see it, and it clears when the session ends.${prep ? ' Set it now and it applies from the first match.' : ''}</span></section>`,
       `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="saveEditLive">Save changes</button>`);
   },
   // Exemption list picker: search, filter by level, tap players to toggle, then Save list.
@@ -9181,8 +9182,8 @@ const ACT = {
   allPresent: () => { cur().roster.forEach((r) => { r.present = true; r.selfLeft = false; }); commit('Everyone marked present'); render(); },
   allAbsent: () => { cur().roster.forEach((r) => { r.present = false; r.selfCheckedIn = false; }); commit('Everyone marked absent'); render(); },
   openEditLive: (d) => {
-    const s = cur(), r = s && R(s, d.pid), p = P(d.pid); if (!r || !p || s.status !== 'active') return;
-    openSheet({ type: 'editLive', pid: p.id, name: p.name, nick: (p.identity === 'registered' ? p.clubNick : p.nick) || '', games: Math.min(99, Math.max(0, gamesOf(s, p.id))), present: !!r.present, hc: hcOf(r) });
+    const s = cur(), r = s && R(s, d.pid), p = P(d.pid); if (!r || !p || (s.status !== 'active' && s.status !== 'prepared')) return;
+    openSheet({ type: 'editLive', pid: p.id, nick: (p.identity === 'registered' ? p.clubNick : p.nick) || '', games: Math.min(99, Math.max(0, gamesOf(s, p.id))), present: !!r.present, hc: hcOf(r) });
   },
   // D-2026-11-25-03: mark or clear a handicap spot in the sheet; saved with Save changes.
   hcToggle: (d) => { const sh = S.ui.sheet; if (sh?.type !== 'editLive' || !HC_SPOTS.some((x) => x.k === d.k)) return; sh.hc = sh.hc || []; sh.hc = sh.hc.includes(d.k) ? sh.hc.filter((k) => k !== d.k) : [...sh.hc, d.k]; render(); },
@@ -9192,19 +9193,16 @@ const ACT = {
     const sh = S.ui.sheet, s = cur(); if (sh?.type !== 'editLive' || !s) return;
     const r = R(s, sh.pid), p = P(sh.pid); if (!r || !p) { S.ui.sheet = null; render(); return; }
     let changed = false;
+    const prep = s.status === 'prepared';
     if (p.identity !== 'registered') {
-      const v = (sh.name ?? p.name).replace(/\s+/g, ' ').trim();
-      if (v.length < 2) { sh.nameErr = 'Enter the full name, at least 2 characters.'; render(); document.getElementById('el-name')?.focus(); return; }
-      sh.nameErr = '';
-      if (v !== p.name) { p.name = v; changed = true; }
       const n = (sh.nick || '').replace(/\s+/g, ' ').trim();
       if (n !== (p.nick || '')) { if (n) p.nick = n; else delete p.nick; changed = true; }
     }
     if (p.identity === 'registered') { const v = (sh.nick || '').trim(); if (v !== (p.clubNick || '')) { p.clubNick = v; changed = true; } }
-    if (sh.games !== gamesOf(s, p.id)) { r.gamesAdj = sh.games - countedGamesOf(s, p.id); changed = true; }
+    if (!prep && sh.games !== gamesOf(s, p.id)) { r.gamesAdj = sh.games - countedGamesOf(s, p.id); changed = true; }
     const hc = HC_SPOTS.map((x) => x.k).filter((k) => (sh.hc || []).includes(k));
     if (hc.join() !== hcOf(r).join()) { if (hc.length) r.handicap = hc; else delete r.handicap; changed = true; }
-    if (sh.present !== !!r.present) {
+    if (!prep && sh.present !== !!r.present) {
       // D-2026-11-09-03: the QM's last action wins, as on the card's Present switch.
       r.present = sh.present; if (r.present) { r.presentAt = Date.now(); r.selfLeft = false; } else r.selfCheckedIn = false;
       changed = true;

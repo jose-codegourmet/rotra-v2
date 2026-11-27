@@ -5,6 +5,7 @@ import { type HandicapSpot, handicapText } from '@rotra/data/session-roster/hand
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
+import { EditPencilButton } from '@rotra/ui/edit-pencil-button'
 import { Icon } from '@rotra/ui/icon'
 import { levelLabel } from '@rotra/ui/level-pill'
 import { PlayerNameBlock } from '@rotra/ui/player-name-block'
@@ -185,15 +186,7 @@ export function PlayerPoolCard({
           onClick={(event) => event.stopPropagation()}
           onKeyDown={(event) => event.stopPropagation()}
         >
-          <button
-            type="button"
-            aria-label={`Edit ${name}`}
-            title="Edit player"
-            onClick={onEdit}
-            className="grid size-7 min-h-0 min-w-7 cursor-pointer place-items-center rounded-full border-[1.5px] border-accent bg-[color-mix(in_srgb,var(--accent)_16%,var(--elev))] p-0 text-accent shadow-md transition-[background-color,color,transform] duration-150 hover:scale-[1.08] hover:bg-accent hover:text-on-accent focus-visible:scale-[1.08] focus-visible:bg-accent focus-visible:text-on-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none"
-          >
-            <Icon name="edit" size={14} />
-          </button>
+          <EditPencilButton name={name} onClick={onEdit} floating />
         </span>
       ) : null}
       <div className="flex min-w-0 items-center gap-2">

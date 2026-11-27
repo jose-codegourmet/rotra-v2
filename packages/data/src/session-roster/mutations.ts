@@ -653,7 +653,9 @@ export function setHandicap(input: SetHandicapInput) {
           : undefined,
       },
       (s) => {
-        if (sessionIn(s, input.sessionId).state !== 'active') fail('Start the session first.')
+        // Mockup change 2026-11-27: the handicap can be set while preparing too; it clears when the session ends.
+        const state = sessionIn(s, input.sessionId).state
+        if (state !== 'active' && state !== 'prepared') fail('This session has ended.')
         if (!input.spots.every(isHandicapSpot)) fail('Choose spots on the figure.')
         const p = row(s, input.rosterId, input.sessionId)
         p.handicapSpots = handicapSpotsOf(input.spots)

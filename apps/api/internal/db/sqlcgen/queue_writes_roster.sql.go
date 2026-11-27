@@ -11,6 +11,16 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const clearSessionHandicaps = `-- name: ClearSessionHandicaps :exec
+UPDATE session_players SET handicap_spots = '{}' WHERE session_id = $1 AND cardinality(handicap_spots) > 0
+`
+
+// Session done: Handicap · tonight is session only (finalization.ts), so every entry is emptied. No revision bump (updateMany).
+func (q *Queries) ClearSessionHandicaps(ctx context.Context, sessionID pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, clearSessionHandicaps, sessionID)
+	return err
+}
+
 const demoteSessionPlayer = `-- name: DemoteSessionPlayer :exec
 UPDATE session_players SET released_at = $1, release_reason = 'demoted', revision = revision + 1, updated_at = $1 WHERE id = $2
 `
@@ -203,6 +213,22 @@ type SetSessionPlayerGamesAdjustmentParams struct {
 
 func (q *Queries) SetSessionPlayerGamesAdjustment(ctx context.Context, arg SetSessionPlayerGamesAdjustmentParams) error {
 	_, err := q.db.Exec(ctx, setSessionPlayerGamesAdjustment, arg.GamesAdjustment, arg.Now, arg.ID)
+	return err
+}
+
+const setSessionPlayerHandicap = `-- name: SetSessionPlayerHandicap :exec
+UPDATE session_players SET handicap_spots = $1::text[], revision = revision + 1, updated_at = $2 WHERE id = $3
+`
+
+type SetSessionPlayerHandicapParams struct {
+	HandicapSpots []string
+	Now           pgtype.Timestamptz
+	ID            pgtype.UUID
+}
+
+// setHandicap: the whole set of marked spots on one live entry, in figure order (empty clears it).
+func (q *Queries) SetSessionPlayerHandicap(ctx context.Context, arg SetSessionPlayerHandicapParams) error {
+	_, err := q.db.Exec(ctx, setSessionPlayerHandicap, arg.HandicapSpots, arg.Now, arg.ID)
 	return err
 }
 

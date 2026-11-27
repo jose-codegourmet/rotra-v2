@@ -1388,11 +1388,6 @@
       "courtIds": [
        "a2c00000-0000-4000-8000-000000000003"
       ]
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]
@@ -3982,11 +3977,6 @@
         "a7000000-0000-4000-8000-000000000021"
        ]
       }
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]
@@ -4009,11 +3999,6 @@
         "a7000000-0000-4000-8000-000000000021"
        ]
       }
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]
@@ -6526,11 +6511,6 @@
        ]
       },
       "expectedQueueRevision": "1"
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]

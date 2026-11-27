@@ -47,7 +47,7 @@ def case(name, steps, scenario='base', **kw):
 # A malformed id: the TypeScript crashes (a 500, Prisma or a raw uuid cast); Go answers not found. A malformed or missing operation
 # id handed to Prisma as a uuid: 500 there, invalid here.
 MALFORMED = {'allow500': True, 'goExpects': {'status': 404, 'code': 'not_found'}}
-BADOP = {'allow500': True, 'goExpects': {'status': 422, 'code': 'invalid'}}
+BADOP = {}  # the TypeScript answers 404 for a malformed id anywhere (isMalformedId, main #1108); Go does the same
 NOSUBJECT = {'goExpects': {'status': 401, 'code': 'unauthenticated'}}
 
 

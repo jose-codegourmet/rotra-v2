@@ -18,7 +18,7 @@
 //	requireRevision       the expected-revision check of a command (409 conflict, or 422 for a revision that is no number)
 //	requireState          the session state check (422 invalid with the field state)
 //	derivedID             a stable UUID derived from an operation id, for the extra rows one command writes
-//	parseOperationID      the operation id as Postgres reads a uuid; a malformed one is 422
+//	parseOperationID      the operation id as Postgres reads a uuid; a malformed one is 404
 //	place, promoteWaiter, assessEntry, createClubPlayer, clubPlayerForProfile, resolveEmail
 //	                      the roster building blocks (roster_*.go); the batch and the single-operation routes both call them
 //	stepDownIn, liveEntry, requireLiveCourt, retireEntryIfOrphan, signedin.SessionOf / CourtOf / VenueOf

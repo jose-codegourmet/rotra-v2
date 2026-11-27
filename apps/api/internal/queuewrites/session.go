@@ -41,15 +41,9 @@ func parseSessionID(text string) (pgtype.UUID, error) {
 	return id, nil
 }
 
-// parseOperationID reads an operation id. The TypeScript hands it to Prisma, which crashes on a malformed uuid (a 500);
-// Go answers invalid with the field the id came in (a logged deviation).
-func parseOperationID(text, field string) (pgtype.UUID, error) {
-	id, ok := writes.ParseUUID(text)
-	if !ok {
-		return pgtype.UUID{}, writes.Fail(httpapi.ErrInvalid, map[string]string{field: "Send a valid operation id."})
-	}
-	return id, nil
-}
+// parseOperationID reads an operation id as Postgres reads a uuid. A malformed or missing one is not found, as it is in the
+// TypeScript, where the id reaches Postgres (22P02) and isMalformedId answers 404 (main #1108; owner answer, 2026-11-27).
+func parseOperationID(text string) (pgtype.UUID, error) { return parseRowID(text) }
 
 // parseRowID reads the ID of a row in a body (a roster entry, a request, a saved player). A malformed one is not found:
 // the TypeScript crashes on it (a 500), and no row can have that ID.

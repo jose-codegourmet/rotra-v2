@@ -1728,11 +1728,6 @@
         "level": "intermediate_low"
        }
       ]
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]

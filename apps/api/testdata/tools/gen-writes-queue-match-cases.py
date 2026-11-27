@@ -57,7 +57,7 @@ def case(name, steps, scenario='s3_full_house', **kw):
 
 
 MALFORMED = {'allow500': True, 'goExpects': {'status': 404, 'code': 'not_found'}}
-BADOP = {'allow500': True, 'goExpects': {'status': 422, 'code': 'invalid'}}
+BADOP = {}  # the TypeScript answers 404 for a malformed id anywhere (isMalformedId, main #1108); Go does the same
 RAND = {'match_court_usage': ['id', 'acquire_operation_id']}
 
 FULL_HOUSE = SCEN['s3_full_house']
@@ -397,8 +397,8 @@ case('add_without_a_lineup', add({'operationId': op_id()}))
 case('add_a_lineup_with_an_unknown_format', add({'operationId': op_id(), 'lineup': {'format': 'triples', 'teamA': [], 'teamB': []}}))
 case('add_a_lineup_whose_team_is_not_a_list', add({'operationId': op_id(), 'lineup': {'format': 'singles', 'teamA': SP(20), 'teamB': [SP(21)]}}))
 case('add_a_lineup_with_ids_that_are_not_text', add({'operationId': op_id(), 'lineup': {'format': 'singles', 'teamA': [1], 'teamB': [SP(21)]}}))
-case('add_malformed_operation_id', manual('singles', [20], [21], 'x'), allow500=True, goExpects={'status': 422, 'code': 'invalid'})
-case('add_missing_operation_id', add({'lineup': lineup('singles', [20], [21])}), allow500=True, goExpects={'status': 422, 'code': 'invalid'})
+case('add_malformed_operation_id', manual('singles', [20], [21], 'x'))
+case('add_missing_operation_id', add({'lineup': lineup('singles', [20], [21])}))
 case('add_on_a_prepared_session', req('POST', f'/api/sessions/{S[1]}/matches', {'operationId': op_id(), 'lineup': lineup('singles', [1], [1])}))
 case('add_in_auto_queue_places_it_on_a_free_court', manual('singles', [20], [21]), 'full_house_auto_ready', redact=RAND)
 case('add_in_auto_queue_twice_does_not_fill_again', [manual('singles', [20], [21], op_id(7)), manual('singles', [20], [21], op_id(7))], 'full_house_auto_ready', redact=RAND)

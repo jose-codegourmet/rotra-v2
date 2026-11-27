@@ -1493,11 +1493,6 @@
       "slides": [
        "standings"
       ]
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]
@@ -1515,11 +1510,6 @@
       "slides": [
        "standings"
       ]
-     },
-     "allow500": true,
-     "goExpects": {
-      "status": 422,
-      "code": "invalid"
      }
     }
    ]

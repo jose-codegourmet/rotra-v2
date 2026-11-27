@@ -106,7 +106,7 @@ case('v_closed_session', step(S[4], [saved(CP(1))]))
 case('v_closed_session_validation_first', step(S[4], [{'op': 'explode', 'operationId': op_id()}]))
 case('v_lapsed_club_prepared_session', step(S[7], [saved(CP(20))], who=LAPSED))
 case('v_lapsed_club_live_session_runs_on', step(S[8], [saved(CP(20))], who=LAPSED))
-case('v_malformed_operation_id_on_add', step(S[1], [saved(CP(1), op='not-a-uuid')], allow500=True, goExpects={'status': 422, 'code': 'invalid'}))
+case('v_malformed_operation_id_on_add', step(S[1], [saved(CP(1), op='not-a-uuid')]))
 case('v_malformed_operation_id_on_remove_is_fine', step(S[1], [remove(SP(1), op='not-a-uuid')]))
 case('v_uppercase_operation_id', step(S[1], [saved(CP(1), op=op_id(5).upper())]))
 

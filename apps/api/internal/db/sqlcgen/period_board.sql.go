@@ -78,11 +78,16 @@ WHERE f.played_at >= $1
   AND m.state = 'completed'
   AND fin.committed_at IS NOT NULL
   AND qs.state = 'completed'
+  -- A session with Record games off is not ranked (D-2026-11-20-02): its wins never count here.
+  AND qs.record_games
+  -- A club leaderboard (D-2026-11-25-04) counts only the games of its own sessions.
+  AND ($3::uuid IS NULL OR f.club_id = $3::uuid)
 `
 
 type ListBoardFactsParams struct {
 	FromAt pgtype.Timestamptz
 	ToAt   pgtype.Timestamptz
+	ClubID pgtype.UUID
 }
 
 type ListBoardFactsRow struct {
@@ -99,7 +104,7 @@ type ListBoardFactsRow struct {
 // (the previous period and the current one). A fact counts for the identity recorded at finalization and for every
 // player a reviewed link (an unrevoked attribution) points its club record to.
 func (q *Queries) ListBoardFacts(ctx context.Context, arg ListBoardFactsParams) ([]ListBoardFactsRow, error) {
-	rows, err := q.db.Query(ctx, listBoardFacts, arg.FromAt, arg.ToAt)
+	rows, err := q.db.Query(ctx, listBoardFacts, arg.FromAt, arg.ToAt, arg.ClubID)
 	if err != nil {
 		return nil, err
 	}

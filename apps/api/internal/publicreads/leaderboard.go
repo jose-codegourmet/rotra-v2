@@ -1,10 +1,12 @@
 package publicreads
 
 import (
+	"errors"
 	"log/slog"
 	"math"
 	"net/http"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -43,7 +45,33 @@ type searchBody struct {
 
 // page answers GET /api/leaderboard?offset=&limit=&period=: the parameters are checked before the board is read
 // (422 invalid), the offset first.
-func (l *leaderboard) page(w http.ResponseWriter, r *http.Request) {
+func (l *leaderboard) page(w http.ResponseWriter, r *http.Request) { l.pageFor(w, r, viewerOf(r), nil) }
+
+// visitorPage is the ROTRA leaderboard for the Queue app (Q-LEADERBOARDS): it cannot verify a Player sign-in, so the viewer is always a visitor.
+func (l *leaderboard) visitorPage(w http.ResponseWriter, r *http.Request) {
+	l.pageFor(w, r, viewerRef{}, nil)
+}
+
+// clubPage answers GET /api/clubs/{clubId}/leaderboard (P-CLUB-LEADERBOARD, D-2026-11-25-04): the club's leaderboard, the ROTRA rules over
+// its own sessions' games. Public with full names; the viewer only decides which rows open a profile. An unknown club is not found, after
+// the parameters are checked.
+func (l *leaderboard) clubPage(w http.ResponseWriter, r *http.Request) {
+	l.pageFor(w, r, viewerOf(r), clubOf(r))
+}
+
+// visitorClubPage is the club leaderboard for the Queue app: the viewer is always a visitor.
+func (l *leaderboard) visitorClubPage(w http.ResponseWriter, r *http.Request) {
+	l.pageFor(w, r, viewerRef{}, clubOf(r))
+}
+
+// clubOf is the club of the path: the parsed ID, or the zero one that is no club (the lookup then finds none).
+func clubOf(r *http.Request) *pgtype.UUID {
+	id, ok := parseUUID(r.PathValue("clubId"))
+	return &pgtype.UUID{Bytes: id, Valid: ok}
+}
+
+// pageFor reads one page of a leaderboard for a viewer; club is nil for the ROTRA leaderboard.
+func (l *leaderboard) pageFor(w http.ResponseWriter, r *http.Request, v viewerRef, club *pgtype.UUID) {
 	offset, limit, ok := pageParams(r.URL.RawQuery)
 	if !ok {
 		httpapi.WriteError(w, httpapi.ErrInvalid, nil)
@@ -56,16 +84,32 @@ func (l *leaderboard) page(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var body pageBody
+	notFound := false
 	err := readTx(r.Context(), l.pool, func(q *sqlcgen.Queries) error {
-		b, err := readBoard(r.Context(), q, p, l.now())
+		scope := pgtype.UUID{}
+		if club != nil {
+			if _, err := q.ClubExists(r.Context(), *club); err != nil {
+				if errors.Is(err, pgx.ErrNoRows) || !club.Valid {
+					notFound = true
+					return nil
+				}
+				return err
+			}
+			scope = *club
+		}
+		b, err := readClubBoard(r.Context(), q, p, l.now(), scope)
 		if err != nil {
 			return err
 		}
-		body, err = b.pageOf(r.Context(), q, int64(offset), limit, viewerOf(r))
+		body, err = b.pageOf(r.Context(), q, int64(offset), limit, v)
 		return err
 	})
 	if err != nil {
 		l.fail(w, r, err)
+		return
+	}
+	if notFound {
+		httpapi.WriteError(w, httpapi.ErrNotFound, nil)
 		return
 	}
 	httpapi.WriteJSON(w, http.StatusOK, body, httpapi.Private)

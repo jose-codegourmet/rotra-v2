@@ -2690,6 +2690,276 @@
    "scenario": "base",
    "now": "2026-03-05T04:30:00.000Z",
    "origin": "http://localhost:9000"
+  },
+  {
+   "name": "lb_quarter_visitor",
+   "path": "/api/leaderboard?period=quarter",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "lb_quarter_alice",
+   "path": "/api/leaderboard?period=quarter",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "lb_quarter_bob",
+   "path": "/api/leaderboard?period=quarter",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "lbme_quarter_alice",
+   "path": "/api/leaderboard/me?period=quarter",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_quarter_a_alice",
+   "path": "/api/leaderboard/search?q=a&period=quarter",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "search_quarter_a_visitor",
+   "path": "/api/leaderboard/search?q=a&period=quarter",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club1_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club1_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club1_year_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?period=year",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club1_year_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club1_quarter_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?period=quarter",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club1_quarter_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?period=quarter",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club1_month_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?period=month",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club1_month_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club1_week_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?period=week",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club1_week_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club2_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000002/leaderboard",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club2_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000002/leaderboard",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club2_year_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000002/leaderboard?period=year",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club2_year_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000002/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club2_quarter_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000002/leaderboard?period=quarter",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club2_quarter_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000002/leaderboard?period=quarter",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club2_month_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000002/leaderboard?period=month",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club2_month_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000002/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club2_week_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000002/leaderboard?period=week",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club2_week_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000002/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club3_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000003/leaderboard",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club3_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000003/leaderboard",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club3_year_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000003/leaderboard?period=year",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club3_year_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000003/leaderboard?period=year",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club3_quarter_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000003/leaderboard?period=quarter",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club3_quarter_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000003/leaderboard?period=quarter",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club3_month_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000003/leaderboard?period=month",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club3_month_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000003/leaderboard?period=month",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club3_week_visitor",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000003/leaderboard?period=week",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_club3_week_alice",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000003/leaderboard?period=week",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_unknown_club",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000009/leaderboard",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_malformed_club",
+   "path": "/api/clubs/x/leaderboard",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_bad_period",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?period=decade",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_bad_period_malformed_club",
+   "path": "/api/clubs/x/leaderboard?period=decade",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_bad_limit",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?limit=51",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_offset_and_limit",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?offset=1&limit=2",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_bad_offset",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?offset=-1",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "clublb_crowded_club1",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?limit=50",
+   "player": null,
+   "scenario": "crowded"
+  },
+  {
+   "name": "clublb_crowded_page2",
+   "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?offset=50&limit=50",
+   "player": null,
+   "scenario": "crowded"
   }
  ]
 }

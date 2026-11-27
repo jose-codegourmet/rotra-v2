@@ -30,6 +30,10 @@ func (s *server) registerPlayer(rt *Router) {
 	optional := s.auth.Optional(player)
 	rt.Handle("GET /api/leaderboard", player, optional(s.viewer.Leaderboard))
 	rt.Handle("GET /api/leaderboard/search", player, optional(s.viewer.Search))
+	rt.Handle("GET /api/clubs/{clubId}/leaderboard", player, optional(s.viewer.ClubLeaderboard))
+	// The Queue app's Leaderboards page reads the same lists as a visitor (Q-LEADERBOARDS, D-2026-11-25-04).
+	rt.Handle("GET /api/leaderboard", store.AudienceClub, s.viewer.VisitorLeaderboard)
+	rt.Handle("GET /api/clubs/{clubId}/leaderboard", store.AudienceClub, s.viewer.VisitorClubLeaderboard)
 	rt.Handle("GET /api/players/{playerId}", player, optional(s.viewer.Profile))
 	rt.Handle("GET /api/players/{playerId}/rank", player, optional(s.viewer.Rank))
 	rt.Handle("GET /api/players/{playerId}/games", player, optional(s.viewer.Games))

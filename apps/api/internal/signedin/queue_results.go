@@ -10,6 +10,7 @@ import (
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/sessionresult"
 )
 
 // GET /api/sessions/{sessionId}/results: the private snapshot, the current publication and the exports (Q-RESULTS).
@@ -49,6 +50,9 @@ type resultExportDTO struct {
 	CreatedAt     string   `json:"createdAt"`
 }
 
+// sharePositions shows saved standings with shared positions without gaps (owner, November 20, 2026); the saved rows never change.
+func sharePositions(b []byte) json.RawMessage { return jsonOrNull(sessionresult.SharePositions(b)) }
+
 func jsonOrNull(b []byte) json.RawMessage {
 	if len(b) == 0 {
 		return json.RawMessage("null")
@@ -83,7 +87,7 @@ func (s *server) queueResults(r *http.Request, q *sqlcgen.Queries, club pgtype.U
 	snap, err := q.GetQueueLatestSnapshot(ctx, sess.ID)
 	if err == nil {
 		out.Snapshot = &snapshotDTO{
-			ID: snap.ID.String(), Version: snap.Version, CalculationVersion: snap.CalculationVersion, Standings: jsonOrNull(snap.Standings),
+			ID: snap.ID.String(), Version: snap.Version, CalculationVersion: snap.CalculationVersion, Standings: sharePositions(snap.Standings),
 			Awards: jsonOrNull(snap.Awards), OffDay: jsonOrNull(snap.OffDay), GeneratedAt: httpapi.ToIso(snap.GeneratedAt.Time),
 		}
 	} else if !errors.Is(err, pgx.ErrNoRows) {

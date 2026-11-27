@@ -27,7 +27,11 @@ WHERE f.played_at >= @from_at
   AND d.kind = 'completed'
   AND m.state = 'completed'
   AND fin.committed_at IS NOT NULL
-  AND qs.state = 'completed';
+  AND qs.state = 'completed'
+  -- A session with Record games off is not ranked (D-2026-11-20-02): its wins never count here.
+  AND qs.record_games
+  -- A club leaderboard (D-2026-11-25-04) counts only the games of its own sessions.
+  AND (sqlc.narg('club_id')::uuid IS NULL OR f.club_id = sqlc.narg('club_id')::uuid);
 
 -- The players of those facts that have a permanent RTR ID. For an unclaimed player the clubs that currently save
 -- them are counted (one club: that club's name and nickname stand in for them; more: they do not qualify).

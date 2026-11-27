@@ -162,6 +162,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -177,6 +178,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "13"
         }
       }
@@ -281,6 +285,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -296,6 +301,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "12"
         }
       }
@@ -380,6 +388,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -395,6 +404,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "13"
         }
       },
@@ -427,6 +439,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -442,6 +455,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "13"
         }
       }
@@ -546,6 +562,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -561,6 +578,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "13"
         }
       }
@@ -872,6 +892,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -887,6 +908,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "13"
         }
       }
@@ -1606,6 +1630,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -1621,6 +1646,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "13"
         }
       }
@@ -1725,6 +1753,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -1740,6 +1769,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -1844,6 +1876,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -1859,6 +1892,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -1963,6 +1999,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -1978,6 +2015,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -2672,7 +2712,7 @@
   "end_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -2680,8 +2720,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -2900,6 +2940,7 @@
               "playersPerCourt": 2,
               "expectedPlayers": null,
               "startedAt": "2026-11-19T01:00:00.000Z",
+              "plannedBeforeStart": null,
               "finalizedAt": null,
               "seriesId": null,
               "publicSlug": "live-now",
@@ -2915,6 +2956,9 @@
                 "fun_5v5": false
               },
               "recordGames": true,
+              "levelRestriction": {
+                "kind": "all"
+              },
               "revision": "13"
             }
           },
@@ -2947,6 +2991,7 @@
               "playersPerCourt": 2,
               "expectedPlayers": null,
               "startedAt": "2026-11-19T01:00:00.000Z",
+              "plannedBeforeStart": null,
               "finalizedAt": null,
               "seriesId": null,
               "publicSlug": "live-now",
@@ -2962,6 +3007,9 @@
                 "fun_5v5": false
               },
               "recordGames": true,
+              "levelRestriction": {
+                "kind": "all"
+              },
               "revision": "13"
             }
           }
@@ -3134,6 +3182,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -3149,6 +3198,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "13"
         }
       }
@@ -3253,6 +3305,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -3268,6 +3321,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "13"
         }
       }
@@ -3372,6 +3428,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -3387,6 +3444,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "13"
         }
       },
@@ -3505,6 +3565,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -3520,6 +3581,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "13"
         }
       },
@@ -3552,6 +3616,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": "2026-11-19T01:00:00.000Z",
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "live-now",
@@ -3567,6 +3632,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "14"
         }
       }
@@ -3673,6 +3741,7 @@
               "playersPerCourt": 2,
               "expectedPlayers": null,
               "startedAt": "2026-11-19T01:00:00.000Z",
+              "plannedBeforeStart": null,
               "finalizedAt": null,
               "seriesId": null,
               "publicSlug": "live-now",
@@ -3688,6 +3757,9 @@
                 "fun_5v5": false
               },
               "recordGames": true,
+              "levelRestriction": {
+                "kind": "all"
+              },
               "revision": "13"
             }
           },
@@ -3808,6 +3880,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -3823,6 +3896,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -4872,6 +4948,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -4887,6 +4964,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -5173,6 +5253,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -5188,6 +5269,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -5402,6 +5486,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -5417,6 +5502,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -5625,6 +5713,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -5640,6 +5729,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -5848,6 +5940,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -5863,6 +5956,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -6071,6 +6167,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -6086,6 +6183,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -6363,6 +6463,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -6378,6 +6479,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -6787,6 +6891,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -6802,6 +6907,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       },
@@ -6834,6 +6942,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -6849,6 +6958,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -7057,6 +7169,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -7072,6 +7185,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "5"
         }
       }
@@ -7156,6 +7272,7 @@
           "playersPerCourt": 2,
           "expectedPlayers": null,
           "startedAt": null,
+          "plannedBeforeStart": null,
           "finalizedAt": null,
           "seriesId": null,
           "publicSlug": "prep-open",
@@ -7171,6 +7288,9 @@
             "fun_5v5": false
           },
           "recordGames": true,
+          "levelRestriction": {
+            "kind": "all"
+          },
           "revision": "6"
         }
       }
@@ -7624,7 +7744,7 @@
   "cancel_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -7632,8 +7752,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -7921,6 +8041,7 @@
               "playersPerCourt": 2,
               "expectedPlayers": null,
               "startedAt": null,
+              "plannedBeforeStart": null,
               "finalizedAt": null,
               "seriesId": null,
               "publicSlug": "prep-open",
@@ -7936,6 +8057,9 @@
                 "fun_5v5": false
               },
               "recordGames": true,
+              "levelRestriction": {
+                "kind": "all"
+              },
               "revision": "6"
             }
           },
@@ -7968,6 +8092,7 @@
               "playersPerCourt": 2,
               "expectedPlayers": null,
               "startedAt": null,
+              "plannedBeforeStart": null,
               "finalizedAt": null,
               "seriesId": null,
               "publicSlug": "prep-open",
@@ -7983,6 +8108,9 @@
                 "fun_5v5": false
               },
               "recordGames": true,
+              "levelRestriction": {
+                "kind": "all"
+              },
               "revision": "6"
             }
           }
@@ -10257,7 +10385,7 @@
   "invalid_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -10265,8 +10393,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }

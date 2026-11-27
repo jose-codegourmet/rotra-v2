@@ -1803,7 +1803,21 @@
       ]
      }
     }
-   ]
+   ],
+   "redact": {
+    "session_publications": [
+     "id",
+     "public_key"
+    ],
+    "session_publication_events": [
+     "id",
+     "publication_id"
+    ],
+    "player_notifications": [
+     "source_id",
+     "created_at"
+    ]
+   }
   },
   {
    "name": "publish_before_the_results_are_ready",

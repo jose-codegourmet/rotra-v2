@@ -5851,7 +5851,7 @@
       "player_id_counters (removed)": [],
       "player_notifications": [
         {
-          "body": "You're number 1. We'll tell you if a spot opens.",
+          "body": "You're number 2. We'll tell you if a spot opens.",
           "kind": "session",
           "title": "You're on the waitlist for Live Now",
           "target": "/players/d4000000-0000-4000-8000-000000000001/sessions",
@@ -6148,7 +6148,7 @@
       "player_id_counters (removed)": [],
       "player_notifications": [
         {
-          "body": "You're number 1. We'll tell you if a spot opens.",
+          "body": "You're number 2. We'll tell you if a spot opens.",
           "kind": "session",
           "title": "You're on the waitlist for Live Now",
           "target": "/players/d4000000-0000-4000-8000-000000000001/sessions",

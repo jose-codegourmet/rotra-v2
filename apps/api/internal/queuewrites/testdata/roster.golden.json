@@ -1749,6 +1749,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -1774,6 +1775,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -1792,6 +1794,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -2232,7 +2235,7 @@
   "v_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -2240,8 +2243,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -2529,6 +2532,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -2553,6 +2557,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -2650,7 +2655,7 @@
   "v_malformed_operation_id_on_add": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -2658,8 +2663,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -2885,6 +2890,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -2909,6 +2915,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -2927,6 +2934,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -3097,6 +3105,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -3121,6 +3130,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -3139,6 +3149,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -3309,6 +3320,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -3333,6 +3345,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -3351,6 +3364,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -3548,6 +3562,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -3566,6 +3581,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -3729,6 +3745,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -3900,6 +3917,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4083,6 +4101,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4101,6 +4120,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4264,6 +4284,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4282,6 +4303,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4442,6 +4464,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -4466,6 +4489,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4484,6 +4508,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4502,6 +4527,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4665,6 +4691,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -4689,6 +4716,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4707,6 +4735,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4725,6 +4754,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -4915,6 +4945,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -5273,7 +5304,7 @@
   "add_saved_malformed_player_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -5281,8 +5312,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -5317,7 +5348,7 @@
   "add_saved_missing_player_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -5325,8 +5356,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -5479,6 +5510,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "4"
@@ -5503,6 +5535,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "4",
@@ -5742,6 +5775,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -5766,6 +5800,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -5784,6 +5819,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -5802,6 +5838,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T03:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -5820,6 +5857,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -6009,6 +6047,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -6033,6 +6072,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -6051,6 +6091,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -6069,6 +6110,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T03:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -6087,6 +6129,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -6398,6 +6441,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -6435,6 +6479,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -6459,6 +6504,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -6477,6 +6523,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -6495,6 +6542,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T03:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -6513,6 +6561,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -6531,6 +6580,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -6775,6 +6825,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -6813,6 +6864,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -6831,6 +6883,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -7023,6 +7076,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -7047,6 +7101,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -7065,6 +7120,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -7083,6 +7139,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -7246,6 +7303,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -7270,6 +7328,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -7420,6 +7479,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -7444,6 +7504,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -7577,6 +7638,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -7601,6 +7663,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -7619,6 +7682,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -7637,6 +7701,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -7812,6 +7877,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -7836,6 +7902,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -7854,6 +7921,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -8077,6 +8145,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -8101,6 +8170,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -8119,6 +8189,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -8327,6 +8398,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -8351,6 +8423,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -8369,6 +8442,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -8645,6 +8719,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -8669,6 +8744,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -8687,6 +8763,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -8872,6 +8949,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -8896,6 +8974,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -8914,6 +8993,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -9193,6 +9273,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -9217,6 +9298,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -9235,6 +9317,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -9466,7 +9549,7 @@
   "add_directory_malformed_profile_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -9474,8 +9557,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -9549,6 +9632,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -9567,6 +9651,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -9753,6 +9838,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -9777,6 +9863,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -9795,6 +9882,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -9999,6 +10087,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -10023,6 +10112,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -10041,6 +10131,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -10249,6 +10340,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -10273,6 +10365,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -10291,6 +10384,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -10516,6 +10610,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -10541,6 +10636,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -10559,6 +10655,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -10720,230 +10817,37 @@
   "add_new_guest_with_nickname_and_phone": {
     "steps": [
       {
-        "status": 200,
+        "status": 422,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
           "vary": "Cookie"
         },
         "body": {
-          "results": [
-            {
-              "operationId": "b0000000-0000-4000-8000-000000000064",
-              "op": "add",
-              "rosterEntry": {
-                "id": "e250e172-872d-8a61-b656-7eb531d5945a",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "clubPlayerId": "7f802854-8293-88b6-8520-8869a1b1353d",
-                "nameSnapshot": "Newbie",
-                "nicknameSnapshot": "Nub",
-                "clubNickname": null,
-                "present": false,
-                "presentChangedAt": "2026-11-19T04:00:00.000Z",
-                "level": "intermediate_low",
-                "levelLockedAt": null,
-                "confirmedAt": "2026-11-19T04:00:00.000Z",
-                "gamesAdjustment": 0,
-                "selfCheckedInAt": null,
-                "leftAt": null,
-                "revision": "2"
-              },
-              "waitlist": null,
-              "emailWords": null,
-              "request": null
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "phone": "Add an email or a social link to save a phone, or leave the phone empty."
             }
-          ],
-          "roster": {
-            "capacity": 2,
-            "roster": [
-              {
-                "id": "a7000000-0000-4000-8000-000000000001",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
-                "nameSnapshot": "Hal Guest",
-                "nicknameSnapshot": null,
-                "clubNickname": null,
-                "present": false,
-                "presentChangedAt": "2026-11-15T01:00:00.000Z",
-                "level": "intermediate_low",
-                "levelLockedAt": null,
-                "confirmedAt": "2026-11-15T01:00:00.000Z",
-                "gamesAdjustment": 0,
-                "selfCheckedInAt": null,
-                "leftAt": null,
-                "revision": "2",
-                "hasPlayedAtClubBefore": false
-              },
-              {
-                "id": "e250e172-872d-8a61-b656-7eb531d5945a",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "clubPlayerId": "7f802854-8293-88b6-8520-8869a1b1353d",
-                "nameSnapshot": "Newbie",
-                "nicknameSnapshot": "Nub",
-                "clubNickname": null,
-                "present": false,
-                "presentChangedAt": "2026-11-19T04:00:00.000Z",
-                "level": "intermediate_low",
-                "levelLockedAt": null,
-                "confirmedAt": "2026-11-19T04:00:00.000Z",
-                "gamesAdjustment": 0,
-                "selfCheckedInAt": null,
-                "leftAt": null,
-                "revision": "2",
-                "hasPlayedAtClubBefore": false
-              }
-            ],
-            "noShows": [],
-            "waitlist": [],
-            "joinRequests": [
-              {
-                "id": "a3400000-0000-4000-8000-000000000003",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "name": "Waiting Wade",
-                "nickname": null,
-                "phoneE164": null,
-                "statedBand": "advanced",
-                "placement": "waitlist",
-                "status": "pending",
-                "requestedAt": "2026-11-19T02:00:00.000Z",
-                "decidedAt": null,
-                "clubPlayerId": null,
-                "playerId": null,
-                "picture": null,
-                "pictureName": null
-              },
-              {
-                "id": "a3400000-0000-4000-8000-000000000002",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "name": "Ann Reyes",
-                "nickname": null,
-                "phoneE164": null,
-                "statedBand": "unsure",
-                "placement": "slot",
-                "status": "pending",
-                "requestedAt": "2026-11-19T02:05:00.000Z",
-                "decidedAt": null,
-                "clubPlayerId": null,
-                "playerId": "d4000000-0000-4000-8000-000000000001",
-                "picture": null,
-                "pictureName": "Ann Reyes"
-              },
-              {
-                "id": "a3400000-0000-4000-8000-000000000001",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "name": "Walk In Wendy",
-                "nickname": "Wen",
-                "phoneE164": "+639175550801",
-                "statedBand": "beginner",
-                "placement": "slot",
-                "status": "pending",
-                "requestedAt": "2026-11-19T02:10:00.123Z",
-                "decidedAt": null,
-                "clubPlayerId": null,
-                "playerId": null,
-                "picture": null,
-                "pictureName": null
-              }
-            ]
           }
         }
       }
     ],
     "db": {
-      "queue_sessions": [
-        {
-          "id": "a3000000-0000-4000-8000-000000000001",
-          "state": "prepared",
-          "revision": "6",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "minimum_games": 20,
-          "queue_revision": "1"
-        }
-      ],
-      "queue_sessions (removed)": [
-        {
-          "id": "a3000000-0000-4000-8000-000000000001",
-          "state": "prepared",
-          "revision": "5",
-          "updated_at": "2026-11-10T00:00:00+00:00",
-          "minimum_games": 0,
-          "queue_revision": "1"
-        }
-      ],
-      "session_players": [
-        {
-          "id": "e250e172-872d-8a61-b656-7eb531d5945a",
-          "present": false,
-          "revision": "2",
-          "joined_at": "2026-11-19T04:00:00+00:00",
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "no_show_at": null,
-          "session_id": "a3000000-0000-4000-8000-000000000001",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "released_at": null,
-          "confirmed_at": "2026-11-19T04:00:00+00:00",
-          "name_snapshot": "Newbie",
-          "club_player_id": "7f802854-8293-88b6-8520-8869a1b1353d",
-          "over_budget_at": null,
-          "release_reason": null,
-          "skill_level_id": 3,
-          "level_locked_at": null,
-          "player_id_at_entry": null,
-          "present_changed_at": "2026-11-19T04:00:00+00:00",
-          "assessment_operation_id": "b0000000-0000-4000-8000-000000000064"
-        }
-      ],
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
       "session_players (removed)": [],
-      "club_assessments": [
-        {
-          "session_id": "a3000000-0000-4000-8000-000000000001",
-          "assessed_at": "2026-11-19T04:00:00+00:00",
-          "received_at": "2026-11-19T04:00:00+00:00",
-          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
-          "club_player_id": "7f802854-8293-88b6-8520-8869a1b1353d",
-          "skill_level_id": 3,
-          "accepted_revision": "5",
-          "session_player_id": "e250e172-872d-8a61-b656-7eb531d5945a",
-          "source_operation_id": "b0000000-0000-4000-8000-000000000064",
-          "player_id_at_assessment": null,
-          "supersedes_operation_id": null
-        }
-      ],
+      "club_assessments": [],
       "club_assessments (removed)": [],
       "session_waitlist": [],
       "session_waitlist (removed)": [],
       "session_join_requests": [],
       "session_join_requests (removed)": [],
-      "club_players": [
-        {
-          "id": "7f802854-8293-88b6-8520-8869a1b1353d",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "added_at": "2026-11-19T04:00:00+00:00",
-          "nickname": "Nub",
-          "revision": "1",
-          "player_id": null,
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "removed_at": null,
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "display_name": "Newbie",
-          "shared_entry_rtr_id": null,
-          "linked_to_club_player_id": null
-        }
-      ],
+      "club_players": [],
       "club_players (removed)": [],
-      "club_player_private_inputs": [
-        {
-          "email": null,
-          "state": "pending",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "revision": "1",
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "phone_e164": "+639175550100",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "captured_at": "2026-11-19T04:00:00+00:00",
-          "club_player_id": "7f802854-8293-88b6-8520-8869a1b1353d"
-        }
-      ],
+      "club_player_private_inputs": [],
       "club_player_private_inputs (removed)": [],
       "shared_player_entries": [],
       "shared_player_entries (removed)": [],
@@ -10960,230 +10864,37 @@
   "add_new_guest_phone_plus63": {
     "steps": [
       {
-        "status": 200,
+        "status": 422,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
           "vary": "Cookie"
         },
         "body": {
-          "results": [
-            {
-              "operationId": "b0000000-0000-4000-8000-000000000065",
-              "op": "add",
-              "rosterEntry": {
-                "id": "4fd1ffca-3146-816c-9b6f-d75f99845084",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "clubPlayerId": "0a32161f-a3ee-82f0-a85e-4f413e7303b1",
-                "nameSnapshot": "Newbie",
-                "nicknameSnapshot": null,
-                "clubNickname": null,
-                "present": false,
-                "presentChangedAt": "2026-11-19T04:00:00.000Z",
-                "level": "intermediate_low",
-                "levelLockedAt": null,
-                "confirmedAt": "2026-11-19T04:00:00.000Z",
-                "gamesAdjustment": 0,
-                "selfCheckedInAt": null,
-                "leftAt": null,
-                "revision": "2"
-              },
-              "waitlist": null,
-              "emailWords": null,
-              "request": null
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "phone": "Add an email or a social link to save a phone, or leave the phone empty."
             }
-          ],
-          "roster": {
-            "capacity": 2,
-            "roster": [
-              {
-                "id": "a7000000-0000-4000-8000-000000000001",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
-                "nameSnapshot": "Hal Guest",
-                "nicknameSnapshot": null,
-                "clubNickname": null,
-                "present": false,
-                "presentChangedAt": "2026-11-15T01:00:00.000Z",
-                "level": "intermediate_low",
-                "levelLockedAt": null,
-                "confirmedAt": "2026-11-15T01:00:00.000Z",
-                "gamesAdjustment": 0,
-                "selfCheckedInAt": null,
-                "leftAt": null,
-                "revision": "2",
-                "hasPlayedAtClubBefore": false
-              },
-              {
-                "id": "4fd1ffca-3146-816c-9b6f-d75f99845084",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "clubPlayerId": "0a32161f-a3ee-82f0-a85e-4f413e7303b1",
-                "nameSnapshot": "Newbie",
-                "nicknameSnapshot": null,
-                "clubNickname": null,
-                "present": false,
-                "presentChangedAt": "2026-11-19T04:00:00.000Z",
-                "level": "intermediate_low",
-                "levelLockedAt": null,
-                "confirmedAt": "2026-11-19T04:00:00.000Z",
-                "gamesAdjustment": 0,
-                "selfCheckedInAt": null,
-                "leftAt": null,
-                "revision": "2",
-                "hasPlayedAtClubBefore": false
-              }
-            ],
-            "noShows": [],
-            "waitlist": [],
-            "joinRequests": [
-              {
-                "id": "a3400000-0000-4000-8000-000000000003",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "name": "Waiting Wade",
-                "nickname": null,
-                "phoneE164": null,
-                "statedBand": "advanced",
-                "placement": "waitlist",
-                "status": "pending",
-                "requestedAt": "2026-11-19T02:00:00.000Z",
-                "decidedAt": null,
-                "clubPlayerId": null,
-                "playerId": null,
-                "picture": null,
-                "pictureName": null
-              },
-              {
-                "id": "a3400000-0000-4000-8000-000000000002",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "name": "Ann Reyes",
-                "nickname": null,
-                "phoneE164": null,
-                "statedBand": "unsure",
-                "placement": "slot",
-                "status": "pending",
-                "requestedAt": "2026-11-19T02:05:00.000Z",
-                "decidedAt": null,
-                "clubPlayerId": null,
-                "playerId": "d4000000-0000-4000-8000-000000000001",
-                "picture": null,
-                "pictureName": "Ann Reyes"
-              },
-              {
-                "id": "a3400000-0000-4000-8000-000000000001",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "name": "Walk In Wendy",
-                "nickname": "Wen",
-                "phoneE164": "+639175550801",
-                "statedBand": "beginner",
-                "placement": "slot",
-                "status": "pending",
-                "requestedAt": "2026-11-19T02:10:00.123Z",
-                "decidedAt": null,
-                "clubPlayerId": null,
-                "playerId": null,
-                "picture": null,
-                "pictureName": null
-              }
-            ]
           }
         }
       }
     ],
     "db": {
-      "queue_sessions": [
-        {
-          "id": "a3000000-0000-4000-8000-000000000001",
-          "state": "prepared",
-          "revision": "6",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "minimum_games": 20,
-          "queue_revision": "1"
-        }
-      ],
-      "queue_sessions (removed)": [
-        {
-          "id": "a3000000-0000-4000-8000-000000000001",
-          "state": "prepared",
-          "revision": "5",
-          "updated_at": "2026-11-10T00:00:00+00:00",
-          "minimum_games": 0,
-          "queue_revision": "1"
-        }
-      ],
-      "session_players": [
-        {
-          "id": "4fd1ffca-3146-816c-9b6f-d75f99845084",
-          "present": false,
-          "revision": "2",
-          "joined_at": "2026-11-19T04:00:00+00:00",
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "no_show_at": null,
-          "session_id": "a3000000-0000-4000-8000-000000000001",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "released_at": null,
-          "confirmed_at": "2026-11-19T04:00:00+00:00",
-          "name_snapshot": "Newbie",
-          "club_player_id": "0a32161f-a3ee-82f0-a85e-4f413e7303b1",
-          "over_budget_at": null,
-          "release_reason": null,
-          "skill_level_id": 3,
-          "level_locked_at": null,
-          "player_id_at_entry": null,
-          "present_changed_at": "2026-11-19T04:00:00+00:00",
-          "assessment_operation_id": "b0000000-0000-4000-8000-000000000065"
-        }
-      ],
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
       "session_players (removed)": [],
-      "club_assessments": [
-        {
-          "session_id": "a3000000-0000-4000-8000-000000000001",
-          "assessed_at": "2026-11-19T04:00:00+00:00",
-          "received_at": "2026-11-19T04:00:00+00:00",
-          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
-          "club_player_id": "0a32161f-a3ee-82f0-a85e-4f413e7303b1",
-          "skill_level_id": 3,
-          "accepted_revision": "5",
-          "session_player_id": "4fd1ffca-3146-816c-9b6f-d75f99845084",
-          "source_operation_id": "b0000000-0000-4000-8000-000000000065",
-          "player_id_at_assessment": null,
-          "supersedes_operation_id": null
-        }
-      ],
+      "club_assessments": [],
       "club_assessments (removed)": [],
       "session_waitlist": [],
       "session_waitlist (removed)": [],
       "session_join_requests": [],
       "session_join_requests (removed)": [],
-      "club_players": [
-        {
-          "id": "0a32161f-a3ee-82f0-a85e-4f413e7303b1",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "added_at": "2026-11-19T04:00:00+00:00",
-          "nickname": null,
-          "revision": "1",
-          "player_id": null,
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "removed_at": null,
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "display_name": "Newbie",
-          "shared_entry_rtr_id": null,
-          "linked_to_club_player_id": null
-        }
-      ],
+      "club_players": [],
       "club_players (removed)": [],
-      "club_player_private_inputs": [
-        {
-          "email": null,
-          "state": "pending",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "revision": "1",
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "phone_e164": "+639175550101",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "captured_at": "2026-11-19T04:00:00+00:00",
-          "club_player_id": "0a32161f-a3ee-82f0-a85e-4f413e7303b1"
-        }
-      ],
+      "club_player_private_inputs": [],
       "club_player_private_inputs (removed)": [],
       "shared_player_entries": [],
       "shared_player_entries (removed)": [],
@@ -11200,230 +10911,37 @@
   "add_new_guest_phone_639": {
     "steps": [
       {
-        "status": 200,
+        "status": 422,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
           "vary": "Cookie"
         },
         "body": {
-          "results": [
-            {
-              "operationId": "b0000000-0000-4000-8000-000000000066",
-              "op": "add",
-              "rosterEntry": {
-                "id": "034e9442-a547-8948-a7bd-fd41da6edd92",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "clubPlayerId": "2db595e9-edf8-8375-920e-20d51e380e01",
-                "nameSnapshot": "Newbie",
-                "nicknameSnapshot": null,
-                "clubNickname": null,
-                "present": false,
-                "presentChangedAt": "2026-11-19T04:00:00.000Z",
-                "level": "intermediate_low",
-                "levelLockedAt": null,
-                "confirmedAt": "2026-11-19T04:00:00.000Z",
-                "gamesAdjustment": 0,
-                "selfCheckedInAt": null,
-                "leftAt": null,
-                "revision": "2"
-              },
-              "waitlist": null,
-              "emailWords": null,
-              "request": null
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "phone": "Add an email or a social link to save a phone, or leave the phone empty."
             }
-          ],
-          "roster": {
-            "capacity": 2,
-            "roster": [
-              {
-                "id": "a7000000-0000-4000-8000-000000000001",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
-                "nameSnapshot": "Hal Guest",
-                "nicknameSnapshot": null,
-                "clubNickname": null,
-                "present": false,
-                "presentChangedAt": "2026-11-15T01:00:00.000Z",
-                "level": "intermediate_low",
-                "levelLockedAt": null,
-                "confirmedAt": "2026-11-15T01:00:00.000Z",
-                "gamesAdjustment": 0,
-                "selfCheckedInAt": null,
-                "leftAt": null,
-                "revision": "2",
-                "hasPlayedAtClubBefore": false
-              },
-              {
-                "id": "034e9442-a547-8948-a7bd-fd41da6edd92",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "clubPlayerId": "2db595e9-edf8-8375-920e-20d51e380e01",
-                "nameSnapshot": "Newbie",
-                "nicknameSnapshot": null,
-                "clubNickname": null,
-                "present": false,
-                "presentChangedAt": "2026-11-19T04:00:00.000Z",
-                "level": "intermediate_low",
-                "levelLockedAt": null,
-                "confirmedAt": "2026-11-19T04:00:00.000Z",
-                "gamesAdjustment": 0,
-                "selfCheckedInAt": null,
-                "leftAt": null,
-                "revision": "2",
-                "hasPlayedAtClubBefore": false
-              }
-            ],
-            "noShows": [],
-            "waitlist": [],
-            "joinRequests": [
-              {
-                "id": "a3400000-0000-4000-8000-000000000003",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "name": "Waiting Wade",
-                "nickname": null,
-                "phoneE164": null,
-                "statedBand": "advanced",
-                "placement": "waitlist",
-                "status": "pending",
-                "requestedAt": "2026-11-19T02:00:00.000Z",
-                "decidedAt": null,
-                "clubPlayerId": null,
-                "playerId": null,
-                "picture": null,
-                "pictureName": null
-              },
-              {
-                "id": "a3400000-0000-4000-8000-000000000002",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "name": "Ann Reyes",
-                "nickname": null,
-                "phoneE164": null,
-                "statedBand": "unsure",
-                "placement": "slot",
-                "status": "pending",
-                "requestedAt": "2026-11-19T02:05:00.000Z",
-                "decidedAt": null,
-                "clubPlayerId": null,
-                "playerId": "d4000000-0000-4000-8000-000000000001",
-                "picture": null,
-                "pictureName": "Ann Reyes"
-              },
-              {
-                "id": "a3400000-0000-4000-8000-000000000001",
-                "sessionId": "a3000000-0000-4000-8000-000000000001",
-                "name": "Walk In Wendy",
-                "nickname": "Wen",
-                "phoneE164": "+639175550801",
-                "statedBand": "beginner",
-                "placement": "slot",
-                "status": "pending",
-                "requestedAt": "2026-11-19T02:10:00.123Z",
-                "decidedAt": null,
-                "clubPlayerId": null,
-                "playerId": null,
-                "picture": null,
-                "pictureName": null
-              }
-            ]
           }
         }
       }
     ],
     "db": {
-      "queue_sessions": [
-        {
-          "id": "a3000000-0000-4000-8000-000000000001",
-          "state": "prepared",
-          "revision": "6",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "minimum_games": 20,
-          "queue_revision": "1"
-        }
-      ],
-      "queue_sessions (removed)": [
-        {
-          "id": "a3000000-0000-4000-8000-000000000001",
-          "state": "prepared",
-          "revision": "5",
-          "updated_at": "2026-11-10T00:00:00+00:00",
-          "minimum_games": 0,
-          "queue_revision": "1"
-        }
-      ],
-      "session_players": [
-        {
-          "id": "034e9442-a547-8948-a7bd-fd41da6edd92",
-          "present": false,
-          "revision": "2",
-          "joined_at": "2026-11-19T04:00:00+00:00",
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "no_show_at": null,
-          "session_id": "a3000000-0000-4000-8000-000000000001",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "released_at": null,
-          "confirmed_at": "2026-11-19T04:00:00+00:00",
-          "name_snapshot": "Newbie",
-          "club_player_id": "2db595e9-edf8-8375-920e-20d51e380e01",
-          "over_budget_at": null,
-          "release_reason": null,
-          "skill_level_id": 3,
-          "level_locked_at": null,
-          "player_id_at_entry": null,
-          "present_changed_at": "2026-11-19T04:00:00+00:00",
-          "assessment_operation_id": "b0000000-0000-4000-8000-000000000066"
-        }
-      ],
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
       "session_players (removed)": [],
-      "club_assessments": [
-        {
-          "session_id": "a3000000-0000-4000-8000-000000000001",
-          "assessed_at": "2026-11-19T04:00:00+00:00",
-          "received_at": "2026-11-19T04:00:00+00:00",
-          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
-          "club_player_id": "2db595e9-edf8-8375-920e-20d51e380e01",
-          "skill_level_id": 3,
-          "accepted_revision": "5",
-          "session_player_id": "034e9442-a547-8948-a7bd-fd41da6edd92",
-          "source_operation_id": "b0000000-0000-4000-8000-000000000066",
-          "player_id_at_assessment": null,
-          "supersedes_operation_id": null
-        }
-      ],
+      "club_assessments": [],
       "club_assessments (removed)": [],
       "session_waitlist": [],
       "session_waitlist (removed)": [],
       "session_join_requests": [],
       "session_join_requests (removed)": [],
-      "club_players": [
-        {
-          "id": "2db595e9-edf8-8375-920e-20d51e380e01",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "added_at": "2026-11-19T04:00:00+00:00",
-          "nickname": null,
-          "revision": "1",
-          "player_id": null,
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "removed_at": null,
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "display_name": "Newbie",
-          "shared_entry_rtr_id": null,
-          "linked_to_club_player_id": null
-        }
-      ],
+      "club_players": [],
       "club_players (removed)": [],
-      "club_player_private_inputs": [
-        {
-          "email": null,
-          "state": "pending",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "revision": "1",
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "phone_e164": "+639175550102",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "captured_at": "2026-11-19T04:00:00+00:00",
-          "club_player_id": "2db595e9-edf8-8375-920e-20d51e380e01"
-        }
-      ],
+      "club_player_private_inputs": [],
       "club_player_private_inputs (removed)": [],
       "shared_player_entries": [],
       "shared_player_entries (removed)": [],
@@ -11464,6 +10982,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -11489,6 +11008,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -11507,6 +11027,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -11833,6 +11354,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -11858,6 +11380,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -11876,6 +11399,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -12061,6 +11585,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -12086,6 +11611,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -12104,6 +11630,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -12289,6 +11816,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -12314,6 +11842,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -12332,6 +11861,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -12517,6 +12047,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -12542,6 +12073,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -12560,6 +12092,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -12768,6 +12301,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -12793,6 +12327,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -12811,6 +12346,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -12913,6 +12449,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -12931,6 +12468,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -13190,6 +12728,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -13215,6 +12754,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -13233,6 +12773,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -13418,6 +12959,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -13443,6 +12985,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -13461,6 +13004,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -13646,6 +13190,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -13671,6 +13216,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -13689,6 +13235,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -13886,6 +13433,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -13911,6 +13459,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -13929,6 +13478,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -14359,6 +13909,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -14377,6 +13928,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -14540,6 +14092,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -14565,6 +14118,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -14583,6 +14137,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -14787,6 +14342,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -14812,6 +14368,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -14830,6 +14387,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -15038,6 +14596,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -15063,6 +14622,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -15081,6 +14641,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -15167,6 +14728,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -15192,6 +14754,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -15210,6 +14773,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -15426,6 +14990,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -16070,7 +15635,7 @@
   "remove_malformed_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -16078,8 +15643,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -16114,7 +15679,7 @@
   "remove_missing_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -16122,8 +15687,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -16189,6 +15754,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "5"
@@ -16213,6 +15779,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "5",
@@ -16586,6 +16153,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -16610,6 +16178,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -16628,6 +16197,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -16850,6 +16420,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -16873,6 +16444,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -16891,6 +16463,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -17112,6 +16685,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -17135,6 +16709,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -17153,6 +16728,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -17385,6 +16961,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -17778,7 +17355,7 @@
   "accept_malformed_request_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -17786,8 +17363,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -17956,6 +17533,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -17979,6 +17557,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -17997,6 +17576,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -18221,6 +17801,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -18239,6 +17820,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -18460,6 +18042,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -18483,6 +18066,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -18501,6 +18085,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -18739,6 +18324,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -18762,6 +18348,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -18780,6 +18367,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -18873,6 +18461,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -18891,6 +18480,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -19156,6 +18746,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -19179,6 +18770,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -19197,6 +18789,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -19396,6 +18989,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -19420,6 +19014,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -19438,6 +19033,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -19638,6 +19234,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -19661,6 +19258,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -19679,6 +19277,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -19697,6 +19296,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T03:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -19715,6 +19315,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -19990,6 +19591,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -20013,6 +19615,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -20031,6 +19634,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -20049,6 +19653,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T03:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -20067,6 +19672,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -20085,6 +19691,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -20327,6 +19934,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -20345,6 +19953,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -20544,6 +20153,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -20567,6 +20177,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -20762,6 +20373,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -20939,6 +20551,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -21032,6 +20645,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -21209,6 +20823,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -21498,7 +21113,7 @@
   "decline_malformed_request_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -21506,8 +21121,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -21660,6 +21275,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -21706,6 +21322,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -21780,6 +21397,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -21798,6 +21416,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -22308,6 +21927,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -22376,6 +21996,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -22394,6 +22015,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -22674,6 +22296,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -22735,6 +22358,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -22753,6 +22377,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -23230,6 +22855,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -23276,6 +22902,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -23294,6 +22921,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -23492,6 +23120,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -23538,6 +23167,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -23556,6 +23186,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -23773,6 +23404,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -23791,6 +23423,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -23950,6 +23583,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -23968,6 +23602,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -24116,6 +23751,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -24140,6 +23776,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -24158,6 +23795,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -24244,6 +23882,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -24268,6 +23907,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -24286,6 +23926,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -24456,6 +24097,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -24480,6 +24122,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-15T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -24498,6 +24141,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -24592,6 +24236,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -24805,6 +24450,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -24829,6 +24475,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -24847,6 +24494,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -24865,6 +24513,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T03:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -24883,6 +24532,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -24961,6 +24611,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -24979,6 +24630,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -24997,6 +24649,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T03:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -25015,6 +24668,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -25236,6 +24890,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T01:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -25254,6 +24909,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T02:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -25272,6 +24928,7 @@
                 "levelLockedAt": "2026-11-19T01:00:00.000Z",
                 "confirmedAt": "2026-11-18T03:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "3",
@@ -25290,6 +24947,7 @@
                 "levelLockedAt": "2026-11-19T04:00:00.000Z",
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -25520,6 +25178,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -25551,6 +25210,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -25637,6 +25297,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "5"
@@ -25661,6 +25322,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2",
@@ -25679,6 +25341,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "5",
@@ -25907,6 +25570,7 @@
                     "levelLockedAt": null,
                     "confirmedAt": "2026-11-19T04:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "2"
@@ -25946,6 +25610,7 @@
                     "levelLockedAt": null,
                     "confirmedAt": "2026-11-15T01:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "2",
@@ -25964,6 +25629,7 @@
                     "levelLockedAt": null,
                     "confirmedAt": "2026-11-19T04:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "2",
@@ -26059,6 +25725,7 @@
                     "levelLockedAt": null,
                     "confirmedAt": "2026-11-19T04:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "2"
@@ -26098,6 +25765,7 @@
                     "levelLockedAt": null,
                     "confirmedAt": "2026-11-15T01:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "2",
@@ -26116,6 +25784,7 @@
                     "levelLockedAt": null,
                     "confirmedAt": "2026-11-19T04:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "2",
@@ -26350,6 +26019,7 @@
                     "levelLockedAt": "2026-11-19T04:00:00.000Z",
                     "confirmedAt": "2026-11-19T04:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "2"
@@ -26374,6 +26044,7 @@
                     "levelLockedAt": "2026-11-19T01:00:00.000Z",
                     "confirmedAt": "2026-11-18T01:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "3",
@@ -26392,6 +26063,7 @@
                     "levelLockedAt": "2026-11-19T01:00:00.000Z",
                     "confirmedAt": "2026-11-18T02:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "3",
@@ -26410,6 +26082,7 @@
                     "levelLockedAt": "2026-11-19T01:00:00.000Z",
                     "confirmedAt": "2026-11-18T03:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "3",
@@ -26428,6 +26101,7 @@
                     "levelLockedAt": "2026-11-19T04:00:00.000Z",
                     "confirmedAt": "2026-11-19T04:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "2",
@@ -26491,6 +26165,7 @@
                     "levelLockedAt": "2026-11-19T04:00:00.000Z",
                     "confirmedAt": "2026-11-19T04:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "2"
@@ -26515,6 +26190,7 @@
                     "levelLockedAt": "2026-11-19T01:00:00.000Z",
                     "confirmedAt": "2026-11-18T01:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "3",
@@ -26533,6 +26209,7 @@
                     "levelLockedAt": "2026-11-19T01:00:00.000Z",
                     "confirmedAt": "2026-11-18T02:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "3",
@@ -26551,6 +26228,7 @@
                     "levelLockedAt": "2026-11-19T01:00:00.000Z",
                     "confirmedAt": "2026-11-18T03:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "3",
@@ -26569,6 +26247,7 @@
                     "levelLockedAt": "2026-11-19T04:00:00.000Z",
                     "confirmedAt": "2026-11-19T04:00:00.000Z",
                     "gamesAdjustment": 0,
+                    "handicapSpots": [],
                     "selfCheckedInAt": null,
                     "leftAt": null,
                     "revision": "2",

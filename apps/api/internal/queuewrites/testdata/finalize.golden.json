@@ -328,6 +328,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -1193,7 +1194,7 @@
   "post_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -1201,8 +1202,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -1310,6 +1311,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -1517,6 +1519,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -1947,6 +1950,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -2779,6 +2783,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -3731,6 +3736,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -4693,6 +4699,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -5420,6 +5427,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -6147,6 +6155,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -6873,6 +6882,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -7356,13 +7366,33 @@
             "sessionId": "a3000000-0000-4000-8000-000000000003",
             "commandId": "b1000000-0000-4000-8000-000000000001",
             "state": "done",
-            "stage": "finishing",
+            "stage": "slides",
             "accepted": true,
             "committedAt": "2026-11-19T04:00:00.000Z",
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
-            "jobs": []
+            "recordGames": false,
+            "jobs": [
+              {
+                "kind": "club_session_summaries",
+                "status": "done",
+                "attempts": 0,
+                "lastErrorCode": null
+              },
+              {
+                "kind": "player_history",
+                "status": "done",
+                "attempts": 1,
+                "lastErrorCode": null
+              },
+              {
+                "kind": "result_snapshot",
+                "status": "done",
+                "attempts": 1,
+                "lastErrorCode": null
+              }
+            ]
           },
           "warnings": {
             "belowMinimum": [
@@ -7569,17 +7599,17 @@
       ],
       "session_finalizations": [
         {
-          "stage": "finishing",
+          "stage": "slides",
           "state": "done",
           "club_id": "c9000000-0000-4000-8000-000000000001",
-          "revision": "1",
+          "revision": "3",
           "command_id": "b1000000-0000-4000-8000-000000000001",
           "session_id": "a3000000-0000-4000-8000-000000000003",
           "started_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "committed_at": "2026-11-19T04:00:00+00:00",
           "completed_at": "2026-11-19T04:00:00+00:00",
-          "facts_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "facts_digest": "91c5bc6c9ca47724fafc00e39745255866ec6ca5092941df71131015312e7356",
           "failed_stage": null,
           "failure_code": null,
           "manifest_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
@@ -7589,13 +7619,535 @@
         }
       ],
       "session_finalizations (removed)": [],
-      "player_match_facts": [],
+      "player_match_facts": [
+        {
+          "id": "<redacted>",
+          "team": "A",
+          "format": "singles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000001",
+          "played_at": "2026-11-19T02:01:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 15,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "standard_match": true,
+          "partner_entry_ids": [],
+          "session_player_id": "a7000000-0000-4000-8000-000000000020",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000021"
+          ],
+          "skill_level_snapshot_id": 3,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "singles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000001",
+          "played_at": "2026-11-19T02:01:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 15,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000002",
+          "standard_match": true,
+          "partner_entry_ids": [],
+          "session_player_id": "a7000000-0000-4000-8000-000000000021",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020"
+          ],
+          "skill_level_snapshot_id": 4,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "doubles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000002",
+          "played_at": "2026-11-19T02:02:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 15,
+          "team_b_score": 21,
+          "winning_team": "B",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "standard_match": true,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000021"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000020",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022",
+            "a7000000-0000-4000-8000-000000000023"
+          ],
+          "skill_level_snapshot_id": 3,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "doubles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000002",
+          "played_at": "2026-11-19T02:02:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 15,
+          "team_b_score": 21,
+          "winning_team": "B",
+          "club_player_id": "c6000000-0000-4000-8000-000000000002",
+          "standard_match": true,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000021",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022",
+            "a7000000-0000-4000-8000-000000000023"
+          ],
+          "skill_level_snapshot_id": 4,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "A",
+          "format": "doubles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000002",
+          "played_at": "2026-11-19T02:02:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 15,
+          "team_b_score": 21,
+          "winning_team": "B",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "standard_match": true,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000023"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000022",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020",
+            "a7000000-0000-4000-8000-000000000021"
+          ],
+          "skill_level_snapshot_id": 5,
+          "player_id_at_finalization": "d4000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "<redacted>",
+          "team": "A",
+          "format": "doubles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000002",
+          "played_at": "2026-11-19T02:02:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 15,
+          "team_b_score": 21,
+          "winning_team": "B",
+          "club_player_id": "c6000000-0000-4000-8000-000000000004",
+          "standard_match": true,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000023",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020",
+            "a7000000-0000-4000-8000-000000000021"
+          ],
+          "skill_level_snapshot_id": 6,
+          "player_id_at_finalization": "d4000000-0000-4000-8000-000000000002"
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "singles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000003",
+          "played_at": "2026-11-19T02:03:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 10,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "standard_match": true,
+          "partner_entry_ids": [],
+          "session_player_id": "a7000000-0000-4000-8000-000000000004",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022"
+          ],
+          "skill_level_snapshot_id": 3,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "A",
+          "format": "singles",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000003",
+          "played_at": "2026-11-19T02:03:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 10,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "standard_match": true,
+          "partner_entry_ids": [],
+          "session_player_id": "a7000000-0000-4000-8000-000000000022",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000004"
+          ],
+          "skill_level_snapshot_id": 5,
+          "player_id_at_finalization": "d4000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "<redacted>",
+          "team": "A",
+          "format": "fun_1v2",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000007",
+          "played_at": "2026-11-19T02:07:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 12,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "standard_match": false,
+          "partner_entry_ids": [],
+          "session_player_id": "a7000000-0000-4000-8000-000000000020",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022",
+            "a7000000-0000-4000-8000-000000000023"
+          ],
+          "skill_level_snapshot_id": 3,
+          "player_id_at_finalization": null
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "fun_1v2",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000007",
+          "played_at": "2026-11-19T02:07:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 12,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "standard_match": false,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000023"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000022",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020"
+          ],
+          "skill_level_snapshot_id": 5,
+          "player_id_at_finalization": "d4000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "<redacted>",
+          "team": "B",
+          "format": "fun_1v2",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "match_id": "a4000000-0000-4000-8000-000000000007",
+          "played_at": "2026-11-19T02:07:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "fact_version": 1,
+          "team_a_score": 21,
+          "team_b_score": 12,
+          "winning_team": "A",
+          "club_player_id": "c6000000-0000-4000-8000-000000000004",
+          "standard_match": false,
+          "partner_entry_ids": [
+            "a7000000-0000-4000-8000-000000000022"
+          ],
+          "session_player_id": "a7000000-0000-4000-8000-000000000023",
+          "full_participation": true,
+          "opponent_entry_ids": [
+            "a7000000-0000-4000-8000-000000000020"
+          ],
+          "skill_level_snapshot_id": 6,
+          "player_id_at_finalization": "d4000000-0000-4000-8000-000000000002"
+        }
+      ],
       "player_match_facts (removed)": [],
-      "club_session_player_summaries": [],
+      "club_session_player_summaries": [
+        {
+          "id": "<redacted>",
+          "wins": 0,
+          "losses": 1,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 0,
+          "full_games": 1,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "standard_games": 1,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000004",
+          "player_id_snapshot": null,
+          "skill_level_snapshot_id": 3
+        },
+        {
+          "id": "<redacted>",
+          "wins": 0,
+          "losses": 0,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 0,
+          "full_games": 0,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "standard_games": 0,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000005",
+          "player_id_snapshot": null,
+          "skill_level_snapshot_id": 4
+        },
+        {
+          "id": "<redacted>",
+          "wins": 0,
+          "losses": 0,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 0,
+          "full_games": 0,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000009",
+          "standard_games": 0,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000006",
+          "player_id_snapshot": null,
+          "skill_level_snapshot_id": 5
+        },
+        {
+          "id": "<redacted>",
+          "wins": 3,
+          "losses": 0,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 1,
+          "full_games": 3,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "standard_games": 2,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000020",
+          "player_id_snapshot": null,
+          "skill_level_snapshot_id": 3
+        },
+        {
+          "id": "<redacted>",
+          "wins": 1,
+          "losses": 1,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 0,
+          "full_games": 2,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000002",
+          "standard_games": 2,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000021",
+          "player_id_snapshot": null,
+          "skill_level_snapshot_id": 4
+        },
+        {
+          "id": "<redacted>",
+          "wins": 1,
+          "losses": 2,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 1,
+          "full_games": 3,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "standard_games": 2,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000022",
+          "player_id_snapshot": "d4000000-0000-4000-8000-000000000001",
+          "skill_level_snapshot_id": 5
+        },
+        {
+          "id": "<redacted>",
+          "wins": 0,
+          "losses": 2,
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "fun_games": 1,
+          "full_games": 2,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "projected_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000004",
+          "standard_games": 1,
+          "summary_version": 1,
+          "session_player_id": "a7000000-0000-4000-8000-000000000023",
+          "player_id_snapshot": "d4000000-0000-4000-8000-000000000002",
+          "skill_level_snapshot_id": 6
+        }
+      ],
       "club_session_player_summaries (removed)": [],
-      "session_result_snapshots": [],
+      "session_result_snapshots": [
+        {
+          "id": "<redacted>",
+          "awards": {
+            "mvp": {
+              "name": "Gus Guest",
+              "games": 3,
+              "score": 2.6155976205368443,
+              "playerId": null,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000020"
+            },
+            "mostImproved": null
+          },
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "off_day": [],
+          "version": 1,
+          "standings": [
+            {
+              "name": "Gus Guest",
+              "wins": 3,
+              "games": 3,
+              "losses": 0,
+              "position": 1,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000020"
+            },
+            {
+              "name": "Gail Guest",
+              "wins": 1,
+              "games": 2,
+              "losses": 1,
+              "position": 2,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000002",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000021"
+            },
+            {
+              "name": "Ann Reyes",
+              "wins": 1,
+              "games": 3,
+              "losses": 2,
+              "position": 3,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000022"
+            },
+            {
+              "name": "Jo Guest",
+              "wins": 0,
+              "games": 1,
+              "losses": 0,
+              "position": 4,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000009",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000006"
+            },
+            {
+              "name": "Hal Guest",
+              "wins": 0,
+              "games": 1,
+              "losses": 1,
+              "position": 5,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000004"
+            },
+            {
+              "name": "Ben Santos",
+              "wins": 0,
+              "games": 3,
+              "losses": 2,
+              "position": 6,
+              "clubPlayerId": "c6000000-0000-4000-8000-000000000004",
+              "sessionPlayerId": "a7000000-0000-4000-8000-000000000023"
+            }
+          ],
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "generated_at": "2026-11-19T04:00:00+00:00",
+          "calculation_version": "prototype-reference",
+          "baseline_session_ids": []
+        }
+      ],
       "session_result_snapshots (removed)": [],
-      "projection_jobs": [],
+      "projection_jobs": [
+        {
+          "id": "<redacted>",
+          "kind": "club_session_summaries",
+          "status": "done",
+          "attempts": 0,
+          "locked_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "finalization",
+          "completed_at": "2026-11-19T04:00:00+00:00",
+          "kind_version": 1,
+          "last_error_code": null,
+          "next_attempt_at": "2026-11-19T04:00:00+00:00",
+          "target_player_id": null,
+          "source_finalization_id": "a3000000-0000-4000-8000-000000000003"
+        },
+        {
+          "id": "<redacted>",
+          "kind": "result_snapshot",
+          "status": "done",
+          "attempts": 1,
+          "locked_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "finalization",
+          "completed_at": "2026-11-19T04:00:00+00:00",
+          "kind_version": 1,
+          "last_error_code": null,
+          "next_attempt_at": "2026-11-19T04:00:00+00:00",
+          "target_player_id": null,
+          "source_finalization_id": "a3000000-0000-4000-8000-000000000003"
+        },
+        {
+          "id": "<redacted>",
+          "kind": "player_history",
+          "status": "done",
+          "attempts": 1,
+          "locked_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "finalization",
+          "completed_at": "2026-11-19T04:00:00+00:00",
+          "kind_version": 1,
+          "last_error_code": null,
+          "next_attempt_at": "2026-11-19T04:00:00+00:00",
+          "target_player_id": null,
+          "source_finalization_id": "a3000000-0000-4000-8000-000000000003"
+        }
+      ],
       "projection_jobs (removed)": [],
       "player_rank_current": [],
       "player_rank_current (removed)": [],
@@ -7623,6 +8175,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -8465,6 +9018,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -9281,6 +9835,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -10763,6 +11318,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -10829,6 +11385,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -11645,6 +12202,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -11711,6 +12269,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -12527,6 +13086,7 @@
             "completedAt": "2026-11-19T03:00:01.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "player_history",
@@ -12595,6 +13155,7 @@
             "completedAt": "2026-11-19T03:00:01.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": []
           },
           "warnings": {
@@ -12706,6 +13267,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -13580,6 +14142,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -14454,6 +15017,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -15286,6 +15850,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -16256,6 +16821,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -17130,6 +17696,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -18049,6 +18616,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -18908,6 +19476,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -19522,6 +20091,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -20422,6 +20992,7 @@
             "completedAt": null,
             "failedStage": "player_records",
             "failureCode": "unavailable",
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -20487,6 +21058,7 @@
           "completedAt": null,
           "failedStage": "player_records",
           "failureCode": "unavailable",
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -20532,6 +21104,7 @@
           "completedAt": "2026-11-19T04:01:30.000Z",
           "failedStage": null,
           "failureCode": null,
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -21344,6 +21917,7 @@
             "completedAt": null,
             "failedStage": "player_records",
             "failureCode": "unavailable",
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -21410,6 +21984,7 @@
             "completedAt": null,
             "failedStage": "player_records",
             "failureCode": "unavailable",
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -22147,6 +22722,7 @@
           "completedAt": "2026-11-19T04:00:00.000Z",
           "failedStage": null,
           "failureCode": null,
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -22303,6 +22879,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -22462,6 +23039,7 @@
           "completedAt": null,
           "failedStage": null,
           "failureCode": null,
+          "recordGames": true,
           "jobs": [
             {
               "kind": "result_snapshot",
@@ -22612,6 +23190,7 @@
             "completedAt": null,
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "result_snapshot",
@@ -22765,6 +23344,7 @@
           "completedAt": null,
           "failedStage": "player_records",
           "failureCode": "unavailable",
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -22847,6 +23427,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -23006,6 +23587,7 @@
           "completedAt": null,
           "failedStage": "player_records",
           "failureCode": "unavailable",
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -23088,6 +23670,7 @@
             "completedAt": null,
             "failedStage": "player_records",
             "failureCode": "unavailable",
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -23173,6 +23756,7 @@
           "completedAt": "2026-11-19T04:00:00.000Z",
           "failedStage": null,
           "failureCode": null,
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -23329,6 +23913,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -23488,6 +24073,7 @@
           "completedAt": null,
           "failedStage": null,
           "failureCode": null,
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -23570,6 +24156,7 @@
             "completedAt": null,
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -23655,6 +24242,7 @@
           "completedAt": "2026-11-19T03:00:01.000Z",
           "failedStage": null,
           "failureCode": null,
+          "recordGames": true,
           "jobs": [
             {
               "kind": "player_history",
@@ -23731,6 +24319,7 @@
             "completedAt": "2026-11-19T03:00:01.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "player_history",
@@ -23810,6 +24399,7 @@
           "completedAt": null,
           "failedStage": "slides",
           "failureCode": "invalid",
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -23966,6 +24556,7 @@
             "completedAt": null,
             "failedStage": "slides",
             "failureCode": "invalid",
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -24125,6 +24716,7 @@
           "completedAt": null,
           "failedStage": "player_records",
           "failureCode": "projection_failed",
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -24281,6 +24873,7 @@
             "completedAt": null,
             "failedStage": "player_records",
             "failureCode": "projection_failed",
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -24440,6 +25033,7 @@
           "completedAt": null,
           "failedStage": "slides",
           "failureCode": "snap",
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -24596,6 +25190,7 @@
             "completedAt": null,
             "failedStage": "slides",
             "failureCode": "snap",
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -24755,6 +25350,7 @@
           "completedAt": null,
           "failedStage": "player_records",
           "failureCode": "x",
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -24911,6 +25507,7 @@
             "completedAt": null,
             "failedStage": "player_records",
             "failureCode": "x",
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",
@@ -25070,6 +25667,7 @@
           "completedAt": null,
           "failedStage": null,
           "failureCode": null,
+          "recordGames": true,
           "jobs": [
             {
               "kind": "player_rank",
@@ -25226,6 +25824,7 @@
             "completedAt": null,
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "player_rank",
@@ -25469,7 +26068,7 @@
   "get_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -25477,8 +26076,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -25635,6 +26234,7 @@
           "completedAt": null,
           "failedStage": null,
           "failureCode": null,
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -25680,6 +26280,7 @@
           "completedAt": "2026-11-19T04:30:00.000Z",
           "failedStage": null,
           "failureCode": null,
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -25835,6 +26436,7 @@
           "completedAt": "2026-11-19T05:30:00.000Z",
           "failedStage": null,
           "failureCode": null,
+          "recordGames": true,
           "jobs": [
             {
               "kind": "club_session_summaries",
@@ -25991,6 +26593,7 @@
             "completedAt": "2026-11-19T04:00:00.000Z",
             "failedStage": null,
             "failureCode": null,
+            "recordGames": true,
             "jobs": [
               {
                 "kind": "club_session_summaries",

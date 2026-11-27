@@ -1401,8 +1401,40 @@
         }
       ],
       "club_player_private_inputs (removed)": [],
-      "shared_player_entries": [],
-      "shared_player_entries (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": "una@example.test",
+          "rtr_id": "RTR-PH-CEB-102926-0007",
+          "revision": "2",
+          "sequence": 7,
+          "city_code": "CEB",
+          "sync_date": "2026-10-29",
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-10-29T03:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [
+        {
+          "email": "una@example.test",
+          "rtr_id": "RTR-PH-CEB-102926-0007",
+          "revision": "1",
+          "sequence": 7,
+          "city_code": "CEB",
+          "sync_date": "2026-10-29",
+          "created_at": "2026-10-29T03:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-10-29T03:00:00+00:00",
+          "allocated_at": "2026-10-29T03:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
       "player_id_counters": [],
       "player_id_counters (removed)": [],
       "player_notifications": [],
@@ -3109,7 +3141,7 @@
   "edit_malformed_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -3117,8 +3149,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }

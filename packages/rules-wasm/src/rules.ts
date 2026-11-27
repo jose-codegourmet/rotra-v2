@@ -10,6 +10,7 @@ import { engine } from './engine'
 import type {
   CourtFillMode,
   EndCourts,
+  ExpectedFinish,
   FillOptions,
   Gender,
   Match,
@@ -158,6 +159,8 @@ export const sessionEndCourtConflict = (
   courtBase: number,
   now: number,
 ) => run<string | null>('courts/sessionEndCourtConflict', { courts, endAt, courtBase }, now)
+export const expectedFinish = (scoring: string | null | undefined, minutesPlayed: number | null) =>
+  run<ExpectedFinish>('courts/expectedFinish', { scoring, minutesPlayed })
 
 // roster
 export const inUnfinishedMatch = (

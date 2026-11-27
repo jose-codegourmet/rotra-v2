@@ -298,6 +298,12 @@ func (rs Ruleset) Runners(strict bool) map[string]Runner {
 		}, now int64) any {
 			return orNull(rs.SessionEndCourtConflict(i.Courts, i.EndAt, i.CourtBase, now))
 		}),
+		"courts/expectedFinish": plain(strict, func(i struct {
+			Scoring       *string `json:"scoring"`
+			MinutesPlayed *int64  `json:"minutesPlayed"`
+		}) any {
+			return rs.ExpectedFinish(i.Scoring, i.MinutesPlayed)
+		}),
 
 		"roster/inUnfinishedMatch": plain(strict, func(i struct {
 			RosterID string        `json:"rosterId"`

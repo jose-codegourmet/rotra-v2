@@ -97,6 +97,13 @@ export type WinChanceBreakdown = {
   lasting: boolean
   upset: boolean
 }
+/** Expected finish (Q27.6, D-2026-11-23-08): where a match stands against its scoring mode's length. */
+export type ExpectedFinish = {
+  phase: 'notStarted' | 'mid' | 'soon' | 'any' | 'long'
+  minutesLeft: number
+  text: string
+  tag: string
+}
 export type MatchCategory = "Men's" | "Women's" | 'Mixed' | 'Genderless'
 export type Gender = 'male' | 'female'
 

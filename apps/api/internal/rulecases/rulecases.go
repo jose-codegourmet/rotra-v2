@@ -45,9 +45,7 @@ type Runner func(input json.RawMessage, now *int64) (any, error)
 // TypeScript in @rotra/data; the Go tests skip them until the Go rule and its runner exist. Remove a
 // key in the PR that adds its Go rule. The WebAssembly wrapper test skips the same keys
 // (packages/rules-wasm/test/rulesWasm.test.ts, GO_COPY_PENDING).
-var GoCopyPending = map[string]bool{
-	"courts/expectedFinish": true, // Q27.6, D-2026-11-23-08
-}
+var GoCopyPending = map[string]bool{}
 
 // RepoRoot finds the monorepo root by walking up from the working directory (a package test's
 // directory) to the first folder that holds packages/rule-cases/cases/v1.

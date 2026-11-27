@@ -48,6 +48,8 @@ export const canSendBack = (match: Pick<Match, 'state'>) =>
   run<boolean>('match/canSendBack', { match })
 export const canMoveCourt = (match: Match, courtIds: string[], ctx: MatchContext) =>
   run<boolean>('match/canMoveCourt', { match, courtIds, ...world(ctx) }, clock(ctx))
+export const canMovePlaying = (match: Match, courtIds: string[], ctx: MatchContext) =>
+  run<boolean>('match/canMovePlaying', { match, courtIds, ...world(ctx) }, clock(ctx))
 export const canReplacePlayer = (match: Match, outId: string, inId: string, ctx: MatchContext) =>
   run<boolean>('match/canReplacePlayer', { match, outId, inId, ...world(ctx) }, ctx.now)
 export const replacedLineup = (lineup: MatchLineup, outId: string, inId: string) =>

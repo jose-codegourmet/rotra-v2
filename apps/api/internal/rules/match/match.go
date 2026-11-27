@@ -314,6 +314,18 @@ func CanMoveCourt(m model.Match, courtIDs []string, ctx model.Context) bool {
 	return true
 }
 
+// CanMovePlaying (Move a Playing match, owner November 19, 2026): a Playing match with no confirmed
+// outcome onto the right number of distinct, free, open courts, the check an On court match gets
+// from CanMoveCourt. Its own courts are held by itself, so they never count as free.
+func CanMovePlaying(m model.Match, courtIDs []string, ctx model.Context) bool {
+	if m.State != model.StateActive || m.Decision != nil {
+		return false
+	}
+	probe := m
+	probe.State = model.StateOnCourt
+	return CanMoveCourt(probe, courtIDs, ctx)
+}
+
 // SubstitutionCandidates are the roster rows that could replace a player: same session, present, not
 // in this match and not busy elsewhere (On court or Playing).
 func SubstitutionCandidates(m model.Match, roster []model.Player, matches []model.Match) []model.Player {

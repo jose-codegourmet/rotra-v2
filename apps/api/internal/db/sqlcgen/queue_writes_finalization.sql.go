@@ -805,7 +805,8 @@ func (q *Queries) ListPlayerAttributions(ctx context.Context, playerID pgtype.UU
 }
 
 const listPlayerRankFacts = `-- name: ListPlayerRankFacts :many
-SELECT club_id, club_player_id, player_id_at_finalization, match_id, session_player_id, played_at, created_at, full_participation, standard_match
+SELECT club_id, club_player_id, player_id_at_finalization, match_id, session_player_id, played_at, created_at, full_participation, standard_match,
+  COALESCE((SELECT s.record_games FROM queue_sessions s WHERE s.id = player_match_facts.session_id), true)::boolean AS session_ranked
 FROM player_match_facts
 WHERE player_id_at_finalization = $1 OR club_player_id = ANY($2::uuid[])
 ORDER BY played_at DESC, match_id, session_player_id
@@ -826,10 +827,12 @@ type ListPlayerRankFactsRow struct {
 	CreatedAt              pgtype.Timestamptz
 	FullParticipation      bool
 	StandardMatch          bool
+	SessionRanked          bool
 }
 
 // playerFacts: the player's own snapshots plus confirmed, unrevoked guest history, newest first. The caller keeps the facts whose club and saved
 // player are one of the attributions (this query matches on the saved player alone).
+// session_ranked is false for a session run with Record games off (D-2026-11-20-02): its facts are kept as evidence, never counted (notRankedSessions).
 func (q *Queries) ListPlayerRankFacts(ctx context.Context, arg ListPlayerRankFactsParams) ([]ListPlayerRankFactsRow, error) {
 	rows, err := q.db.Query(ctx, listPlayerRankFacts, arg.PlayerID, arg.ClubPlayerIds)
 	if err != nil {
@@ -849,6 +852,7 @@ func (q *Queries) ListPlayerRankFacts(ctx context.Context, arg ListPlayerRankFac
 			&i.CreatedAt,
 			&i.FullParticipation,
 			&i.StandardMatch,
+			&i.SessionRanked,
 		); err != nil {
 			return nil, err
 		}

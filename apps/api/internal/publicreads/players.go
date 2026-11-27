@@ -165,7 +165,8 @@ func (p *players) readPublicProfile(ctx context.Context, q *sqlcgen.Queries, id 
 func (p *players) loadProfile(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID, raw string, v viewerRef, mode alwaysPrivateMode) (profileDTO, error) {
 	row, err := q.GetPublicProfile(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return profileDTO{}, errProfileNotFound
+		// An unclaimed person a club saved with an email or a social link is a shared entry, not a players row.
+		return p.entryProfile(ctx, q, id, v)
 	}
 	if err != nil {
 		return profileDTO{}, fmt.Errorf("reading profile: %w", err)
@@ -310,6 +311,18 @@ func (p *players) findByRTR(w http.ResponseWriter, r *http.Request) {
 	var playerID pgtype.UUID
 	err := readTx(r.Context(), p.pool, func(q *sqlcgen.Queries) error {
 		found, err := q.FindPlayerIDByRTR(r.Context(), key)
+		if errors.Is(err, pgx.ErrNoRows) {
+			// An unclaimed person a club saved is found by their RTR ID too. Unlike a player, a refusal here stays a refusal.
+			entry, err := q.FindOpenEntryByRTR(r.Context(), key)
+			if err != nil {
+				return err
+			}
+			if _, err := p.entryProfile(r.Context(), q, entry, viewerOf(r)); err != nil {
+				return err
+			}
+			playerID = entry
+			return nil
+		}
 		if err != nil {
 			return err
 		}
@@ -327,6 +340,9 @@ func (p *players) findByRTR(w http.ResponseWriter, r *http.Request) {
 	})
 	if errors.Is(err, pgx.ErrNoRows) || errors.Is(err, errProfileNotFound) {
 		notFound(w)
+		return
+	}
+	if p.refused(w, err) {
 		return
 	}
 	if err != nil {

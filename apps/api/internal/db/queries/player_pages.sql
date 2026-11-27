@@ -249,3 +249,29 @@ FROM session_players e
 LEFT JOIN players pl ON pl.id = e.player_id_at_entry
 LEFT JOIN player_id_allocations a ON a.player_id = pl.id
 WHERE e.club_id = @club_id AND e.session_id = @session_id;
+
+-- An unclaimed person a club saved (a shared entry, D-2026-11-16-04, D-2026-11-23-05): open means not claimed and not
+-- retired. Their public profile is read from the clubs that hold them, the first club to save them first.
+-- name: FindOpenEntryByRTR :one
+SELECT id FROM shared_player_entries WHERE rtr_id = @rtr_id::text AND claimed_player_id IS NULL AND retired_at IS NULL;
+
+-- name: ListEntrySavers :many
+SELECT e.rtr_id, cp.display_name, cp.nickname, cp.avatar_ref, c.name AS club_name, pi.preset_fields
+FROM shared_player_entries e
+JOIN club_players cp ON cp.shared_entry_id = e.id
+JOIN clubs c ON c.id = cp.club_id
+LEFT JOIN club_player_private_inputs pi ON pi.club_player_id = cp.id
+WHERE e.id = @entry_id AND e.claimed_player_id IS NULL AND e.retired_at IS NULL
+  AND cp.removed_at IS NULL AND cp.linked_to_club_player_id IS NULL AND cp.player_id IS NULL
+ORDER BY cp.added_at ASC, cp.id ASC;
+
+-- name: EntryIsOpen :one
+SELECT EXISTS (SELECT 1 FROM shared_player_entries WHERE id = @entry_id AND claimed_player_id IS NULL AND retired_at IS NULL)::bool;
+
+-- readEntryClubs: the clubs that saved an unclaimed person (a club once, in the order it saved them).
+-- name: ListEntryClubs :many
+SELECT c.id, c.name, c.logo_ref
+FROM club_players cp
+JOIN clubs c ON c.id = cp.club_id
+WHERE cp.shared_entry_id = @entry_id AND cp.removed_at IS NULL AND cp.linked_to_club_player_id IS NULL
+ORDER BY cp.added_at ASC, cp.id ASC;

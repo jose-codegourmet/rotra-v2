@@ -305,6 +305,8 @@ type createResult struct {
 	FirstSessionID string `json:"firstSessionId"`
 	Created        int    `json:"created"`
 	Skipped        *int   `json:"skipped"`
+	// Hosts is what the first date's save did with its hosts. The setup save's hostClubPlayerIds is not ported yet (see hosts.go), so it is always null.
+	Hosts *hostRegistration `json:"hosts"`
 }
 
 // createSession is POST /api/sessions, Q-SETUP Create session (or a repeating series). Repeat-safe on commandId: a retry returns
@@ -533,9 +535,10 @@ func isJSObject(v any) bool {
 
 // updateResult is what saving Edit preparation answers.
 type updateResult struct {
-	Session           signedin.Session `json:"session"`
-	MovedToWaitlist   int              `json:"movedToWaitlist"`
-	MovedFromWaitlist int              `json:"movedFromWaitlist"`
+	Session           signedin.Session  `json:"session"`
+	MovedToWaitlist   int               `json:"movedToWaitlist"`
+	Hosts             *hostRegistration `json:"hosts"`
+	MovedFromWaitlist int               `json:"movedFromWaitlist"`
 }
 
 // updateSession is updateQueueSession: prepared sessions only, at the expected revision. It reconciles the courts, then applies the

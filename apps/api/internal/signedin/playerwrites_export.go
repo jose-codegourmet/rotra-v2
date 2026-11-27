@@ -37,6 +37,10 @@ func OwnContactChangeOf(r sqlcgen.PlayerContactChangeRequest) OwnContactChange {
 // VerificationReminderUnread says whether the state-derived "Verify your ROTRA account" reminder is shown and unread: the
 // player is claimed with an account, not verified, and has not marked it read (reminderFor(...)?.readAt === null).
 func VerificationReminderUnread(ctx context.Context, q *sqlcgen.Queries, id pgtype.UUID) (bool, error) {
+	// D-2026-11-18-01: no verification reminder while Google sign-in for players is off; a missing flag or a failed read is off.
+	if on, err := q.GetFeatureFlagValue(ctx, playerGoogleFlag); err != nil || !on {
+		return false, nil
+	}
 	r, err := http.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
 	if err != nil {
 		return false, err

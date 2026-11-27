@@ -28,12 +28,14 @@ type linkView struct {
 
 // linkPreview is the public identity: nothing the player set, since the profile is unclaimed.
 type linkPreview struct {
-	PlayerID    *string `json:"playerId"`
-	FullName    string  `json:"fullName"`
-	Nickname    *string `json:"nickname"`
-	RTRID       *string `json:"rtrId"`
-	Picture     *string `json:"picture"`
-	MaskedPhone string  `json:"maskedPhone"`
+	PlayerID *string `json:"playerId"`
+	FullName string  `json:"fullName"`
+	Nickname *string `json:"nickname"`
+	RTRID    *string `json:"rtrId"`
+	Picture  *string `json:"picture"`
+	// PictureSeedID is only on a record link: the entry or record the picture is drawn from.
+	PictureSeedID *string `json:"pictureSeedId,omitempty"`
+	MaskedPhone   string  `json:"maskedPhone"`
 }
 
 // linkPreset is the registration form's starting values, as text the way the form holds them.
@@ -109,6 +111,9 @@ func (l *recordLink) view(now time.Time) *linkView {
 		ClubName: l.ClubName,
 		Preview: linkPreview{
 			FullName: l.DisplayName, Nickname: text(l.Nickname),
+			// Saved with an email: the RTR ID the person keeps (D-2026-11-16-04); else none yet. The picture the club set
+			// (D-2026-11-09-12), drawn as on its Saved players card.
+			RTRID: text(l.SharedEntryRtrID), Picture: text(l.AvatarRef),
 			MaskedPhone: maskedPhone(l.InputPhone),
 		},
 		// recordPresetOf: the club typed only a name, a nickname and an email; the email of the record's shared entry comes first
@@ -119,6 +124,11 @@ func (l *recordLink) view(now time.Time) *linkView {
 		id := uuidOf(l.PlayerID).String()
 		v.Preview.PlayerID = &id
 	}
+	seed := uuidOf(l.ClubPlayerID).String()
+	if l.SharedEntryID.Valid {
+		seed = uuidOf(l.SharedEntryID).String()
+	}
+	v.Preview.PictureSeedID = &seed
 	return v
 }
 

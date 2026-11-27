@@ -62,7 +62,7 @@ SELECT effective_access_ends_at FROM club_entitlements WHERE club_id = @club_id;
 -- name: ListQueueClubPlayers :many
 SELECT cp.id, cp.club_id, cp.player_id, cp.display_name, cp.nickname, cp.added_at,
        pi.phone_e164 AS input_phone,
-       se.id AS entry_id, se.rtr_id AS entry_rtr_id, se.claimed_player_id AS entry_claimed_player_id,
+       se.id AS entry_id, se.rtr_id AS entry_rtr_id, se.claimed_player_id AS entry_claimed_player_id, se.email AS entry_email,
        (p.id IS NOT NULL)::bool AS has_player,
        p.avatar_ref, p.full_name AS player_full_name, p.nickname AS player_nickname, p.profile_state,
        p.banner_id, pb.image AS banner_image, p.hide_phone_from_clubs,
@@ -84,7 +84,7 @@ ORDER BY cp.display_name ASC, cp.id ASC;
 SELECT cp.id, cp.display_name, cp.nickname, cp.player_id, cp.shared_entry_id, cp.removed_at,
        pi.phone_e164 AS input_phone, pi.preset_fields,
        se.email AS entry_email, p.profile_state,
-       cp.saved_skill_level_id, cp.saved_level_at, COALESCE(al.skill_level_id, -1)::smallint AS assessed_level_id, al.assessed_at AS assessed_at
+       cp.saved_skill_level_id, cp.saved_level_at, cp.avatar_ref, cp.avatar_previous_ref, COALESCE(al.skill_level_id, -1)::smallint AS assessed_level_id, al.assessed_at AS assessed_at
 FROM club_players cp
 LEFT JOIN LATERAL (SELECT a.skill_level_id, a.assessed_at FROM club_assessments a WHERE a.club_player_id = cp.id ORDER BY a.assessed_at DESC LIMIT 1) al ON true
 LEFT JOIN club_player_private_inputs pi ON pi.club_player_id = cp.id

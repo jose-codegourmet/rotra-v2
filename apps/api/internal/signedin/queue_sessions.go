@@ -69,6 +69,8 @@ type queueSessionDTO struct {
 	RequestFormats       map[string]bool `json:"requestFormats"`
 	RecordGames          bool            `json:"recordGames"`
 	Revision             string          `json:"revision"`
+	// PlannedBeforeStart is the planned window the session had when it started (Back to preparation puts it back); null before Start.
+	PlannedBeforeStart *PlannedWindow `json:"plannedBeforeStart"`
 }
 
 func sessionDTOOf(r sqlcgen.ListQueueSessionsRow) queueSessionDTO {
@@ -86,6 +88,9 @@ func sessionDTOOf(r sqlcgen.ListQueueSessionsRow) queueSessionDTO {
 	if r.ExpectedPlayers.Valid {
 		v := r.ExpectedPlayers.Int32
 		d.ExpectedPlayers = &v
+	}
+	if r.PlannedStartBeforeStartAt.Valid && r.PlannedEndBeforeStartAt.Valid {
+		d.PlannedBeforeStart = &PlannedWindow{StartAt: httpapi.ToIso(r.PlannedStartBeforeStartAt.Time), EndAt: httpapi.ToIso(r.PlannedEndBeforeStartAt.Time)}
 	}
 	return d
 }

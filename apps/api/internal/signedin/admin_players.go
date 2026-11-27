@@ -2,8 +2,10 @@ package signedin
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/answers"
 	"net/http"
 
 	"github.com/jackc/pgx/v5"
@@ -68,6 +70,17 @@ type adminPlayerDTO struct {
 	ArchivedAt            *string         `json:"archivedAt"`
 	Revision              string          `json:"revision"`
 	RemovalReason         string          `json:"removalReason"`
+	// Gender is public and set by the player, read-only for Admin (D-2026-11-19-01): null for a player with none given, and absent
+	// on a record that is not a player.
+	Gender json.RawMessage `json:"gender,omitempty"`
+	// Verification is the derived status of a registered player with an account (D-2026-11-23-07); null for every other row.
+	Verification *playerVerificationDTO `json:"verification"`
+}
+
+type playerVerificationDTO struct {
+	Verified        bool `json:"verified"`
+	VerifiedByAdmin bool `json:"verifiedByAdmin"`
+	CompletedSteps  int  `json:"completedSteps"`
 }
 
 // createdOnFromRtrId: 'RTR-PH-CEB-031526-0001' becomes '2026-03-15' (the date segment is MMDDYY); ” when malformed.
@@ -188,6 +201,14 @@ func (s *server) adminPlayerDirectory(ctx context.Context, q *sqlcgen.Queries, i
 			PhoneHidden:     p.HidePhoneFromClubs, Claimed: claimed, Clubs: clubs, LevelIndex: nil,
 			LevelBand: levelBandOf(p.LevelOrder), RecentStandardMatches: p.RecentStandardMatchCount.Int32,
 			Revision: httpapi.ToDecimalString(p.Revision), RemovalReason: notConnectedNote,
+		}
+		d.Gender = json.RawMessage("null")
+		if p.Gender.Valid {
+			d.Gender, _ = json.Marshal(string(p.Gender.PlayerGender))
+		}
+		if claimed && p.HasAccount {
+			v, byAdmin, steps := answers.Verification(p.GoogleEmail.String, p.Email.String, p.PhoneE164.String, p.VerifiedOverride)
+			d.Verification = &playerVerificationDTO{Verified: v, VerifiedByAdmin: byAdmin, CompletedSteps: steps}
 		}
 		if p.HasContact {
 			d.Phone = addr(p.PhoneE164.String)

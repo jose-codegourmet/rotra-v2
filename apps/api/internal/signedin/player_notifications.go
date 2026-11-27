@@ -41,6 +41,10 @@ func (s *server) visibleSince() pgtype.Timestamptz {
 // reminderFor is the state-derived "Verify your ROTRA account" reminder, or nil when the account is verified
 // (or has no verification facts).
 func (s *server) reminderFor(r *http.Request, q *sqlcgen.Queries, who viewer) (*notificationDTO, error) {
+	// D-2026-11-18-01: no verification reminder while Google sign-in for players is off.
+	if !s.flagOn(r, playerGoogleFlag) {
+		return nil, nil
+	}
 	v, err := readVerification(r, q, who.ID)
 	if err != nil || v == nil || v.dto.Verified {
 		return nil, err

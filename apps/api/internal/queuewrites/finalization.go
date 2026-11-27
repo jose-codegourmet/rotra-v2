@@ -45,15 +45,17 @@ type finalizationJob struct {
 }
 
 type finalizationStatus struct {
-	SessionID   string            `json:"sessionId"`
-	CommandID   string            `json:"commandId"`
-	State       string            `json:"state"`
-	Stage       string            `json:"stage"`
-	Accepted    bool              `json:"accepted"`
-	CommittedAt *string           `json:"committedAt"`
-	CompletedAt *string           `json:"completedAt"`
-	FailedStage *string           `json:"failedStage"`
-	FailureCode *string           `json:"failureCode"`
+	SessionID   string  `json:"sessionId"`
+	CommandID   string  `json:"commandId"`
+	State       string  `json:"state"`
+	Stage       string  `json:"stage"`
+	Accepted    bool    `json:"accepted"`
+	CommittedAt *string `json:"committedAt"`
+	CompletedAt *string `json:"completedAt"`
+	FailedStage *string `json:"failedStage"`
+	FailureCode *string `json:"failureCode"`
+	// RecordGames is false for a session run with Record games off (D-2026-11-20-02): not ranked; the done toast says so.
+	RecordGames bool              `json:"recordGames"`
 	Jobs        []finalizationJob `json:"jobs"`
 }
 
@@ -88,8 +90,16 @@ func statusOf(ctx context.Context, q *sqlcgen.Queries, f sqlcgen.SessionFinaliza
 	if f.FailureCode.Valid {
 		failure = &f.FailureCode.String
 	}
+	recordGames, err := q.GetSessionRecordGames(ctx, f.SessionID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		recordGames, err = true, nil
+	}
+	if err != nil {
+		return finalizationStatus{}, err
+	}
 	return finalizationStatus{
-		SessionID: f.SessionID.String(), CommandID: f.CommandID.String(), State: string(f.State), Stage: string(f.Stage), Accepted: f.CommittedAt.Valid,
+		RecordGames: recordGames,
+		SessionID:   f.SessionID.String(), CommandID: f.CommandID.String(), State: string(f.State), Stage: string(f.Stage), Accepted: f.CommittedAt.Valid,
 		CommittedAt: isoOf(f.CommittedAt), CompletedAt: isoOf(f.CompletedAt), FailedStage: failedStage, FailureCode: failure, Jobs: jobs,
 	}, nil
 }

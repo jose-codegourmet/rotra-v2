@@ -79,7 +79,10 @@ SELECT l.id AS link_id,
        (pi.club_player_id IS NOT NULL)::bool AS has_input,
        pi.phone_e164 AS input_phone,
        pi.email AS input_email,
-       se.email AS shared_entry_email
+       se.email AS shared_entry_email,
+       se.id AS shared_entry_id,
+       se.rtr_id AS shared_entry_rtr_id,
+       cp.avatar_ref
 FROM club_player_claim_links l
 JOIN club_players cp ON cp.club_id = l.club_id AND cp.id = l.club_player_id
 JOIN clubs c ON c.id = cp.club_id
@@ -103,6 +106,9 @@ type GetClubPlayerClaimLinkViewRow struct {
 	InputPhone       pgtype.Text
 	InputEmail       pgtype.Text
 	SharedEntryEmail pgtype.Text
+	SharedEntryID    pgtype.UUID
+	SharedEntryRtrID pgtype.Text
+	AvatarRef        pgtype.Text
 }
 
 func (q *Queries) GetClubPlayerClaimLinkView(ctx context.Context, tokenDigest []byte) (GetClubPlayerClaimLinkViewRow, error) {
@@ -123,6 +129,9 @@ func (q *Queries) GetClubPlayerClaimLinkView(ctx context.Context, tokenDigest []
 		&i.InputPhone,
 		&i.InputEmail,
 		&i.SharedEntryEmail,
+		&i.SharedEntryID,
+		&i.SharedEntryRtrID,
+		&i.AvatarRef,
 	)
 	return i, err
 }

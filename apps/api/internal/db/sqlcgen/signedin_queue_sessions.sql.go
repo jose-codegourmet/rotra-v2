@@ -668,6 +668,7 @@ SELECT s.id, s.club_id, s.title, s.notes, s.scheduled_start_at, s.scheduled_end_
        s.minimum_games, s.minimum_is_calculated, s.players_per_court, s.expected_players, s.started_at, s.finalized_at,
        s.series_id, s.public_slug, s.accept_join_requests, s.always_require_request, s.court_fill_mode,
        s.request_formats::text[] AS request_formats, s.record_games, s.revision, s.queue_revision,
+       s.planned_start_before_start_at, s.planned_end_before_start_at,
        (s.start_license_term_id IS NOT NULL)::bool AS has_start_term,
        (SELECT count(*) FROM session_players p WHERE p.session_id = s.id AND p.released_at IS NULL AND p.no_show_at IS NULL)::int AS roster_count,
        (SELECT count(*) FROM session_players p WHERE p.session_id = s.id AND p.released_at IS NULL AND p.no_show_at IS NULL AND p.present)::int AS present_count,
@@ -686,44 +687,46 @@ type ListQueueSessionsParams struct {
 }
 
 type ListQueueSessionsRow struct {
-	ID                   pgtype.UUID
-	ClubID               pgtype.UUID
-	Title                string
-	Notes                pgtype.Text
-	ScheduledStartAt     pgtype.Timestamptz
-	ScheduledEndAt       pgtype.Timestamptz
-	VenueID              pgtype.UUID
-	VenueName            pgtype.Text
-	VenueAddress         pgtype.Text
-	State                QueueSessionState
-	InvalidReason        pgtype.Text
-	CancelledAt          pgtype.Timestamptz
-	CancelReason         pgtype.Text
-	SessionMode          SessionMode
-	AllowSingles         bool
-	AllowDoubles         bool
-	MinimumGames         int32
-	MinimumIsCalculated  bool
-	PlayersPerCourt      int16
-	ExpectedPlayers      pgtype.Int4
-	StartedAt            pgtype.Timestamptz
-	FinalizedAt          pgtype.Timestamptz
-	SeriesID             pgtype.UUID
-	PublicSlug           string
-	AcceptJoinRequests   bool
-	AlwaysRequireRequest bool
-	CourtFillMode        CourtFillMode
-	RequestFormats       []string
-	RecordGames          bool
-	Revision             int64
-	QueueRevision        int64
-	HasStartTerm         bool
-	RosterCount          int32
-	PresentCount         int32
-	WaitlistCount        int32
-	CourtsInUse          int32
-	GamesPlayed          int32
-	QueuedCount          int32
+	ID                        pgtype.UUID
+	ClubID                    pgtype.UUID
+	Title                     string
+	Notes                     pgtype.Text
+	ScheduledStartAt          pgtype.Timestamptz
+	ScheduledEndAt            pgtype.Timestamptz
+	VenueID                   pgtype.UUID
+	VenueName                 pgtype.Text
+	VenueAddress              pgtype.Text
+	State                     QueueSessionState
+	InvalidReason             pgtype.Text
+	CancelledAt               pgtype.Timestamptz
+	CancelReason              pgtype.Text
+	SessionMode               SessionMode
+	AllowSingles              bool
+	AllowDoubles              bool
+	MinimumGames              int32
+	MinimumIsCalculated       bool
+	PlayersPerCourt           int16
+	ExpectedPlayers           pgtype.Int4
+	StartedAt                 pgtype.Timestamptz
+	FinalizedAt               pgtype.Timestamptz
+	SeriesID                  pgtype.UUID
+	PublicSlug                string
+	AcceptJoinRequests        bool
+	AlwaysRequireRequest      bool
+	CourtFillMode             CourtFillMode
+	RequestFormats            []string
+	RecordGames               bool
+	Revision                  int64
+	QueueRevision             int64
+	PlannedStartBeforeStartAt pgtype.Timestamptz
+	PlannedEndBeforeStartAt   pgtype.Timestamptz
+	HasStartTerm              bool
+	RosterCount               int32
+	PresentCount              int32
+	WaitlistCount             int32
+	CourtsInUse               int32
+	GamesPlayed               int32
+	QueuedCount               int32
 }
 
 // The Queue app's session reads: the list, one session, its roster and its matches.
@@ -771,6 +774,8 @@ func (q *Queries) ListQueueSessions(ctx context.Context, arg ListQueueSessionsPa
 			&i.RecordGames,
 			&i.Revision,
 			&i.QueueRevision,
+			&i.PlannedStartBeforeStartAt,
+			&i.PlannedEndBeforeStartAt,
 			&i.HasStartTerm,
 			&i.RosterCount,
 			&i.PresentCount,

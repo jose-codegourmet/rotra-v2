@@ -87,7 +87,8 @@ func (s *server) queueClubPlayers(r *http.Request, q *sqlcgen.Queries, club pgty
 		d := clubPlayerDTO{
 			ID: p.ID.String(), ClubID: p.ClubID.String(), BannerKey: bannerKey, BannerImageURL: bannerImage,
 			PlayingLevel: levelFromID(p.LevelID), SessionsHere: p.SessionsHere, AddedAt: httpapi.ToIso(p.AddedAt.Time),
-			EmailOnFile: entryOpen, DetailsRequired: !registered && !entryOpen && !p.HasPlayer && jsTruthyText(phone),
+			EmailOnFile:     entryOpen && p.EntryEmail.String != "", // #1019: an entry saved with a social link only has no email
+			DetailsRequired: !registered && !entryOpen && !p.HasPlayer && jsTruthyText(phone),
 		}
 		switch {
 		case registered:
@@ -139,12 +140,54 @@ type clubPlayerProfile struct {
 }
 
 type clubPlayerDetailsDTO struct {
-	ClubPlayerID string             `json:"clubPlayerId"`
-	Identity     string             `json:"identity"`
-	FullName     string             `json:"fullName"`
-	Nickname     *string            `json:"nickname"`
-	PhoneOnFile  bool               `json:"phoneOnFile"`
-	Profile      *clubPlayerProfile `json:"profile"`
+	ClubPlayerID string  `json:"clubPlayerId"`
+	Identity     string  `json:"identity"`
+	FullName     string  `json:"fullName"`
+	Nickname     *string `json:"nickname"`
+	PhoneOnFile  bool    `json:"phoneOnFile"`
+	// Level is the level for this club: the saved level or the latest session assessment, whichever is newer.
+	Level *string `json:"level"`
+	// Picture is the club-set picture and the previous photo kept (D-2026-11-09-12).
+	Picture clubPictureState   `json:"picture"`
+	Profile *clubPlayerProfile `json:"profile"`
+}
+
+// clubPictureState is ClubPictureStateDto: the Profile picture field's state.
+type clubPictureState struct {
+	Kind        string  `json:"kind"`
+	Reference   *string `json:"reference"`
+	CharacterID *string `json:"characterId"`
+	PreviousSrc *string `json:"previousSrc"`
+}
+
+func isPhotoRef(ref string) bool {
+	return strings.HasPrefix(ref, "http://") || strings.HasPrefix(ref, "https://")
+}
+
+// clubPictureOf is clubPictureStateOf.
+func clubPictureOf(avatar, previous pgtype.Text) clubPictureState {
+	var prev *string
+	if previous.Valid && isPhotoRef(previous.String) {
+		prev = &previous.String
+	}
+	switch {
+	case avatar.Valid && strings.HasPrefix(avatar.String, "character:"):
+		id := avatar.String[len("character:"):]
+		return clubPictureState{Kind: "character", Reference: &avatar.String, CharacterID: &id, PreviousSrc: prev}
+	case avatar.Valid && isPhotoRef(avatar.String):
+		return clubPictureState{Kind: "photo", Reference: &avatar.String, PreviousSrc: prev}
+	}
+	return clubPictureState{Kind: "initials", PreviousSrc: prev}
+}
+
+// shownLevel is levelCodeFor(savedLevelOf(row)): the saved level, unless a session assessment is newer.
+func shownLevel(row sqlcgen.GetQueueClubPlayerEditableRow) *string {
+	id := pgtype.Int2{Int16: row.AssessedLevelID, Valid: row.AssessedLevelID >= 0}
+	if row.SavedSkillLevelID.Valid && row.SavedLevelAt.Valid &&
+		(!row.AssessedAt.Valid || row.AssessedAt.Time.UnixMilli() <= row.SavedLevelAt.Time.UnixMilli()) {
+		id = row.SavedSkillLevelID
+	}
+	return publicreads.LevelCode(id)
 }
 
 // ownDetails is readOwnDetails: what the club entered about its own unclaimed player. Anything missing or malformed
@@ -206,6 +249,7 @@ func (s *server) queueClubPlayerDetails(r *http.Request, q *sqlcgen.Queries, clu
 	own := readOwnDetails(row.PresetFields)
 	d := clubPlayerDetailsDTO{
 		ClubPlayerID: row.ID.String(), Identity: "guest", FullName: row.DisplayName, Nickname: textPtr(row.Nickname), PhoneOnFile: jsTruthyText(row.InputPhone),
+		Level: shownLevel(row), Picture: clubPictureOf(row.AvatarRef, row.AvatarPreviousRef),
 	}
 	if unclaimed {
 		d.Identity = "unclaimed"

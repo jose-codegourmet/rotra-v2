@@ -9,6 +9,7 @@ SELECT s.id, s.club_id, s.title, s.notes, s.scheduled_start_at, s.scheduled_end_
        s.minimum_games, s.minimum_is_calculated, s.players_per_court, s.expected_players, s.started_at, s.finalized_at,
        s.series_id, s.public_slug, s.accept_join_requests, s.always_require_request, s.court_fill_mode,
        s.request_formats::text[] AS request_formats, s.record_games, s.revision, s.queue_revision,
+       s.planned_start_before_start_at, s.planned_end_before_start_at,
        (s.start_license_term_id IS NOT NULL)::bool AS has_start_term,
        (SELECT count(*) FROM session_players p WHERE p.session_id = s.id AND p.released_at IS NULL AND p.no_show_at IS NULL)::int AS roster_count,
        (SELECT count(*) FROM session_players p WHERE p.session_id = s.id AND p.released_at IS NULL AND p.no_show_at IS NULL AND p.present)::int AS present_count,

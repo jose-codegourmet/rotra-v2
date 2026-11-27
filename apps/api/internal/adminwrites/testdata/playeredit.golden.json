@@ -4493,6 +4493,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -4524,7 +4525,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -5650,6 +5656,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -5681,7 +5688,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -6807,6 +6819,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -6844,7 +6857,12 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -6864,6 +6882,7 @@
             "id": "d4000000-0000-4000-8000-000000000002",
             "name": "Bob Santos",
             "nickname": "Bobby",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0002",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -6895,7 +6914,12 @@
             },
             "archivedAt": null,
             "revision": "9007199254740993",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": true,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -6932,6 +6956,7 @@
             "id": "d4000000-0000-4000-8000-000000000010",
             "name": "June Tan",
             "nickname": "JT",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0016",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -6969,7 +6994,12 @@
             },
             "archivedAt": null,
             "revision": "2",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 2
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -6989,6 +7019,7 @@
             "id": "d4000000-0000-4000-8000-000000000009",
             "name": "Ivan Cruz",
             "nickname": "Iv",
+            "gender": null,
             "rtrId": "RTR-PH-MNL-102926-0004",
             "createdByClubId": "c9000000-0000-4000-8000-000000000002",
             "createdOn": "2026-10-29",
@@ -7020,7 +7051,12 @@
             },
             "archivedAt": null,
             "revision": "1",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -8146,6 +8182,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -8183,7 +8220,12 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -9309,6 +9351,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo-Lim",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -9340,7 +9383,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -10493,6 +10541,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo-Lim",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -10524,7 +10573,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -11677,6 +11731,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana  Lim",
             "nickname": "Han",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -11708,7 +11763,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name",
@@ -12863,6 +12923,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": "Han",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -12894,7 +12955,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "nickname"
@@ -12916,6 +12982,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -12947,7 +13014,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "nickname"
@@ -14124,6 +14196,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Aly",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -14161,7 +14234,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "nickname"
@@ -15314,6 +15392,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -15345,7 +15424,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "playing style"
@@ -16500,6 +16584,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -16537,7 +16622,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "playing style"
@@ -17690,6 +17780,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -17721,7 +17812,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "experience"
@@ -18874,6 +18970,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -18905,7 +19002,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "experience"
@@ -20058,6 +20160,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -20089,7 +20192,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "experience"
@@ -21242,6 +21350,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -21279,7 +21388,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "experience"
@@ -22432,6 +22546,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -22469,7 +22584,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "experience"
@@ -24745,6 +24865,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -24776,7 +24897,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "experience"
@@ -25929,6 +26055,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -25960,7 +26087,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "private profile"
@@ -25982,6 +26114,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -26013,7 +26146,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "private profile"
@@ -27190,6 +27328,7 @@
             "id": "d4000000-0000-4000-8000-000000000009",
             "name": "Ivan Cruz",
             "nickname": "Iv",
+            "gender": null,
             "rtrId": "RTR-PH-MNL-102926-0004",
             "createdByClubId": "c9000000-0000-4000-8000-000000000002",
             "createdOn": "2026-10-29",
@@ -27221,7 +27360,12 @@
             },
             "archivedAt": null,
             "revision": "2",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "private profile"
@@ -28374,6 +28518,7 @@
             "id": "d4000000-0000-4000-8000-000000000010",
             "name": "June Tan",
             "nickname": "JT",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0016",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -28411,7 +28556,12 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 2
+            }
           },
           "changed": [
             "private profile"
@@ -29564,6 +29714,7 @@
             "id": "d4000000-0000-4000-8000-000000000010",
             "name": "June T.",
             "nickname": "JT",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0016",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -29601,7 +29752,12 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 2
+            }
           },
           "changed": [
             "name"
@@ -30754,6 +30910,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -30785,7 +30942,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "phone privacy"
@@ -31938,6 +32100,7 @@
             "id": "d4000000-0000-4000-8000-000000000002",
             "name": "Bob Santos",
             "nickname": "Bobby",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0002",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -31969,7 +32132,12 @@
             },
             "archivedAt": null,
             "revision": "9007199254740994",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": true,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "phone privacy"
@@ -33122,6 +33290,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana H.",
             "nickname": "H",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -33153,7 +33322,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name",
@@ -34350,6 +34524,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana L.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -34381,7 +34556,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -40023,6 +40203,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -40054,7 +40235,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -41213,6 +41399,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -41244,7 +41431,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Instagram link"
@@ -42403,6 +42595,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -42434,7 +42627,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "YouTube link"
@@ -43593,6 +43791,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -43624,7 +43823,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "LinkedIn link"
@@ -44783,6 +44987,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -44820,7 +45025,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "Facebook link"
@@ -45973,6 +46183,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -46010,7 +46221,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "Facebook link",
@@ -47152,6 +47368,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -47183,7 +47400,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -49462,6 +49684,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -49493,7 +49716,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link",
@@ -55160,6 +55388,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -55191,7 +55420,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -56350,6 +56584,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -56381,7 +56616,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -57540,6 +57780,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -57571,7 +57812,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -62090,6 +62336,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -62121,7 +62368,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -63280,6 +63532,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -63311,7 +63564,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -64470,6 +64728,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -64501,7 +64760,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -65660,6 +65924,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -65691,7 +65956,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -69096,6 +69366,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -69127,7 +69398,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -70286,6 +70562,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -70317,7 +70594,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -72599,6 +72881,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -72630,7 +72913,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "Facebook link"
@@ -78278,6 +78566,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -78309,7 +78598,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "profile picture"
@@ -79462,6 +79756,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -79493,7 +79788,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "profile picture"
@@ -79515,6 +79815,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -79546,7 +79847,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "profile picture"
@@ -80723,6 +81029,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -80760,7 +81067,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "profile picture"
@@ -81913,6 +82225,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -81950,7 +82263,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "profile picture"
@@ -81972,6 +82290,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -82009,7 +82328,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "profile picture"
@@ -83186,6 +83510,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -83223,7 +83548,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "profile picture"
@@ -100106,6 +100436,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -100137,7 +100468,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "phone"
@@ -101290,6 +101626,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -101321,7 +101658,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "phone"
@@ -102474,6 +102816,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -102505,7 +102848,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -103631,6 +103979,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -103668,7 +104017,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "phone"
@@ -104836,6 +105190,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice Reyes",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -104873,7 +105228,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": false,
+              "completedSteps": 3
+            }
           },
           "changed": [
             "phone"
@@ -106041,6 +106401,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -106072,7 +106433,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "phone"
@@ -109471,6 +109837,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -109502,7 +109869,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "phone"
@@ -112915,6 +113287,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -112946,7 +113319,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "phone"
@@ -121968,6 +122346,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana L.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -121999,7 +122378,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -122035,6 +122419,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana M.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -122066,7 +122451,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -123243,6 +123633,7 @@
             "id": "d4000000-0000-4000-8000-000000000002",
             "name": "Bob S.",
             "nickname": "Bobby",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0002",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -123274,7 +123665,12 @@
             },
             "archivedAt": null,
             "revision": "9007199254740994",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": true,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -128913,6 +129309,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana L.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -128944,7 +129341,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -130097,6 +130499,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana L.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -130128,7 +130531,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -131281,6 +131689,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana L.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -131312,7 +131721,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -132465,6 +132879,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana L.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -132496,7 +132911,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -136998,7 +137418,7 @@
   "player_not_a_uuid": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -137006,8 +137426,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -141495,6 +141915,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana L.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -141526,7 +141947,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -143802,6 +144228,7 @@
             "id": "d4000000-0000-4000-8000-000000000007",
             "name": "Gina Claimed No Contact",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0013",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -143824,7 +144251,12 @@
             },
             "archivedAt": null,
             "revision": "1",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 0
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -144950,6 +145382,7 @@
             "id": "d4000000-0000-4000-8000-000000000007",
             "name": "Gina C.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0013",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -144972,7 +145405,12 @@
             },
             "archivedAt": null,
             "revision": "2",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 0
+            }
           },
           "changed": [
             "name"
@@ -155173,6 +155611,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -155204,7 +155643,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -191143,6 +191587,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana L.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -191174,7 +191619,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -192327,6 +192777,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana L.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -192358,7 +192809,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -196880,6 +197336,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -196911,7 +197368,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -199187,6 +199649,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -199218,7 +199681,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "nickname"
@@ -201494,6 +201962,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -201525,7 +201994,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "playing style"
@@ -207172,6 +207646,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -207203,7 +207678,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "experience"
@@ -209479,6 +209959,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -209510,7 +209991,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "experience"
@@ -216278,6 +216764,7 @@
             "id": "d4000000-0000-4000-8000-000000000007",
             "name": "Gina C.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0013",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -216300,7 +216787,12 @@
             },
             "archivedAt": null,
             "revision": "2",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 0
+            }
           },
           "changed": [
             "name"
@@ -218576,6 +219068,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -218607,7 +219100,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "password"
@@ -220876,6 +221374,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -220907,7 +221406,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "password"
@@ -222053,6 +222557,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -222084,7 +222589,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "password"
@@ -223230,6 +223740,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -223261,7 +223772,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "password"
@@ -225530,6 +226046,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana P.",
             "nickname": "HP",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -225561,7 +226078,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name",
@@ -226734,6 +227256,7 @@
             "id": "d4000000-0000-4000-8000-000000000007",
             "name": "Gina Claimed No Contact",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0013",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -226756,7 +227279,12 @@
             },
             "archivedAt": null,
             "revision": "2",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 0
+            }
           },
           "changed": [
             "password"
@@ -227902,6 +228430,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -227932,7 +228461,8 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": null
           },
           "changed": [],
           "passwordSet": false,
@@ -229050,6 +229580,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -229081,7 +229612,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "password"
@@ -229103,6 +229639,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -229134,7 +229671,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "password"
@@ -238164,6 +238706,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-MNL-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -238195,7 +238738,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "RTR ID"
@@ -239344,6 +239892,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-103026-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-30",
@@ -239375,7 +239924,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "RTR ID"
@@ -240529,6 +241083,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-DVO-110226-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-11-02",
@@ -240560,7 +241115,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "RTR ID"
@@ -241714,6 +242274,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana M.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-MNL-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -241745,7 +242306,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name",
@@ -242919,6 +243485,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana M.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-103026-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-30",
@@ -242950,7 +243517,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name",
@@ -242973,6 +243545,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-103126-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-31",
@@ -243004,7 +243577,12 @@
             },
             "archivedAt": null,
             "revision": "8",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name",
@@ -244232,6 +244810,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-MNL-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -244263,7 +244842,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "RTR ID"
@@ -245414,6 +245998,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana M.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-MNL-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -245445,7 +246030,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name",
@@ -246621,6 +247211,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-MNL-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -246652,7 +247243,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "RTR ID",
@@ -247819,6 +248415,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana M.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-MNL-103026-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-30",
@@ -247850,7 +248447,12 @@
             },
             "archivedAt": null,
             "revision": "7",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name",
@@ -259180,6 +259782,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -259211,7 +259814,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -261460,6 +262068,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-022928-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2028-02-29",
@@ -261491,7 +262100,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "RTR ID"
@@ -263768,6 +264382,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -263799,7 +264414,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -264925,6 +265545,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-010101-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2001-01-01",
@@ -264956,7 +265577,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "RTR ID"
@@ -266110,6 +266736,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -266141,7 +266768,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -267267,6 +267899,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -267298,7 +267931,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -268424,6 +269062,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -268455,7 +269094,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -270704,6 +271348,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana M.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -270735,7 +271380,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -276382,6 +277032,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-103026-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-30",
@@ -276413,7 +277064,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "RTR ID"
@@ -277567,6 +278223,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-MNL-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -277598,7 +278255,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "RTR ID"
@@ -278747,6 +279409,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -278778,7 +279441,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -279904,6 +280572,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana L.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -279935,7 +280604,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -281088,6 +281762,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-MNL-102926-0015",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -281119,7 +281794,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "RTR ID"
@@ -282268,6 +282948,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -282299,7 +282980,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "email"
@@ -283463,6 +284149,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -283494,7 +284181,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "email"
@@ -284658,6 +285350,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -284689,7 +285382,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "email"
@@ -285817,6 +286515,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana E.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -285848,7 +286547,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name",
@@ -287037,6 +287741,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -287068,7 +287773,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "email"
@@ -290489,6 +291199,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -290520,7 +291231,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "email"
@@ -291727,6 +292443,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -291758,7 +292475,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "phone"
@@ -292954,6 +293676,7 @@
             "id": "d4000000-0000-4000-8000-000000000003",
             "name": "Carla Dizon",
             "nickname": "CD",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0003",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -292984,7 +293707,12 @@
             },
             "archivedAt": null,
             "revision": "1",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 2
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -294112,6 +294840,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -294143,7 +294872,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -295271,6 +296005,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana E.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -295302,7 +296037,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -296457,6 +297197,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -296488,7 +297229,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -297616,6 +298362,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -297647,7 +298394,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "email"
@@ -298811,6 +299563,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -298842,7 +299595,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "email"
@@ -300006,6 +300764,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -300037,7 +300796,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -301176,6 +301940,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana E.",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -301207,7 +301972,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -302373,6 +303143,7 @@
             "id": "d4000000-0000-4000-8000-000000000002",
             "name": "Bob Santos",
             "nickname": "Bobby",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0002",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -302404,7 +303175,12 @@
             },
             "archivedAt": null,
             "revision": "9007199254740993",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": true,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -303532,6 +304308,7 @@
             "id": "d4000000-0000-4000-8000-000000000002",
             "name": "Bob E.",
             "nickname": "Bobby",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0002",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -303563,7 +304340,12 @@
             },
             "archivedAt": null,
             "revision": "9007199254740994",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": true,
+              "verifiedByAdmin": true,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "name"
@@ -304718,6 +305500,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -304749,7 +305532,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -305877,6 +306665,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -305908,7 +306697,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "email"
@@ -307072,6 +307866,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -307103,7 +307898,12 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [],
           "passwordSet": false,
@@ -309356,6 +310156,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -309386,7 +310187,8 @@
             },
             "archivedAt": null,
             "revision": "4",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": null
           },
           "changed": [],
           "passwordSet": false,
@@ -310504,6 +311306,7 @@
             "id": "d4000000-0000-4000-8000-000000000008",
             "name": "Hana Ocampo",
             "nickname": null,
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0014",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -310535,7 +311338,12 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 1
+            }
           },
           "changed": [
             "phone",
@@ -311724,6 +312532,7 @@
             "id": "d4000000-0000-4000-8000-000000000001",
             "name": "Alice R.",
             "nickname": "Ace",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0001",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -311761,7 +312570,12 @@
             },
             "archivedAt": null,
             "revision": "5",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 2
+            }
           },
           "changed": [
             "name",
@@ -312967,6 +313781,7 @@
             "id": "d4000000-0000-4000-8000-000000000010",
             "name": "June Tan",
             "nickname": "JT",
+            "gender": null,
             "rtrId": "RTR-PH-CEB-102926-0016",
             "createdByClubId": "c9000000-0000-4000-8000-000000000001",
             "createdOn": "2026-10-29",
@@ -313004,7 +313819,12 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "This part of ROTRA isn't connected to saved data yet."
+            "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+            "verification": {
+              "verified": false,
+              "verifiedByAdmin": false,
+              "completedSteps": 2
+            }
           },
           "changed": [
             "email"
@@ -314170,6 +314990,7 @@
                 "id": "d4000000-0000-4000-8000-000000000008",
                 "name": "<redacted>",
                 "nickname": null,
+                "gender": null,
                 "rtrId": "RTR-PH-CEB-102926-0014",
                 "createdByClubId": "c9000000-0000-4000-8000-000000000001",
                 "createdOn": "2026-10-29",
@@ -314201,7 +315022,12 @@
                 },
                 "archivedAt": null,
                 "revision": "5",
-                "removalReason": "This part of ROTRA isn't connected to saved data yet."
+                "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+                "verification": {
+                  "verified": false,
+                  "verifiedByAdmin": false,
+                  "completedSteps": 1
+                }
               },
               "changed": [
                 "name"
@@ -315359,6 +316185,7 @@
                 "id": "d4000000-0000-4000-8000-000000000008",
                 "name": "Hana A.",
                 "nickname": null,
+                "gender": null,
                 "rtrId": "RTR-PH-CEB-102926-0014",
                 "createdByClubId": "c9000000-0000-4000-8000-000000000001",
                 "createdOn": "2026-10-29",
@@ -315390,7 +316217,12 @@
                 },
                 "archivedAt": null,
                 "revision": "5",
-                "removalReason": "This part of ROTRA isn't connected to saved data yet."
+                "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+                "verification": {
+                  "verified": false,
+                  "verifiedByAdmin": false,
+                  "completedSteps": 1
+                }
               },
               "changed": [
                 "name"
@@ -315412,6 +316244,7 @@
                 "id": "d4000000-0000-4000-8000-000000000010",
                 "name": "June A.",
                 "nickname": "JT",
+                "gender": null,
                 "rtrId": "RTR-PH-CEB-102926-0016",
                 "createdByClubId": "c9000000-0000-4000-8000-000000000001",
                 "createdOn": "2026-10-29",
@@ -315449,7 +316282,12 @@
                 },
                 "archivedAt": null,
                 "revision": "3",
-                "removalReason": "This part of ROTRA isn't connected to saved data yet."
+                "removalReason": "This part of ROTRA isn't connected to saved data yet.",
+                "verification": {
+                  "verified": false,
+                  "verifiedByAdmin": false,
+                  "completedSteps": 2
+                }
               },
               "changed": [
                 "name"
@@ -316667,7 +317505,8 @@
             },
             "archivedAt": null,
             "revision": "1",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [],
           "passwordSet": false,
@@ -317832,7 +318671,8 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [
             "email"
@@ -319020,7 +319860,8 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [
             "email"
@@ -320208,7 +321049,8 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [
             "email"
@@ -331514,7 +332356,8 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [
             "email"
@@ -332702,7 +333545,8 @@
             },
             "archivedAt": null,
             "revision": "2",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [
             "RTR ID"
@@ -333891,7 +334735,8 @@
             },
             "archivedAt": null,
             "revision": "2",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [
             "RTR ID"
@@ -335085,7 +335930,8 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [
             "email",
@@ -338513,7 +339359,8 @@
             },
             "archivedAt": null,
             "revision": "6",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [
             "RTR ID"
@@ -340825,7 +341672,8 @@
             },
             "archivedAt": null,
             "revision": "1",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [],
           "passwordSet": false,
@@ -348728,7 +349576,8 @@
             },
             "archivedAt": null,
             "revision": "1",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [],
           "passwordSet": false,
@@ -362222,7 +363071,8 @@
             },
             "archivedAt": null,
             "revision": "3",
-            "removalReason": "Saved by its club only; the club manages this record"
+            "removalReason": "Saved by its club only; the club manages this record",
+            "verification": null
           },
           "changed": [
             "email"

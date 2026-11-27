@@ -10,7 +10,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/rulestest"
 )
 
-// Every committed v1 case file runs through rules.For(1): 49 files, 472 cases (plan, "Case counts", plus the two shared-position cases of Q23.4, the scoring-mode cases of Q22.3 the no-ties standings case of Q26.5, and the match name and win chance rules, and the expected finish rule).
+// Every committed v1 case file runs through rules.For(1): 50 files, 493 cases (plan, "Case counts", plus the two shared-position cases of Q23.4, the scoring-mode cases of Q22.3 the no-ties standings case of Q26.5, and the match name and win chance rules, and the expected finish rule).
 func TestEveryV1CaseFilePassesThroughForOne(t *testing.T) {
 	root, err := rulecases.RepoRoot()
 	if err != nil {
@@ -30,8 +30,8 @@ func TestEveryV1CaseFilePassesThroughForOne(t *testing.T) {
 	if want := len(onDisk) - len(rulecases.GoCopyPending); total.Files != want {
 		t.Errorf("ran %d case files, %d are on disk: an area has no test", total.Files, want)
 	}
-	if total.Files != 49 || total.Cases != 472 {
-		t.Errorf("ran %d files and %d cases, want 49 and 472", total.Files, total.Cases)
+	if total.Files != 50 || total.Cases != 493 {
+		t.Errorf("ran %d files and %d cases, want 50 and 493", total.Files, total.Cases)
 	}
 }
 
@@ -51,8 +51,8 @@ func TestRunnersAreOnePerRuleAndFollowTheRuleset(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if n := len(rs.Runners(true)); n != 49 {
-		t.Errorf("%d runners, want 49", n)
+	if n := len(rs.Runners(true)); n != 50 {
+		t.Errorf("%d runners, want 50", n)
 	}
 	// A later version that changes one rule changes what its runner returns.
 	rs.CourtsNeeded = func(model.Format) int { return 9 }

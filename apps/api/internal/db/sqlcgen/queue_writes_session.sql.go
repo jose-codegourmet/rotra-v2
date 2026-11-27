@@ -417,11 +417,11 @@ const insertQueueSession = `-- name: InsertQueueSession :exec
 INSERT INTO queue_sessions (id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address,
                             session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
                             expected_players, request_formats, record_games, series_id, public_slug, source_command_id,
-                            created_at, updated_at)
+                            level_restriction, beginner_slots, intermediate_slots, advanced_slots, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
         $10, $11, $12, $13, $14, $15,
         $16, CAST($17::text[] AS match_format[]), $18, $19, $20, $21,
-        $22, $22)
+        $22::level_restriction, $23, $24, $25, $26, $26)
 `
 
 type InsertQueueSessionParams struct {
@@ -446,6 +446,10 @@ type InsertQueueSessionParams struct {
 	SeriesID            pgtype.UUID
 	PublicSlug          string
 	SourceCommandID     pgtype.UUID
+	LevelRestriction    LevelRestriction
+	BeginnerSlots       pgtype.Int4
+	IntermediateSlots   pgtype.Int4
+	AdvancedSlots       pgtype.Int4
 	Now                 pgtype.Timestamptz
 }
 
@@ -472,6 +476,10 @@ func (q *Queries) InsertQueueSession(ctx context.Context, arg InsertQueueSession
 		arg.SeriesID,
 		arg.PublicSlug,
 		arg.SourceCommandID,
+		arg.LevelRestriction,
+		arg.BeginnerSlots,
+		arg.IntermediateSlots,
+		arg.AdvancedSlots,
 		arg.Now,
 	)
 	return err
@@ -819,8 +827,12 @@ SET title = $1, notes = $2, venue_id = $3, venue_name = $4, venue_address = $5,
     minimum_is_calculated = $12, expected_players = $13, players_per_court = $14,
     request_formats = COALESCE(CAST($15::text[] AS match_format[]), request_formats),
     record_games = COALESCE($16::boolean, record_games),
-    revision = revision + 1, updated_at = $17
-WHERE id = $18
+    level_restriction = CASE WHEN $17::boolean THEN $18::level_restriction ELSE level_restriction END,
+    beginner_slots = CASE WHEN $17::boolean THEN $19 ELSE beginner_slots END,
+    intermediate_slots = CASE WHEN $17::boolean THEN $20 ELSE intermediate_slots END,
+    advanced_slots = CASE WHEN $17::boolean THEN $21 ELSE advanced_slots END,
+    revision = revision + 1, updated_at = $22
+WHERE id = $23
 `
 
 type UpdateQueueSessionPreparationParams struct {
@@ -840,6 +852,11 @@ type UpdateQueueSessionPreparationParams struct {
 	PlayersPerCourt     int16
 	RequestFormats      []string
 	RecordGames         pgtype.Bool
+	SetLevelRestriction bool
+	LevelRestriction    LevelRestriction
+	BeginnerSlots       pgtype.Int4
+	IntermediateSlots   pgtype.Int4
+	AdvancedSlots       pgtype.Int4
 	Now                 pgtype.Timestamptz
 	ID                  pgtype.UUID
 }
@@ -863,6 +880,11 @@ func (q *Queries) UpdateQueueSessionPreparation(ctx context.Context, arg UpdateQ
 		arg.PlayersPerCourt,
 		arg.RequestFormats,
 		arg.RecordGames,
+		arg.SetLevelRestriction,
+		arg.LevelRestriction,
+		arg.BeginnerSlots,
+		arg.IntermediateSlots,
+		arg.AdvancedSlots,
 		arg.Now,
 		arg.ID,
 	)

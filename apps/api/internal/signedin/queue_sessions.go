@@ -2,6 +2,7 @@ package signedin
 
 import (
 	"context"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/levelrestriction"
 	"net/http"
 	"slices"
 
@@ -68,7 +69,9 @@ type queueSessionDTO struct {
 	CourtFillMode        string          `json:"courtFillMode"`
 	RequestFormats       map[string]bool `json:"requestFormats"`
 	RecordGames          bool            `json:"recordGames"`
-	Revision             string          `json:"revision"`
+	// LevelRestriction is Restrictions (D-2026-11-19-12): which levels may take a slot; all by default.
+	LevelRestriction levelrestriction.Wire `json:"levelRestriction"`
+	Revision         string                `json:"revision"`
 	// PlannedBeforeStart is the planned window the session had when it started (Back to preparation puts it back); null before Start.
 	PlannedBeforeStart *PlannedWindow `json:"plannedBeforeStart"`
 }
@@ -84,6 +87,7 @@ func sessionDTOOf(r sqlcgen.ListQueueSessionsRow) queueSessionDTO {
 		FinalizedAt: isoPtr(r.FinalizedAt), SeriesID: uuidPtr(r.SeriesID), PublicSlug: r.PublicSlug, AcceptJoinRequests: r.AcceptJoinRequests,
 		AlwaysRequireRequest: r.AlwaysRequireRequest, CourtFillMode: string(r.CourtFillMode), RequestFormats: requestFormatsRecord(r.RequestFormats),
 		RecordGames: r.RecordGames, Revision: httpapi.ToDecimalString(r.Revision),
+		LevelRestriction: levelrestriction.Of(r.LevelRestriction, r.BeginnerSlots, r.IntermediateSlots, r.AdvancedSlots),
 	}
 	if r.ExpectedPlayers.Valid {
 		v := r.ExpectedPlayers.Int32

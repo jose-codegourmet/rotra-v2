@@ -110,3 +110,10 @@ leftnotice = scenario("notice_player_released", "UPDATE session_players SET rele
 case("requests-club1-s9-notice-entry-released", f"/api/sessions/{SESSION(9)}/requests", club=1, scenario=leftnotice)
 case("session-club1-s9-notice-entry-released", f"/api/sessions/{SESSION(9)}", club=1, scenario=leftnotice)
 case("requests-club2-s2-finalizing-lapsed", f"/api/sessions/{SESSION(2)}/requests", club=2, scenario=stale_close)
+
+# Restrictions (D-2026-11-19-12, task 2.2): the session object carries the pick, and the slots per level for slots per level only.
+for label, sql in (("beginners", "level_restriction = 'beginners'"), ("beginners-intermediate", "level_restriction = 'beginners_intermediate'"),
+                   ("per-level", "level_restriction = 'slots_per_band', beginner_slots = 3, intermediate_slots = 2, advanced_slots = 1")):
+    restricted = scenario("s9_restricted_" + label.replace("-", "_"), "UPDATE queue_sessions SET %s WHERE id = '%s'" % (sql, SESSION(9)))
+    case(f"sessions-club1-restricted-{label}", "/api/sessions", club=1, scenario=restricted)
+    case(f"session-club1-s9-restricted-{label}", f"/api/sessions/{SESSION(9)}", club=1, scenario=restricted)

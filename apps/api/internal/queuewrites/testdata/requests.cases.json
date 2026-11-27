@@ -20,6 +20,12 @@
   "s3_full": [
    "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000012', 'Lee Guest', true, TIMESTAMPTZ '2026-11-19 01:08:00+00', 'a0300000-0000-4000-8000-000000000199', 3, TIMESTAMPTZ '2026-11-19 01:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-19 01:08:00+00', 3)"
   ],
+  "s1_beginners": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "s1_per_level": [
+   "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0 WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
   "request_on_s4": [
    "INSERT INTO session_join_requests (id, club_id, session_id, name, stated_band, placement, status, requested_at, created_at, updated_at, revision) VALUES ('a3400000-0000-4000-8000-000000000031', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000004', 'Late Lena', 'unsure', 'slot', 'pending', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)"
   ],
@@ -2568,6 +2574,122 @@
      "method": "POST",
      "path": "/api/sessions/a3000000-0000-4000-8000-000000000007/requests/drop-outs/a3800000-0000-4000-8000-000000000005/remove",
      "who": "c7000000-0000-4000-8000-000000000002"
+    }
+   ]
+  },
+  {
+   "name": "confirm_restricted_beginners_refuses_an_intermediate",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/join-requests/a3400000-0000-4000-8000-000000000001/confirm",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b3000000-0000-4000-8000-000000000040",
+      "level": "intermediate_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "confirm_restricted_beginners_allows_a_beginner",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/join-requests/a3400000-0000-4000-8000-000000000001/confirm",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b3000000-0000-4000-8000-000000000041",
+      "level": "beginner_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "confirm_restricted_after_the_warning",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/join-requests/a3400000-0000-4000-8000-000000000001/confirm",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b3000000-0000-4000-8000-000000000043",
+      "level": "intermediate_low",
+      "allowOutsideLevels": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "confirm_restricted_warning_flag_not_true_does_not_count",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/join-requests/a3400000-0000-4000-8000-000000000001/confirm",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b3000000-0000-4000-8000-000000000045",
+      "level": "intermediate_low",
+      "allowOutsideLevels": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "confirm_restricted_waitlist_placement_is_not_checked",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/join-requests/a3400000-0000-4000-8000-000000000003/confirm",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b3000000-0000-4000-8000-000000000047",
+      "level": "intermediate_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "confirm_restricted_per_level_band_full",
+   "scenario": "s1_per_level",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/join-requests/a3400000-0000-4000-8000-000000000001/confirm",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b3000000-0000-4000-8000-000000000048",
+      "level": "intermediate_low"
+     }
+    }
+   ]
+  },
+  {
+   "name": "confirm_restricted_refusal_keeps_the_request_pending",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/join-requests/a3400000-0000-4000-8000-000000000001/confirm",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b3000000-0000-4000-8000-000000000049",
+      "level": "intermediate_low"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/join-requests/a3400000-0000-4000-8000-000000000001/confirm",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operationId": "b3000000-0000-4000-8000-000000000050",
+      "level": "beginner_low"
+     }
     }
    ]
   }

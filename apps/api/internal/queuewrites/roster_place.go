@@ -8,6 +8,7 @@ import (
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/levelrestriction"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
 )
@@ -20,7 +21,9 @@ func failLevel() error {
 }
 
 // addPlacement is AddPlacement: Add anyway / Add to waitlist on a full roster (#735). Only `true` counts.
-type addPlacement struct{ allowOverfill, toWaitlist bool }
+// allowOutsideLevels is Confirm again after the level restriction warning (D-2026-11-19-12): the Queue Master takes a player outside the
+// session's restriction.
+type addPlacement struct{ allowOverfill, toWaitlist, allowOutsideLevels bool }
 
 // placed is what place answers: the roster entry, or the waitlist entry, the other being null.
 type placed struct {
@@ -156,8 +159,9 @@ func (t *txn) promoteWaiter(w waiter, operationID string, overBudget bool) (sqlc
 // place places a club player: a slot while one is open, otherwise the waitlist. toWaitlist (a Be waitlisted request, or Add to
 // waitlist) always gives the waitlist place, even during play; allowOverfill (Add anyway) gives the slot beyond the budget.
 // It refuses a player already live on the roster or waiting. Concurrent admissions are serialized by the session lock.
-// Repeat-safe on the operation id: a retry answers the entry the first try made.
-func (t *txn) place(clubPlayer sqlcgen.ClubPlayer, skillLevelID pgtype.Int2, operationID string, addedAt pgtype.Timestamptz, toWaitlist, allowOverfill bool) (placed, error) {
+// A slot outside the session's level restriction (D-2026-11-19-12) is refused with the reason unless allowOutsideLevels; the waitlist is
+// never checked. Repeat-safe on the operation id: a retry answers the entry the first try made.
+func (t *txn) place(clubPlayer sqlcgen.ClubPlayer, skillLevelID pgtype.Int2, operationID string, addedAt pgtype.Timestamptz, toWaitlist, allowOverfill, allowOutsideLevels bool) (placed, error) {
 	waitlistID := derivedID(operationID, "waitlist")
 	op, err := opUUID(operationID)
 	if err != nil {
@@ -220,10 +224,47 @@ func (t *txn) place(clubPlayer sqlcgen.ClubPlayer, skillLevelID pgtype.Int2, ope
 		d := signedin.WaitlistEntryOf(row, pos)
 		return placed{Waitlist: &d}, nil
 	}
+	if !allowOutsideLevels {
+		reason, blocked, err := t.levelBlock(skillLevelID)
+		if err != nil {
+			return placed{}, err
+		}
+		// Refused: the transaction rolls back, so nothing of this add or confirm is kept.
+		if blocked {
+			return placed{}, writes.Fail(httpapi.ErrForbidden, map[string]string{"levelRestriction": reason})
+		}
+	}
 	entry, err := t.promoteWaiter(waiter{ID: row.ID, ClubPlayerID: row.ClubPlayerID, SkillLevelID: row.SkillLevelID}, operationID, atBudget)
 	if err != nil {
 		return placed{}, err
 	}
 	d, err := t.rosterEntryOf(entry, clubPlayer.ID)
 	return placed{RosterEntry: d}, err
+}
+
+// levelBlock is levelRestrictionBlockIn: why a player of this level cannot take a slot in the session now (D-2026-11-19-12), counting the
+// live roster by band. The caller holds the session lock. No restriction, or no level, never blocks.
+func (t *txn) levelBlock(level pgtype.Int2) (string, bool, error) {
+	restriction := levelrestriction.Of(t.sess.LevelRestriction, t.sess.BeginnerSlots, t.sess.IntermediateSlots, t.sess.AdvancedSlots)
+	if !restriction.Restricted() || !level.Valid {
+		return "", false, nil
+	}
+	rows, err := t.q.ListQueueLiveRoster(t.ctx, t.sess.ID)
+	if err != nil {
+		return "", false, err
+	}
+	roster := make([]*string, len(rows))
+	for i, e := range rows {
+		roster[i] = levelCode(e.SkillLevelID)
+	}
+	reason, blocked := levelrestriction.Block(restriction, levelCode(level), roster)
+	return reason, blocked, nil
+}
+
+// levelCode is levelCodeFor: a stored skill level as its code, nil for none.
+func levelCode(id pgtype.Int2) *string {
+	if !id.Valid || id.Int16 < 0 || int(id.Int16) >= len(levels) {
+		return nil
+	}
+	return &levels[id.Int16]
 }

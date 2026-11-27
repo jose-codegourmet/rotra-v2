@@ -47,6 +47,7 @@ func (s *server) confirmJoinRequest(r *http.Request, club pgtype.UUID) (writes.R
 		return writes.Result{}, err
 	}
 	in := requestAccept{operationID: body.Text("operationId"), requestID: r.PathValue("requestId"), level: body.Text("level")}
+	in.allowOutsideLevels, _ = body.Bool("allowOutsideLevels")
 	if _, err := levelID(in.level); err != nil {
 		return writes.Result{}, err
 	}

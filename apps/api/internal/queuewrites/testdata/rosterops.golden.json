@@ -17000,6 +17000,1620 @@
       "admin_audit_events (removed)": []
     }
   },
+  "add_restricted_beginners_refuses_an_intermediate": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "This session is for beginners only."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_beginners_allows_a_beginner": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterEntry": {
+            "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "nameSnapshot": "Gus Guest",
+            "nicknameSnapshot": "Gus",
+            "clubNickname": null,
+            "present": false,
+            "presentChangedAt": "2026-11-19T04:00:00.000Z",
+            "level": "beginner_mid",
+            "levelLockedAt": null,
+            "confirmedAt": "2026-11-19T04:00:00.000Z",
+            "gamesAdjustment": 0,
+            "handicapSpots": [],
+            "selfCheckedInAt": null,
+            "leftAt": null,
+            "revision": "2"
+          },
+          "waitlist": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 1,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b1000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "skill_level_id": 1,
+          "accepted_revision": "5",
+          "session_player_id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "source_operation_id": "b1000000-0000-4000-8000-000000000001",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_beginners_refuses_an_advanced_new_player": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "This session is for beginners only."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_outside_levels_allowed_after_the_warning": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterEntry": {
+            "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "nameSnapshot": "Gus Guest",
+            "nicknameSnapshot": "Gus",
+            "clubNickname": null,
+            "present": false,
+            "presentChangedAt": "2026-11-19T04:00:00.000Z",
+            "level": "intermediate_low",
+            "levelLockedAt": null,
+            "confirmedAt": "2026-11-19T04:00:00.000Z",
+            "gamesAdjustment": 0,
+            "handicapSpots": [],
+            "selfCheckedInAt": null,
+            "leftAt": null,
+            "revision": "2"
+          },
+          "waitlist": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b1000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "source_operation_id": "b1000000-0000-4000-8000-000000000001",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_outside_levels_flag_not_true_does_not_count": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "This session is for beginners only."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_to_the_waitlist_is_not_checked": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterEntry": null,
+          "waitlist": {
+            "id": "212c8f8e-e125-8aa9-bea3-099073158581",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "level": "intermediate_low",
+            "addedAt": "2026-11-19T04:00:00.000Z",
+            "position": 1
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 40,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [
+        {
+          "id": "212c8f8e-e125-8aa9-bea3-099073158581",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "demoted_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "skill_level_id": 3,
+          "demoted_confirmed_at": null
+        }
+      ],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_full_roster_goes_to_the_waitlist_unchecked": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterEntry": null,
+          "waitlist": {
+            "id": "212c8f8e-e125-8aa9-bea3-099073158581",
+            "sessionId": "a3000000-0000-4000-8000-000000000002",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "level": "intermediate_low",
+            "addedAt": "2026-11-19T04:00:00.000Z",
+            "position": 2
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000002",
+          "state": "prepared",
+          "revision": "9007199254740994",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 3,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000002",
+          "state": "prepared",
+          "revision": "9007199254740993",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 3,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [
+        {
+          "id": "212c8f8e-e125-8aa9-bea3-099073158581",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "demoted_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "skill_level_id": 3,
+          "demoted_confirmed_at": null
+        }
+      ],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_overfill_is_checked": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "This session is for beginners only."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_beginners_intermediate_refuses_an_advanced": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "This session is for beginners to intermediate only."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_beginners_intermediate_allows_an_intermediate": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterEntry": {
+            "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "nameSnapshot": "Gus Guest",
+            "nicknameSnapshot": "Gus",
+            "clubNickname": null,
+            "present": false,
+            "presentChangedAt": "2026-11-19T04:00:00.000Z",
+            "level": "intermediate_low",
+            "levelLockedAt": null,
+            "confirmedAt": "2026-11-19T04:00:00.000Z",
+            "gamesAdjustment": 0,
+            "handicapSpots": [],
+            "selfCheckedInAt": null,
+            "leftAt": null,
+            "revision": "2"
+          },
+          "waitlist": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b1000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "source_operation_id": "b1000000-0000-4000-8000-000000000001",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_per_level_band_full": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "All 1 intermediate slots are taken."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_per_level_band_has_no_slots": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "This session has no advanced slots."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_per_level_band_has_a_free_slot": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterEntry": {
+            "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "nameSnapshot": "Gus Guest",
+            "nicknameSnapshot": "Gus",
+            "clubNickname": null,
+            "present": false,
+            "presentChangedAt": "2026-11-19T04:00:00.000Z",
+            "level": "beginner_low",
+            "levelLockedAt": null,
+            "confirmedAt": "2026-11-19T04:00:00.000Z",
+            "gamesAdjustment": 0,
+            "handicapSpots": [],
+            "selfCheckedInAt": null,
+            "leftAt": null,
+            "revision": "2"
+          },
+          "waitlist": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 0,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b1000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "skill_level_id": 0,
+          "accepted_revision": "5",
+          "session_player_id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "source_operation_id": "b1000000-0000-4000-8000-000000000001",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_per_level_a_released_player_frees_the_band": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterEntry": {
+            "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "nameSnapshot": "Gus Guest",
+            "nicknameSnapshot": "Gus",
+            "clubNickname": null,
+            "present": false,
+            "presentChangedAt": "2026-11-19T04:00:00.000Z",
+            "level": "intermediate_low",
+            "levelLockedAt": null,
+            "confirmedAt": "2026-11-19T04:00:00.000Z",
+            "gamesAdjustment": 0,
+            "handicapSpots": [],
+            "selfCheckedInAt": null,
+            "leftAt": null,
+            "revision": "2"
+          },
+          "waitlist": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 40,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b1000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "source_operation_id": "b1000000-0000-4000-8000-000000000001",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_restricted_a_retry_is_not_checked_again": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterEntry": {
+            "id": "349d277a-e696-86af-bc2e-6ccad0947265",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "nameSnapshot": "Gus Guest",
+            "nicknameSnapshot": "Gus",
+            "clubNickname": null,
+            "present": false,
+            "presentChangedAt": "2026-11-19T04:00:00.000Z",
+            "level": "beginner_low",
+            "levelLockedAt": null,
+            "confirmedAt": "2026-11-19T04:00:00.000Z",
+            "gamesAdjustment": 0,
+            "handicapSpots": [],
+            "selfCheckedInAt": null,
+            "leftAt": null,
+            "revision": "2"
+          },
+          "waitlist": null
+        },
+        "db": {
+          "queue_sessions": [
+            {
+              "id": "a3000000-0000-4000-8000-000000000001",
+              "state": "prepared",
+              "revision": "6",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "minimum_games": 20,
+              "queue_revision": "1"
+            }
+          ],
+          "queue_sessions (removed)": [
+            {
+              "id": "a3000000-0000-4000-8000-000000000001",
+              "state": "prepared",
+              "revision": "5",
+              "updated_at": "2026-11-10T00:00:00+00:00",
+              "minimum_games": 0,
+              "queue_revision": "1"
+            }
+          ],
+          "session_players": [
+            {
+              "id": "349d277a-e696-86af-bc2e-6ccad0947265",
+              "present": false,
+              "revision": "2",
+              "joined_at": "2026-11-19T04:00:00+00:00",
+              "created_at": "2026-11-19T04:00:00+00:00",
+              "no_show_at": null,
+              "session_id": "a3000000-0000-4000-8000-000000000001",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "released_at": null,
+              "confirmed_at": "2026-11-19T04:00:00+00:00",
+              "name_snapshot": "Gus Guest",
+              "club_player_id": "c6000000-0000-4000-8000-000000000001",
+              "handicap_spots": [],
+              "over_budget_at": null,
+              "release_reason": null,
+              "skill_level_id": 0,
+              "level_locked_at": null,
+              "games_adjustment": 0,
+              "player_id_at_entry": null,
+              "present_changed_at": "2026-11-19T04:00:00+00:00",
+              "assessment_operation_id": "b1000000-0000-4000-8000-000000000005"
+            }
+          ],
+          "session_players (removed)": [],
+          "club_assessments": [
+            {
+              "session_id": "a3000000-0000-4000-8000-000000000001",
+              "assessed_at": "2026-11-19T04:00:00+00:00",
+              "received_at": "2026-11-19T04:00:00+00:00",
+              "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+              "club_player_id": "c6000000-0000-4000-8000-000000000001",
+              "skill_level_id": 0,
+              "accepted_revision": "5",
+              "session_player_id": "349d277a-e696-86af-bc2e-6ccad0947265",
+              "source_operation_id": "b1000000-0000-4000-8000-000000000005",
+              "player_id_at_assessment": null,
+              "supersedes_operation_id": null
+            }
+          ],
+          "club_assessments (removed)": [],
+          "session_waitlist": [],
+          "session_waitlist (removed)": [],
+          "session_join_requests": [],
+          "session_join_requests (removed)": [],
+          "club_players": [],
+          "club_players (removed)": [],
+          "club_player_private_inputs": [],
+          "club_player_private_inputs (removed)": [],
+          "shared_player_entries": [],
+          "shared_player_entries (removed)": [],
+          "player_id_counters": [],
+          "player_id_counters (removed)": [],
+          "player_notifications": [],
+          "player_notifications (removed)": [],
+          "session_match_requests": [],
+          "session_match_requests (removed)": [],
+          "admin_audit_events": [],
+          "admin_audit_events (removed)": []
+        }
+      },
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "rosterEntry": {
+            "id": "349d277a-e696-86af-bc2e-6ccad0947265",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+            "nameSnapshot": "Gus Guest",
+            "nicknameSnapshot": "Gus",
+            "clubNickname": null,
+            "present": false,
+            "presentChangedAt": "2026-11-19T04:00:00.000Z",
+            "level": "beginner_low",
+            "levelLockedAt": null,
+            "confirmedAt": "2026-11-19T04:00:00.000Z",
+            "gamesAdjustment": 0,
+            "handicapSpots": [],
+            "selfCheckedInAt": null,
+            "leftAt": null,
+            "revision": "2"
+          },
+          "waitlist": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "7",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "349d277a-e696-86af-bc2e-6ccad0947265",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 0,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b1000000-0000-4000-8000-000000000005"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "skill_level_id": 0,
+          "accepted_revision": "5",
+          "session_player_id": "349d277a-e696-86af-bc2e-6ccad0947265",
+          "source_operation_id": "b1000000-0000-4000-8000-000000000005",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "batch_restricted_refuses_the_whole_batch": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "This session is for beginners to intermediate only."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "batch_restricted_allows_the_warning_on_one_add": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b1000000-0000-4000-8000-000000000001",
+              "op": "add",
+              "rosterEntry": {
+                "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+                "nameSnapshot": "Gus Guest",
+                "nicknameSnapshot": "Gus",
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "beginner_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "request": null
+            },
+            {
+              "operationId": "b1000000-0000-4000-8000-000000000002",
+              "op": "add",
+              "rosterEntry": {
+                "id": "8c08ef59-3f13-8780-9447-7fa8e5ab8d3a",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000002",
+                "nameSnapshot": "Gail Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "advanced_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000001",
+                "nameSnapshot": "Gus Guest",
+                "nicknameSnapshot": "Gus",
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "beginner_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "8c08ef59-3f13-8780-9447-7fa8e5ab8d3a",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000002",
+                "nameSnapshot": "Gail Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "advanced_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 0,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b1000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "8c08ef59-3f13-8780-9447-7fa8e5ab8d3a",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gail Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000002",
+          "handicap_spots": [],
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 6,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b1000000-0000-4000-8000-000000000002"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "skill_level_id": 0,
+          "accepted_revision": "5",
+          "session_player_id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
+          "source_operation_id": "b1000000-0000-4000-8000-000000000001",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        },
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000002",
+          "skill_level_id": 6,
+          "accepted_revision": "5",
+          "session_player_id": "8c08ef59-3f13-8780-9447-7fa8e5ab8d3a",
+          "source_operation_id": "b1000000-0000-4000-8000-000000000002",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
   "handicap_signed_out": {
     "steps": [
       {

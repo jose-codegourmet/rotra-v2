@@ -20,6 +20,12 @@
   "s3_full": [
    "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000012', 'Lee Guest', true, TIMESTAMPTZ '2026-11-19 01:08:00+00', 'a0300000-0000-4000-8000-000000000199', 3, TIMESTAMPTZ '2026-11-19 01:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-19 01:08:00+00', 3)"
   ],
+  "s1_beginners_only": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "s1_per_level": [
+   "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0 WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
   "s1_at_smash_hall": [
    "UPDATE queue_sessions SET venue_id = 'a5000000-0000-4000-8000-000000000001', venue_name = 'Smash Hall' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
   ],
@@ -155,6 +161,11 @@
    "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id) VALUES ('a4500000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000004', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4600000-0000-4000-8000-000000000001')",
    "INSERT INTO active_court_holds (court_id, club_id, session_id, match_id, held_at) VALUES ('a2c00000-0000-4000-8000-000000000004', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00')"
   ],
+  "s1_per_level_today": [
+   "UPDATE queue_sessions SET state = 'invalid', invalid_reason = 'Test night' WHERE id = 'a3000000-0000-4000-8000-000000000003'",
+   "UPDATE queue_sessions SET scheduled_start_at = TIMESTAMPTZ '2026-11-19 03:00:00+00', scheduled_end_at = TIMESTAMPTZ '2026-11-19 07:00:00+00' WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0 WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
   "s3_on_court_match": [
    "INSERT INTO matches (id, club_id, session_id, match_no, state, format, queue_position, origin, source_operation_id, placed_at, started_at, created_at, updated_at, revision) VALUES ('a4000000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 1, 'on_court', 'singles', 1, 'manual', 'a4100000-0000-4000-8000-000000000001', TIMESTAMPTZ '2026-11-19 02:00:00+00', NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
    "INSERT INTO match_court_usage (id, club_id, session_id, match_id, court_id, acquired_at, acquire_operation_id) VALUES ('a4500000-0000-4000-8000-000000000001', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'a4000000-0000-4000-8000-000000000001', 'a2c00000-0000-4000-8000-000000000003', TIMESTAMPTZ '2026-11-19 02:00:00+00', 'a4600000-0000-4000-8000-000000000001')",
@@ -164,7 +175,7 @@
  "snapshot": [
   {
    "name": "queue_sessions",
-   "sql": "SELECT id, club_id, title, notes, state, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court, expected_players, queue_revision::text AS queue_revision, started_at, series_id, start_license_term_id, public_slug, accept_join_requests, always_require_request, court_fill_mode, record_games, request_formats::text AS request_formats, source_command_id, planned_start_before_start_at, planned_end_before_start_at, revision::text AS revision, created_at, updated_at FROM queue_sessions ORDER BY id"
+   "sql": "SELECT id, club_id, title, notes, state, scheduled_start_at, scheduled_end_at, venue_id, venue_name, venue_address, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court, expected_players, queue_revision::text AS queue_revision, started_at, series_id, start_license_term_id, public_slug, accept_join_requests, always_require_request, court_fill_mode, record_games, request_formats::text AS request_formats, source_command_id, planned_start_before_start_at, planned_end_before_start_at, level_restriction::text AS level_restriction, beginner_slots, intermediate_slots, advanced_slots, revision::text AS revision, created_at, updated_at FROM queue_sessions ORDER BY id"
   },
   {
    "name": "session_courts",
@@ -7253,6 +7264,1438 @@
        }
       }
      ]
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_default_is_all",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_all",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": {
+        "kind": "all"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_beginners",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": {
+        "kind": "beginners"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_beginners_intermediate",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": {
+        "kind": "beginners-intermediate"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_per_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 2,
+         "intermediate": 1,
+         "advanced": 1
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_per_level_with_zero_slots",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 0,
+         "intermediate": 4,
+         "advanced": 0
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_per_level_uses_the_club_default_per_court",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 4,
+         "intermediate": 4,
+         "advanced": 0
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_slots_ignored_with_another_pick",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": {
+        "kind": "beginners",
+        "slots": {
+         "beginner": 9,
+         "intermediate": 9,
+         "advanced": 9
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_null_is_all",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": null
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_unknown_kind",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": {
+        "kind": "experts"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_without_a_kind",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": {
+        "slots": {
+         "beginner": 1
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_not_an_object",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": "beginners"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_a_list",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": [
+        "all"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_slots_add_up_to_less",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 1,
+         "intermediate": 1,
+         "advanced": 1
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_slots_add_up_to_more",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 2,
+         "intermediate": 2,
+         "advanced": 2
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_slots_one_court",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 1,
+         "intermediate": 1,
+         "advanced": 1
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_slots_missing_reads_zero_each",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_slot_not_whole",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 1.5,
+         "intermediate": 1.5,
+         "advanced": 1
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_slot_negative",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": -1,
+         "intermediate": 3,
+         "advanced": 2
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_slot_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": "2",
+         "intermediate": 1,
+         "advanced": 1
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_slots_null",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": null
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_slots_missing_a_band",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 2,
+         "intermediate": 2
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_bad_slots_win_over_a_bad_kind",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "levelRestriction": {
+        "kind": "experts",
+        "slots": {
+         "beginner": -1,
+         "intermediate": 0,
+         "advanced": 0
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "create_restriction_a_series_gets_the_same_pick",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "repeat": "weekly",
+       "occurrences": 3,
+       "levelRestriction": {
+        "kind": "beginners"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_beginners",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "beginners"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_per_level",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 1,
+         "intermediate": 1,
+         "advanced": 0
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_slots_must_add_up",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 1,
+         "intermediate": 1,
+         "advanced": 1
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_slots_not_whole",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 1.5,
+         "intermediate": 0.5,
+         "advanced": 0
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_unknown_kind",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "experts"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_follows_a_new_court_count",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 2,
+         "intermediate": 2,
+         "advanced": 0
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_left_out_keeps_the_stored_pick",
+   "scenario": "s1_beginners_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_null_keeps_the_stored_pick",
+   "scenario": "s1_beginners_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": null
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_back_to_all",
+   "scenario": "s1_per_level",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "all"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_per_level_to_beginners_drops_the_slots",
+   "scenario": "s1_per_level",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "beginners"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit_restriction_refused_keeps_the_stored_pick",
+   "scenario": "s1_beginners_only",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "levelRestriction": {
+        "kind": "per-level",
+        "slots": {
+         "beginner": 5,
+         "intermediate": 0,
+         "advanced": 0
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "start_a_restricted_session",
+   "scenario": "s1_per_level_today",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/start",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "5"
+     }
     }
    ]
   }

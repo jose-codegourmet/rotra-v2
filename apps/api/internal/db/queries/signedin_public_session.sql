@@ -15,6 +15,7 @@ SELECT s.id,
        s.record_games,
        s.players_per_court,
        s.request_formats::text[] AS request_formats,
+       s.level_restriction, s.beginner_slots, s.intermediate_slots, s.advanced_slots,
        COALESCE(sp.state = 'deleted', false)::bool AS publication_deleted
 FROM queue_sessions s
 LEFT JOIN session_publications sp ON sp.session_id = s.id
@@ -242,3 +243,15 @@ SELECT DISTINCT ON (club_player_id) club_player_id, skill_level_id
 FROM club_assessments
 WHERE club_player_id = ANY (@ids::uuid[])
 ORDER BY club_player_id, assessed_at DESC;
+
+-- The Player's level at the club (D-2026-11-19-12, clubLevelIdOf/savedLevelOf): on their current saved record, the level the club
+-- gave outside a session or the latest session assessment, whichever is newer. No row: not saved in the club; -1: none yet.
+-- name: GetPlayerClubLevel :one
+SELECT COALESCE(CASE WHEN cp.saved_skill_level_id IS NULL OR cp.saved_level_at IS NULL THEN al.skill_level_id
+             WHEN al.assessed_at IS NOT NULL AND date_trunc('milliseconds', al.assessed_at) > date_trunc('milliseconds', cp.saved_level_at) THEN al.skill_level_id
+             ELSE cp.saved_skill_level_id END, -1)::smallint AS level_id
+FROM club_players cp
+LEFT JOIN LATERAL (SELECT a.skill_level_id, a.assessed_at FROM club_assessments a WHERE a.club_player_id = cp.id
+                   ORDER BY a.assessed_at DESC, a.id DESC LIMIT 1) al ON true
+WHERE cp.club_id = @club_id AND cp.player_id = @player_id AND cp.removed_at IS NULL
+LIMIT 1;

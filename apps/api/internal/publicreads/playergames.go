@@ -348,9 +348,43 @@ func score(team sqlcgen.TeamSide, a, b pgtype.Int4) *string {
 	return &s
 }
 
-// winChanceReader is readClubForms with the levels: it reads, in two queries, the level each entry played its session at and the lasting
-// form of every saved player on these courts, and answers the win chance of one finished game. A face with no finalized session before
-// the game's session at that club counts as its level only.
+// clubForms is readClubForms: the lasting form of saved players at their clubs, read in one query. The function it returns gives one saved
+// player's form for a game of a session: their wins and losses in the club's sessions finalized before that session, by weekday. Nil when
+// they have no finalized session there before it: the level alone is used.
+func clubForms(ctx context.Context, q *sqlcgen.Queries, clubs, players []pgtype.UUID) (func(clubPlayer, session pgtype.UUID, scheduled time.Time, finalized pgtype.Timestamptz) *winchance.Form, error) {
+	history := map[pgtype.UUID][]sqlcgen.ListClubFormRowsRow{}
+	if len(players) > 0 {
+		rows, err := q.ListClubFormRows(ctx, sqlcgen.ListClubFormRowsParams{ClubIds: clubs, ClubPlayerIds: players})
+		if err != nil {
+			return nil, fmt.Errorf("reading club forms: %w", err)
+		}
+		for _, r := range rows {
+			history[r.ClubPlayerID] = append(history[r.ClubPlayerID], r)
+		}
+	}
+	weekday := func(t time.Time) int { return int(t.Add(8 * time.Hour).UTC().Weekday()) } // Manila, Sunday 0
+	return func(clubPlayer, session pgtype.UUID, scheduled time.Time, finalized pgtype.Timestamptz) *winchance.Form {
+		before := time.Now()
+		if finalized.Valid {
+			before = finalized.Time
+		}
+		var prior []winchance.SessionRecord
+		for _, r := range history[clubPlayer] {
+			if r.SessionID != session && r.CommittedAt.Valid && r.CommittedAt.Time.Before(before) {
+				prior = append(prior, winchance.SessionRecord{Weekday: weekday(r.ScheduledStartAt.Time), Wins: int(r.Wins), Losses: int(r.Losses)})
+			}
+		}
+		if len(prior) == 0 {
+			return nil
+		}
+		form := winchance.FormFromHistory(prior, weekday(scheduled))
+		return &form
+	}, nil
+}
+
+// winChanceReader reads, in two queries, the level each entry played its session at and the lasting form of every saved player on these
+// courts, and answers the win chance of one finished game. A face with no finalized session before the game's session at that club counts as
+// its level only.
 func winChanceReader(ctx context.Context, q *sqlcgen.Queries, sessions []sqlcgen.ListCompletedSessionsRow, sessionIDs []pgtype.UUID,
 	entryRows []sqlcgen.ListSessionEntriesRow) (func(f historyFact, s sqlcgen.ListCompletedSessionsRow) *winchance.Game, error) {
 
@@ -373,44 +407,20 @@ func winChanceReader(ctx context.Context, q *sqlcgen.Queries, sessions []sqlcgen
 			players = append(players, e.ClubPlayerID)
 		}
 	}
-	history := map[pgtype.UUID][]sqlcgen.ListClubFormRowsRow{}
-	if len(players) > 0 {
-		rows, err := q.ListClubFormRows(ctx, sqlcgen.ListClubFormRowsParams{ClubIds: clubs, ClubPlayerIds: players})
-		if err != nil {
-			return nil, fmt.Errorf("reading club forms: %w", err)
-		}
-		for _, r := range rows {
-			history[r.ClubPlayerID] = append(history[r.ClubPlayerID], r)
-		}
-	}
-	weekday := func(t time.Time) int { return int(t.Add(8 * time.Hour).UTC().Weekday()) } // Manila, Sunday 0
-	formOf := func(entry pgtype.UUID, s sqlcgen.ListCompletedSessionsRow) *winchance.Form {
-		clubPlayer, ok := clubOf[entry]
-		if !ok {
-			return nil
-		}
-		before := time.Now()
-		if s.FinalizedAt.Valid {
-			before = s.FinalizedAt.Time
-		}
-		var prior []winchance.SessionRecord
-		for _, r := range history[clubPlayer] {
-			if r.SessionID != s.ID && r.CommittedAt.Valid && r.CommittedAt.Time.Before(before) {
-				prior = append(prior, winchance.SessionRecord{Weekday: weekday(r.ScheduledStartAt.Time), Wins: int(r.Wins), Losses: int(r.Losses)})
-			}
-		}
-		if len(prior) == 0 {
-			return nil
-		}
-		form := winchance.FormFromHistory(prior, weekday(s.ScheduledStartAt.Time))
-		return &form
+	formFor, err := clubForms(ctx, q, clubs, players)
+	if err != nil {
+		return nil, err
 	}
 	face := func(entry pgtype.UUID, s sqlcgen.ListCompletedSessionsRow) winchance.Face {
 		lv, ok := level[entry]
 		if !ok {
 			lv = -1
 		}
-		return winchance.Face{Level: lv, Form: formOf(entry, s)}
+		f := winchance.Face{Level: lv}
+		if clubPlayer, ok := clubOf[entry]; ok {
+			f.Form = formFor(clubPlayer, s.ID, s.ScheduledStartAt.Time, s.FinalizedAt)
+		}
+		return f
 	}
 	return func(f historyFact, s sqlcgen.ListCompletedSessionsRow) *winchance.Game {
 		left := []winchance.Face{face(f.SessionPlayerID, s)}

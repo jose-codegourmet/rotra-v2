@@ -59,6 +59,9 @@
   ],
   "job_pending": [
    "INSERT INTO projection_jobs (id, kind, kind_version, source_type, source_finalization_id, status, completed_at, updated_at) VALUES ('b9000000-0000-4000-8000-000000000001', 'player_rank', 1, 'finalization', 'a1000000-0000-4000-8000-000000000001', 'pending', NULL, now())"
+  ],
+  "record_games_off": [
+   "UPDATE queue_sessions SET record_games = false WHERE id = 'a1000000-0000-4000-8000-000000000001'"
   ]
  },
  "cases": [
@@ -2960,6 +2963,498 @@
    "path": "/api/clubs/e8000000-0000-4000-8000-000000000001/leaderboard?offset=50&limit=50",
    "player": null,
    "scenario": "crowded"
+  },
+  {
+   "name": "match_01_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000001",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_01_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_01_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_02_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000002",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_02_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000002",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_02_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000002",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_03_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000003",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_03_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_03_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_04_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000004",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_04_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000004",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_04_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000004",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_05_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000005",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_05_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000005",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_05_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000005",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_06_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000006",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_06_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000006",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_06_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000006",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_07_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000007",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_07_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000007",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_07_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000007",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_08_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000008",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_08_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000008",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_08_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000008",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_09_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000009",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_09_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000009",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_09_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000009",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0a_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000a",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_0a_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000a",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0a_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000a",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0b_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000b",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_0b_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000b",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0b_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000b",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0c_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000c",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_0c_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000c",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0c_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000c",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0d_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000d",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_0d_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000d",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0d_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000d",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0e_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000e",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_0e_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000e",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0e_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000e",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0f_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000f",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_0f_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000f",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0f_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000f",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_10_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000010",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_10_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000010",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_10_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000010",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_11_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000011",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_11_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000011",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_11_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000011",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_12_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000012",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_12_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000012",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_12_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000012",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_13_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000013",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_13_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000013",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_13_bob",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000013",
+   "player": "f3000000-0000-4000-8000-000000000002",
+   "scenario": "base"
+  },
+  {
+   "name": "match_01_carla",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "match_01_dan",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "match_01_eve",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "match_03_carla",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "match_03_dan",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "match_03_eve",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000003",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "match_07_carla",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000007",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "match_07_dan",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000007",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "match_07_eve",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000007",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0e_carla",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000e",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0e_dan",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000e",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0e_eve",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000e",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0f_carla",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000f",
+   "player": "f3000000-0000-4000-8000-000000000003",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0f_dan",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000f",
+   "player": "f3000000-0000-4000-8000-000000000004",
+   "scenario": "base"
+  },
+  {
+   "name": "match_0f_eve",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000f",
+   "player": "f3000000-0000-4000-8000-000000000005",
+   "scenario": "base"
+  },
+  {
+   "name": "match_unknown",
+   "path": "/api/matches/a3000000-0000-4000-8000-0000000000ff",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_malformed",
+   "path": "/api/matches/x",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_upper_case_uuid",
+   "path": "/api/matches/A3000000-0000-4000-8000-000000000001",
+   "player": null,
+   "scenario": "base"
+  },
+  {
+   "name": "match_unknown_signed_in",
+   "path": "/api/matches/a3000000-0000-4000-8000-0000000000ff",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "base"
+  },
+  {
+   "name": "match_01_ranked_off_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000001",
+   "player": null,
+   "scenario": "record_games_off"
+  },
+  {
+   "name": "match_01_ranked_off_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000001",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "record_games_off"
+  },
+  {
+   "name": "match_02_ranked_off_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000002",
+   "player": null,
+   "scenario": "record_games_off"
+  },
+  {
+   "name": "match_02_ranked_off_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-000000000002",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "record_games_off"
+  },
+  {
+   "name": "match_0e_ranked_off_visitor",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000e",
+   "player": null,
+   "scenario": "record_games_off"
+  },
+  {
+   "name": "match_0e_ranked_off_alice",
+   "path": "/api/matches/a3000000-0000-4000-8000-00000000000e",
+   "player": "f3000000-0000-4000-8000-000000000001",
+   "scenario": "record_games_off"
   }
  ]
 }

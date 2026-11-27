@@ -42,11 +42,13 @@ export function useSessionPayments(sessionId: string) {
     data: {
       ...query.data,
       players,
+      // D-2026-11-27-01: free players (no mark) are left out of Paid X/Y, Not paid and still due.
       totals: paymentTotals({
         marks: players.flatMap((p) => (p.mark ? [p.mark] : [])),
-        total: players.length,
+        total: players.filter((p) => !(p.free && !p.mark)).length,
         amountDue: query.data.amountDue,
         cost: query.data.totals.cost,
+        free: players.filter((p) => p.free && !p.mark).length,
       }),
     },
   }

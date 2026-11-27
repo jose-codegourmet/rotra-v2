@@ -89,16 +89,59 @@ case('edit_twice', [edit(GUS, form(email='new.person@example.test')), edit(GUS, 
 # Edit details takes no lock, so two different names race for the last word (not decided, so not pinned); the same edit twice is.
 case('edit_the_same_edit_twice_at_once', {'parallel': [edit(UNA, {'fullName': 'Una A'}), edit(UNA, {'fullName': 'Una A'})]})
 
+
+# ------------------------------------------------------------------ Saved level (club_player_saved_level) and a link-only record (#1019), task 2.7
+case('edit_level_sets_the_saved_level', edit(GUS, form(level='beginner_mid')))
+case('edit_level_on_an_unclaimed_player', edit(UNA, {'fullName': 'Una Alonzo', 'level': 'advanced_low'}))
+case('edit_level_same_as_the_saved_one_changes_nothing', edit(GUS, form(level='intermediate_low')), scenario='gus_saved_level')
+case('edit_level_changed', edit(GUS, form(level='advanced_high')), scenario='gus_saved_level')
+case('edit_level_cleared_by_an_empty_text', edit(GUS, form(level='')), scenario='gus_saved_level')
+case('edit_level_left_out_clears_it', edit(GUS, form()), scenario='gus_saved_level')
+case('edit_level_not_text_clears_it', edit(GUS, form(level=5)), scenario='gus_saved_level')
+case('edit_level_not_a_level', edit(GUS, form(level='wizard')), scenario='gus_saved_level')
+case('edit_level_not_a_level_rolls_the_name_back', edit(GUS, {'fullName': 'Gus Renamed', 'level': 'wizard'}))
+case('edit_level_a_session_assessment_is_newer', edit(GUS, form(level='advanced_low')), scenario='gus_assessed_later')
+case('edit_level_a_session_assessment_is_newer_and_another_is_typed', edit(GUS, form(level='beginner_low')), scenario='gus_assessed_later')
+case('edit_level_the_saved_level_is_newer_than_the_assessment', edit(GUS, form(level='intermediate_low')), scenario='gus_assessed_earlier')
+case('edit_level_the_saved_level_is_newer_and_another_is_typed', edit(GUS, form(level='advanced_low')), scenario='gus_assessed_earlier')
+case('edit_level_only_an_assessment_exists', edit(GUS, form(level='advanced_low')), scenario='gus_assessed_only')
+case('edit_level_only_an_assessment_exists_and_it_is_cleared', edit(GUS, form()), scenario='gus_assessed_only')
+case('edit_level_twice', [edit(GUS, form(level='beginner_high')), edit(GUS, form(level='beginner_high'))])
+
+LINK = {'facebook': 'fb.com/una'}
+case('edit_link_only_adds_an_email', edit(UNA, {'fullName': 'Una Alonzo', 'email': ' New.Una@Example.test ', 'socialLinks': LINK}), scenario='una_link_only')
+case('edit_link_only_email_of_a_registered_player_leaves_the_link', edit(UNA, {'fullName': 'Una Alonzo', 'email': 'ben@example.test', 'socialLinks': LINK}), scenario='una_link_only')
+case('edit_link_only_email_of_an_open_entry_leaves_the_link', edit(UNA, {'fullName': 'Una Alonzo', 'email': 'eve@example.test', 'socialLinks': LINK}), scenario='una_link_only')
+case('edit_link_only_email_not_valid', edit(UNA, {'fullName': 'Una Alonzo', 'email': 'nope', 'socialLinks': LINK}), scenario='una_link_only')
+case('edit_link_only_no_email_keeps_the_link', edit(UNA, {'fullName': 'Una Alonzo', 'socialLinks': LINK}), scenario='una_link_only')
+case('edit_link_only_clearing_the_link_makes_a_guest', edit(UNA, {'fullName': 'Una Alonzo'}), scenario='una_link_only')
+case('edit_link_only_changing_the_link_moves_the_key', edit(UNA, {'fullName': 'Una Alonzo', 'socialLinks': {'instagram': 'instagram.com/una_a'}}), scenario='una_link_only')
+case('edit_link_only_adds_an_email_and_clears_the_link', edit(UNA, {'fullName': 'Una Alonzo', 'email': 'solo.una@example.test'}), scenario='una_link_only')
+case('edit_link_only_adds_an_email_twice', [edit(UNA, {'fullName': 'Una Alonzo', 'email': 'first.una@example.test', 'socialLinks': LINK}), edit(UNA, {'fullName': 'Una Alonzo', 'email': 'second.una@example.test', 'socialLinks': LINK})], scenario='una_link_only')
+case('edit_an_unclaimed_player_with_an_email_ignores_a_typed_one', edit(UNA, {'fullName': 'Una Alonzo', 'email': 'other@example.test', 'socialLinks': LINK}))
+
 SCEN = dict(BASE['scenarios'])
 SCEN['una_has_a_phone'] = [f"INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, created_at, updated_at) VALUES ('{CP(UNA)}', '{CLUB1}', '+639175550111', 'pending', {NOW}, {NOW}, {NOW})"]
 SCEN['rex_has_that_phone_and_is_deleted'] = [f"INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, state, captured_at, created_at, updated_at) VALUES ('{CP(6)}', '{CLUB1}', '+639175550199', 'pending', {NOW}, {NOW}, {NOW})"]
 SCEN['una_has_experience'] = [f"INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, preset_fields, state, captured_at, created_at, updated_at) VALUES ('{CP(UNA)}', '{CLUB1}', NULL, "
                               f"'{{\"version\":1,\"playingStyle\":\"Old\",\"experienceMonths\":24,\"experienceRecordedAt\":\"2026-03-10T00:00:00.000Z\",\"socialLinks\":{{\"facebook\":\"old\"}}}}'::jsonb, 'pending', {NOW}, {NOW}, {NOW})"]
+
+ASSESS = lambda lvl, at, n: (f"INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) "
+                             f"VALUES ('a0300000-0000-4000-8000-000000000a{n:02d}', '{CLUB1}', '{CP(GUS)}', 'a3000000-0000-4000-8000-000000000003', 'a7000000-0000-4000-8000-000000000099', {lvl}, 'a0300000-0000-4000-8000-000000000b{n:02d}', TIMESTAMPTZ '{at}', TIMESTAMPTZ '{at}', 1, '{CLUB1}')")
+SAVED3 = f"UPDATE club_players SET saved_skill_level_id = 3, saved_level_at = TIMESTAMPTZ '2026-11-10 00:00:00+00' WHERE id = '{CP(GUS)}'"
+SCEN['gus_saved_level'] = [SAVED3]
+SCEN['gus_assessed_later'] = [SAVED3, ASSESS(6, '2026-11-15 00:00:00+00', 1)]
+SCEN['gus_assessed_earlier'] = [SAVED3, ASSESS(6, '2026-11-05 00:00:00+00', 2)]
+SCEN['gus_assessed_only'] = [ASSESS(6, '2026-11-05 00:00:00+00', 3)]
+SCEN['una_link_only'] = [
+    "UPDATE shared_player_entries SET email = NULL, social_key = 'facebook.com/una' WHERE id = 'a6000000-0000-4000-8000-000000000007'",
+    f"INSERT INTO club_player_private_inputs (club_player_id, club_id, phone_e164, preset_fields, state, captured_at, created_at, updated_at) VALUES ('{CP(UNA)}', '{CLUB1}', NULL, "
+    f"'{{\"version\":1,\"playingStyle\":\"\",\"experienceMonths\":null,\"experienceRecordedAt\":null,\"socialLinks\":{{\"facebook\":\"fb.com/una\"}}}}'::jsonb, 'pending', {NOW}, {NOW}, {NOW})"]
 SNAPSHOT = []
 for s in BASE['snapshot']:
     s = dict(s)
     if s['name'] == 'club_player_private_inputs':
-        s['sql'] = s['sql'].replace('phone_e164, email, state,', 'phone_e164, email, preset_fields, state,')
+        s['sql'] = s['sql'].replace('phone_e164, email, state,', 'phone_e164, email, preset_fields, state,') if 'preset_fields' not in s['sql'] else s['sql']
     SNAPSHOT.append(s)
 doc = {'now': BASE['now'], 'app': 'club', 'snapshotDiff': True, 'seed': 'queue.seed.sql', 'scenarios': SCEN, 'snapshot': SNAPSHOT, 'cases': cases}
 for c in cases:

@@ -1,6 +1,7 @@
 package queuewrites
 
 import (
+	"encoding/json"
 	"errors"
 	"net/url"
 	"regexp"
@@ -10,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/signedin"
 )
 
 // socialHosts is SOCIAL_PROVIDERS (packages/schema/src/social-link.ts): per provider, the hosts of its site; the first is the key's host.
@@ -26,33 +28,43 @@ var (
 	trailingBar = regexp.MustCompile(`/+$`)
 )
 
-// socialLinkKey is normalizeSocialLink(...).key (#1019): the scheme may be left out; www., m. and mobile. and the provider's other hosts become
-// its site; the query, hash and trailing slash are dropped; lower case. A bare site with no profile path is not a link ("" here).
-func socialLinkKey(typed string) string {
+// socialLink is NormalizedSocialLink: the provider, the entry key (e.g. facebook.com/jun.bautista) and the link as typed (trimmed, with
+// https:// added when the scheme was left out).
+type socialLink struct{ provider, key, url string }
+
+// normalizeSocialLink is normalizeSocialLink (#1019): the scheme may be left out; www., m. and mobile. and the provider's other hosts become
+// its site; the query, hash and trailing slash are dropped; lower case. A bare site with no profile path is not a link (false).
+func normalizeSocialLink(typed string) (socialLink, bool) {
 	value := strings.TrimSpace(typed)
 	if value == "" {
-		return ""
+		return socialLink{}, false
 	}
 	if !hasScheme.MatchString(value) {
 		value = "https://" + value
 	}
 	u, err := url.Parse(value)
 	if err != nil || u.Hostname() == "" {
-		return ""
+		return socialLink{}, false
 	}
 	host := wwwPrefix.ReplaceAllString(strings.ToLower(u.Hostname()), "")
 	path := strings.ToLower(trailingBar.ReplaceAllString(u.EscapedPath(), ""))
 	if path == "" {
-		return ""
+		return socialLink{}, false
 	}
 	for _, provider := range socialProviders {
 		for _, h := range socialHosts[provider] {
 			if h == host {
-				return socialHosts[provider][0] + path
+				return socialLink{provider: provider, key: socialHosts[provider][0] + path, url: value}, true
 			}
 		}
 	}
-	return ""
+	return socialLink{}, false
+}
+
+// socialLinkKey is normalizeSocialLink(...).key, "" when it is no link.
+func socialLinkKey(typed string) string {
+	link, _ := normalizeSocialLink(typed)
+	return link.key
 }
 
 // socialLinkKeys is socialLinkKeys: the entry keys of the profile links, in provider order (empty and malformed links are skipped).
@@ -126,4 +138,79 @@ func (t *txn) followClubLinks(clubPlayer, entryID pgtype.UUID, links map[string]
 		}
 	}
 	return true, nil
+}
+
+const (
+	socialLinkError = "Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty."
+)
+
+// resolveSocialKey is resolveSocialKey (#1019): the open shared entry whose key the link is, else (create) a new entry with a new RTR ID.
+// Never a registered player. The email typed with it joins a new entry only when nobody on ROTRA has that email yet. It takes the link
+// lock first.
+func (t *txn) resolveSocialKey(key string, at pgtype.Timestamptz, create bool, email string) (*emailResolution, error) {
+	if err := t.q.LockSocialKey(t.ctx, key); err != nil {
+		return nil, err
+	}
+	open, err := t.q.GetOpenSharedEntryBySocialKey(t.ctx, pgtype.Text{String: key, Valid: true})
+	if err == nil {
+		return &emailResolution{email: open.Email.String, entryID: open.ID, rtrID: open.RtrID}, nil
+	}
+	if !errors.Is(err, pgx.ErrNoRows) {
+		return nil, err
+	}
+	if !create {
+		return nil, nil
+	}
+	free := ""
+	if email != "" {
+		if err := t.q.LockEmailAddress(t.ctx, email); err != nil {
+			return nil, err
+		}
+		registered, err := t.registeredPlayerByEmail(email)
+		if err != nil {
+			return nil, err
+		}
+		taken := registered.Valid
+		if !taken {
+			if _, err := t.q.GetOpenSharedEntryByEmail(t.ctx, pgtype.Text{String: email, Valid: true}); err == nil {
+				taken = true
+			} else if !errors.Is(err, pgx.ErrNoRows) {
+				return nil, err
+			}
+		}
+		if !taken {
+			free = email
+		}
+	}
+	id, rtr, err := t.createSharedEntryWith(free, key, at)
+	if err != nil {
+		return nil, err
+	}
+	return &emailResolution{email: free, entryID: id, rtrID: rtr, created: true}, nil
+}
+
+// keepClubLink writes the link into this club's own details for the record (its preset fields).
+func (t *txn) keepClubLink(clubPlayer pgtype.UUID, link socialLink, now pgtype.Timestamptz) error {
+	stored, err := t.q.GetClubPlayerPresetFields(t.ctx, clubPlayer)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return err
+	}
+	own := signedin.OwnDetailsOf(stored)
+	links := map[string]string{}
+	for _, p := range socialProviders {
+		links[p] = own.Links[p]
+	}
+	links[link.provider] = link.url
+	var recorded any
+	if own.RecordedAt != "" {
+		recorded = own.RecordedAt
+	}
+	raw, err := json.Marshal(map[string]any{
+		"version": ownDetailsVersion, "playingStyle": own.PlayingStyle, "experienceMonths": own.Months,
+		"experienceRecordedAt": recorded, "socialLinks": links,
+	})
+	if err != nil {
+		return err
+	}
+	return t.q.UpsertClubPlayerOwnDetails(t.ctx, sqlcgen.UpsertClubPlayerOwnDetailsParams{ClubPlayerID: clubPlayer, ClubID: t.club, PresetFields: raw, Now: now})
 }

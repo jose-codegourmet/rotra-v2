@@ -932,14 +932,15 @@ func (q *Queries) InsertSessionWaitlistEntry(ctx context.Context, arg InsertSess
 }
 
 const insertSharedPlayerEntry = `-- name: InsertSharedPlayerEntry :exec
-INSERT INTO shared_player_entries (id, email, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence,
+INSERT INTO shared_player_entries (id, email, social_key, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence,
                                    allocated_at, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9, $10, $11, $11)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::date, $10, $11, $12, $12)
 `
 
 type InsertSharedPlayerEntryParams struct {
 	ID             pgtype.UUID
 	Email          pgtype.Text
+	SocialKey      pgtype.Text
 	RtrID          string
 	CreatingClubID pgtype.UUID
 	LocationCodeID pgtype.UUID
@@ -956,6 +957,7 @@ func (q *Queries) InsertSharedPlayerEntry(ctx context.Context, arg InsertSharedP
 	_, err := q.db.Exec(ctx, insertSharedPlayerEntry,
 		arg.ID,
 		arg.Email,
+		arg.SocialKey,
 		arg.RtrID,
 		arg.CreatingClubID,
 		arg.LocationCodeID,

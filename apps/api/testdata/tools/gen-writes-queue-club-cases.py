@@ -148,6 +148,48 @@ case('player_add_directory_malformed_id', req('POST', PLS, {'source': 'directory
 case('player_add_directory_retry_says_already_saved', [req('POST', PLS, {'source': 'directory', 'operationId': OPID(1), 'playerId': PL(6)}), req('POST', PLS, {'source': 'directory', 'operationId': OPID(1), 'playerId': PL(6)})])
 case('player_add_lapsed_club', req('POST', PLS, {'operationId': OPID(1), 'name': 'Newbie'}, who=LAPSED))
 
+# ---- #1019 social links on a new player and the saved level on Add player (task 2.7)
+
+
+def add(**kw):
+    return req('POST', PLS, {'operationId': OPID(1), **kw})
+
+
+case('player_add_with_a_social_link', add(name='Link Newbie', socialLink='https://facebook.com/Link.Newbie/'))
+case('player_add_with_a_link_without_a_scheme', add(name='Link Newbie', socialLink=' www.fb.com/link.newbie?ref=x#top '))
+case('player_add_with_an_instagram_link', add(name='Link Newbie', socialLink='instagram.com/link_newbie'))
+case('player_add_with_a_youtube_link', add(name='Link Newbie', socialLink='https://youtu.be/@linknewbie'))
+case('player_add_with_a_linkedin_link', add(name='Link Newbie', socialLink='https://m.linkedin.com/in/link-newbie/'))
+case('player_add_with_a_link_and_a_nickname', add(name='Link Newbie', nickname='Linky', socialLink='facebook.com/link.newbie'))
+case('player_add_with_a_link_and_a_phone', add(name='Link Newbie', phone='0917 555 0188', socialLink='facebook.com/link.newbie'))
+case('player_add_with_a_link_and_a_new_email', add(name='Link Newbie', email='link.newbie@example.test', socialLink='facebook.com/link.newbie'))
+case('player_add_with_a_link_and_a_registered_players_email', add(name='Link Newbie', email='gil@example.test', socialLink='facebook.com/link.newbie'))
+case('player_add_with_a_link_and_an_open_entrys_email', add(name='Link Newbie', email='eve@example.test', socialLink='facebook.com/link.newbie'))
+case('player_add_with_a_link_and_a_bad_email', add(name='Link Newbie', email='nope', socialLink='facebook.com/link.newbie'))
+case('player_add_with_a_link_of_an_open_entry', add(name='Eve Open', socialLink='https://facebook.com/eve.open'), scenario='eve_has_a_link')
+case('player_add_with_a_link_of_an_open_entry_and_an_email', add(name='Eve Open', email='someone.else@example.test', socialLink='facebook.com/Eve.Open/'), scenario='eve_has_a_link')
+case('player_add_with_a_link_already_saved', add(name='Una Again', socialLink='facebook.com/una'), scenario='una_has_a_link')
+case('player_add_with_a_link_already_saved_and_an_email', add(name='Una Again', email='fresh@example.test', socialLink='fb.com/una/'), scenario='una_has_a_link')
+case('player_add_with_a_link_that_is_not_a_profile', add(name='Bad Link', socialLink='https://example.com/someone'))
+case('player_add_with_a_bare_site', add(name='Bad Link', socialLink='facebook.com'))
+case('player_add_with_a_bare_site_and_a_slash', add(name='Bad Link', socialLink='https://facebook.com/'))
+case('player_add_with_text_that_is_not_a_link', add(name='Bad Link', socialLink='nope'))
+case('player_add_with_a_bad_link_and_a_phone', add(name='Bad Link', phone='0917 555 0188', socialLink='nope'))
+case('player_add_link_not_text', add(name='Link Newbie', socialLink=5))
+case('player_add_with_a_link_retry_same_operation', [add(name='Link Newbie', socialLink='facebook.com/link.newbie'), add(name='Link Newbie', socialLink='facebook.com/link.newbie')])
+case('player_add_with_a_level', add(name='Level Newbie', level='intermediate_mid'))
+case('player_add_with_a_level_and_an_email', add(name='Level Newbie', email='level.newbie@example.test', level='advanced_low'))
+case('player_add_with_a_level_and_a_link', add(name='Level Newbie', socialLink='facebook.com/level.newbie', level='beginner_low'))
+case('player_add_with_a_level_that_is_not_a_level', add(name='Level Newbie', level='wizard'))
+case('player_add_with_a_level_that_is_not_a_level_adds_nobody', add(name='Level Newbie', email='level.newbie@example.test', level='wizard'))
+case('player_add_level_not_text', add(name='Level Newbie', level=5))
+case('player_add_with_an_empty_level', add(name='Level Newbie', level=''))
+case('player_add_directory_registered_player_with_a_level', req('POST', PLS, {'source': 'directory', 'operationId': OPID(1), 'playerId': PL(6), 'level': 'advanced_mid'}))
+case('player_add_directory_registered_player_with_a_bad_level', req('POST', PLS, {'source': 'directory', 'operationId': OPID(1), 'playerId': PL(6), 'level': 'wizard'}))
+case('player_add_directory_deleted_record_restored_with_a_level', req('POST', PLS, {'source': 'directory', 'operationId': OPID(1), 'playerId': PL(3), 'level': 'beginner_high'}))
+case('player_add_directory_unclaimed_person_with_a_level', req('POST', PLS, {'source': 'directory', 'operationId': OPID(1), 'playerId': 'a6000000-0000-4000-8000-000000000009', 'name': 'Eve Mine', 'level': 'intermediate_high'}))
+case('player_add_directory_already_saved_with_a_level', req('POST', PLS, {'source': 'directory', 'operationId': OPID(1), 'playerId': PL(2), 'level': 'advanced_high'}))
+
 # ---------------------------------------------------------------- POST club-nickname
 def nick(cp, value, **kw):
     return req('POST', f'{PLS}/{cp}/club-nickname', {'clubNickname': value}, **kw)
@@ -272,6 +314,8 @@ case('namechange_cancel_lapsed_club', req('DELETE', NC, who=LAPSED))
 
 # ---------------------------------------------------------------- scenarios
 SCEN = dict(BASE['scenarios'])
+SCEN['una_has_a_link'] = [f"UPDATE shared_player_entries SET social_key = 'facebook.com/una' WHERE id = 'a6000000-0000-4000-8000-000000000007'"]
+SCEN['eve_has_a_link'] = [f"UPDATE shared_player_entries SET social_key = 'facebook.com/eve.open' WHERE id = 'a6000000-0000-4000-8000-000000000009'"]
 SCEN.update({
     'club_has_a_name_change': [f"INSERT INTO club_name_change_requests (id, club_id, requested_name, requested_name_key, requested_at, state, source_command_id, created_at, updated_at, revision) VALUES ('b4000000-0000-4000-8000-000000000001', '{CLUB1}', 'Pending Name', 'pending name', {NOW}, 'pending', '{'b3000000-0000-4000-8000-000000000001'}', {NOW}, {NOW}, 1)"],
     'other_club_name_change': [f"INSERT INTO club_name_change_requests (id, club_id, requested_name, requested_name_key, requested_at, state, source_command_id, created_at, updated_at, revision) VALUES ('b4000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000003', 'Other Pending', 'other pending', {NOW}, 'pending', '{'b3000000-0000-4000-8000-000000000009'}', {NOW}, {NOW}, 1)"],
@@ -330,6 +374,12 @@ for s in BASE['snapshot']:
     s = dict(s)
     if s['name'] == 'session_players':
         s['sql'] = s['sql'].replace('no_show_at, revision::text', 'no_show_at, games_adjustment, revision::text')
+    if s['name'] == 'club_players':
+        s['sql'] = s['sql'].replace('removed_at, linked_to_club_player_id,', 'removed_at, saved_skill_level_id, saved_level_at, linked_to_club_player_id,')
+    if s['name'] == 'shared_player_entries':
+        s['sql'] = s['sql'].replace('SELECT email, rtr_id,', 'SELECT email, social_key, rtr_id,')
+    if s['name'] == 'club_player_private_inputs':
+        s['sql'] = s['sql'].replace('phone_e164, email, state,', 'phone_e164, email, preset_fields, state,')
     SNAPSHOT.append(s)
 SNAPSHOT += [
     {'name': 'clubs', 'sql': "SELECT id, name, invite_code, post_template, description, court_rules, self_check_in_enabled, revision::text AS revision, updated_at FROM clubs ORDER BY id", 'redact': ['invite_code']},

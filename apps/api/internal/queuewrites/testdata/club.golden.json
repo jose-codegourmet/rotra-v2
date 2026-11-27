@@ -3968,7 +3968,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Newbie",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -4093,7 +4095,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Newbie",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -4446,7 +4450,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Eli Newmail",
+          "saved_level_at": null,
           "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -4463,6 +4469,7 @@
           "sync_date": "2026-11-19",
           "created_at": "2026-11-19T04:00:00+00:00",
           "retired_at": null,
+          "social_key": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "allocated_at": "2026-11-19T04:00:00+00:00",
           "country_code": "PH",
@@ -4537,7 +4544,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Eve Open",
+          "saved_level_at": null,
           "shared_entry_rtr_id": "RTR-PH-CEB-102926-0009",
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -4605,7 +4614,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gil Again",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -4785,7 +4796,9 @@
               "removed_at": null,
               "updated_at": "2026-11-19T04:00:00+00:00",
               "display_name": "Newbie",
+              "saved_level_at": null,
               "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+              "saved_skill_level_id": null,
               "linked_to_club_player_id": null
             }
           ],
@@ -4802,6 +4815,7 @@
               "sync_date": "2026-11-19",
               "created_at": "2026-11-19T04:00:00+00:00",
               "retired_at": null,
+              "social_key": null,
               "updated_at": "2026-11-19T04:00:00+00:00",
               "allocated_at": "2026-11-19T04:00:00+00:00",
               "country_code": "PH",
@@ -4874,7 +4888,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Newbie",
+          "saved_level_at": null,
           "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -4891,6 +4907,7 @@
           "sync_date": "2026-11-19",
           "created_at": "2026-11-19T04:00:00+00:00",
           "retired_at": null,
+          "social_key": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "allocated_at": "2026-11-19T04:00:00+00:00",
           "country_code": "PH",
@@ -4965,7 +4982,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Newbie",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5032,7 +5051,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gil Gomez",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5111,7 +5132,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Cy Dela Cruz",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5127,7 +5150,9 @@
           "removed_at": "2026-11-05T00:00:00+00:00",
           "updated_at": "2026-11-05T00:00:00+00:00",
           "display_name": "Cy Dela Cruz",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5262,7 +5287,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Uri B.",
+          "saved_level_at": null,
           "shared_entry_rtr_id": "RTR-PH-CEB-102926-0008",
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5571,7 +5598,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gil Gomez",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5625,6 +5654,2929 @@
           "error": {
             "code": "entitlement_required",
             "message": "This club does not have an active license."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_social_link": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://facebook.com/Link.Newbie/",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "facebook.com/link.newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_without_a_scheme": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://www.fb.com/link.newbie?ref=x#top",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "facebook.com/link.newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_an_instagram_link": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": "https://instagram.com/link_newbie"
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "instagram.com/link_newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_youtube_link": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "https://youtu.be/@linknewbie",
+              "facebook": "",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "youtube.com/@linknewbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_linkedin_link": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "",
+              "linkedin": "https://m.linkedin.com/in/link-newbie/",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "linkedin.com/in/link-newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_and_a_nickname": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": "Linky",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://facebook.com/link.newbie",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "facebook.com/link.newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_and_a_phone": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": "+639175550188",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://facebook.com/link.newbie",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "facebook.com/link.newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_and_a_new_email": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://facebook.com/link.newbie",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": "link.newbie@example.test",
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "facebook.com/link.newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_and_a_registered_players_email": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://facebook.com/link.newbie",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "facebook.com/link.newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_and_an_open_entrys_email": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://facebook.com/link.newbie",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "facebook.com/link.newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_and_a_bad_email": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "email": "Enter an email address, like name@example.com, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_of_an_open_entry": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Eve Open",
+          "emailWords": "already on ROTRA · RTR-PH-CEB-102926-0009"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Eve Open",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0009",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://facebook.com/eve.open",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_of_an_open_entry_and_an_email": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Eve Open",
+          "emailWords": "already on ROTRA · RTR-PH-CEB-102926-0009"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Eve Open",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0009",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://facebook.com/Eve.Open/",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_already_saved": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "socialLink": "That social link is already Una Alonzo in your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_already_saved_and_an_email": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "socialLink": "That social link is already Una Alonzo in your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_that_is_not_a_profile": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "socialLink": "Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_bare_site": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "socialLink": "Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_bare_site_and_a_slash": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "socialLink": "Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_text_that_is_not_a_link": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "socialLink": "Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_bad_link_and_a_phone": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "socialLink": "Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_link_not_text": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_link_retry_same_operation": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      },
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Link Newbie",
+          "emailWords": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://facebook.com/link.newbie",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "facebook.com/link.newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_level": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Level Newbie",
+          "emailWords": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Level Newbie",
+          "saved_level_at": "2026-11-19T04:00:00+00:00",
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": 4,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_level_and_an_email": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Level Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "3",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Level Newbie",
+          "saved_level_at": "2026-11-19T04:00:00+00:00",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": 6,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": "level.newbie@example.test",
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_level_and_a_link": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Level Newbie",
+          "emailWords": "unclaimed · RTR-PH-CEB-111926-0001"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "3",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Level Newbie",
+          "saved_level_at": "2026-11-19T04:00:00+00:00",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "saved_skill_level_id": 0,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "preset_fields": {
+            "version": 1,
+            "socialLinks": {
+              "youtube": "",
+              "facebook": "https://facebook.com/level.newbie",
+              "linkedin": "",
+              "instagram": ""
+            },
+            "playingStyle": "",
+            "experienceMonths": null,
+            "experienceRecordedAt": null
+          },
+          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "social_key": "facebook.com/level.newbie",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_level_that_is_not_a_level": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "level": "Choose a level for this club before confirming."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_a_level_that_is_not_a_level_adds_nobody": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "level": "Choose a level for this club before confirming."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_level_not_text": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Level Newbie",
+          "emailWords": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Level Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_with_an_empty_level": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Level Newbie",
+          "emailWords": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Level Newbie",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_directory_registered_player_with_a_level": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Gil Gomez"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": "d4000000-0000-4000-8000-000000000006",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Gil Gomez",
+          "saved_level_at": "2026-11-19T04:00:00+00:00",
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": 7,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [
+        {
+          "body": "You're in the club's saved players. You can leave from the club page.",
+          "kind": "club",
+          "title": "Smash Club added you",
+          "target": "/clubs/c9000000-0000-4000-8000-000000000001",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000006",
+          "source_id": "b2000000-0000-4000-8000-000000000001",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "club_player_add"
+        }
+      ],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_directory_registered_player_with_a_bad_level": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "level": "Choose a level for this club before confirming."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_directory_deleted_record_restored_with_a_level": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "c6000000-0000-4000-8000-000000000010",
+          "name": "Cy Dela Cruz"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000010",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "3",
+          "player_id": "d4000000-0000-4000-8000-000000000003",
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Cy Dela Cruz",
+          "saved_level_at": "2026-11-19T04:00:00+00:00",
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": 2,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [
+        {
+          "id": "c6000000-0000-4000-8000-000000000010",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-10-01T00:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": "d4000000-0000-4000-8000-000000000003",
+          "created_at": "2026-10-01T00:00:00+00:00",
+          "removed_at": "2026-11-05T00:00:00+00:00",
+          "updated_at": "2026-11-05T00:00:00+00:00",
+          "display_name": "Cy Dela Cruz",
+          "saved_level_at": null,
+          "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [
+        {
+          "body": "You're in the club's saved players. You can leave from the club page.",
+          "kind": "club",
+          "title": "Smash Club added you",
+          "target": "/clubs/c9000000-0000-4000-8000-000000000001",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000003",
+          "source_id": "b2000000-0000-4000-8000-000000000001",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "club_player_add"
+        }
+      ],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_directory_unclaimed_person_with_a_level": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "name": "Eve Mine"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Eve Mine",
+          "saved_level_at": "2026-11-19T04:00:00+00:00",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0009",
+          "saved_skill_level_id": 5,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "clubs": [],
+      "clubs (removed)": [],
+      "club_venues": [],
+      "club_venues (removed)": [],
+      "club_name_change_requests": [],
+      "club_name_change_requests (removed)": [],
+      "club_player_claim_links": [],
+      "club_player_claim_links (removed)": [],
+      "player_claim_links": [],
+      "player_claim_links (removed)": []
+    }
+  },
+  "player_add_directory_already_saved_with_a_level": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "player": "Ben Santos is already in your saved players."
+            }
           }
         }
       }
@@ -5759,7 +8711,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5775,7 +8729,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5842,7 +8798,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5858,7 +8816,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5925,7 +8885,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -5941,7 +8903,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6008,7 +8972,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6024,7 +8990,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6091,7 +9059,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6107,7 +9077,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6174,7 +9146,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6190,7 +9164,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6257,7 +9233,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6273,7 +9251,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6679,7 +9659,9 @@
           "removed_at": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6695,7 +9677,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6923,7 +9907,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -6939,7 +9925,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -7018,7 +10006,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -7034,7 +10024,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Ann Reyes",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -7234,7 +10226,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Hal Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -7250,7 +10244,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Hal Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -7512,7 +10508,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Hal Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -7528,7 +10526,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Hal Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -7847,7 +10847,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Hal Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -7863,7 +10865,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Hal Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -8081,7 +11085,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Hal Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -8097,7 +11103,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Hal Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -8163,7 +11171,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Una Alonzo",
+          "saved_level_at": null,
           "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -8179,7 +11189,9 @@
           "removed_at": null,
           "updated_at": "2026-10-29T03:00:00+00:00",
           "display_name": "Una Alonzo",
+          "saved_level_at": null,
           "shared_entry_rtr_id": "RTR-PH-CEB-102926-0007",
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -8195,6 +11207,7 @@
           "sync_date": "2026-10-29",
           "created_at": "2026-10-29T03:00:00+00:00",
           "retired_at": "2026-11-19T04:00:00+00:00",
+          "social_key": null,
           "updated_at": "2026-11-19T04:00:00+00:00",
           "allocated_at": "2026-10-29T03:00:00+00:00",
           "country_code": "PH",
@@ -8212,6 +11225,7 @@
           "sync_date": "2026-10-29",
           "created_at": "2026-10-29T03:00:00+00:00",
           "retired_at": null,
+          "social_key": null,
           "updated_at": "2026-10-29T03:00:00+00:00",
           "allocated_at": "2026-10-29T03:00:00+00:00",
           "country_code": "PH",
@@ -8345,7 +11359,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -8361,7 +11377,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -8850,7 +11868,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": "c6000000-0000-4000-8000-000000000005"
         }
       ],
@@ -8866,7 +11886,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -9111,7 +12133,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": "c6000000-0000-4000-8000-000000000005"
         }
       ],
@@ -9127,7 +12151,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -9372,7 +12398,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": "c6000000-0000-4000-8000-000000000004"
         }
       ],
@@ -9388,7 +12416,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -9481,7 +12511,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": "c6000000-0000-4000-8000-000000000005"
         }
       ],
@@ -9497,7 +12529,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -9691,7 +12725,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": "c6000000-0000-4000-8000-000000000005"
         }
       ],
@@ -9707,7 +12743,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -9820,7 +12858,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": "c6000000-0000-4000-8000-000000000005"
         }
       ],
@@ -9836,7 +12876,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],
@@ -11012,7 +14054,9 @@
           "removed_at": "2026-11-19T04:00:00+00:00",
           "updated_at": "2026-11-19T04:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": "c6000000-0000-4000-8000-000000000005"
         }
       ],
@@ -11028,7 +14072,9 @@
           "removed_at": null,
           "updated_at": "2026-10-01T00:00:00+00:00",
           "display_name": "Gus Guest",
+          "saved_level_at": null,
           "shared_entry_rtr_id": null,
+          "saved_skill_level_id": null,
           "linked_to_club_player_id": null
         }
       ],

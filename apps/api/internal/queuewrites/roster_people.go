@@ -81,6 +81,11 @@ func (t *txn) registeredPlayerByEmail(email string) (pgtype.UUID, error) {
 // createSharedEntry creates the shared entry for a new email and allocates its RTR ID: one atomic counter step for the creating
 // club's founding location and today's sync day, the same counter registered players use. The caller holds the email lock.
 func (t *txn) createSharedEntry(email string, at pgtype.Timestamptz) (pgtype.UUID, string, error) {
+	return t.createSharedEntryWith(email, "", at)
+}
+
+// createSharedEntryWith is createSharedEntry with the keys the entry starts with: an email, a social link key, or both (empty is none).
+func (t *txn) createSharedEntryWith(email, socialKey string, at pgtype.Timestamptz) (pgtype.UUID, string, error) {
 	loc, err := t.q.GetClubFoundingLocation(t.ctx, t.club)
 	if err != nil {
 		return pgtype.UUID{}, "", err
@@ -97,7 +102,7 @@ func (t *txn) createSharedEntry(email string, at pgtype.Timestamptz) (pgtype.UUI
 	id := randomID()
 	rtr := identity.FormatRTRID(loc.CountryCode, loc.CityCode, syncDate, seq)
 	err = t.q.InsertSharedPlayerEntry(t.ctx, sqlcgen.InsertSharedPlayerEntryParams{
-		ID: id, Email: pgtype.Text{String: email, Valid: true}, RtrID: rtr, CreatingClubID: t.club, LocationCodeID: loc.ID,
+		ID: id, Email: pgtype.Text{String: email, Valid: email != ""}, SocialKey: pgtype.Text{String: socialKey, Valid: socialKey != ""}, RtrID: rtr, CreatingClubID: t.club, LocationCodeID: loc.ID,
 		CountryCode: loc.CountryCode, CityCode: loc.CityCode, SyncDate: day, Sequence: seq, AllocatedAt: at, Now: t.stamp(),
 	})
 	return id, rtr, err
@@ -161,8 +166,7 @@ type newClubPlayer struct {
 	nickname string // empty is none
 	phone    string // empty is none
 	email    string // empty is none
-	// socialLink is only counted, not read: a phone needs an email or a social link (D-2026-11-23-03, #1031). The link itself
-	// (its check, the unclaimed record it makes, the player it links) is #1019, not done in Go yet.
+	// socialLink is a profile link (#1019): an entry key like the email, and it wins over the email.
 	socialLink string
 }
 
@@ -194,11 +198,39 @@ func (t *txn) createClubPlayer(operationID string, in newClubPlayer, at pgtype.T
 			return existing, nil, writes.Fail(httpapi.ErrInvalid, map[string]string{"email": newPlayerEmailError})
 		}
 	}
-	if phone != "" && email == "" && fields.JSTrim(in.socialLink) == "" {
+	var link socialLink
+	hasLink := false
+	if typedLink := fields.JSTrim(in.socialLink); typedLink != "" {
+		if link, hasLink = normalizeSocialLink(typedLink); !hasLink {
+			return existing, nil, writes.Fail(httpapi.ErrInvalid, map[string]string{"socialLink": socialLinkError})
+		}
+	}
+	if phone != "" && email == "" && !hasLink {
 		return existing, nil, writes.Fail(httpapi.ErrInvalid, map[string]string{"phone": "Add an email or a social link to save a phone, or leave the phone empty."})
 	}
+	// #1019: a social link makes the record unclaimed, or links the unclaimed player who has it; the link decides who they are, so the
+	// email's owner is not checked. One the club saved is refused.
+	var linked *emailResolution
+	if hasLink {
+		if linked, err = t.resolveSocialKey(link.key, at, false, ""); err != nil {
+			return existing, nil, err
+		}
+		if linked != nil {
+			same, err := t.savedRecordFor(linked)
+			if err != nil {
+				return existing, nil, err
+			}
+			if same != nil {
+				who := same.DisplayName
+				if same.PlayerFullName.Valid && same.PlayerFullName.String != "" {
+					who = same.PlayerFullName.String
+				}
+				return existing, nil, writes.Fail(httpapi.ErrConflict, map[string]string{"socialLink": "That social link is already " + who + " in your saved players."})
+			}
+		}
+	}
 	var resolution *emailResolution
-	if email != "" {
+	if email != "" && !hasLink {
 		if resolution, err = t.resolveEmail(email, at, false); err != nil {
 			return existing, nil, err
 		}
@@ -229,6 +261,24 @@ func (t *txn) createClubPlayer(operationID string, in newClubPlayer, at pgtype.T
 		}); err != nil {
 			return existing, nil, err
 		}
+	}
+	if hasLink {
+		resolved := linked
+		if resolved == nil {
+			if resolved, err = t.resolveSocialKey(link.key, at, true, email); err != nil {
+				return existing, nil, err
+			}
+		}
+		if err := t.pointRecordAt(id, resolved); err != nil {
+			return existing, nil, err
+		}
+		// The link is public on the profile card: it is kept in this club's own details.
+		if err := t.keepClubLink(id, link, at); err != nil {
+			return existing, nil, err
+		}
+		words := emailWords(resolved)
+		cp, err := t.q.GetQueueClubPlayerOfClub(t.ctx, sqlcgen.GetQueueClubPlayerOfClubParams{ClubID: t.club, ID: id})
+		return cp, &words, err
 	}
 	if email != "" {
 		resolved := resolution

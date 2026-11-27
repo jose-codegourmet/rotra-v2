@@ -163,9 +163,9 @@ SELECT id FROM shared_player_entries WHERE id = @entry_id AND claimed_player_id 
 
 -- name: InsertSharedPlayerEntry :exec
 -- createSharedEntry: the entry and its RTR ID. allocated_at is passed (the TypeScript sets it).
-INSERT INTO shared_player_entries (id, email, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence,
+INSERT INTO shared_player_entries (id, email, social_key, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence,
                                    allocated_at, created_at, updated_at)
-VALUES (@id, @email, @rtr_id, @creating_club_id, @location_code_id, @country_code, @city_code, @sync_date::date, @sequence, @allocated_at, @now, @now);
+VALUES (@id, @email, sqlc.narg('social_key'), @rtr_id, @creating_club_id, @location_code_id, @country_code, @city_code, @sync_date::date, @sequence, @allocated_at, @now, @now);
 
 -- name: GetSavedRecordForPerson :one
 -- savedRecordFor: the club's current saved record that already is this person, with the account's name (a registered

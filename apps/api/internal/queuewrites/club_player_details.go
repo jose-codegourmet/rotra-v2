@@ -71,7 +71,7 @@ func (s *server) editClubPlayerDetails(r *http.Request, club pgtype.UUID) (write
 	}
 	in := detailsInput{
 		fullName: body.Text("fullName"), nickname: body.Text("nickname"), phone: e164, email: body.Text("email"),
-		playingStyle: body.Text("playingStyle"), links: links,
+		playingStyle: body.Text("playingStyle"), links: links, level: body.Text("level"),
 	}
 	in.years, in.hasYears = body.NumberOrNull("experienceYears")
 	in.months, in.hasMonths = body.NumberOrNull("experienceMonths")
@@ -97,7 +97,7 @@ func (s *server) editClubPlayerDetails(r *http.Request, club pgtype.UUID) (write
 }
 
 type detailsInput struct {
-	fullName, nickname, phone, email, playingStyle string
+	fullName, nickname, phone, email, playingStyle, level string
 	links                                          map[string]string
 	years, months                                  float64
 	hasYears, hasMonths                            bool
@@ -138,7 +138,9 @@ func (t *txn) updateDetails(id pgtype.UUID, in detailsInput, experience *int64) 
 	}
 	onFile := row.InputPhone.Valid && row.InputPhone.String != ""
 	unclaimed := row.SharedEntryID.Valid || row.PlayerID.Valid || onFile
-	emailOnFile := row.SharedEntryID.Valid || row.PlayerID.Valid
+	// #1019: a record saved with a social link only has an entry and no email yet: one can be added.
+	linkOnly := row.SharedEntryID.Valid && !row.PlayerID.Valid && row.EntryEmail.String == ""
+	emailOnFile := (row.SharedEntryID.Valid || row.PlayerID.Valid) && !linkOnly
 	typedEmail, email := "", ""
 	if !emailOnFile {
 		typedEmail = fields.JSTrim(in.email)
@@ -156,6 +158,11 @@ func (t *txn) updateDetails(id pgtype.UUID, in detailsInput, experience *int64) 
 	}
 	if err := t.q.UpdateClubPlayerDetails(t.ctx, sqlcgen.UpdateClubPlayerDetailsParams{DisplayName: in.name, Nickname: nick, Now: now, ClubID: t.club, ID: row.ID}); err != nil {
 		return nil, err
+	}
+	if in.level != shownLevel(row) {
+		if err := t.setSavedLevel(row.ID, in.level, now); err != nil {
+			return nil, err
+		}
 	}
 	// A phone is taken only for an unclaimed player with none on file; a guest has none.
 	newPhone := pgtype.Text{}
@@ -181,6 +188,29 @@ func (t *txn) updateDetails(id pgtype.UUID, in detailsInput, experience *int64) 
 		}
 	}
 	message := "Details saved · " + in.name
+	if linkOnly && row.SharedEntryID.Valid && email != "" {
+		// The email joins the person when nobody on ROTRA has it; the link wins otherwise.
+		if err := t.q.LockEmailAddress(t.ctx, email); err != nil {
+			return nil, err
+		}
+		registered, err := t.registeredPlayerByEmail(email)
+		if err != nil {
+			return nil, err
+		}
+		taken := registered.Valid
+		if !taken {
+			if _, err := t.q.GetOpenSharedEntryByEmail(t.ctx, pgtype.Text{String: email, Valid: true}); err == nil {
+				taken = true
+			} else if !errors.Is(err, pgx.ErrNoRows) {
+				return nil, err
+			}
+		}
+		if !taken {
+			if err := t.q.SetSharedEntryEmail(t.ctx, sqlcgen.SetSharedEntryEmailParams{Email: pgtype.Text{String: email, Valid: true}, Now: now, ID: row.SharedEntryID}); err != nil {
+				return nil, err
+			}
+		}
+	}
 	// #1019: the entry's link key follows this club's links; no email and no link left is a guest.
 	if row.SharedEntryID.Valid && !row.PlayerID.Valid {
 		stored, err := t.q.GetClubPlayerPresetFields(t.ctx, row.ID)
@@ -195,7 +225,7 @@ func (t *txn) updateDetails(id pgtype.UUID, in detailsInput, experience *int64) 
 			return detailsAnswer{ClubPlayerID: row.ID.String(), Message: message + " · now a guest"}, nil
 		}
 	}
-	if email == "" {
+	if email == "" || linkOnly {
 		return detailsAnswer{ClubPlayerID: row.ID.String(), Message: message}, nil
 	}
 	known, err := t.resolveEmail(email, now, false)
@@ -255,4 +285,40 @@ func ownDetailsJSON(stored []byte, in detailsInput, experience *int64, now time.
 		"version": ownDetailsVersion, "playingStyle": fields.JSTrim(in.playingStyle), "experienceMonths": months,
 		"experienceRecordedAt": recorded, "socialLinks": links,
 	})
+}
+
+// shownLevel is levelCodeFor(savedLevelOf(row)): the level Saved players show, the one the club gave outside a session or the latest
+// session assessment, whichever is newer; "" for none.
+func shownLevel(row sqlcgen.GetQueueClubPlayerEditableRow) string {
+	id := row.AssessedLevelID // -1 for never assessed
+	if row.SavedSkillLevelID.Valid && row.SavedLevelAt.Valid {
+		if !row.AssessedAt.Valid || row.AssessedAt.Time.UnixMilli() <= row.SavedLevelAt.Time.UnixMilli() {
+			id = row.SavedSkillLevelID.Int16
+		}
+	}
+	if id < 0 || int(id) >= len(levels) {
+		return ""
+	}
+	return levels[id]
+}
+
+// setSavedLevel is setSavedLevel: a level code saves it with the time, an empty one clears it. A code that is no level is refused.
+func (t *txn) setSavedLevel(id pgtype.UUID, level string, now pgtype.Timestamptz) error {
+	params := sqlcgen.SetClubPlayerSavedLevelParams{Now: now, ClubID: t.club, ID: id}
+	if level != "" {
+		lvl, err := levelID(level)
+		if err != nil {
+			return err
+		}
+		params.Level, params.LevelAt = lvl, now
+	}
+	return t.q.SetClubPlayerSavedLevel(t.ctx, params)
+}
+
+// saveLevel is the saved level Add player gives a new saved player: a level chosen is saved, none leaves it alone.
+func (t *txn) saveLevel(id pgtype.UUID, level string) error {
+	if level == "" {
+		return nil
+	}
+	return t.setSavedLevel(id, level, t.stamp())
 }

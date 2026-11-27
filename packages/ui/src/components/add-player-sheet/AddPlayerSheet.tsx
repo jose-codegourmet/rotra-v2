@@ -130,6 +130,10 @@ export type AddPlayerSheetProps = (AddPlayerSessionContext | AddPlayerClubContex
   offline?: boolean
   /** Called with the Player Information query as it is typed ('' when cleared) */
   onDirectorySearch?: (query: string) => void
+  /** Called when the saved players search applies (debounced), and when the sheet opens: refetch from the database */
+  onSavedSearch?: (query: string) => void
+  /** The saved players list is being refetched from the database */
+  savedSearching?: boolean
   /** Player Information results for the current query */
   directoryResults?: AddPlayerCandidate[]
   /**
@@ -172,11 +176,21 @@ const TABS: { value: AddPlayerTab; label: string }[] = [
 const LEVEL_ERROR = 'Choose a level for this club before adding.'
 const NAME_ERROR = 'Enter a name.'
 
-const matches = (candidate: AddPlayerCandidate, query: string) =>
-  !query ||
-  [candidate.name, candidate.nickname, candidate.clubNickname, candidate.rtrId].some((v) =>
-    v?.toLowerCase().includes(query),
-  )
+/** The saved players list shows this many rows, then "Show more" adds this many again. */
+const SAVED_PAGE_SIZE = 3
+
+/**
+ * Every word typed must appear in the full name (any part of it), the nickname, the club nickname
+ * or the RTR ID, so "ana sm" finds "Ana Smith" and "smith ana" does too.
+ */
+const matches = (candidate: AddPlayerCandidate, query: string) => {
+  const words = query.split(/\s+/).filter(Boolean)
+  if (!words.length) return true
+  const fields = [candidate.name, candidate.nickname, candidate.clubNickname, candidate.rtrId]
+    .filter((v): v is string => Boolean(v))
+    .map((v) => v.toLowerCase())
+  return words.every((w) => fields.some((f) => f.includes(w)))
+}
 
 /** A saved player row while the search waits: picture, two lines and the chip, as skeletons. */
 function CandidateRowSkeleton() {
@@ -265,6 +279,8 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     onOpenChange,
     offline = false,
     onDirectorySearch,
+    onSavedSearch,
+    savedSearching = false,
     directoryResults = [],
     directoryLoading = false,
     directorySavedName,
@@ -291,6 +307,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
   const [skillFilter, setSkillFilter] = useState<SkillFilter>('all')
   // The search the saved players list applies: the typed query, SAVED_SEARCH_DEBOUNCE_MS later.
   const [savedQuery, setSavedQuery] = useState('')
+  const [savedShown, setSavedShown] = useState(SAVED_PAGE_SIZE)
   const [pick, setPick] = useState<{
     candidate: AddPlayerCandidate
     source: AddPlayerSource
@@ -355,6 +372,19 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
     return () => clearTimeout(timer)
   }, [query, savedQuery])
 
+  // The saved list comes from the database, not the cache: ask for a fresh one when the sheet
+  // opens and whenever the applied search changes.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the callback's identity changes every render
+  useEffect(() => {
+    if (open) onSavedSearch?.(savedQuery)
+  }, [open, savedQuery])
+
+  // A new search or filter starts again at the first page.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the dependencies are the triggers
+  useEffect(() => {
+    setSavedShown(SAVED_PAGE_SIZE)
+  }, [savedQuery, savedFilter, skillFilter, open])
+
   const changeTab = (next: AddPlayerTab) => {
     setTab(next)
     clearTab()
@@ -415,7 +445,7 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
   // applies the other filter, so it is what that option would list; a lookup-pending player shows
   // under All only.
   const sq = savedQuery.trim().toLowerCase()
-  const searching = query !== savedQuery
+  const searching = query !== savedQuery || savedSearching
   const savedMatches = savedPlayers.filter((p) => !inSession.has(p.id) && matches(p, sq))
   const byAccount = (filter: SavedFilter) => (p: AddPlayerCandidate) =>
     filter === 'all' || p.identity === filter
@@ -583,19 +613,32 @@ export function AddPlayerSheet(props: AddPlayerSheetProps) {
                     ))}
                   </>
                 ) : savedList.length ? (
-                  savedList.map((candidate) => (
-                    <CandidateRow
-                      key={candidate.id}
-                      candidate={candidate}
-                      subtitle={
-                        candidate.rtrId ??
-                        (candidate.identity === 'unclaimed' ? 'Details required' : 'Guest')
-                      }
-                      onPick={() => pickCandidate(candidate, 'saved')}
-                      disabled={isPending}
-                      showLevel
-                    />
-                  ))
+                  [
+                    ...savedList
+                      .slice(0, savedShown)
+                      .map((candidate) => (
+                        <CandidateRow
+                          key={candidate.id}
+                          candidate={candidate}
+                          subtitle={
+                            candidate.rtrId ??
+                            (candidate.identity === 'unclaimed' ? 'Details required' : 'Guest')
+                          }
+                          onPick={() => pickCandidate(candidate, 'saved')}
+                          disabled={isPending}
+                          showLevel
+                        />
+                      )),
+                    savedList.length > savedShown ? (
+                      <Button
+                        key="more"
+                        size="sm"
+                        onClick={() => setSavedShown((n) => n + SAVED_PAGE_SIZE)}
+                      >
+                        Show more · {savedList.length - savedShown} left
+                      </Button>
+                    ) : null,
+                  ]
                 ) : filtered && savedMatches.length ? (
                   <EmptyState
                     action={

@@ -397,6 +397,8 @@ function SessionAddPlayer({
         openSlots={Math.max(0, capacity - rosterList.length)}
         waitlistCount={waitlist.length}
         savedPlayers={savedPlayers}
+        onSavedSearch={() => void clubPlayers.refetch()}
+        savedSearching={clubPlayers.isRefetching}
         inSessionIds={inSessionIds}
         onConfirm={confirm}
         onSubmitNewPlayer={submitNewPlayer}

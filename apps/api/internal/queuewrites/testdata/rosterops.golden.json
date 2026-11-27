@@ -242,6 +242,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -355,6 +356,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -560,6 +562,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -971,7 +974,7 @@
   "add_saved_missing_player_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -979,8 +982,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -1015,7 +1018,7 @@
   "add_saved_missing_operation_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -1023,8 +1026,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -1079,6 +1082,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -1188,6 +1192,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -1348,6 +1353,7 @@
             "levelLockedAt": "2026-11-19T04:00:00.000Z",
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -1527,7 +1533,7 @@
   "add_saved_malformed_session": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -1535,8 +1541,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -1679,6 +1685,7 @@
             "levelLockedAt": "2026-11-19T04:00:00.000Z",
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -1792,6 +1799,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -1943,6 +1951,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -2098,7 +2107,7 @@
   "add_directory_malformed_profile": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -2106,8 +2115,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -2142,131 +2151,37 @@
   "add_new_guest": {
     "steps": [
       {
-        "status": 201,
+        "status": 422,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
           "vary": "Cookie"
         },
         "body": {
-          "rosterEntry": {
-            "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
-            "sessionId": "a3000000-0000-4000-8000-000000000001",
-            "clubPlayerId": "d0e98b62-de29-8760-8663-5015a8ab60eb",
-            "nameSnapshot": "Newbie",
-            "nicknameSnapshot": "Nub",
-            "clubNickname": null,
-            "present": false,
-            "presentChangedAt": "2026-11-19T04:00:00.000Z",
-            "level": "intermediate_low",
-            "levelLockedAt": null,
-            "confirmedAt": "2026-11-19T04:00:00.000Z",
-            "gamesAdjustment": 0,
-            "selfCheckedInAt": null,
-            "leftAt": null,
-            "revision": "2"
-          },
-          "waitlist": null,
-          "emailWords": null
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "phone": "Add an email or a social link to save a phone, or leave the phone empty."
+            }
+          }
         }
       }
     ],
     "db": {
-      "queue_sessions": [
-        {
-          "id": "a3000000-0000-4000-8000-000000000001",
-          "state": "prepared",
-          "revision": "6",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "minimum_games": 20,
-          "queue_revision": "1"
-        }
-      ],
-      "queue_sessions (removed)": [
-        {
-          "id": "a3000000-0000-4000-8000-000000000001",
-          "state": "prepared",
-          "revision": "5",
-          "updated_at": "2026-11-10T00:00:00+00:00",
-          "minimum_games": 0,
-          "queue_revision": "1"
-        }
-      ],
-      "session_players": [
-        {
-          "id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
-          "present": false,
-          "revision": "2",
-          "joined_at": "2026-11-19T04:00:00+00:00",
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "no_show_at": null,
-          "session_id": "a3000000-0000-4000-8000-000000000001",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "released_at": null,
-          "confirmed_at": "2026-11-19T04:00:00+00:00",
-          "name_snapshot": "Newbie",
-          "club_player_id": "d0e98b62-de29-8760-8663-5015a8ab60eb",
-          "over_budget_at": null,
-          "release_reason": null,
-          "skill_level_id": 3,
-          "level_locked_at": null,
-          "games_adjustment": 0,
-          "player_id_at_entry": null,
-          "present_changed_at": "2026-11-19T04:00:00+00:00",
-          "assessment_operation_id": "b1000000-0000-4000-8000-000000000001"
-        }
-      ],
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
       "session_players (removed)": [],
-      "club_assessments": [
-        {
-          "session_id": "a3000000-0000-4000-8000-000000000001",
-          "assessed_at": "2026-11-19T04:00:00+00:00",
-          "received_at": "2026-11-19T04:00:00+00:00",
-          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
-          "club_player_id": "d0e98b62-de29-8760-8663-5015a8ab60eb",
-          "skill_level_id": 3,
-          "accepted_revision": "5",
-          "session_player_id": "70b9a5ee-f60b-81a6-a77b-b583505e5209",
-          "source_operation_id": "b1000000-0000-4000-8000-000000000001",
-          "player_id_at_assessment": null,
-          "supersedes_operation_id": null
-        }
-      ],
+      "club_assessments": [],
       "club_assessments (removed)": [],
       "session_waitlist": [],
       "session_waitlist (removed)": [],
       "session_join_requests": [],
       "session_join_requests (removed)": [],
-      "club_players": [
-        {
-          "id": "d0e98b62-de29-8760-8663-5015a8ab60eb",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "added_at": "2026-11-19T04:00:00+00:00",
-          "nickname": "Nub",
-          "revision": "1",
-          "player_id": null,
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "removed_at": null,
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "display_name": "Newbie",
-          "shared_entry_rtr_id": null,
-          "linked_to_club_player_id": null
-        }
-      ],
+      "club_players": [],
       "club_players (removed)": [],
-      "club_player_private_inputs": [
-        {
-          "email": null,
-          "state": "pending",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "revision": "1",
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "phone_e164": "+639175550100",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "captured_at": "2026-11-19T04:00:00+00:00",
-          "club_player_id": "d0e98b62-de29-8760-8663-5015a8ab60eb"
-        }
-      ],
+      "club_player_private_inputs": [],
       "club_player_private_inputs (removed)": [],
       "shared_player_entries": [],
       "shared_player_entries (removed)": [],
@@ -2303,6 +2218,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -2573,6 +2489,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -2725,6 +2642,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -2913,6 +2831,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -3061,6 +2980,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -3213,6 +3133,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -3908,7 +3829,7 @@
   "remove_malformed_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -3916,8 +3837,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -4191,6 +4112,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-15T01:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "3"
@@ -4324,6 +4246,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-15T01:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "3"
@@ -4457,6 +4380,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-15T01:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "3"
@@ -4586,6 +4510,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-15T01:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "3"
@@ -4719,6 +4644,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-15T01:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "3"
@@ -4744,6 +4670,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-15T01:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "4"
@@ -4890,6 +4817,7 @@
           "levelLockedAt": null,
           "confirmedAt": "2026-11-15T01:00:00.000Z",
           "gamesAdjustment": 0,
+          "handicapSpots": [],
           "selfCheckedInAt": null,
           "leftAt": null,
           "revision": "3"
@@ -5112,7 +5040,7 @@
   "level_missing_operation_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -5120,8 +5048,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -5429,7 +5357,7 @@
   "level_malformed_entry_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -5437,8 +5365,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -6462,7 +6390,7 @@
   "no_show_malformed_entry": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -6470,8 +6398,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -7942,7 +7870,7 @@
       "player_id_counters (removed)": [],
       "player_notifications": [
         {
-          "body": "You're number 1. We'll tell you if a spot opens.",
+          "body": "You're number 2. We'll tell you if a spot opens.",
           "kind": "session",
           "title": "You're on the waitlist for Live Now",
           "target": "/players/d4000000-0000-4000-8000-000000000001/sessions",
@@ -8682,7 +8610,7 @@
   "step_down_malformed_entry": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -8690,8 +8618,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -11129,7 +11057,7 @@
   "games_missing_roster_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -11137,8 +11065,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -11173,7 +11101,7 @@
   "games_malformed_roster_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -11181,8 +11109,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -12896,7 +12824,7 @@
   "presence_a_malformed_id_keeps_the_earlier_changes": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -12904,8 +12832,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -13737,7 +13665,7 @@
   "waitlist_remove_malformed_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -13745,8 +13673,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -14094,6 +14022,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -14231,6 +14160,7 @@
             "levelLockedAt": "2026-11-19T04:00:00.000Z",
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -14398,6 +14328,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -14531,6 +14462,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -14668,6 +14600,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -14805,6 +14738,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "3"
@@ -15080,7 +15014,7 @@
   "slot_malformed_waiter": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -15088,8 +15022,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -15124,7 +15058,7 @@
   "slot_missing_operation_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -15132,8 +15066,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -15188,6 +15122,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -15215,6 +15150,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"

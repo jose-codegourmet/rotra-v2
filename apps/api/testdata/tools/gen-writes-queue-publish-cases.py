@@ -110,7 +110,7 @@ SCEN['command_used_elsewhere'] = SCEN['snapshot'] + [
     f"INSERT INTO session_publication_events (id, club_id, session_id, publication_id, snapshot_id, slides, include_off_day, actor_club_id, source_command_id, occurred_at) VALUES ('a3a00000-0000-4000-8000-000000000001', '{CLUB1}', '{S[4]}', 'a3900000-0000-4000-8000-000000000006', 'a8000000-0000-4000-8000-000000000001', '{{standings}}', false, '{CLUB1}', '{CMD(1)}', {NOW})"]
 case('publish_a_session_that_is_not_finished', pub(1, sid=S[3]), 'snapshot_on_live')
 case('publish_a_prepared_session', pub(1, sid=S[1]))
-case('publish_with_record_games_off', pub(), 'snapshot_record_off')
+case('publish_with_record_games_off', pub(), 'snapshot_record_off', redact=RED)
 case('publish_before_the_results_are_ready', pub(), 'base')
 case('publish_a_removed_public_page', pub(), 'snapshot_publication_deleted')
 case('publish_over_a_details_publication', pub(), 'snapshot_details_publication', redact=RED)

@@ -1415,7 +1415,7 @@
   "publish_without_a_command_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -1423,8 +1423,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -1483,7 +1483,7 @@
   "publish_a_malformed_command_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -1491,8 +1491,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -2345,20 +2345,19 @@
   "publish_with_record_games_off": {
     "steps": [
       {
-        "status": 422,
+        "status": 200,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
           "vary": "Cookie"
         },
         "body": {
-          "error": {
-            "code": "invalid",
-            "message": "Check the details and try again.",
-            "fields": {
-              "results": "This session has no result slides yet."
-            }
-          }
+          "slides": [
+            "standings",
+            "awards"
+          ],
+          "includeOffDay": false,
+          "publishedAt": "2026-11-19T04:00:00.000Z"
         }
       }
     ],
@@ -2407,9 +2406,42 @@
       "sync_conflicts (removed)": [],
       "session_courts": [],
       "session_courts (removed)": [],
-      "session_publications": [],
+      "session_publications": [
+        {
+          "id": "<redacted>",
+          "state": "published",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "deleted_at": null,
+          "public_key": "<redacted>",
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "published_at": "2026-11-19T04:00:00+00:00",
+          "last_synced_at": "2026-11-19T04:00:00+00:00",
+          "public_results": "{\"awards\": {\"mvp\": {\"name\": \"Hal\"}, \"mostImproved\": {\"name\": \"Ann\", \"priorSessions\": 2}}, \"standings\": [{\"name\": \"Hal\", \"wins\": 3, \"games\": 4, \"losses\": 1, \"position\": 1}, {\"name\": \"Ann\", \"wins\": 1, \"games\": 4, \"losses\": 3, \"position\": 2}]}",
+          "expiry_cycle_id": null,
+          "include_off_day": false,
+          "published_slides": "{standings,awards}",
+          "details_projection": "{\"end\": 1794582000000, \"start\": 1794560400000, \"title\": \"Last Week\", \"venue\": {\"name\": \"\", \"address\": null}, \"minimum\": 0}",
+          "published_snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "participants_projection": "[{\"name\": \"Hal Guest\", \"pictureUrl\": null, \"hasRotraProfile\": false}]"
+        }
+      ],
       "session_publications (removed)": [],
-      "session_publication_events": [],
+      "session_publication_events": [
+        {
+          "id": "<redacted>",
+          "slides": "{standings,awards}",
+          "device_id": null,
+          "session_id": "a3000000-0000-4000-8000-000000000004",
+          "occurred_at": "2026-11-19T04:00:00+00:00",
+          "snapshot_id": "a8000000-0000-4000-8000-000000000001",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "publication_id": "<redacted>",
+          "include_off_day": false,
+          "source_command_id": "b6000000-0000-4000-8000-000000000001"
+        }
+      ],
       "session_publication_events (removed)": []
     }
   },
@@ -3279,7 +3311,7 @@
   "publish_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -3287,8 +3319,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }

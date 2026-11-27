@@ -1301,7 +1301,7 @@
   "venue_id_missing": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -1309,8 +1309,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -1353,7 +1353,7 @@
   "venue_id_not_a_uuid": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -1361,8 +1361,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -3880,16 +3880,20 @@
   "player_add_guest_with_nickname_and_phone": {
     "steps": [
       {
-        "status": 201,
+        "status": 422,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
           "vary": "Cookie"
         },
         "body": {
-          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
-          "name": "Newbie",
-          "emailWords": null
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "phone": "Add an email or a social link to save a phone, or leave the phone empty."
+            }
+          }
         }
       }
     ],
@@ -3904,36 +3908,9 @@
       "session_waitlist (removed)": [],
       "session_join_requests": [],
       "session_join_requests (removed)": [],
-      "club_players": [
-        {
-          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "added_at": "2026-11-19T04:00:00+00:00",
-          "nickname": "Nub",
-          "revision": "1",
-          "player_id": null,
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "removed_at": null,
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "display_name": "Newbie",
-          "shared_entry_rtr_id": null,
-          "linked_to_club_player_id": null
-        }
-      ],
+      "club_players": [],
       "club_players (removed)": [],
-      "club_player_private_inputs": [
-        {
-          "email": null,
-          "state": "pending",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "revision": "1",
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "phone_e164": "+639175550100",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "captured_at": "2026-11-19T04:00:00+00:00",
-          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
-        }
-      ],
+      "club_player_private_inputs": [],
       "club_player_private_inputs (removed)": [],
       "shared_player_entries": [],
       "shared_player_entries (removed)": [],
@@ -4090,7 +4067,7 @@
             "code": "conflict",
             "message": "This changed since you loaded it. Refresh and try again.",
             "fields": {
-              "player": "Gus Guest is already in your saved players."
+              "phone": "Gus Guest already has this number."
             }
           }
         }
@@ -4145,7 +4122,7 @@
             "code": "conflict",
             "message": "This changed since you loaded it. Refresh and try again.",
             "fields": {
-              "player": "Ann Reyes is already in your saved players."
+              "phone": "Ann Reyes already has this number."
             }
           }
         }
@@ -4189,16 +4166,20 @@
   "player_add_phone_of_a_deleted_player_is_fine": {
     "steps": [
       {
-        "status": 201,
+        "status": 422,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
           "vary": "Cookie"
         },
         "body": {
-          "clubPlayerId": "0e6455c4-e511-839f-8751-2cb77b9a66db",
-          "name": "Newbie",
-          "emailWords": null
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "phone": "Add an email or a social link to save a phone, or leave the phone empty."
+            }
+          }
         }
       }
     ],
@@ -4213,36 +4194,9 @@
       "session_waitlist (removed)": [],
       "session_join_requests": [],
       "session_join_requests (removed)": [],
-      "club_players": [
-        {
-          "id": "0e6455c4-e511-839f-8751-2cb77b9a66db",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "added_at": "2026-11-19T04:00:00+00:00",
-          "nickname": null,
-          "revision": "1",
-          "player_id": null,
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "removed_at": null,
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "display_name": "Newbie",
-          "shared_entry_rtr_id": null,
-          "linked_to_club_player_id": null
-        }
-      ],
+      "club_players": [],
       "club_players (removed)": [],
-      "club_player_private_inputs": [
-        {
-          "email": null,
-          "state": "pending",
-          "club_id": "c9000000-0000-4000-8000-000000000001",
-          "revision": "1",
-          "created_at": "2026-11-19T04:00:00+00:00",
-          "phone_e164": "+639175550100",
-          "updated_at": "2026-11-19T04:00:00+00:00",
-          "captured_at": "2026-11-19T04:00:00+00:00",
-          "club_player_id": "0e6455c4-e511-839f-8751-2cb77b9a66db"
-        }
-      ],
+      "club_player_private_inputs": [],
       "club_player_private_inputs (removed)": [],
       "shared_player_entries": [],
       "shared_player_entries (removed)": [],
@@ -5347,7 +5301,7 @@
   "player_add_directory_malformed_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -5355,8 +5309,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -8316,7 +8270,7 @@
   "delete_malformed_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -8324,8 +8278,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -10376,7 +10330,7 @@
   "move_malformed_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -10384,8 +10338,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -10428,7 +10382,7 @@
   "move_into_missing": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -10436,8 +10390,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -11469,7 +11423,7 @@
   "link_malformed_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -11477,8 +11431,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }

@@ -270,6 +270,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -468,6 +469,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -1028,7 +1030,7 @@
   "confirm_malformed_request_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -1036,8 +1038,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -1269,7 +1271,7 @@
   "confirm_missing_operation_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -1277,8 +1279,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -1327,7 +1329,7 @@
   "confirm_malformed_operation_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -1335,8 +1337,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -1421,6 +1423,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -1619,6 +1622,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -1995,6 +1999,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -2210,6 +2215,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -2494,6 +2500,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -2702,6 +2709,7 @@
             "levelLockedAt": "2026-11-19T04:00:00.000Z",
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -3009,6 +3017,7 @@
             "levelLockedAt": "2026-11-19T04:00:00.000Z",
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -3418,6 +3427,7 @@
             "levelLockedAt": null,
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -3616,6 +3626,7 @@
             "levelLockedAt": "2026-11-19T04:00:00.000Z",
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -3981,6 +3992,7 @@
             "levelLockedAt": "2026-11-19T04:00:00.000Z",
             "confirmedAt": "2026-11-19T04:00:00.000Z",
             "gamesAdjustment": 0,
+            "handicapSpots": [],
             "selfCheckedInAt": null,
             "leftAt": null,
             "revision": "2"
@@ -4181,6 +4193,7 @@
                 "levelLockedAt": null,
                 "confirmedAt": "2026-11-19T04:00:00.000Z",
                 "gamesAdjustment": 0,
+                "handicapSpots": [],
                 "selfCheckedInAt": null,
                 "leftAt": null,
                 "revision": "2"
@@ -5102,7 +5115,7 @@
   "decline_malformed_request_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -5110,8 +5123,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -9767,7 +9780,7 @@
   "madd_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -9775,8 +9788,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -11094,7 +11107,7 @@
   "mdecline_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -11102,8 +11115,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -13282,7 +13295,7 @@
   "fill_mode_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -13290,8 +13303,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -15097,7 +15110,7 @@
   "fill_courts_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -15105,8 +15118,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -16032,7 +16045,7 @@
   "keep_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -16040,8 +16053,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -17211,7 +17224,7 @@
   "remove_malformed_session_id": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -17219,8 +17232,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }

@@ -7743,7 +7743,7 @@
   "pay_a_malformed_session": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -7751,8 +7751,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -10096,7 +10096,7 @@
   "amt_a_malformed_session": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -10104,8 +10104,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -11434,7 +11434,7 @@
   "all_a_malformed_session": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -11442,8 +11442,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -11761,7 +11761,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -11887,7 +11888,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -11996,7 +11998,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -12092,7 +12095,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -12201,7 +12205,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -12297,7 +12302,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -12439,7 +12445,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -12565,7 +12572,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -12674,7 +12682,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -12800,7 +12809,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -12926,7 +12936,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -13035,7 +13046,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 3,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -13335,7 +13347,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 2,
-          "skipped": 1
+          "skipped": 1,
+          "hosts": null
         }
       }
     ],
@@ -13548,7 +13561,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         },
         "db": {
           "queue_sessions": [
@@ -13670,7 +13684,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": null
+          "skipped": null,
+          "hosts": null
         }
       }
     ],
@@ -13796,7 +13811,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 3,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       },
       {
@@ -13809,7 +13825,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 3,
-          "skipped": null
+          "skipped": null,
+          "hosts": null
         }
       }
     ],
@@ -14109,7 +14126,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       },
       {
@@ -14252,7 +14270,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       },
       {
@@ -14265,7 +14284,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": null
+          "skipped": null,
+          "hosts": null
         }
       }
     ],
@@ -14391,7 +14411,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -14487,7 +14508,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -14583,7 +14605,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -14679,7 +14702,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -17330,7 +17354,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -18432,7 +18457,7 @@
   "create_a_line_with_an_item_that_is_not_a_uuid_crashes": {
     "steps": [
       {
-        "status": 500,
+        "status": 404,
         "headers": {
           "cache-control": "private, no-store",
           "content-type": "application/json",
@@ -18440,8 +18465,8 @@
         },
         "body": {
           "error": {
-            "code": "internal",
-            "message": "Something went wrong."
+            "code": "not_found",
+            "message": "Not found."
           }
         }
       }
@@ -18938,7 +18963,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -19056,7 +19082,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -19174,7 +19201,8 @@
         "body": {
           "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
           "created": 1,
-          "skipped": 0
+          "skipped": 0,
+          "hosts": null
         }
       }
     ],
@@ -19395,6 +19423,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -19410,10 +19439,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -19594,6 +19627,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -19609,10 +19643,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -19807,6 +19845,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -19822,10 +19861,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -20020,6 +20063,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -20035,10 +20079,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -20211,6 +20259,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -20226,10 +20275,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -20380,6 +20433,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -20395,10 +20449,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -20571,6 +20629,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -20586,10 +20645,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -20762,6 +20825,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -20777,10 +20841,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -20953,6 +21021,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -20968,10 +21037,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -21122,6 +21195,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -21137,10 +21211,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -21335,6 +21413,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -21350,10 +21429,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -21680,6 +21763,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -21695,10 +21779,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -22597,6 +22685,7 @@
                 "playersPerCourt": 2,
                 "expectedPlayers": null,
                 "startedAt": null,
+                "plannedBeforeStart": null,
                 "finalizedAt": null,
                 "seriesId": null,
                 "publicSlug": "prep-open",
@@ -22612,10 +22701,14 @@
                   "fun_5v5": false
                 },
                 "recordGames": true,
+                "levelRestriction": {
+                  "kind": "all"
+                },
                 "revision": "6"
               },
               "movedToWaitlist": 0,
-              "movedFromWaitlist": 0
+              "movedFromWaitlist": 0,
+              "hosts": null
             }
           },
           {
@@ -22812,6 +22905,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -22827,10 +22921,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         },
         "db": {
           "queue_sessions": [
@@ -23007,6 +23105,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -23022,10 +23121,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "8"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],
@@ -23206,6 +23309,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -23221,10 +23325,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "6"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       },
       {
@@ -23257,6 +23365,7 @@
             "playersPerCourt": 2,
             "expectedPlayers": null,
             "startedAt": null,
+            "plannedBeforeStart": null,
             "finalizedAt": null,
             "seriesId": null,
             "publicSlug": "prep-open",
@@ -23272,10 +23381,14 @@
               "fun_5v5": false
             },
             "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
             "revision": "8"
           },
           "movedToWaitlist": 0,
-          "movedFromWaitlist": 0
+          "movedFromWaitlist": 0,
+          "hosts": null
         }
       }
     ],

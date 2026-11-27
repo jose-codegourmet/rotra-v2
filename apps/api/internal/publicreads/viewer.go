@@ -30,6 +30,7 @@ type ViewerReads struct {
 	FindByRTR              http.Handler // GET /api/rtr-ids/{rtrId}
 	Rank                   http.Handler // GET /api/players/{playerId}/rank
 	Games                  http.Handler // GET /api/players/{playerId}/games
+	MatchPage              http.Handler // GET /api/matches/{matchId}
 	// ClubPage and RankingSettings are public, but Admin answers the same paths with its own reads, so the signed-in
 	// layer routes them per app too.
 	ClubPage        http.Handler // GET /api/clubs/{clubId}
@@ -57,7 +58,7 @@ func NewViewerReads(d Deps) *ViewerReads {
 		ClubPage: limited(cp.page), RankingSettings: limited(lib.rankingSettings),
 		Leaderboard: limited(lb.page), Search: limited(lb.search), ClubLeaderboard: limited(lb.clubPage),
 		VisitorLeaderboard: limited(lb.visitorPage), VisitorClubLeaderboard: limited(lb.visitorClubPage),
-		Profile: limited(pl.profile), FindByRTR: limited(pl.findByRTR), Rank: limited(pl.rank), Games: limited(pl.games),
+		Profile: limited(pl.profile), FindByRTR: limited(pl.findByRTR), Rank: limited(pl.rank), Games: limited(pl.games), MatchPage: limited(pl.matchPage),
 	}
 }
 
@@ -71,6 +72,7 @@ func RegisterVisitorOnly(d Deps) func(*http.ServeMux) {
 		mux.Handle("GET /api/players/{playerId}", v.Profile)
 		mux.Handle("GET /api/players/{playerId}/rank", v.Rank)
 		mux.Handle("GET /api/players/{playerId}/games", v.Games)
+		mux.Handle("GET /api/matches/{matchId}", v.MatchPage)
 		mux.Handle("GET /api/rtr-ids/{rtrId}", v.FindByRTR)
 		mux.Handle("GET /api/clubs/{clubId}", v.ClubPage)
 		mux.Handle("GET /api/ranking-settings", v.RankingSettings)

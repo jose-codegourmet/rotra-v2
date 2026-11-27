@@ -54,6 +54,46 @@ func (q *Queries) FindPlayerIDByRTR(ctx context.Context, rtrID string) (FindPlay
 	return i, err
 }
 
+const getMatchSession = `-- name: GetMatchSession :one
+SELECT f.club_id, f.session_id, qs.title, qs.finalized_at, qs.public_slug, qs.record_games, qs.scheduled_start_at, c.name AS club_name, sp.published_at
+FROM player_match_facts f
+JOIN queue_sessions qs ON qs.id = f.session_id AND qs.club_id = f.club_id AND qs.state = 'completed'
+JOIN clubs c ON c.id = qs.club_id
+LEFT JOIN session_publications sp ON sp.session_id = qs.id
+WHERE f.match_id = $1
+LIMIT 1
+`
+
+type GetMatchSessionRow struct {
+	ClubID           pgtype.UUID
+	SessionID        pgtype.UUID
+	Title            string
+	FinalizedAt      pgtype.Timestamptz
+	PublicSlug       string
+	RecordGames      bool
+	ScheduledStartAt pgtype.Timestamptz
+	ClubName         string
+	PublishedAt      pgtype.Timestamptz
+}
+
+// readMatchPage: the club and session a match was played in, from any fact of it, and the session when it is completed and finalized.
+func (q *Queries) GetMatchSession(ctx context.Context, matchID pgtype.UUID) (GetMatchSessionRow, error) {
+	row := q.db.QueryRow(ctx, getMatchSession, matchID)
+	var i GetMatchSessionRow
+	err := row.Scan(
+		&i.ClubID,
+		&i.SessionID,
+		&i.Title,
+		&i.FinalizedAt,
+		&i.PublicSlug,
+		&i.RecordGames,
+		&i.ScheduledStartAt,
+		&i.ClubName,
+		&i.PublishedAt,
+	)
+	return i, err
+}
+
 const getPendingRankSession = `-- name: GetPendingRankSession :one
 SELECT qs.title, c.name AS club_name, qs.finalized_at
 FROM queue_sessions qs
@@ -351,6 +391,61 @@ func (q *Queries) ListCompletedSessions(ctx context.Context, sessionIds []pgtype
 			&i.ClubID,
 			&i.ScheduledStartAt,
 			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listMatchPageEntries = `-- name: ListMatchPageEntries :many
+SELECT e.id, e.club_player_id, e.name_snapshot,
+       pl.id AS player_id, pl.avatar_ref, pl.profile_state, pl.profile_visibility,
+       (a.player_id IS NOT NULL)::bool AS has_rtr_id
+FROM session_players e
+LEFT JOIN players pl ON pl.id = e.player_id_at_entry
+LEFT JOIN player_id_allocations a ON a.player_id = pl.id
+WHERE e.club_id = $1 AND e.session_id = $2
+`
+
+type ListMatchPageEntriesParams struct {
+	ClubID    pgtype.UUID
+	SessionID pgtype.UUID
+}
+
+type ListMatchPageEntriesRow struct {
+	ID                pgtype.UUID
+	ClubPlayerID      pgtype.UUID
+	NameSnapshot      string
+	PlayerID          pgtype.UUID
+	AvatarRef         pgtype.Text
+	ProfileState      NullPlayerProfileState
+	ProfileVisibility NullProfileVisibility
+	HasRtrID          bool
+}
+
+func (q *Queries) ListMatchPageEntries(ctx context.Context, arg ListMatchPageEntriesParams) ([]ListMatchPageEntriesRow, error) {
+	rows, err := q.db.Query(ctx, listMatchPageEntries, arg.ClubID, arg.SessionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListMatchPageEntriesRow
+	for rows.Next() {
+		var i ListMatchPageEntriesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ClubPlayerID,
+			&i.NameSnapshot,
+			&i.PlayerID,
+			&i.AvatarRef,
+			&i.ProfileState,
+			&i.ProfileVisibility,
+			&i.HasRtrID,
 		); err != nil {
 			return nil, err
 		}
@@ -661,6 +756,68 @@ func (q *Queries) ListSessionGameNumbers(ctx context.Context, sessionIds []pgtyp
 	return items, nil
 }
 
+const listSessionMatchFacts = `-- name: ListSessionMatchFacts :many
+SELECT f.match_id, f.session_player_id, f.format, f.team, f.winning_team, f.full_participation, f.standard_match, f.skill_level_snapshot_id,
+       f.partner_entry_ids, f.opponent_entry_ids, f.team_a_score, f.team_b_score
+FROM player_match_facts f
+WHERE f.club_id = $1 AND f.session_id = $2
+ORDER BY f.played_at ASC, f.match_id ASC, f.id ASC
+`
+
+type ListSessionMatchFactsParams struct {
+	ClubID    pgtype.UUID
+	SessionID pgtype.UUID
+}
+
+type ListSessionMatchFactsRow struct {
+	MatchID              pgtype.UUID
+	SessionPlayerID      pgtype.UUID
+	Format               MatchFormat
+	Team                 TeamSide
+	WinningTeam          TeamSide
+	FullParticipation    bool
+	StandardMatch        bool
+	SkillLevelSnapshotID int16
+	PartnerEntryIds      []pgtype.UUID
+	OpponentEntryIds     []pgtype.UUID
+	TeamAScore           pgtype.Int4
+	TeamBScore           pgtype.Int4
+}
+
+// The session's facts in play order, the same order profile games number them in.
+func (q *Queries) ListSessionMatchFacts(ctx context.Context, arg ListSessionMatchFactsParams) ([]ListSessionMatchFactsRow, error) {
+	rows, err := q.db.Query(ctx, listSessionMatchFacts, arg.ClubID, arg.SessionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSessionMatchFactsRow
+	for rows.Next() {
+		var i ListSessionMatchFactsRow
+		if err := rows.Scan(
+			&i.MatchID,
+			&i.SessionPlayerID,
+			&i.Format,
+			&i.Team,
+			&i.WinningTeam,
+			&i.FullParticipation,
+			&i.StandardMatch,
+			&i.SkillLevelSnapshotID,
+			&i.PartnerEntryIds,
+			&i.OpponentEntryIds,
+			&i.TeamAScore,
+			&i.TeamBScore,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listUnclaimedSavers = `-- name: ListUnclaimedSavers :many
 SELECT cp.display_name, cp.nickname, c.name AS club_name
 FROM club_players cp
@@ -697,4 +854,15 @@ func (q *Queries) ListUnclaimedSavers(ctx context.Context, playerID pgtype.UUID)
 		return nil, err
 	}
 	return items, nil
+}
+
+const matchExists = `-- name: MatchExists :one
+SELECT EXISTS (SELECT 1 FROM player_match_facts WHERE match_id = $1)
+`
+
+func (q *Queries) MatchExists(ctx context.Context, matchID pgtype.UUID) (bool, error) {
+	row := q.db.QueryRow(ctx, matchExists, matchID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }

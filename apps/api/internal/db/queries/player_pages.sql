@@ -219,3 +219,33 @@ FROM club_session_player_summaries s
 JOIN session_finalizations fin ON fin.club_id = s.club_id AND fin.session_id = s.session_id
 JOIN queue_sessions qs ON qs.id = s.session_id
 WHERE s.club_id = ANY (@club_ids::uuid[]) AND s.club_player_id = ANY (@club_player_ids::uuid[]);
+
+-- name: GetMatchSession :one
+-- readMatchPage: the club and session a match was played in, from any fact of it, and the session when it is completed and finalized.
+SELECT f.club_id, f.session_id, qs.title, qs.finalized_at, qs.public_slug, qs.record_games, qs.scheduled_start_at, c.name AS club_name, sp.published_at
+FROM player_match_facts f
+JOIN queue_sessions qs ON qs.id = f.session_id AND qs.club_id = f.club_id AND qs.state = 'completed'
+JOIN clubs c ON c.id = qs.club_id
+LEFT JOIN session_publications sp ON sp.session_id = qs.id
+WHERE f.match_id = @match_id
+LIMIT 1;
+
+-- name: MatchExists :one
+SELECT EXISTS (SELECT 1 FROM player_match_facts WHERE match_id = @match_id);
+
+-- name: ListSessionMatchFacts :many
+-- The session's facts in play order, the same order profile games number them in.
+SELECT f.match_id, f.session_player_id, f.format, f.team, f.winning_team, f.full_participation, f.standard_match, f.skill_level_snapshot_id,
+       f.partner_entry_ids, f.opponent_entry_ids, f.team_a_score, f.team_b_score
+FROM player_match_facts f
+WHERE f.club_id = @club_id AND f.session_id = @session_id
+ORDER BY f.played_at ASC, f.match_id ASC, f.id ASC;
+
+-- name: ListMatchPageEntries :many
+SELECT e.id, e.club_player_id, e.name_snapshot,
+       pl.id AS player_id, pl.avatar_ref, pl.profile_state, pl.profile_visibility,
+       (a.player_id IS NOT NULL)::bool AS has_rtr_id
+FROM session_players e
+LEFT JOIN players pl ON pl.id = e.player_id_at_entry
+LEFT JOIN player_id_allocations a ON a.player_id = pl.id
+WHERE e.club_id = @club_id AND e.session_id = @session_id;

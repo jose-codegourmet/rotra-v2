@@ -1,6 +1,9 @@
 package winchance
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func rate(r float64) *float64 { return &r }
 
@@ -50,5 +53,25 @@ func TestFormFromHistory(t *testing.T) {
 	long := FormFromHistory([]SessionRecord{{Weekday: 2, Wins: 6, Losses: 2}, {Weekday: 5, Wins: 1, Losses: 3}}, 5)
 	if long.ClubWinRate == nil || *long.ClubWinRate != 7.0/12 || long.BestDay {
 		t.Errorf("12 games: %+v", long)
+	}
+}
+
+func TestGameBreakdown(t *testing.T) {
+	b := GameBreakdown([]Face{{Level: 4}, {Level: 4}}, []Face{{Level: 4}, {Level: -1, Form: &Form{BestDay: true}}}, true)
+	if b == nil || b.TeamA.Players[1].ID != "a1" || b.TeamB.Players[1].ID != "b1" {
+		t.Fatalf("%+v", b)
+	}
+	if got := b.TeamB.Players[1].Rows; len(got) != 3 || got[0].Detail != "No level · counts as mid" || got[2].Key != "best_day" {
+		t.Errorf("rows %+v", got)
+	}
+	if b.TeamA.Players[0].Rows[0].Detail != "Intermediate Mid" || b.TeamB.Average != 4.125 || !b.Lasting {
+		t.Errorf("%+v", b)
+	}
+	raw, err := json.Marshal(b.Chance)
+	if err != nil || string(raw) != `{"a":46,"b":54,"favored":null,"strong":false}` {
+		t.Errorf("%s %v", raw, err)
+	}
+	if GameBreakdown(nil, []Face{{Level: 4}}, true) != nil {
+		t.Error("one side is no game")
 	}
 }

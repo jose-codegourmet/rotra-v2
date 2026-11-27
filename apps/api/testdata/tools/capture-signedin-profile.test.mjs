@@ -77,6 +77,7 @@ beforeAll(async () => {
   routes.search = (await import(`${api}/leaderboard/search/route.ts`)).GET
   routes.me = (await import(`${api}/leaderboard/me/route.ts`)).GET
   routes.club = (await import(`${api}/clubs/[clubId]/leaderboard/route.ts`)).GET
+  routes.match = (await import(`${api}/matches/[matchId]/route.ts`)).GET
   routes.profile = (await import(`${api}/players/[playerId]/route.ts`)).GET
   routes.rank = (await import(`${api}/players/[playerId]/rank/route.ts`)).GET
   routes.games = (await import(`${api}/players/[playerId]/games/route.ts`)).GET
@@ -100,6 +101,7 @@ function dispatch(c) {
   const seg = url.pathname.split('/').slice(1).map((s) => decodeURIComponent(s))
   const request = new Request(url, { headers: c.origin ? { Origin: c.origin } : {} })
   if (seg[1] === 'clubs' && seg[3] === 'leaderboard') return routes.club(request, { params: Promise.resolve({ clubId: seg[2] }) })
+  if (seg[1] === 'matches') return routes.match(request, { params: Promise.resolve({ matchId: seg[2] }) })
   if (seg[1] === 'leaderboard') return (seg[2] === 'search' ? routes.search : seg[2] === 'me' ? routes.me : routes.page)(request)
   if (seg[1] === 'me') return routes.myProfile(request)
   if (seg[1] === 'rtr-ids') return (seg[3] === 'stats' ? routes.stats : routes.rtr)(request, { params: Promise.resolve({ rtrId: seg[2] }) })

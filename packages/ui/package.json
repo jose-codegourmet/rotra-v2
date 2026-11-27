@@ -118,6 +118,7 @@
     "./host-picker-sheet": "./src/components/host-picker-sheet/HostPickerSheet.tsx",
     "./hooks/use-media-query": "./src/hooks/useMediaQuery.ts",
     "./icon": "./src/components/icon/Icon.tsx",
+    "./edit-pencil-button": "./src/components/edit-pencil-button/EditPencilButton.tsx",
     "./icon-button": "./src/components/icon-button/IconButton.tsx",
     "./identity-chip": "./src/components/identity-chip/IdentityChip.tsx",
     "./identity-chip/variants": "./src/components/identity-chip/IdentityChip.variants.ts",

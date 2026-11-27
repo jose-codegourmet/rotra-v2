@@ -34,6 +34,7 @@ import { toast } from '@rotra/ui/toaster'
 import { WaitlistPanel, type WaitlistPanelEntry } from '@rotra/ui/waitlist-panel'
 import { useEffect, useRef, useState } from 'react'
 import { AddPlayer } from '@/app/(operator)/_components/add-player/AddPlayer'
+import { EditPlayer } from '@/app/(operator)/_components/edit-player/EditPlayer'
 import { OverfillConfirm } from '@/app/(operator)/_components/overfill-confirm/OverfillConfirm'
 import { usePlayerProfileActions } from '@/app/(operator)/_components/player-profile-actions/PlayerProfileActions'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
@@ -79,7 +80,8 @@ const errorMessage = (error: unknown) =>
  * opens the shared AddPlayer container. While the session or roster loads the panels show Skeleton
  * rows; every mutation toasts its result (offline adds say "Saved on this device, waiting to sync")
  * or its error, and a refused change leaves the roster as it was. Move to waitlist (#735) is on
- * every row and card; the summary carries expected games; Give slot anyway on a full roster asks
+ * every row and card; the pencil (before Start) opens EditPlayer in the preparing mode (Club
+ * nickname and Handicap); the summary carries expected games; Give slot anyway on a full roster asks
  * OverfillConfirm first.
  */
 export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
@@ -126,6 +128,8 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   }
   const [addOpen, setAddOpen] = useState(false)
   const [profileId, setProfileId] = useState<string | null>(null)
+  /** Edit player before Start (mockup change 2026-11-27): the roster id whose sheet is open */
+  const [editFor, setEditFor] = useState<string | null>(null)
 
   const options = {
     onSuccess: (result: { message: string }) => toast(result.message),
@@ -196,6 +200,8 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
   // D-PARTICIPANT-PROFILE: on this roster, the badge reads the session level and Tonight shows
   // Free or Away (no matches before the start).
   const profileEntry = profile ? rosterList.find((r) => r.clubPlayerId === profile.id) : undefined
+  const editEntry = s?.state === 'prepared' ? rosterList.find((r) => r.id === editFor) : undefined
+  const editClubPlayer = editEntry ? byClubPlayer(editEntry.clubPlayerId) : undefined
   const openProfileFromRoster = (rosterId: string) => {
     const r = rosterList.find((r) => r.id === rosterId)
     if (r) setProfileId(r.clubPlayerId)
@@ -250,6 +256,7 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
               { ...options, onSettled: () => steppingDown.current.delete(rosterId) },
             )
           }}
+          onEdit={s?.state === 'prepared' ? setEditFor : undefined}
           onRemove={(rosterId) => {
             if (removing.current.has(rosterId)) return
             removing.current.add(rosterId)
@@ -295,6 +302,24 @@ export function PreparationRoster({ sessionId, tab }: PreparationRosterProps) {
         />
       ) : null}
       <AddPlayer sessionId={sessionId} open={addOpen} onOpenChange={setAddOpen} />
+      {editEntry ? (
+        <EditPlayer
+          sessionId={sessionId}
+          mode="preparing"
+          entry={editEntry}
+          clubPlayer={editClubPlayer}
+          photoUrl={
+            editClubPlayer
+              ? profilePictureSrc(
+                  editClubPlayer.picture,
+                  editClubPlayer.playerId ?? editClubPlayer.id,
+                  editClubPlayer.pictureName ?? editClubPlayer.fullName,
+                )
+              : undefined
+          }
+          onClose={() => setEditFor(null)}
+        />
+      ) : null}
       {profile ? (
         <PlayerProfileSheet
           open={profileId !== null}

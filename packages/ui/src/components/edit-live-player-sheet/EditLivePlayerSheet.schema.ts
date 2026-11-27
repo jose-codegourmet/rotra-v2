@@ -1,5 +1,4 @@
 import { HANDICAP_SPOTS, type HandicapSpot } from '@rotra/data/session-roster/handicap'
-import { fullNameSchema } from '@rotra/schema/name'
 import { clubNicknameSchema } from '@rotra/ui/forms/club-nickname-form/schema'
 import { z } from 'zod'
 
@@ -7,14 +6,13 @@ export const EDIT_LIVE_GAMES_MIN = 0
 export const EDIT_LIVE_GAMES_MAX = 99
 
 /**
- * Edit player during a session (D-EDIT-LIVE-PLAYER): the full name (unclaimed and guest only: the
- * `@rotra/schema/name` rule, 2–60 characters with spaces collapsed; a registered player's name is
- * their own, so the field is left out), the club nickname (the same rule as Saved players › Club
- * nickname; every player has it), the games played shown for tonight (0–99) and whether the player
- * is present.
+ * Edit player during a session (D-EDIT-LIVE-PLAYER; mockup change 2026-11-27: the Queue Master
+ * edits only these): the club nickname (the same rule as Saved players › Club nickname; every
+ * player has it), the games played shown for tonight (0–99), whether the player is present and the
+ * handicap spots. In the preparing mode the sheet shows only the nickname and the handicap; games
+ * and presence keep their current values.
  */
 export const editLivePlayerSchema = z.object({
-  fullName: fullNameSchema.optional(),
   nickname: clubNicknameSchema.shape.nickname,
   games: z
     .number()
@@ -27,5 +25,5 @@ export const editLivePlayerSchema = z.object({
 })
 
 export type EditLivePlayerFormInput = z.input<typeof editLivePlayerSchema>
-/** What onSave receives: the full name (unclaimed and guest only), the trimmed nickname ('' removes it), the games to show, presence and the handicap spots. */
+/** What onSave receives: the trimmed nickname ('' removes it), the games to show, presence and the handicap spots. */
 export type EditLivePlayerFormValues = z.output<typeof editLivePlayerSchema>

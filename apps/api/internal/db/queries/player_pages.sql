@@ -161,6 +161,8 @@ SELECT qs.id,
        qs.finalized_at,
        qs.public_slug,
        qs.record_games,
+       qs.club_id,
+       qs.scheduled_start_at,
        sp.published_at
 FROM queue_sessions qs
 JOIN clubs c ON c.id = qs.club_id
@@ -171,6 +173,7 @@ WHERE qs.id = ANY (@session_ids::uuid[])
 -- name: ListSessionEntries :many
 SELECT e.id,
        e.name_snapshot,
+       e.club_player_id,
        pl.id                  AS player_id,
        pl.avatar_ref,
        pl.profile_visibility,
@@ -200,3 +203,19 @@ WHERE t.removed_at IS NULL
     OR (cp.removed_at IS NOT NULL AND EXISTS (
           SELECT 1 FROM club_players l
           WHERE l.club_id = cp.club_id AND l.id = cp.linked_to_club_player_id AND l.player_id = @player_id AND l.removed_at IS NULL)));
+
+-- name: ListSessionEntryLevels :many
+-- Win chance: the level each entry played its session at (its first fact, as the match page reads it).
+SELECT DISTINCT ON (f.session_player_id) f.session_player_id, f.skill_level_snapshot_id
+FROM player_match_facts f
+WHERE f.session_id = ANY (@session_ids::uuid[])
+ORDER BY f.session_player_id, f.played_at ASC, f.match_id ASC;
+
+-- name: ListClubFormRows :many
+-- Win chance (readClubForms): every finalized session of the given saved players at their clubs, with its result for them, when it was
+-- committed and when it was scheduled (its weekday).
+SELECT s.club_player_id, s.session_id, s.wins, s.losses, fin.committed_at, qs.scheduled_start_at
+FROM club_session_player_summaries s
+JOIN session_finalizations fin ON fin.club_id = s.club_id AND fin.session_id = s.session_id
+JOIN queue_sessions qs ON qs.id = s.session_id
+WHERE s.club_id = ANY (@club_ids::uuid[]) AND s.club_player_id = ANY (@club_player_ids::uuid[]);

@@ -133,7 +133,7 @@ func ReadStatsByRTR(ctx context.Context, q *sqlcgen.Queries, rtrID string, viewe
 		if err != nil {
 			return nil, fmt.Errorf("listing facts: %w", err)
 		}
-		if sessions, err = readHistory(ctx, q, historyFactsOf(facts), viewerRef{}, true); err != nil {
+		if sessions, err = readHistory(ctx, q, historyFactsOf(facts), viewerRef{}, true, false); err != nil {
 			return nil, err
 		}
 	} else {
@@ -152,7 +152,7 @@ func ReadStatsByRTR(ctx context.Context, q *sqlcgen.Queries, rtrID string, viewe
 			if err != nil {
 				return nil, fmt.Errorf("listing club facts: %w", err)
 			}
-			more, err := readHistory(ctx, q, clubHistoryFactsOf(facts), viewerRef{}, false)
+			more, err := readHistory(ctx, q, clubHistoryFactsOf(facts), viewerRef{}, false, false)
 			if err != nil {
 				return nil, err
 			}

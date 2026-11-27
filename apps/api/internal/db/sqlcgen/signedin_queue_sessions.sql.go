@@ -548,9 +548,10 @@ func (q *Queries) ListQueueResultExports(ctx context.Context, sessionID pgtype.U
 }
 
 const listQueueReturningPlayers = `-- name: ListQueueReturningPlayers :many
-SELECT DISTINCT s.club_player_id
+SELECT s.club_player_id, s.session_id, s.wins, s.losses, qs.scheduled_start_at
 FROM club_session_player_summaries s
 JOIN session_finalizations f ON f.club_id = s.club_id AND f.session_id = s.session_id
+JOIN queue_sessions qs ON qs.id = s.session_id
 WHERE s.club_id = $1
   AND s.club_player_id = ANY ($2::uuid[])
   AND s.session_id <> $3
@@ -564,8 +565,18 @@ type ListQueueReturningPlayersParams struct {
 	Before        pgtype.Timestamptz
 }
 
+type ListQueueReturningPlayersRow struct {
+	ClubPlayerID     pgtype.UUID
+	SessionID        pgtype.UUID
+	Wins             int32
+	Losses           int32
+	ScheduledStartAt pgtype.Timestamptz
+}
+
 // Club players who played here before this session was finalized (or now): their entries show Played here before.
-func (q *Queries) ListQueueReturningPlayers(ctx context.Context, arg ListQueueReturningPlayersParams) ([]pgtype.UUID, error) {
+// One row per finalized session of each player before this one: who has played here before, and their record by weekday (Win chance,
+// D-2026-11-27-02: formFromHistory).
+func (q *Queries) ListQueueReturningPlayers(ctx context.Context, arg ListQueueReturningPlayersParams) ([]ListQueueReturningPlayersRow, error) {
 	rows, err := q.db.Query(ctx, listQueueReturningPlayers,
 		arg.ClubID,
 		arg.ClubPlayerIds,
@@ -576,13 +587,19 @@ func (q *Queries) ListQueueReturningPlayers(ctx context.Context, arg ListQueueRe
 		return nil, err
 	}
 	defer rows.Close()
-	var items []pgtype.UUID
+	var items []ListQueueReturningPlayersRow
 	for rows.Next() {
-		var club_player_id pgtype.UUID
-		if err := rows.Scan(&club_player_id); err != nil {
+		var i ListQueueReturningPlayersRow
+		if err := rows.Scan(
+			&i.ClubPlayerID,
+			&i.SessionID,
+			&i.Wins,
+			&i.Losses,
+			&i.ScheduledStartAt,
+		); err != nil {
 			return nil, err
 		}
-		items = append(items, club_player_id)
+		items = append(items, i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

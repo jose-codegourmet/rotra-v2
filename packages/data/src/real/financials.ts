@@ -10,6 +10,7 @@ import type {
   RecordSessionRefundInput,
   SetPaymentAmountInput,
   SetPaymentMarksInput,
+  SetPlayerFreeInput,
 } from '../session-payment/sessionPayment.types'
 import type { SlotPaymentTransfer } from '../slot-transfer/slotTransfer.types'
 import { minorOf, msOf, realRequest, type WireMoney } from './client'
@@ -58,6 +59,8 @@ export type WirePayments = {
     sessionPlayerId: string
     clubPlayerId: string
     name: string
+    /** Plays free (D-2026-11-27-01); missing on older servers means false */
+    free?: boolean
     /** Own cash plus cash an approved slot transfer carried in (#1013); `at` the latest of them */
     paid: { amount: WireMoney; at: string } | null
     /** The slot came by approved transfer (#1013): waivers and the chain; missing or null otherwise */
@@ -107,6 +110,7 @@ export async function realGetSessionPayments(sessionId: string) {
         sessionPlayerId: player.sessionPlayerId,
         clubPlayerId: player.clubPlayerId,
         name: player.name,
+        free: !!player.free,
         // Saved data has no player pictures on this read yet.
         picture: undefined as string | undefined,
         paid: player.paid
@@ -190,6 +194,22 @@ export async function realSetPaymentAmount({
   return paid
     ? accepted({ paid: true }, `${name} paid ${formatPeso(amountMinor)}`)
     : accepted({ paid: false }, `${name} marked not paid`)
+}
+
+/** D-2026-11-27-01 · Plays free on one player; setting it clears their amount received. */
+export async function realSetPlayerFree({
+  sessionId,
+  clubPlayerId,
+  free,
+  operationId = crypto.randomUUID() as string,
+}: SetPlayerFreeInput & { operationId?: string }) {
+  const current = await realGetSessionPayments(sessionId)
+  const name = current?.players.find((p) => p.clubPlayerId === clubPlayerId)?.name ?? 'Player'
+  await realRequest<{ free: boolean; cleared: boolean }>(sessionPath(sessionId, 'payments/free'), {
+    method: 'POST',
+    body: { operationId, clubPlayerId, free },
+  })
+  return accepted({ free }, free ? `${name} plays free` : `${name} pays again`)
 }
 
 export async function realMarkAllPaid(

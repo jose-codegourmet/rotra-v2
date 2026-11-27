@@ -1,6 +1,6 @@
 # Queue Payments: a player can play free
 
-Status: NEW
+Status: IN MOCK APP
 Date: 2026-11-27
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `paymentsPanel`, `payAmount` sheet, `duePerHead`, `financeCalc`
@@ -37,4 +37,5 @@ Superseded by: none
 - Screen docs: none yet; add with the ticket.
 
 ## Real app work
+- Done November 27, 2026 ([D-2026-11-27-01](../mvp/decisions/2026-11-27.md#d-2026-11-27-01)): PaymentCard (dashed, Free chip, no switch), PaymentsChecklist (Free · N tab, Paid X/payers, "N free"), PaymentAmountForm (Plays free row), PaymentsPanel wiring; mock store, real mode and the offline outbox.
 - Roster entry gets a free flag; break-even, status, totals, filters and the share text follow the rules in the business doc, in mock and real modes.

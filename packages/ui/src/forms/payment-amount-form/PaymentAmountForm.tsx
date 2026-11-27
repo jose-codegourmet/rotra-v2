@@ -6,6 +6,7 @@ import { formatPeso, moneyField } from '@rotra/schema/money'
 import { Button } from '@rotra/ui/button'
 import { Field } from '@rotra/ui/field'
 import { PaymentStatusChip } from '@rotra/ui/payments-checklist/payment-status-chip'
+import { Switch } from '@rotra/ui/switch'
 import { TextInput } from '@rotra/ui/text-input'
 import { useId } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
@@ -33,6 +34,11 @@ export type PaymentAmountFormProps = {
   isPending?: boolean
   /** Why saving failed; the typed amount stays */
   serverError?: string
+  /**
+   * Plays free (D-2026-11-27-01): the switch row, shown when given. `hasCash` adds that turning it on
+   * clears the amount received (payments are a guide only). The container saves it.
+   */
+  free?: { checked: boolean; hasCash: boolean; onChange: (next: boolean) => void; name: string }
 }
 
 /**
@@ -48,6 +54,7 @@ export function PaymentAmountForm({
   onCancel,
   isPending = false,
   serverError,
+  free,
 }: PaymentAmountFormProps) {
   const formId = useId()
   const form = useForm<PaymentAmountFormInput, unknown, PaymentAmountFormValues>({
@@ -100,6 +107,23 @@ export function PaymentAmountForm({
       {parsed.success ? (
         <div className="flex flex-wrap items-center gap-2 text-sm text-fg2">
           Status: <PaymentStatusChip status={previewStatus(parsed.data)} />
+        </div>
+      ) : null}
+      {free ? (
+        <div className="flex items-center justify-between gap-3 rounded-md border border-border p-3">
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <b className="text-sm">Plays free</b>
+            <span className="text-xs text-fg2">
+              Owes nothing and is not counted when the break-even share is worked out.
+              {free.hasCash && !free.checked ? ' Turning this on clears the amount received.' : ''}
+            </span>
+          </div>
+          <Switch
+            aria-label={`${free.name} plays free`}
+            checked={free.checked}
+            onChange={(next) => free.onChange(next)}
+            disabled={isPending}
+          />
         </div>
       ) : null}
       <p className="m-0 text-xs text-fg2">

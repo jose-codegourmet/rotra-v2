@@ -14,8 +14,17 @@ import { amountDuePerHead } from '../session-cost/sessionCost.rules'
 import type { SessionCostInput } from '../session-cost/sessionCost.types'
 import { slotPaymentsIn, slotPaymentTransfer } from '../slot-transfer/slotPayments'
 import { TRANSFER_PAYMENT_LOCKED_ERROR } from '../slot-transfer/transferAccounting.rules'
-import { paymentStatus, paymentTotals, receivedAmount } from './sessionPayment.rules'
-import type { SetPaymentAmountInput, SetPaymentMarksInput } from './sessionPayment.types'
+import {
+  FREE_PAYMENT_LOCKED_ERROR,
+  paymentStatus,
+  paymentTotals,
+  receivedAmount,
+} from './sessionPayment.rules'
+import type {
+  SetPaymentAmountInput,
+  SetPaymentMarksInput,
+  SetPlayerFreeInput,
+} from './sessionPayment.types'
 
 /** Uploaded pictures by global player id (registered and unclaimed players only). */
 const pictures: Record<string, string> = portraits
@@ -34,6 +43,8 @@ export async function getSessionPayments(sessionId: string) {
   // waivers an approved transfer carried into it. Senders are off the roster, so cash counts once.
   const ledger = slotPaymentsIn(state, sessionId, amountDue)
   const entries = roster.map((p) => ({ p, payment: ledger.paymentOf(p.id) }))
+  // D-2026-11-27-01: a free player owes nothing and is left out of Paid X/Y, still due and reimburse.
+  const isFreeEntry = ({ p, payment }: (typeof entries)[number]) => !!p.isFree && !payment.mark
   // #1014: `amountMinor` is the cash kept (net of a manual refund); the refund is counted apart.
   const marks = entries.flatMap(({ payment }) =>
     payment.mark ? [{ ...payment.mark, refundedMinor: payment.refundedMinor }] : [],
@@ -49,6 +60,7 @@ export async function getSessionPayments(sessionId: string) {
         sessionPlayerId: p.id,
         clubPlayerId: p.clubPlayerId,
         name: p.nameSnapshot,
+        free: !!p.isFree && !payment.mark,
         picture: clubPlayer?.playerId ? pictures[clubPlayer.playerId] : undefined,
         paid: payment.mark
           ? {
@@ -71,9 +83,10 @@ export async function getSessionPayments(sessionId: string) {
     entranceFeeIncluded: estimate?.entranceFeePerHead,
     totals: paymentTotals({
       marks,
-      total: roster.length,
+      total: entries.filter((e) => !isFreeEntry(e)).length,
       amountDue,
       cost: estimate?.total ?? null,
+      free: entries.filter(isFreeEntry).length,
     }),
   }
 }
@@ -119,7 +132,7 @@ export function setPaymentMarks({ sessionId, marks }: SetPaymentMarksInput) {
           (m) => m.sessionId === sessionId && m.sessionPlayerId === player.id,
         )
         if (!paid && mark) state.paymentMarks = state.paymentMarks.filter((m) => m !== mark)
-        if (paid && !mark)
+        if (paid && !mark) {
           state.paymentMarks.push({
             sessionId,
             sessionPlayerId: player.id,
@@ -127,6 +140,9 @@ export function setPaymentMarks({ sessionId, marks }: SetPaymentMarksInput) {
             currency: 'PHP',
             markedAt: Date.now(),
           })
+          // D-2026-11-27-01: recording cash for a free player makes them a payer again.
+          player.isFree = false
+        }
       }
       const count = wanted.size
       return {
@@ -164,6 +180,7 @@ export function setPaymentAmount({ sessionId, clubPlayerId, amountMinor }: SetPa
         currency: 'PHP',
         markedAt: Date.now(),
       })
+      player.isFree = false
       return {
         data: { paid: true },
         text: `${player.nameSnapshot} paid ${formatPeso(amountMinor)}`,
@@ -202,6 +219,7 @@ export function togglePaid({
         currency: 'PHP',
         markedAt: Date.now(),
       })
+      player.isFree = false
       return { data: { paid: true }, text: `${player.nameSnapshot} paid ${formatPeso(amount)}` }
     }),
   )
@@ -217,6 +235,8 @@ export function markAllPaid(sessionId: string) {
           continue
         // #1013: a slot paid through a transfer is already Paid; never a second payment.
         if (isPaymentLocked(state, sessionId, p.id)) continue
+        // D-2026-11-27-01: a free player owes nothing.
+        if (p.isFree) continue
         state.paymentMarks.push({
           sessionId,
           sessionPlayerId: p.id,
@@ -227,6 +247,34 @@ export function markAllPaid(sessionId: string) {
         count++
       }
       return { data: { count }, text: `${count} players marked paid` }
+    }),
+  )
+}
+/**
+ * D-2026-11-27-01 · **Plays free** on one roster player. A free player owes nothing and leaves the
+ * break-even head count. Payments are a guide only, so setting a paid player free removes their
+ * amount received (nothing to reimburse). A slot paid through a transfer, or refunded, is history.
+ */
+export function setPlayerFree({ sessionId, clubPlayerId, free }: SetPlayerFreeInput) {
+  return dispatch('payments.free', { sessionId, clubPlayerId, free }, () =>
+    queueMutation({ area: 'Payments' }, (state) => {
+      requirePaymentsWrite(state, sessionId)
+      const player = state.roster.find(
+        (p) => p.sessionId === sessionId && p.clubPlayerId === clubPlayerId,
+      )
+      if (!player) throw new MockError('permission', 'Player not in this session.')
+      if (free && !player.isFree) {
+        if (isPaymentLocked(state, sessionId, player.id))
+          throw new MockError('permission', FREE_PAYMENT_LOCKED_ERROR)
+        state.paymentMarks = state.paymentMarks.filter(
+          (m) => !(m.sessionId === sessionId && m.sessionPlayerId === player.id),
+        )
+      }
+      player.isFree = free
+      return {
+        data: { free },
+        text: free ? `${player.nameSnapshot} plays free` : `${player.nameSnapshot} pays again`,
+      }
     }),
   )
 }

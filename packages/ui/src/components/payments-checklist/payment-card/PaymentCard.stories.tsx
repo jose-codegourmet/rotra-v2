@@ -37,3 +37,5 @@ export const NoFeeSet: Story = { args: { amountDue: null } }
 /** #1013: paid through a slot transfer: locked switch, waiver line, the body opens Slot history */
 export const ViaTransfer: Story = { args: { player: transferredPaymentPlayer } }
 export const ViaTransferLight: Story = { ...ViaTransfer, globals: { theme: 'light' } }
+export const Free: Story = { args: { player: { ...unpaidPaymentPlayers[0]!, free: true } } }
+export const FreeLight: Story = { ...Free, globals: { theme: 'light' } }

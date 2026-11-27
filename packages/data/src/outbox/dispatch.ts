@@ -183,6 +183,7 @@ const COMMAND_AREAS: Record<CommandName, OutboxCommand['area']> = {
   'payments.amount': 'Payments',
   'payments.toggle': 'Payments',
   'payments.markAll': 'Payments',
+  'payments.free': 'Payments',
 }
 
 export async function dispatch<R extends SaveOutcome & { data: unknown }>(

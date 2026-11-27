@@ -24,10 +24,13 @@ export function estimateSessionCost(
   const entranceFeePerHead = values.entranceFeePerHead ?? 0
   const entrance = entranceFeePerHead * players
   const total = court + shuttle + entrance
-  const breakEven = Math.ceil(total / (players * 100)) * 100
+  // D-2026-11-27-01: free players leave the head count of the split (at least 1 payer); costs stay.
+  const free = Math.min(Math.max(0, context.freePlayers ?? 0), players - 1)
+  const payers = players - free
+  const breakEven = Math.ceil(total / (payers * 100)) * 100
   const isCustom = values.paymentMode === 'custom'
   const perHead = isCustom ? (values.customFeePerHead ?? 0) : breakEven
-  const collect = perHead * players
+  const collect = perHead * payers
   const diff = collect - total
   const kind =
     total === 0
@@ -39,6 +42,7 @@ export function estimateSessionCost(
           : 'loss'
   return {
     players,
+    payers,
     court,
     shuttle,
     entrance,

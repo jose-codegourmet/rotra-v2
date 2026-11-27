@@ -1,6 +1,6 @@
 # Phase 3 (task 3.1): what the recaptured goldens changed
 
-Recaptured on 2026-11-27 from the TypeScript on `go-stack` after the `origin/main` merge (#1177), on a throwaway `postgres:16-alpine` with all 62 migrations, `TZ=UTC`. Scripts run: `capture-claim`, `capture-signedin-{admin,player,profile,pubsession,queue}`, `capture-writes-player`, `capture-writes-profiles`. `capture-writes-queue` groups were recaptured with their tasks in Phase 2. Nothing was edited by hand.
+Recaptured on 2026-11-27 from the TypeScript on `go-stack` after the `origin/main` merge (#1177), on a throwaway `postgres:16-alpine` with all 61 migrations, `TZ=UTC`. Scripts run: `capture-claim`, `capture-signedin-{admin,player,profile,pubsession,queue}`, `capture-writes-player`, `capture-writes-profiles`. `capture-writes-queue` groups were recaptured with their tasks in Phase 2. Nothing was edited by hand.
 
 **Reading the table.** One line per JSON path that differs between the committed golden and the new capture: `added` (the TypeScript now sends it), `changed` (the value differs), `length` (a list got longer or shorter). The number is how many cases show it. Only the biggest paths per file are listed (top 45); the golden files in git have the rest.
 

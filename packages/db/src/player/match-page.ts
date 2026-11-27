@@ -8,6 +8,7 @@ import {
   sideScore,
 } from '@rotra/data/match-page/rules'
 import type { MatchPage, MatchPagePlayer } from '@rotra/data/match-page/types'
+import { gameWinChanceBreakdown, gameWinChanceFields } from '@rotra/data/player/game-win-chance'
 import { countYearCountedWins } from '@rotra/data/player/rules'
 import type { PlayerGame, PlayerGamePlayer, ProfileVisibility } from '@rotra/data/player/types'
 import { publicLevel } from '@rotra/data/public-session/rules'
@@ -16,6 +17,7 @@ import { levelCodeFor } from '../queue/session-store'
 import { ServiceError } from '../service/errors'
 import { toIso } from '../service/serialize'
 import { readPlayerMatchHistory } from './projections'
+import { readClubForms, winChanceFace } from './win-chance'
 
 /** Public reads take an ID from the URL; anything that is not a UUID is simply not found. */
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -29,6 +31,11 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
  * Faces follow the profile rules for the viewer (`matchFaceAccess`), applied here, so a masked
  * name never leaves the server. No costs, levels beyond the skill group, Off Day or private
  * identity. No new table: `player_match_facts.match_id` is the shared id.
+ *
+ * Win chance (D-2026-11-27-03): the match and every earlier game carry it, from each face's level
+ * in this session and its club form before it, the inputs `readPlayerMatchHistory` uses, so the
+ * games list and this page agree. The breakdown's rows show each face's level and club win rate as
+ * the Win chance dialog draws them; names stay masked through `teamA` / `teamB`.
  */
 export async function readMatchPage(matchId: string, viewerId: string | null): Promise<MatchPage> {
   if (!UUID.test(matchId)) throw new ServiceError('not_found')
@@ -49,6 +56,7 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
         finalizedAt: true,
         publicSlug: true,
         recordGames: true,
+        scheduledStartAt: true,
         club: { select: { name: true } },
         publication: { select: { publishedAt: true } },
       },
@@ -78,6 +86,7 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
         where: { clubId: any.clubId, sessionId: session.id },
         select: {
           id: true,
+          clubPlayerId: true,
           nameSnapshot: true,
           playerAtEntry: {
             select: {
@@ -100,6 +109,18 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
     // That entry's games in the session up to and including the match (the games badge).
     const gameNumber = (entryId: string, ofMatch: string) =>
       (factsOf.get(entryId)?.findIndex((f) => f.matchId === ofMatch) ?? -1) + 1
+    // Win chance inputs: the level an entry played the session at (its first fact) and its club
+    // form before this session; one query for everyone with a game in the session.
+    const formOf = await readClubForms(
+      tx,
+      [any.clubId],
+      entries.flatMap((e) => (factsOf.has(e.id) ? [e.clubPlayerId] : [])),
+    )
+    const chanceFace = (entryId: string) =>
+      winChanceFace(
+        factsOf.get(entryId)?.[0]?.skillLevelSnapshotId,
+        formOf(byEntry.get(entryId)?.clubPlayerId, session),
+      )
 
     /**
      * As profile games: a ROTRA player has a profile with an RTR ID, anyone else is a guest. An
@@ -133,17 +154,25 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
     const gameOf = (f: Fact): PlayerGame => {
       const partnerPlayers = f.partnerEntryIds.map((id) => courtFace(id, f.matchId))
       const opponentPlayers = f.opponentEntryIds.map((id) => courtFace(id, f.matchId))
+      const drawn = {
+        format: f.format,
+        counting: countingOf(f),
+        result: f.team === f.winningTeam ? ('won' as const) : ('lost' as const),
+      }
       return {
         id: f.matchId,
-        format: f.format,
         sessionGameNumber: gameNumber(f.sessionPlayerId, f.matchId),
         partners: partnerPlayers.map((p) => p.name),
         opponents: opponentPlayers.map((p) => p.name),
         partnerPlayers,
         opponentPlayers,
-        counting: countingOf(f),
-        result: f.team === f.winningTeam ? 'won' : 'lost',
+        ...drawn,
         score: sideScore(f.teamAScore, f.teamBScore, f.team === 'A' ? 'a' : 'b'),
+        ...gameWinChanceFields(
+          drawn,
+          [f.sessionPlayerId, ...f.partnerEntryIds].map(chanceFace),
+          f.opponentEntryIds.map(chanceFace),
+        ),
       }
     }
 
@@ -184,6 +213,12 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
         beforeGame: access.gamesHidden ? null : beforeGameRecord(earlierGames),
       }
     }
+    const winChance = gameWinChanceBreakdown(
+      first.format,
+      side('A').map(chanceFace),
+      side('B').map(chanceFace),
+      first.winningTeam === 'A' ? 'left' : 'right',
+    )
     return {
       page: {
         matchId,
@@ -202,6 +237,7 @@ export async function readMatchPage(matchId: string, viewerId: string | null): P
         teamA: side('A').map(player),
         teamB: side('B').map(player),
         viewerPlayerId: viewerId,
+        ...(winChance ? { winChance } : {}),
       },
       yearPlayerIds,
     }

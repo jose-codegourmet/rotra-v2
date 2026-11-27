@@ -12,6 +12,7 @@ import { generateMatches } from '@rotra/data/match/queue.rules'
 import type { Match, MatchLineup } from '@rotra/data/match/types'
 import { useAddSuggestedMatch } from '@rotra/data/match/useAddSuggestedMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { formRating, winChance } from '@rotra/data/match/win-chance'
 import type { QueueSession } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import type { SessionPlayer } from '@rotra/data/session-roster/types'
@@ -25,6 +26,7 @@ import type { TeamLineupPlayer } from '@rotra/ui/team-lineup'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 
 export type SuggestMatchProps = {
   sessionId: string
@@ -46,9 +48,14 @@ const errorMessage = (error: unknown) =>
 const lineupKey = (m: MatchLineup | null) =>
   m ? `${[...m.teamA].sort().join()}|${[...m.teamB].sort().join()}` : ''
 
-/** One lineup from the reference heuristic, or why none is possible */
+/**
+ * One lineup from the reference heuristic, or why none is possible. Teams are split by the form
+ * rating behind Win chance (D-2026-11-27-02).
+ */
 function suggest(session: QueueSession, roster: SessionPlayer[], matches: Match[]): Suggestion {
-  const result = generateMatches(session, roster, matches, 1, Math.random)
+  const result = generateMatches(session, roster, matches, 1, Math.random, (p) =>
+    formRating(p, roster, matches),
+  )
   return result.error
     ? { lineup: null, reason: result.error }
     : { lineup: result.matches[0] ?? null, reason: undefined }
@@ -102,6 +109,7 @@ function OpenSuggestMatch({
   onAdded,
 }: OpenSuggestMatchProps) {
   const addSuggested = useAddSuggestedMatch()
+  const winChanceDialog = useWinChanceDialog(roster, matches)
   const [suggestion, setSuggestion] = useState<Suggestion>(() => suggest(session, roster, matches))
   /** Edited: switched sides or replaced a player, so Add to queue adds it protected */
   const [switched, setSwitched] = useState(false)
@@ -273,6 +281,8 @@ function OpenSuggestMatch({
           if (!next) onBack()
         }}
         lineup={shown}
+        winChance={lineup ? winChance(lineup, roster, matches) : undefined}
+        onOpenWinChance={lineup ? () => winChanceDialog.open(lineup) : undefined}
         reason={suggestion.reason}
         sessionMode={session.sessionMode}
         minimumGames={session.minimumGames}
@@ -324,6 +334,7 @@ function OpenSuggestMatch({
         backLabel="suggestion"
         onBack={() => setProfileId(null)}
       />
+      {winChanceDialog.dialog}
     </>
   )
 }

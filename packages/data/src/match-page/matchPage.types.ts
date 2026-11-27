@@ -1,4 +1,5 @@
 import type { MatchFormat } from '../match/match.types'
+import type { WinChanceBreakdown } from '../match/winChance.rules'
 import type { PlayerGame, PlayerSessionRecord } from '../player/player.types'
 import type { PublicSessionParticipant } from '../public-session/publicSession.types'
 
@@ -35,6 +36,14 @@ export type MatchPage = {
    * their side first as "You" (compare with each face's `playerId`).
    */
   viewerPlayerId: string | null
+  /**
+   * Win chance (D-2026-11-27-03) with the rows behind it, Team A = `teamA`: the face ids are
+   * `gameFaceKey('a' | 'b', index)` into `teamA` / `teamB`, which hold the faces (already masked
+   * for this viewer). Lasting signals only. Missing when the match has no two sides. The page
+   * draws it from its own left side with `drawnWinChanceBreakdown`, and not at all when the match
+   * is partial (not counted) for the player its court reads from.
+   */
+  winChance?: WinChanceBreakdown
 }
 
 /** The session the match belongs to, as on profile games. */

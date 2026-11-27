@@ -113,3 +113,31 @@ export const TeamPickedLight: Story = { ...TeamPicked, globals: { theme: 'light'
 export const GuestPickedLight: Story = { ...GuestPicked, globals: { theme: 'light' } }
 export const MaskedPlayerPickedLight: Story = { ...MaskedPlayerPicked, globals: { theme: 'light' } }
 export const YouLight: Story = { ...You, globals: { theme: 'light' } }
+
+/**
+ * Win chance (D-2026-11-27-03): each team's percent beside Won / Lost; the Favored team (65% or
+ * more) takes the accent. The chips open the Win chance dialog.
+ */
+export const WinChance: Story = {
+  args: {
+    winChance: { chance: { a: 27, b: 73, favored: 'B', strong: true }, onOpen: () => {} },
+  },
+  globals: { theme: 'dark' },
+}
+export const WinChanceLight: Story = { ...WinChance, globals: { theme: 'light' } }
+export const WinChanceEven: Story = {
+  args: {
+    winChance: { chance: { a: 48, b: 52, favored: null, strong: false }, onOpen: () => {} },
+  },
+  globals: { theme: 'dark' },
+}
+export const WinChanceSingles: Story = {
+  args: {
+    format: 'singles',
+    left: left.slice(0, 1),
+    right: right.slice(0, 1),
+    winChance: { chance: { a: 39, b: 61, favored: 'B', strong: false }, onOpen: () => {} },
+  },
+  globals: { theme: 'dark' },
+}
+export const WinChanceSinglesLight: Story = { ...WinChanceSingles, globals: { theme: 'light' } }

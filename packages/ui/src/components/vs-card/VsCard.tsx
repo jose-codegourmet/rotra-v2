@@ -1,3 +1,4 @@
+import type { WinChance } from '@rotra/data/match/win-chance'
 import type { MatchPagePlayer } from '@rotra/data/match-page/types'
 import type { PlayerGame } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
@@ -6,6 +7,7 @@ import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import { MATCH_FORMAT_LABELS } from '@rotra/ui/game-row'
 import { MATCH_COURT_SKILL_RINGS } from '@rotra/ui/match-court'
+import { WinChanceChip } from '@rotra/ui/win-chance-chip'
 
 export type VsCardPlayer = {
   /** Unique button id, also used to restore focus when the player's stats card closes. */
@@ -27,6 +29,12 @@ export type VsCardProps = {
   picked: readonly string[]
   onPickPlayer: (id: string) => void
   onPickTeam: (ids: string[]) => void
+  /**
+   * Win chance (D-2026-11-27-03), `a` = the left team: each team's own percent as a chip beside
+   * Won / Lost, in the accent tone at 65% or more. With `onOpen` the chips are buttons that open
+   * the Win chance dialog. Leave it out for a partial game.
+   */
+  winChance?: { chance: WinChance; onOpen?: () => void }
 }
 
 const TEAM_LABEL = 'text-[11px] font-bold tracking-[0.6px] uppercase'
@@ -43,7 +51,8 @@ function Team({
   picked,
   onPickPlayer,
   onPickTeam,
-}: Pick<VsCardProps, 'winner' | 'picked' | 'onPickPlayer' | 'onPickTeam'> & {
+  winChance,
+}: Pick<VsCardProps, 'winner' | 'picked' | 'onPickPlayer' | 'onPickTeam' | 'winChance'> & {
   players: readonly VsCardPlayer[]
   side: 'left' | 'right'
 }) {
@@ -53,6 +62,23 @@ function Team({
   const teamPicked = hasTeamButton && players.every((player) => picked.includes(player.id))
   const seeTeam = players.length === 2 ? 'See both' : `See all ${players.length}`
   const teamNames = players.map((player) => player.name).join(' and ')
+  const header = hasTeamButton ? (
+    <button
+      type="button"
+      aria-pressed={teamPicked}
+      aria-label={`${label} team: ${teamPicked ? 'hide' : 'show'} stats for ${teamNames}`}
+      onClick={() => onPickTeam(players.map((player) => player.id))}
+      className={cn(
+        '-mt-1 flex min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md border-0 bg-transparent px-1.5 py-1 text-fg hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent touch:min-h-11',
+        winChance && 'flex-auto',
+      )}
+    >
+      <span className={cn(TEAM_LABEL, 'text-fg2')}>{label}</span>
+      <span className="text-xs font-bold text-accent">{teamPicked ? 'Showing both' : seeTeam}</span>
+    </button>
+  ) : (
+    <span className={cn(TEAM_LABEL, won ? 'text-accent' : 'text-fg2')}>{label}</span>
+  )
 
   return (
     <div
@@ -64,21 +90,24 @@ function Team({
         teamPicked && 'shadow-[inset_0_0_0_2px_var(--accent)]',
       )}
     >
-      {hasTeamButton ? (
-        <button
-          type="button"
-          aria-pressed={teamPicked}
-          aria-label={`${label} team: ${teamPicked ? 'hide' : 'show'} stats for ${teamNames}`}
-          onClick={() => onPickTeam(players.map((player) => player.id))}
-          className="-mt-1 flex min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md border-0 bg-transparent px-1.5 py-1 text-fg hover:bg-surface focus-visible:outline-2 focus-visible:outline-accent touch:min-h-11"
+      {winChance ? (
+        // The prototype's .vs-hdrow: the header, then the team's percent; mirrored on the right.
+        <div
+          className={cn(
+            'flex items-center justify-between gap-2',
+            side === 'right' && 'flex-row-reverse',
+          )}
         >
-          <span className={cn(TEAM_LABEL, 'text-fg2')}>{label}</span>
-          <span className="text-xs font-bold text-accent">
-            {teamPicked ? 'Showing both' : seeTeam}
-          </span>
-        </button>
+          {header}
+          <WinChanceChip
+            chance={winChance.chance}
+            team={side === 'left' ? 'A' : 'B'}
+            onOpen={winChance.onOpen}
+            className="text-xs"
+          />
+        </div>
       ) : (
-        <span className={cn(TEAM_LABEL, won ? 'text-accent' : 'text-fg2')}>{label}</span>
+        header
       )}
       {players.map((player) => {
         const selected = picked.includes(player.id)
@@ -131,8 +160,9 @@ export function VsCard({
   picked,
   onPickPlayer,
   onPickTeam,
+  winChance,
 }: VsCardProps) {
-  const team = { winner, picked, onPickPlayer, onPickTeam }
+  const team = { winner, picked, onPickPlayer, onPickTeam, winChance }
   return (
     <Card asChild>
       <section aria-label="Players" className="@container flex flex-col gap-3">

@@ -184,6 +184,32 @@ button.conn:hover { border-color: var(--accent); background: var(--surface); }
 .chip.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); background: var(--warn-subtle); }
 .chip.bad { color: var(--error); border-color: color-mix(in srgb, var(--error) 45%, transparent); background: var(--error-subtle); }
 .chip.solid { background: var(--elev); color: var(--fg); }
+/* Win chance (D-2026-11-27-02): a small chip per pair on every match card, Queue Master only. */
+.chip.wc { font-size: 11px; padding: 1px 7px; font-variant-numeric: tabular-nums; flex: none; }
+.gm-fmt.wc-upset { color: var(--warn); }
+button.chip.wc, button.gm-fmt.wc-btn { font-family: inherit; line-height: inherit; cursor: pointer; }
+button.chip.wc:not(.ok) { background: none; }
+button.gm-fmt.wc-btn { border: 0; }
+button.chip.wc:hover, button.gm-fmt.wc-btn:hover { border-color: var(--accent); }
+.sg-team .tl-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+/* D-WIN-CHANCE: the explanation dialog. Two team blocks side by side from 640 px, stacked below. */
+.wcx-teams { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 640px) { .wcx-teams { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.wcx-team { display: flex; flex-direction: column; gap: 12px; padding: 14px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); min-width: 0; }
+.wcx-head { display: flex; flex-direction: column; gap: 4px; }
+.wcx-pair { font-size: 13px; font-weight: 700; color: var(--fg2); }
+.wcx-pct { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.wcx-pct b { font-size: 32px; line-height: 1.1; font-weight: 800; font-variant-numeric: tabular-nums; }
+.wcx-pct b.fav { color: var(--accent); }
+.wcx-p { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--border); }
+.wcx-who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.wcx-who .main { display: flex; flex-direction: column; min-width: 0; }
+.wcx-rows { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.wcx-rows li { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; align-items: baseline; font-size: 13px; }
+.wcx-rows li .d { grid-column: 1; color: var(--fg2); font-size: 12px; }
+.wcx-rows li .v { grid-column: 2; grid-row: 1 / span 2; font-variant-numeric: tabular-nums; font-weight: 700; }
+.qfaces .chip.wc, .qstack-row .chip.wc { align-self: center; }
+.chip.wc.lead { color: var(--fg); }
 .avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--elev); color: var(--fg2); flex: none; }
 .avatar.lg { width: 52px; height: 52px; font-size: 18px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-weight: 800; }
 .avatar.photo { background: var(--elev); overflow: hidden; }
@@ -3314,7 +3340,8 @@ const SWAP_TIP = 'Drag onto a player on the other team, or press the left or rig
 const swapAttrs = (scope, team, i, pid) => scope ? `data-swap="${scope}" data-team="${team}" data-i="${i}"${pid ? ` data-pid="${pid}" title="${SWAP_TIP}"` : ''}` : '';
 // Owner artifact comment, November 19, 2026: in the match dialogs, tapping a player's card changes that player (swap); tapping the
 // picture opens their profile. `card(pid)` gives the card's action attributes; without it the whole card opens the profile.
-const faceTeam = (s, ids, label, swap, card) => `<div class="sg-team" role="group" aria-label="${label}"><span class="tl">${label}</span>${ids.map((pid, i) => {
+// `wc` is the pair's win chance chip (D-WIN-CHANCE); it sits right-aligned on the label row, empty while a team is empty.
+const faceTeam = (s, ids, label, swap, card, wc) => `<div class="sg-team" role="group" aria-label="${label}">${wc ? `<div class="tl-row"><span class="tl">${label}</span>${wc}</div>` : `<span class="tl">${label}</span>`}${ids.map((pid, i) => {
   const p = P(pid), r = R(s, pid), g = gamesOf(s, pid);
   if (card) {
     const c = card(pid);
@@ -4249,7 +4276,7 @@ function historyMatch(s, m, hl, pill) {
   const score = invalid || !played ? '' : gmScore(m, false);
   const res = !played ? '<span class="gm-who">VS</span>' : invalid ? chip('Invalid', 'bad') : wl != null ? `<span class="gm-who">${wl ? '◀' : ''} Won ${wl ? '' : '▶'}</span>` : '';
   return `<article class="gm${invalid ? ' partial' : ''}" data-mid="${m.id}"><div class="gm-court" role="group" aria-label="Match ${m.seq}: ${m.teamA.map((x) => esc(nm(x))).join(' and ')} versus ${m.teamB.map((x) => esc(nm(x))).join(' and ')}">${courtSVG(1).replace('class="court-svg"', 'class="gm-svg"')}
-    ${gmTop(m, false, `<span class="gm-fmt">${pill || `#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}`}</span>`)}${side(m.teamA, wl === true)}<div class="gm-res">${score}${res}</div>${side(m.teamB, wl === false)}</div>
+    ${gmTop(m, false, `<span class="gm-fmt">${pill || `#${m.seq} · ${fmtRange(m.startedAt, m.endedAt, s.start)}${FUN.includes(m.format) ? ' · Fun' : ''}`}</span>${invalid ? '' : (() => { const w = wcOf(s, m); return `<button type="button" class="gm-fmt tnum wc-btn" ${wcAttrs(m)} title="${esc(wcTitle(m, w))} · tap to see why" aria-label="${esc(wcTitle(m, w))}. Explain">${wcText(w)}</button>${wcUpset(s, m) ? `<button type="button" class="gm-fmt wc-upset wc-btn" ${wcAttrs(m)} title="The favored team lost · tap to see why" aria-label="Upset: the favored team lost. Explain">Upset</button>` : ''}`; })()}`)}${side(m.teamA, wl === true)}<div class="gm-res">${score}${res}</div>${side(m.teamB, wl === false)}</div>
     ${(m.subs || []).map((x) => `<p class="small muted">${esc(subLine(x, m))}</p>`).join('')}
   </article>`;
 }
@@ -5408,7 +5435,7 @@ function liveSettings(s, est, present, allLink) {
     // Owner, November 25, 2026: a drag handle (⠿) before the label reorders the courts. Dragging starts only from the handle,
     // so the phone carousel still swipes; the arrow keys move the court one place on the focused handle.
     // Owner, November 25, 2026: the label is a button that opens the Change court label dialog (the Courts tab's ⋯ menu one).
-    return `<article class="ls-cc${m && m.status === 'active' ? ' playing' : ''}" data-court-id="${esc(c.id)}"><div class="between"><div class="ls-cc-h"><button type="button" class="ls-grip" id="ls-grip-${esc(c.id)}" data-court-grip="${esc(c.id)}" aria-label="Move ${esc(c.label)}" title="Drag to reorder">⠿</button><button type="button" class="ls-name" data-act="openCourtLabel" data-id="${esc(c.id)}" aria-label="Change ${esc(c.label)} label">${esc(c.label)}</button></div>${st}</div>
+    return `<article class="ls-cc${m && m.status === 'active' ? ' playing' : ''}" data-court-id="${esc(c.id)}"><div class="between"><div class="ls-cc-h"><button type="button" class="ls-grip" id="ls-grip-${esc(c.id)}" data-court-grip="${esc(c.id)}" aria-label="Move ${esc(c.label)}" title="Drag to reorder">⠿</button><button type="button" class="ls-name" data-act="openCourtLabel" data-id="${esc(c.id)}" aria-label="Change ${esc(c.label)} label">${esc(c.label)}</button></div><div class="row" style="gap:6px;flex-wrap:nowrap">${m ? wcChip(s, m) : ''}${st}</div></div>
       <div class="pitch ls-pitch${m ? '' : ' empty'}">${courtSVG(1)}${m ? courtSides(s, m) : '<span class="ls-free">FREE</span>'}</div>
       <div class="ls-times">
         ${courtTimePickers(c, follows)}
@@ -5759,7 +5786,7 @@ function courtsPane(s) {
       m.courts.forEach((x) => { if (x !== c.id) skip.add(x); });
       // Owner, November 25, 2026: a one-court match can be dropped onto another busy court; the two matches trade courts.
       const swapAttr = merged ? '' : ` data-swap-court="${c.id}" data-swap-match="${m.id}"`;
-      const head = (label) => `<div class="ct"><div><h3>${esc(merged ? courtsOf(s, m) : c.label)}</h3>${courtTimeLine(s, c)}</div><div class="row" style="gap:6px;flex-wrap:nowrap">${label}${courtMenu(s, c, true)}</div></div>
+      const head = (label) => `<div class="ct"><div><h3>${esc(merged ? courtsOf(s, m) : c.label)}</h3>${courtTimeLine(s, c)}</div><div class="row" style="gap:6px;flex-wrap:nowrap">${wcChip(s, m)}${label}${courtMenu(s, c, true)}</div></div>
         <div class="pitch open-pitch ${merged ? 'tall' : ''}" role="button" tabindex="0" data-act="openMatch" data-id="${m.id}" title="Open match" aria-label="${esc(`Open match: Team A ${listNames(m.teamA)} versus Team B ${listNames(m.teamB)}`)}">${courtSVG(merged ? 2 : 1)}${courtSides(s, m)}</div>`;
       if (m.status === 'oncourt') {
         // On court: placed, getting ready. Normal border; the Queue Master starts it.
@@ -5915,6 +5942,73 @@ function autoMoreMenu(batch, replaceWhy, draftsWhy) {
   </div>` : ''}</div>`;
 }
 // A draft as a queue tile: same head, faces, VS and status line; tap anywhere to pick it.
+// ---------- Win chance (D-2026-11-27-02; owner, November 27, 2026) ----------
+// Queue Master only: never on the public page, in the Player app, in results or in exports. Each player gets a form rating in
+// level steps; a team is the average of its players; win chance = 1 / (1 + 10^((opponents - own team) / 2)), the awards curve,
+// shown between 5% and 95%. Even 45-55%, an edge 56-64%, Favored 65% or more. A Favored team that loses is an Upset.
+// Mockup data: club win rate, best day and leaderboard place are sample values made from the player id (a guest has no
+// record, so 50% and nothing else). The real app reads them from the club's history.
+const wcSeed = (pid) => { let h = 7; for (const ch of String(pid)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
+// One function builds a player's rows (label, detail, value) and the total, so the explanation dialog (D-WIN-CHANCE) always shows
+// exactly the numbers the chip used. `m` null reads the lasting signals only (what a finished match uses); otherwise the
+// signals of tonight are added too. Level and Club win rate always show; the other rows only when they are not zero.
+function wcRows(s, pid, m) {
+  const r = R(s, pid), p = P(pid), level = r && r.level != null ? r.level : 4, rows = [];
+  rows.push({ k: 'level', label: 'Level', detail: lvLabel(level), value: level, plain: true });
+  if (!p || regStatus(p) === 'guest') rows.push({ k: 'rate', label: 'Club win rate', detail: 'No record · counts as 50%', value: 0, keep: true });
+  else {
+    const h = wcSeed(pid), winRate = 0.35 + (h % 31) / 100;
+    rows.push({ k: 'rate', label: 'Club win rate', detail: `${Math.round(winRate * 100)}%`, value: Math.max(-1, Math.min(1, (winRate - 0.5) * 2)), keep: true });
+    const bestDay = (h >>> 5) % 7 === new Date().getDay() ? 0.25 : 0;
+    const place = [0.25, 0, 0, -0.25][(h >>> 8) % 4], trend = [-0.25, 0, 0.25][(h >>> 10) % 3];
+    rows.push({ k: 'day', label: 'Best day', detail: 'Plays best on this weekday', value: bestDay });
+    rows.push({ k: 'place', label: 'Club leaderboard', detail: place > 0 ? 'Top quarter' : 'Bottom quarter', value: place });
+    rows.push({ k: 'trend', label: 'Leaderboard direction', detail: trend > 0 ? 'Rising' : 'Falling', value: trend });
+  }
+  if (m) {
+    let w = 0, l = 0, up = 0, uw = 0, ul = 0;
+    s.matches.forEach((x) => { if (x.status !== 'done' || !x.winner || !counted(x, pid)) return; const sd = sideOf(x, pid); if (!sd) return;
+      if (sd === x.winner) w += 1; else l += 1;
+      if (wcUpset(s, x)) { if (sd === x.winner) { up += 0.25; uw += 1; } else { up += -0.25; ul += 1; } } });
+    const inRow = Math.max(0, streakOf(s, pid) - (m.status === 'oncourt' || m.status === 'active' ? 1 : 0));
+    rows.push({ k: 'tonight', label: 'Tonight', detail: `${w} won · ${l} lost`, value: Math.max(-1, Math.min(1, 0.25 * (w - l))) });
+    rows.push({ k: 'upsets', label: 'Upsets tonight', detail: [uw ? `${uw} upset win${uw === 1 ? '' : 's'}` : '', ul ? `${ul} upset loss${ul === 1 ? '' : 'es'}` : ''].filter(Boolean).join(' · '), value: Math.max(-0.5, Math.min(0.5, up)) });
+    rows.push({ k: 'row', label: 'Games in a row', detail: `${inRow} before this match`, value: -(0.25 * Math.min(2, inRow)) });
+    const hc = hcOf(r);
+    rows.push({ k: 'hc', label: 'Handicap tonight', detail: hc.map((k) => HC_SPOTS.find((x) => x.k === k).label.toLowerCase()).join(', '), value: hc.length ? -0.5 : 0 });
+  }
+  return { rows: rows.filter((x) => x.keep || x.k === 'level' || x.value !== 0), total: rows.reduce((t, x) => t + x.value, 0) };
+}
+const wcBase = (s, pid) => wcRows(s, pid, null).total;
+const wcCurve = (m, rate) => { const avg = (ids) => ids.reduce((t, p) => t + rate(p), 0) / Math.max(1, ids.length);
+  return Math.max(0.05, Math.min(0.95, 1 / (1 + 10 ** ((avg(m.teamB) - avg(m.teamA)) / 2)))); };
+const wcRead = (a) => { const pct = Math.round(Math.max(a, 1 - a) * 100); return { a, pct, fav: pct <= 55 ? null : a > 0.5 ? 'A' : 'B', tier: pct <= 55 ? 'even' : pct < 65 ? 'edge' : 'fav' }; };
+// A finished match is read from the lasting signals only, so its Upset mark doesn't move as the night goes on.
+const wcDone = (s, m) => wcRead(wcCurve(m, (p) => wcBase(s, p)));
+const wcUpset = (s, m) => { if (m.status !== 'done' || !m.winner) return false; const w = wcDone(s, m); return w.tier === 'fav' && w.fav !== m.winner; };
+const wcRating = (s, pid, m) => wcRows(s, pid, m).total;
+const wcOf = (s, m) => (m.status === 'done' || m.status === 'invalid' ? wcDone(s, m) : wcRead(wcCurve(m, (p) => wcRating(s, p, m))));
+// Owner, November 27, 2026: "can you put the percentage per pair". Each pair carries its own percent; the two add up to 100.
+const wcPct = (w, team) => (team === 'A' ? Math.round(w.a * 100) : 100 - Math.round(w.a * 100));
+const wcText = (w) => `${wcPct(w, 'A')}% · ${wcPct(w, 'B')}%`;
+// The chip beside one pair on a queue or draft tile. The stronger pair reads brighter; a Favored pair (65% or more) takes the accent.
+function wcPair(s, m, team) {
+  if (!m || !m.teamA.length || !m.teamB.length) return '';
+  const w = wcOf(s, m), lead = w.fav === (team === 'teamA' || team === 'A' ? 'A' : 'B'), t = team === 'teamA' || team === 'A' ? 'A' : 'B';
+  return `<button type="button" class="chip wc${lead ? (w.tier === 'fav' ? ' ok' : ' lead') : ''}" ${wcAttrs(m)} title="${esc(wcTitle(m, w))} · tap to see why" aria-label="Win chance ${wcPct(w, t)}%${lead && w.tier === 'fav' ? ', favored' : ''}. Explain">${wcPct(w, t)}%</button>`;
+}
+// Owner, November 27, 2026: "win rates should be clickable with explanation in a dialog". Every chip and pill is a button that
+// opens D-WIN-CHANCE. The click lands on the button, not on the tile or card under it (the same way the games badge works).
+// A finished match is looked up by id so its Upset reads its winner; any other lineup travels in the attributes.
+const wcAttrs = (m) => `data-act="openWinChance" data-ta="${esc(m.teamA.join(','))}" data-tb="${esc(m.teamB.join(','))}" data-st="${esc(m.status || '')}"${m.status === 'done' && m.id ? ` data-mid="${esc(m.id)}"` : ''} aria-haspopup="dialog"`;
+const wcTitle = (m, w) => `Win chance · ${listNames(m.teamA)} ${Math.round(w.a * 100)}% · ${listNames(m.teamB)} ${100 - Math.round(w.a * 100)}%`;
+// Court cards: one chip in the head, left pair first, as the court is drawn.
+function wcChip(s, m) {
+  if (!m || !m.teamA.length || !m.teamB.length) return '';
+  const w = wcOf(s, m);
+  return `<button type="button" class="chip wc${w.tier === 'fav' ? ' ok' : ''}" ${wcAttrs(m)} title="${esc(wcTitle(m, w))} · tap to see why" aria-label="${esc(wcTitle(m, w))}. Explain">${wcText(w)}</button>`;
+}
+
 function draftTile(s, m, batch, selected) {
   const pick = selected.indexOf(m.draftId) + 1;
   const attention = all(m).some((p) => !R(s, p) || !R(s, p).present);
@@ -5929,11 +6023,11 @@ function draftTile(s, m, batch, selected) {
     : `<span class="status-line muted">${I.info} ${esc(m.reason || 'Suggested by Generate matches')}</span>`;
   // Owner artifact comment, November 23, 2026: no "2 played · 2 suggested" chips. Each face has the level ring and the
   // games badge, like the Main Queue tiles; the badge opens the player's games this session (D-SESSION-GAMES).
-  const faces = (ids) => `<div class="qfaces">${ids.map((p) => `<div class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span>${faceNames(p, 'qf-n')}</div>`).join('')}</div>`;
+  const faces = (ids, team) => `<div class="qfaces">${ids.map((p) => `<div class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span>${faceNames(p, 'qf-n')}</div>`).join('')}${wcPair(s, m, team)}</div>`;
   return `<article class="qtile draft ${attention ? 'attn' : ''}" role="button" tabindex="0" aria-pressed="${pick > 0}" data-act="autoToggle" data-id="${m.draftId}" aria-label="Draft ${esc(matchLabel(m))}: ${esc(listNames(m.teamA))} vs ${esc(listNames(m.teamB))}${pick ? `, picked ${pick}` : ''}">
     ${pick ? `<span class="sel-badge" aria-hidden="true">${pick}</span>` : ''}
     <div class="qt-head">${chip('Draft')}${chip(matchLabel(m), 'solid')}</div>
-    ${faces(m.teamA)}<div class="vs">VS</div>${faces(m.teamB)}
+    ${faces(m.teamA, 'A')}<div class="vs">VS</div>${faces(m.teamB, 'B')}
     ${status}
   </article>`;
 }
@@ -6068,7 +6162,7 @@ function streakOf(s, pid) {
 }
 // Exhaustion: 2 games in a row, 3 in Hard mode; a player with a handicap tonight (D-2026-11-25-03) one fewer (1, Hard 2).
 const restAfter = (s, pid) => (s.mode === 'hard' ? 3 : 2) - (hcOf(R(s, pid)).length ? 1 : 0);
-// Even game: level adjusted by tonight's results only, level + 0.25 × (wins − losses), capped at ±1 level. No long-term win rate.
+// The Even game level before D-2026-11-27-02 (level + 0.25 × (wins − losses), capped at ±1). Generate matches now uses wcRating.
 function tonightLevel(s, pid) {
   const r = R(s, pid); let w = 0, l = 0;
   s.matches.forEach((m) => { if (m.status !== 'done' || !m.winner || !counted(m, pid)) return; const sd = sideOf(m, pid); if (sd === m.winner) w += 1; else if (sd) l += 1; });
@@ -6141,7 +6235,8 @@ function generateDrafts(s, tab, count, target, fixed) {
     if (tab === 'catchup' && !group.some((p) => load[p] < +target)) { stop = `Made ${out.length} of ${count}: no other match helps anyone reach ${target} game${+target === 1 ? '' : 's'}.`; break; }
     const pk = fmt === 'doubles' && baggingPairs(s).length ? bagFill(s, group, sorted) : group;
     // 3. Even game: teams split by tonight's level (Chill and Fair easy games stay as before).
-    const teams = splitTeams(s, pk, fmt, (p) => tonightLevel(s, p));
+    // Even game (D-2026-11-27-02): teams are split by the form rating behind Win chance, so the split is the closest to 50%.
+    const teams = splitTeams(s, pk, fmt, (p) => wcRating(s, p, {}));
     const m = { format: fmt, ...(fmt === 'doubles' && baggingPairs(s).length ? bagTeams(s, teams) : teams) };
     // The reason line says what drove the draft: the bagging pair or Whose turn, then Fresh faces.
     const left = clashes(pk), dodged = avoided ? clashes(avoided) : [];
@@ -6198,10 +6293,10 @@ function queueCard(s, m, i, n, cols, compact = false) {
   const wait = (p) => (s.status === 'active' ? statusPill(s, p, m) : '');
   const waitLabel = (p) => { const r = R(s, p); return s.status === 'active' && r && r.present && !busyOf(s, p, m) ? `, waiting ${queueTime(restInfo(s, p).mins)}` : ''; };
   // Owner artifact comment, November 19, 2026: each picture has the level ring and the player's games so far on it.
-  let faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}${waitLabel(p)}. View profile. Left or right arrow switches sides"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span>${faceNames(p, 'qf-n')}${wait(p)}</button>`).join('')}</div>`;
+  let faces = (ids, team) => `<div class="qfaces">${ids.map((p, j) => `<button class="qf lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))} · drag onto the other team to switch sides" aria-label="${esc(nm(p))}, ${gamesOf(s, p)} game${gamesOf(s, p) === 1 ? '' : 's'}${waitLabel(p)}. View profile. Left or right arrow switches sides"><span class="pf-face">${avatar(P(p))}<span class="pf-g tnum" data-act="openSessionGames" data-pid="${p}" title="${esc(nm(p))}'s games this session · tap to see them">${gamesOf(s, p)}</span></span>${faceNames(p, 'qf-n')}${wait(p)}</button>`).join('')}${wcPair(s, m, team)}</div>`;
   // Owner artifact comment, November 19, 2026 (Courts tab › Upcoming queued matches): compact cards with no wait times; each
   // team is a stack of overlapping pictures with the level ring, and the names on one line beside it.
-  const stack = (ids, team) => `<div class="qstack-row"><div class="qstack">${ids.map((p, j) => `<button class="qs-f lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}" aria-label="${esc(nm(p))}, ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}. View profile">${avatar(P(p))}</button>`).join('')}</div><span class="qs-names">${ids.map((p) => esc(short(p))).join(' & ')}</span></div>`;
+  const stack = (ids, team) => `<div class="qstack-row"><div class="qstack">${ids.map((p, j) => `<button class="qs-f lv-${R(s, p) ? rvBand(R(s, p)) : 'none'}${hitIds.includes(p) ? ' hit' : ''}" data-act="openProfile" data-id="${p}" data-swap="m:${m.id}" data-team="${team}" data-i="${j}" data-pid="${p}" title="${esc(nm(p))} · ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}" aria-label="${esc(nm(p))}, ${esc(lvLabel(R(s, p) ? R(s, p).level : null))}. View profile">${avatar(P(p))}</button>`).join('')}</div><span class="qs-names">${ids.map((p) => esc(short(p))).join(' & ')}</span>${wcPair(s, m, team)}</div>`;
   if (compact) faces = stack;
   return `<article class="qtile${compact ? ' compact' : ''} ${b && b.kind === 'attention' ? 'attn' : ''} ${!b ? 'ready' : ''}${qs ? (hitIds.length ? ' hit' : ' dim') : ''}" data-qid="${m.id}" style="grid-row:${row + 1};grid-column:${col + 1}" aria-label="Queue position ${i + 1}">
     ${!b ? `<span class="qt-ready">${I.check} Ready for court</span>` : ''}
@@ -7884,7 +7979,7 @@ const SHEETS = {
     const b = blockOf(s, m);
     return sheetShell(`Match ${m.seq} · ${esc(courtsOf(s, m))} · Getting ready`, `<div class="row">${chip(matchLabel(m), 'solid')}${FUN.includes(m.format) ? chip('Fun game') : ''}${chip('Getting ready')}</div>
       ${(() => { const card = (pid) => ({ attrs: `data-act="replaceFor" data-mid="${m.id}" data-pid="${pid}"`, label: 'Replace player' });
-        return `<div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`, card)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`, card)}</div>`; })()}
+        return `<div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`, card, wcPair(s, m, 'A'))}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`, card, wcPair(s, m, 'B'))}</div>`; })()}
       <p class="small muted">Drag a player onto someone in the other pair to swap partners. Tap a player's card to replace them with someone from outside, or their picture to see their profile. Placed ${fmtWhen(m.placedAt, { lower: true })}; the time starts when you tap Start match.</p>
       ${b ? notice('bad', `${esc(b.text)}. Replace the player or send the match back to the queue.`) : ''}
       ${(() => { const n = swapCandidate(s, m), at = n ? waiting(s).indexOf(n) + 1 : 0; return `<div class="row"><button class="btn sm" data-act="openReplace" data-id="${m.id}">Replace player</button><button class="btn sm" data-act="openMoveCourt" data-id="${m.id}">Move to another court</button><button class="btn sm" data-act="openSwap" data-id="${m.id}" ${n ? '' : 'disabled'}>${n ? `Swap with #${at}` : 'Swap with the queue'}</button></div>
@@ -7951,7 +8046,7 @@ const SHEETS = {
         const card = (pid) => ({ attrs: `data-act="playerAction" data-mid="${m.id}" data-pid="${pid}"`, label: 'Substitute or replace' });
         // Owner artifact comment, November 19, 2026: drag a player onto the other pair to swap partners (also while playing);
         // tap a card to bring in a player from outside.
-        return `<div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`, card)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`, card)}</div><p class="small muted" style="margin:0">Drag a player onto someone in the other pair to swap partners. Tap a player's card to bring in someone from outside (substitute or replace), or their picture to see their profile.</p>`; })()}
+        return `<div class="qteams">${faceTeam(s, m.teamA, 'Team A', `m:${m.id}`, card, wcPair(s, m, 'A'))}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', `m:${m.id}`, card, wcPair(s, m, 'B'))}</div><p class="small muted" style="margin:0">Drag a player onto someone in the other pair to swap partners. Tap a player's card to bring in someone from outside (substitute or replace), or their picture to see their profile.</p>`; })()}
       ${(m.subs || []).map((x) => `<p class="small muted">Substitution: ${esc(subLine(x, m))}.</p>`).join('')}
       <div class="row"><button class="btn sm" data-act="openMoveCourt" data-id="${m.id}" ${freeCourts(s).length >= courtsNeeded(m) ? '' : 'disabled title="No court is free"'}>Move to a free court</button></div>
       <p class="small muted">The court stays in use until you confirm a winner or mark the match invalid. Closing this doesn't end the game.</p>`,
@@ -8132,13 +8227,39 @@ const SHEETS = {
       return `<div class="slot-row"><button class="slot-btn${sh.err && dup.includes(v) ? ' bad' : ''}" id="slot-${team}-${i}" data-act="pickSlot" data-swap="ed" data-team="${team}" data-i="${i}" data-pid="${v}" title="${SWAP_TIP}" aria-label="${label}: ${esc(p.name)}. Change. Left or right arrow switches sides">${avatar(p)}<span class="main"><b>${esc(p.name)}</b><span class="small muted">${esc(lvLabel(r.level))} · ${gamesOf(s, v)}/${s.minimum}${!r.present ? ' · not present' : a ? (a.status === 'oncourt' ? ' · on court' : ' · playing now') : ''}</span></span><span class="small muted">Change</span></button>
         <button class="btn xs ghost icon-btn" data-act="clearSlot" data-team="${team}" data-i="${i}" aria-label="Clear ${label}">${I.x}</button></div>`;
     };
+    // Win chance beside each team (D-WIN-CHANCE); live as the lineup changes, none while a team is empty.
+    const wcLine = { teamA: sh.teamA.filter(Boolean), teamB: sh.teamB.filter(Boolean), status: sh.id ? (s.matches.find((x) => x.id === sh.id) || {}).status : undefined };
     return sheetShell(sh.id ? 'Edit lineup' : 'Add match', `
       <div class="field"><span>Format</span><div class="row">${fmts.map((f) => `<button class="btn xs" aria-pressed="${sh.format === f}" data-act="editorFormat" data-v="${f}">${FORMAT_LABEL[f]}</button>`).join('')}</div>
       ${FUN.includes(sh.format) ? `<span class="hint">Counts toward session games and the minimum; excluded from long-term player performance.${sh.format === '5v5' ? ' 5v5 occupies two courts.' : ''}</span>` : ''}</div>
-      <div class="slots"><div class="slot-col"><span class="label">Team A</span>${Array.from({ length: na }, (_, i) => slotSel('teamA', i)).join('')}</div><div class="slot-col"><span class="label">Team B</span>${Array.from({ length: nb }, (_, i) => slotSel('teamB', i)).join('')}</div></div>
+      <div class="slots"><div class="slot-col"><div class="between" style="flex-wrap:nowrap"><span class="label">Team A</span>${wcPair(s, wcLine, 'A')}</div>${Array.from({ length: na }, (_, i) => slotSel('teamA', i)).join('')}</div><div class="slot-col"><div class="between" style="flex-wrap:nowrap"><span class="label">Team B</span>${wcPair(s, wcLine, 'B')}</div>${Array.from({ length: nb }, (_, i) => slotSel('teamB', i)).join('')}</div></div>
       ${sh.err ? `<span class="err">${esc(sh.err)}</span>` : ''}
       <p class="small muted">Drag a player onto a slot on the other team to switch sides. A player who's playing now can go into a later match. That match can't start until they're free. Saving doesn't take a court.</p>`,
       `<button class="btn" data-act="closeSheet">Cancel</button><button class="btn primary" data-act="saveEditor">${sh.id ? 'Save lineup' : 'Add to queue'}</button>`, true);
+  },
+  // D-WIN-CHANCE (owner, November 27, 2026: "win rates should be clickable with explanation in a dialog"). Opened from any win chance
+  // chip or pill; it keeps the dialog under it in `back`, so Close returns to that dialog with its state intact.
+  winChance(sh) {
+    const s = cur();
+    const real = sh.mid && s.matches.find((x) => x.id === sh.mid);
+    const m = real || { teamA: String(sh.ta || '').split(',').filter(Boolean), teamB: String(sh.tb || '').split(',').filter(Boolean), status: sh.st || undefined };
+    const done = m.status === 'done' || m.status === 'invalid';
+    const w = wcOf(s, m), upset = wcUpset(s, m);
+    const sgn = (v) => v === 0 ? '0.00' : (v < 0 ? '\u2212' : '+') + Math.abs(v).toFixed(2);
+    const block = (ids, team) => {
+      const pct = wcPct(w, team), favored = w.tier === 'fav' && w.fav === team;
+      const reads = ids.map((pid) => ({ pid, ...wcRows(s, pid, done ? null : m) }));
+      const avg = reads.reduce((t, x) => t + x.total, 0) / Math.max(1, reads.length);
+      return `<section class="wcx-team" aria-label="Team ${team}, ${pct}%">
+        <div class="wcx-head"><span class="wcx-pair">${esc(ids.map(short).join(' & '))}</span><div class="wcx-pct"><b class="${pct >= 65 ? 'fav' : ''}">${pct}%</b>${favored ? chip('Favored', 'ok') : ''}</div></div>
+        ${reads.map((x) => `<div class="wcx-p"><div class="wcx-who">${avatar(P(x.pid))}<span class="main"><b>${esc(nm(x.pid))}</b><span class="small muted tnum">Form rating ${x.total.toFixed(1)}</span></span></div>
+          <ul class="wcx-rows">${x.rows.map((r) => `<li><span>${r.label}</span><span class="d">${esc(r.detail)}</span><span class="v">${r.plain ? r.value : sgn(r.value)}</span></li>`).join('')}</ul></div>`).join('')}
+        <p class="small muted tnum" style="margin:0">Team average ${avg.toFixed(1)}</p></section>`;
+    };
+    return sheetShell(`Win chance${upset ? ` ${chip('Upset', 'warn')}` : ''}`, `<div class="wcx-teams">${block(m.teamA, 'A')}${block(m.teamB, 'B')}</div>
+      <p class="small muted" style="margin:0">Each pair's chance comes from the gap between the two team averages: one level apart is about 76%. Favored means 65% or more. An Upset is a match the Favored pair lost.</p>
+      ${done ? `<p class="small muted" style="margin:0">A finished match is read from the lasting signals only: level, club win rate, best day and leaderboard.</p>` : ''}`,
+      '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>', true);
   },
   suggest(sh) {
     const s = cur();
@@ -8151,11 +8272,11 @@ const SHEETS = {
     // Owner artifact comment, November 26, 2026: "add a reshuffle button, add a animation". Reshuffle draws a different fair lineup;
     // the faces deal back in (a short staggered flip). CSS only: the prototype has no React, so no React Motion.
     return sheetShell('Suggested match', `<div class="between"><div class="row">${chip(matchLabel(m), 'solid')}${chip(MODES[s.mode].label + ' mode')}</div><button type="button" class="btn sm" data-act="reshuffleSuggest">${I.swap} Reshuffle</button></div>
-      <div class="qteams${sh.shuf ? ' shuffle' : ''}" ${sh.shuf ? `data-shuf="${sh.shuf}"` : ''}>${faceTeam(s, m.teamA, 'Team A', 'sg', sgCard)}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', 'sg', sgCard)}</div>
+      <div class="qteams${sh.shuf ? ' shuffle' : ''}" ${sh.shuf ? `data-shuf="${sh.shuf}"` : ''}>${faceTeam(s, m.teamA, 'Team A', 'sg', sgCard, wcPair(s, m, 'A'))}<span class="vs">VS</span>${faceTeam(s, m.teamB, 'Team B', 'sg', sgCard, wcPair(s, m, 'B'))}</div>
       <p class="small muted">Tap a player to replace them. Drag a player onto someone on the other team to switch sides.</p>
       <div class="card stack tight"><span class="label">Why this lineup</span>
         ${below.length ? `<p class="small">${esc(listNames(below))} ${below.length > 1 ? 'are' : 'is'} below the minimum (${below.map((p) => `${esc(short(p))} ${gamesOf(s, p)}/${s.minimum}`).join(', ')}).</p>` : '<p class="small">Everyone here has met the minimum; they have the fewest games among present players.</p>'}
-        <p class="small muted">Teams are split by assigned levels to suit ${MODES[s.mode].label} mode.</p></div>`,
+        <p class="small muted">Teams are split by win chance to suit ${MODES[s.mode].label} mode.</p></div>`,
       `<button class="btn" data-act="sheetBack">${I.back} Back</button><button class="btn primary" data-act="addSuggest">Add to queue</button>`);
   },
   autoReview(sh) {
@@ -8357,7 +8478,8 @@ function splitTeams(s, pick, fmt, lvOf) {
   const o = easy ? opts[opts.length - 1] : opts[0];
   return { teamA: o.A, teamB: o.B };
 }
-function generate(s, n) {
+// Suggest (one match) passes the form rating behind Win chance as lvOf (owner, November 27, 2026); Main Queue regeneration keeps the assigned level.
+function generate(s, n, lvOf) {
   const present = s.roster.filter((r) => r.present).map((r) => r.pid);
   const fmts = [...(s.doubles ? ['doubles'] : []), ...(s.singles ? ['singles'] : [])];
   if (!fmts.length) return { error: 'Singles and doubles are both off for this session, so there is nothing to generate. Add a fun game manually instead.' };
@@ -8372,7 +8494,7 @@ function generate(s, n) {
       break;
     }
     const pick = present.slice().sort((a, b) => load[a] - load[b]).slice(0, size);
-    out.push({ format: fmt, ...splitTeams(s, pick, fmt) });
+    out.push({ format: fmt, ...splitTeams(s, pick, fmt, lvOf) });
     pick.forEach((p) => { load[p] += 1; });
   }
   return { matches: out };
@@ -8561,6 +8683,7 @@ const ACT = {
   qView: (d) => { S.ui.qView = d.v === 'grid' ? 'grid' : 'slide'; render(); },
   qsStep: (d) => { const el = document.getElementById('qslide'); if (!el) return; const card = el.querySelector('.qtile'); const step = card ? card.offsetWidth + 10 : 300; el.scrollBy({ left: (+d.d || 1) * step, behavior: reduceMotion() ? 'auto' : 'smooth' }); },
   lhCourt: (d) => { S.ui.lhCourt = d.v; render(); },
+  openWinChance: (d) => openSheet({ type: 'winChance', ta: d.ta, tb: d.tb, st: d.st, mid: d.mid || '', back: S.ui.sheet || null }),
   openSessionGames: (d) => openSheet({ type: 'sessionGames', pid: d.pid, tab: 'matches' }),
   ppTab: (d) => { S.ui.sheet = { ...S.ui.sheet, tab: d.v }; render(); },
   ddPick: (d) => { S.ui.courtMenu = null; if (d.menu === 'dd-prep') ACT.prepTab({ k: d.v }); else if (d.menu === 'dd-console') ACT.pane({ k: d.v }); else { ACT.rvSet({ k: 'tab', v: d.v }); } const b = document.querySelector(`[data-act="toggleCourtMenu"][data-id="${d.menu}"]`); if (b) b.focus(); },
@@ -9702,7 +9825,7 @@ const ACT = {
     else addMatch(s, { format: sh.format, teamA: A, teamB: B }, 'manual', true);
     S.ui.sheet = null; S.ui.pane = 'queue'; commit(sh.id ? 'Lineup saved · protected from regeneration' : `Match added to the queue${autoNote(s, autoFill(s))}`); render();
   },
-  openSuggest: (d) => { const r = generate(cur(), 1); openSheet({ type: 'suggest', lineup: r.matches ? r.matches[0] : null, error: r.error, court: (d && d.court) || null, back: S.ui.sheet || null }); },
+  openSuggest: (d) => { const r = generate(cur(), 1, (p) => wcRating(cur(), p, {})); openSheet({ type: 'suggest', lineup: r.matches ? r.matches[0] : null, error: r.error, court: (d && d.court) || null, back: S.ui.sheet || null }); },
   sgReplace: (d) => { S.ui.sheet = { type: 'sgPick', out: d.pid, back: S.ui.sheet }; render(); },
   sgPickBack: () => closeSheet(),
   // Edit from Put a match on Court N: the editor returns to that dialog when closed.
@@ -9714,10 +9837,10 @@ const ACT = {
     toast(sh.from === 'match' ? `${short(out)} and ${short(inn)} swapped places` : `${P(inn).name} in for ${P(out).name}`); },
   reshuffleSuggest: () => {
     const sh = S.ui.sheet, key = (m) => (m ? [...m.teamA].sort().join() + '|' + [...m.teamB].sort().join() : ''), before = key(sh.lineup);
-    let r = null; for (let i = 0; i < 8; i++) { r = generate(cur(), 1); if (!r.matches || key(r.matches[0]) !== before) break; }
+    let r = null; for (let i = 0; i < 8; i++) { r = generate(cur(), 1, (p) => wcRating(cur(), p, {})); if (!r.matches || key(r.matches[0]) !== before) break; }
     sh.lineup = r.matches ? r.matches[0] : null; sh.error = r.error; sh.edited = false; sh.shuf = Date.now(); render(); setTimeout(() => { sh.shuf = 0; }, 800); // animate once, not on later renders
   },
-  skipSuggest: () => { const r = generate(cur(), 1); S.ui.sheet.lineup = r.matches ? r.matches[0] : null; S.ui.sheet.error = r.error; render(); },
+  skipSuggest: () => { const r = generate(cur(), 1, (p) => wcRating(cur(), p, {})); S.ui.sheet.lineup = r.matches ? r.matches[0] : null; S.ui.sheet.error = r.error; render(); },
   editSuggest: () => { const m = S.ui.sheet.lineup; openSheet({ type: 'editor', id: null, format: m.format, teamA: m.teamA.slice(), teamB: m.teamB.slice() }); },
   addSuggest: () => { const s = cur(); addMatch(s, S.ui.sheet.lineup, 'suggested', !!S.ui.sheet.edited); S.ui.sheet = null; S.ui.pane = 'queue'; commit(`Suggestion added to the queue${autoNote(s, autoFill(s))}`); render(); },
   queueWorkspace: (d) => { S.ui.pane = d.k === 'auto' ? 'generate' : 'queue'; render(); },

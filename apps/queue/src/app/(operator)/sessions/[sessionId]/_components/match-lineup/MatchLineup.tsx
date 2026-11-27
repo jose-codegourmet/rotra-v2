@@ -7,10 +7,11 @@ import {
   waitMinutes,
 } from '@rotra/data/match/match.rules'
 import { pickerOrder } from '@rotra/data/match/queue.rules'
-import type { MatchLineup as Lineup } from '@rotra/data/match/types'
+import type { MatchLineup as Lineup, Match } from '@rotra/data/match/types'
 import { useAddMatch } from '@rotra/data/match/useAddMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useUpdateMatchLineup } from '@rotra/data/match/useUpdateMatchLineup'
+import { winChance } from '@rotra/data/match/win-chance'
 import { MockError } from '@rotra/data/mock/errors'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
@@ -19,6 +20,7 @@ import type { MatchLineupFormValues } from '@rotra/ui/forms/match-lineup-form/sc
 import type { PlayerPickerCandidate } from '@rotra/ui/player-picker-sheet'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 
 /** What opened the sheet: Add match (optionally pre-filled by Edit then add) or Edit on a waiting match */
 export type MatchLineupRequest =
@@ -59,6 +61,7 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
   const matches = useSessionMatches(sessionId)
   const addMatch = useAddMatch()
   const updateLineup = useUpdateMatchLineup()
+  const winChanceDialog = useWinChanceDialog(roster.data?.roster, matches.data)
   const [serverError, setServerError] = useState<string | undefined>()
   // One save per attempt: a second tap can land before isPending reaches this render.
   const saving = useRef(false)
@@ -79,6 +82,18 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
     : request.mode === 'add'
       ? request.lineup
       : undefined
+
+  // The lineup as filled now (the form passes only complete lineups). The win chance math ignores
+  // the format; the edited match's state is passed so its own signals are read the same way.
+  const lineupOf = (l: {
+    teamA: string[]
+    teamB: string[]
+  }): Lineup & { state?: Match['state'] } => ({
+    format: lineup?.format ?? 'doubles',
+    teamA: l.teamA,
+    teamB: l.teamB,
+    state: editing?.state,
+  })
 
   const players: PlayerPickerCandidate[] = pickerOrder(
     roster.data.roster,
@@ -131,21 +146,26 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
 
   return (
     // Remounted per request so the format and slots start from that request, never a previous one
-    <MatchLineupForm
-      key={editing ? `edit:${editing.id}` : 'add'}
-      open
-      onOpenChange={(open) => {
-        if (!open) close()
-      }}
-      mode={editing ? 'edit' : 'add'}
-      enabledFormats={{ singles: s.allowSingles, doubles: s.allowDoubles }}
-      players={players}
-      minimumGames={s.minimumGames}
-      lineup={lineup}
-      onSubmit={onSubmit}
-      isPending={addMatch.isPending || updateLineup.isPending}
-      serverError={serverError}
-      onCancel={close}
-    />
+    <>
+      <MatchLineupForm
+        key={editing ? `edit:${editing.id}` : 'add'}
+        open
+        onOpenChange={(open) => {
+          if (!open) close()
+        }}
+        mode={editing ? 'edit' : 'add'}
+        enabledFormats={{ singles: s.allowSingles, doubles: s.allowDoubles }}
+        players={players}
+        minimumGames={s.minimumGames}
+        lineup={lineup}
+        onSubmit={onSubmit}
+        isPending={addMatch.isPending || updateLineup.isPending}
+        serverError={serverError}
+        onCancel={close}
+        winChanceOf={(l) => winChance(lineupOf(l), roster.data.roster, all)}
+        onOpenWinChance={(l) => winChanceDialog.open(lineupOf(l))}
+      />
+      {winChanceDialog.dialog}
+    </>
   )
 }

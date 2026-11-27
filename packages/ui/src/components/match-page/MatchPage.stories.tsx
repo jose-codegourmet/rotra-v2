@@ -1,5 +1,7 @@
 import { joseGame, joseSession } from '@rotra/data/fixtures/player-games'
+import { sampleForm } from '@rotra/data/match/win-chance'
 import type { MatchPage as MatchPageData, MatchPagePlayer } from '@rotra/data/match-page/types'
+import { gameWinChanceBreakdown } from '@rotra/data/player/game-win-chance'
 import type { PlayerGame, PlayerGamePlayer } from '@rotra/data/player/types'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MatchPage } from './MatchPage'
@@ -253,3 +255,55 @@ export const YourStatsPicked: Story = {
   },
 }
 export const YourStatsPickedLight: Story = { ...YourStatsPicked, globals: { theme: 'light' } }
+
+// Sample lasting signals, as the mock read makes them; the masked player has no club record here.
+const SUNDAY = 0
+const winChance = (winner: 'left' | 'right', teamBLevel: 'intermediate_mid' | 'advanced_high') =>
+  gameWinChanceBreakdown(
+    'doubles',
+    [
+      { level: 'intermediate_mid', form: sampleForm('jose', SUNDAY) },
+      { level: 'intermediate_low', form: sampleForm('dalton', SUNDAY) },
+    ],
+    [{ level: teamBLevel, form: sampleForm('gab', SUNDAY) }, { level: teamBLevel }],
+    winner,
+  ) ?? undefined
+
+/**
+ * Win chance (D-2026-11-27-03): the pill on the court and each team's percent beside Won / Lost;
+ * all three open the Win chance dialog. A masked name stays masked in the dialog.
+ */
+export const WinChance: Story = {
+  args: { page: { ...page, winChance: winChance('right', 'intermediate_mid') } },
+  globals: { theme: 'dark' },
+}
+export const WinChanceLight: Story = { ...WinChance, globals: { theme: 'light' } }
+export const WinChancePhone: Story = {
+  ...WinChance,
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}
+/** The viewer was on Team B: the percents turn round with the court. */
+export const WinChanceOnTeamB: Story = {
+  args: {
+    page: { ...page, viewerPlayerId: 'gab', winChance: winChance('right', 'intermediate_mid') },
+  },
+  globals: { theme: 'dark' },
+}
+/** The Favored pair lost: the Upset pill on the court and the Upset chip in the dialog title. */
+export const WinChanceUpset: Story = {
+  args: { page: { ...page, winner: 'a', winChance: winChance('left', 'advanced_high') } },
+  globals: { theme: 'dark' },
+}
+export const WinChanceUpsetLight: Story = { ...WinChanceUpset, globals: { theme: 'light' } }
+export const WinChanceDialogOpen: Story = {
+  ...WinChance,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole('button', { name: /^Win chance \d+% · \d+%\. Explain/i }),
+    )
+  },
+}
+export const WinChanceDialogOpenLight: Story = {
+  ...WinChanceDialogOpen,
+  globals: { theme: 'light' },
+}

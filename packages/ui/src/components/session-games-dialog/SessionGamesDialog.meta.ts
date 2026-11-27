@@ -8,6 +8,7 @@ export const sessionGamesDialogMeta = {
     'Presentational: pass the player’s finished matches (any order, the dialog sorts latest first), the planned queue matches (nearest first) and `gamesPlayed`. Each match carries its own `counting` (counts, not-counted, invalid).',
     '`setByHand` adds “includes +N set by hand”; the “N waiting in the Main Queue” part follows `planned.length`. `onCourt` shows the notice “NAME is playing on Court 2 now (Match 18). It counts after Match done.” (“getting ready” for a Getting ready match; the sentence “It counts…” only on Matches).',
     'A face calls `onOpenProfile(playerId)`. “Back to games” is the caller’s job: close this dialog (`open` false), open the profile with a Back button, and on Back set `open` true again. Keep the picked pill with `tab` and `onTabChange` so Back returns to the same pill.',
+    'Optional `winChance` / `upset` on a finished or planned match show the corner pill (and Upset pill); `onOpenWinChance(matchId)` makes them open WinChanceDialog, which the caller stacks on top of this dialog.',
     'Opened from the games badge (`onOpenGames` on CourtCard, MatchCard); a badge inside another dialog stays display only.',
     'Empty copy: “NAME has no finished matches yet this session.”; “NAME isn’t in the Main Queue right now.”',
   ],

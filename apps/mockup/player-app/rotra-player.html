@@ -872,7 +872,14 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .gm-res { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; margin: 0 4px; border-radius: 12px; background: rgba(0, 0, 0, .78); color: #fff; text-align: center; min-width: 96px; }
 /* Artifact comment, same day ("find a way for the center to be readable and not cramped"): the centre keeps only the score and the result;
    the format is a pill in the top-left corner and Share an icon in the top-right corner. */
-.gm-fmt { position: absolute; z-index: 2; top: 8px; left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; background: rgba(0, 0, 0, .72); color: rgba(255, 255, 255, .85); }
+.gm-pills { position: absolute; z-index: 2; top: 8px; left: 8px; display: flex; align-items: center; gap: 4px; max-width: calc(100% - 52px); }
+/* Win chance (D-2026-11-27-03): second pill after the format, then Upset in the warn colour. Lists draw it as text only; the Game page draws a button. */
+.gm-wc { font-variant-numeric: tabular-nums; }
+.gm-wc.up { color: var(--warn); }
+button.gm-wc { border: 0; font-family: inherit; cursor: pointer; }
+button.gm-wc:hover { box-shadow: 0 0 0 2px var(--accent); }
+button.gm-wc:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gm-fmt { padding: 1px 8px; white-space: nowrap; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; background: rgba(0, 0, 0, .72); color: rgba(255, 255, 255, .85); }
 .gm-score { font-family: var(--mono); font-size: 22px; font-weight: 700; line-height: 1; white-space: nowrap; }
 .gm-share { position: absolute; z-index: 2; top: 6px; right: 6px; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; background: rgba(0, 0, 0, .72); color: #fff; cursor: pointer; }
 .gm-share:hover { background: rgba(0, 0, 0, .9); box-shadow: 0 0 0 2px var(--accent); }
@@ -885,7 +892,7 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .gm-open { position: absolute; inset: 0; z-index: 0; padding: 0; border: 0; border-radius: 8px; background: none; cursor: pointer; }
 .gm-open:hover { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .55); }
 .gm-open:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.gm-court.opens .gm-side, .gm-court.opens .gm-res, .gm-court.opens .gm-fmt { pointer-events: none; }
+.gm-court.opens .gm-side, .gm-court.opens .gm-res, .gm-court.opens .gm-pills { pointer-events: none; }
 .gm-court.opens .gm-pl, .gm-court.opens .gm-share { pointer-events: auto; }
 /* Skill-group rings on the match page court: the picture's own border is the skill group (the public session tiles' colors);
    the winning side keeps an outer accent ring, set off from the skill ring by a dark gap so both read. */
@@ -918,7 +925,32 @@ a.srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .vs-body { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: center; }
 .vs-team { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 10px; border-radius: var(--r); background: var(--elev); align-self: stretch; justify-content: center; }
 .vs-team.won { background: var(--accent-subtle); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
-.vs-team.won > .label { color: var(--accent); }
+.vs-team.won .vs-hdrow > .label { color: var(--accent); }
+.vs-hdrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.vs-hdrow > .vs-teamhd { flex: 1 1 auto; min-width: 0; width: auto; }
+.vs-team.r .vs-hdrow { flex-direction: row-reverse; }
+button.chip.wc-chip { font-family: inherit; font-size: 12px; font-variant-numeric: tabular-nums; cursor: pointer; flex: none; }
+button.chip.wc-chip:hover { box-shadow: 0 0 0 2px var(--accent); }
+button.chip.wc-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* P-WIN-CHANCE dialog (D-2026-11-27-03) */
+.wcd-teams { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 640px) { .wcd-teams { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.wcd-team { display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: var(--r); background: var(--elev); border: 1px solid var(--border); min-width: 0; }
+.wcd-team.fav { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.wcd-hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.wcd-hd b { font-size: 14px; }
+.wcd-pct { display: flex; align-items: center; gap: 8px; }
+.wcd-pct .big { font-family: var(--mono); font-size: 32px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.wcd-team.fav .wcd-pct .big { color: var(--accent); }
+.wcd-pl { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--border); }
+.wcd-who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.wcd-who .avatar { width: 32px; height: 32px; font-size: 12px; }
+.wcd-who span.small { display: block; }
+.wcd-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: baseline; font-size: 13px; }
+.wcd-row .d { grid-column: 1; color: var(--fg2); font-size: 12px; }
+.wcd-row .v { grid-row: 1 / span 2; grid-column: 2; font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; align-self: center; }
+.wcd-avg { display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border); font-weight: 700; font-size: 13px; }
+.wcd-avg .v { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .vs-team.r { text-align: right; }
 .vs-p { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 48px; padding: 6px; border: 1px solid transparent; border-radius: var(--r-sm); background: none; color: var(--fg); font: inherit; text-align: inherit; cursor: pointer; }
 .vs-team.r .vs-p { flex-direction: row-reverse; }
@@ -1778,6 +1810,40 @@ const people = (names) => listNames(names.map(esc));
 // solid court green, white lines, a dashed net — with faces ringed in white and names on dark pills.
 const gmCourtSVG = () => `<svg class="gm-svg" viewBox="0 0 134 61" preserveAspectRatio="none" aria-hidden="true"><rect width="134" height="61" fill="var(--court)"/><g fill="none" stroke="var(--court-line)" stroke-width="1.5" vector-effect="non-scaling-stroke"><rect x="0.75" y="0.75" width="132.5" height="59.5" vector-effect="non-scaling-stroke"/><path d="M0 4.6H134M0 56.4H134M7.6 0V61M126.4 0V61M47.2 0V61M86.8 0V61M0 30.5H47.2M86.8 30.5H134" vector-effect="non-scaling-stroke"/></g><path d="M67 0V61" stroke="var(--court-line)" stroke-width="3" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/></svg>`;
 const idByName = (n) => { const a = Object.keys(S.accounts).find((k) => S.accounts[k].name === n); if (a) return a; const i = BASE.findIndex((e) => e.name === n); return i >= 0 ? `b${i}` : null; };
+// ---------- Win chance (D-2026-11-27-03; owner, November 27, 2026) ----------
+// The Queue's Win chance (D-2026-11-27-02), read from the lasting signals only because the Player app shows finished games: level,
+// club win rate, best day, leaderboard place and direction. Never tonight's signals, never Handicap. Team = average of its players'
+// form ratings; chance = 1 / (1 + 10^((opponents - own) / 2)), kept between 5% and 95%; Favored = 65% or more; Upset = the Favored
+// pair lost. Same sample data as the Queue mockup: made from the player id; a player with no account or record counts as level only.
+// One function (wcGame) feeds the pill, the team chips and the dialog rows, so the numbers always agree.
+const wcSeed = (pid) => { let h = 7; for (const ch of String(pid)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
+function wcPlayer(n) {
+  const id = idByName(n), p = id ? profileOf(id) : null, level = p && p.level != null ? p.level : 4;
+  const out = { n, id, p, level, rec: false, winRate: 0.5, wr: 0, best: 0, place: 0, trend: 0 };
+  if (p && !p.guest) {
+    const h = wcSeed(id);
+    out.rec = true; out.winRate = 0.35 + (h % 31) / 100;
+    out.wr = Math.max(-1, Math.min(1, (out.winRate - 0.5) * 2));
+    out.best = (h >>> 5) % 7 === new Date().getDay() ? 0.25 : 0;
+    out.place = [0.25, 0, 0, -0.25][(h >>> 8) % 4]; out.trend = [-0.25, 0, 0.25][(h >>> 10) % 3];
+  }
+  out.rating = level + out.wr + out.best + out.place + out.trend;
+  return out;
+}
+// left and right are name lists as the court is drawn; res is the left side's result ('W' or 'L').
+function wcGame(left, right, res) {
+  if (!left.length || !right.length) return null;
+  const side = (names) => { const players = names.map(wcPlayer); return { players, avg: players.reduce((t, x) => t + x.rating, 0) / players.length }; };
+  const l = side(left), r = side(right);
+  const a = Math.max(0.05, Math.min(0.95, 1 / (1 + 10 ** ((r.avg - l.avg) / 2))));
+  l.pct = Math.round(a * 100); r.pct = 100 - l.pct;
+  const top = Math.max(l.pct, r.pct), fav = top >= 65 ? (l.pct > r.pct ? 'l' : 'r') : null;
+  l.fav = fav === 'l'; r.fav = fav === 'r';
+  const upset = !!fav && !!res && ((fav === 'l') !== (res === 'W'));
+  return { l, r, fav, upset, text: `${l.pct}% · ${r.pct}%` };
+}
+const wcOfGame = (g, whoName) => (g.kind === 'partial' || !whoName ? null : wcGame([whoName, ...g.partner], g.opp, g.res));
+const wcSigned = (v) => { const x = Math.round(v * 100) / 100; return x === 0 ? '0.00' : `${x < 0 ? '−' : '+'}${Math.abs(x).toFixed(2)}`; };
 // Match page (mockup change 2026-11-25-player-match-page). `o.open` (default on): the court box opens the game's match page; the faces
 // and the share button keep their own actions. `o.rings`: each face gets its skill-group ring (the match page court). `o.mask`: names
 // follow the profile privacy rules for this viewer (the match page is public). `at.ownerName`: the profile whose session this is, when
@@ -1786,6 +1852,7 @@ const skillGroupOf = (p) => (!p || p.level == null || hiddenFromViewer(p) ? 'non
 const faceMasked = (q) => (q.real ? hiddenFromViewer(q.p) : !S.me);
 function gameRow(g, who, ctx = null, at = null, o = {}) {
   const won = g.res === 'W', partial = g.kind === 'partial', opens = o.open !== false && !!g.mid;
+  const wc = wcOfGame(g, who ? who.name : null);
   // Owner, November 14, 2026: each face carries how many games that person had played in that session up to and
   // including this one (the Queue console's face badge). The profile owner's count is the game's place in the session;
   // the others count their appearances in the session's games so far.
@@ -1810,7 +1877,7 @@ function gameRow(g, who, ctx = null, at = null, o = {}) {
   const score = g.score ? `<span class="gm-score tnum" aria-label="Score ${g.score}">${g.score}</span>` : '<span class="gm-noscore" title="Winner recorded; score not entered">No score</span>';
   const nm = (n) => (o.mask && faceMasked(other(n)) ? maskName(n) : n), meName = o.mask && whoQ && faceMasked(whoQ) ? maskName(meLabel) : meLabel;
   const label = `${esc(g.fmt)}: ${esc(meName)}${g.partner.length ? ` and ${esc(g.partner.map(nm).join(' and '))}` : ''} versus ${esc(g.opp.map(nm).join(' and '))}`;
-  return `<div class="gm${partial ? ' partial' : ''}${o.rings ? ' rings' : ''}"><div class="gm-court ${won ? 'w-left' : 'w-right'}${opens ? ' opens' : ''}" role="group" aria-label="${label}">${gmCourtSVG()}${opens ? `<button type="button" class="gm-open" data-act="openMatch" data-mid="${esc(g.mid)}" aria-label="Open the match page: ${label}"></button>` : ''}<div class="gm-side">${mine}</div><span class="gm-fmt">${esc(g.fmt)}</span>${ctx && !partial ? `<button type="button" class="gm-share" data-act="openShare" data-kind="game" data-sid="${esc(ctx.sid)}" data-gi="${ctx.gi}" aria-label="Share this game" title="Share this game">${I.share}</button>` : ''}<div class="gm-res">${score}${res}</div><div class="gm-side">${theirs}</div></div>${g.note ? `<div class="gm-note small">${esc(g.note)}${g.kind === 'unranked' ? '' : ' · not counted'}</div>` : ''}</div>`;
+  return `<div class="gm${partial ? ' partial' : ''}${o.rings ? ' rings' : ''}"><div class="gm-court ${won ? 'w-left' : 'w-right'}${opens ? ' opens' : ''}" role="group" aria-label="${label}">${gmCourtSVG()}${opens ? `<button type="button" class="gm-open" data-act="openMatch" data-mid="${esc(g.mid)}" aria-label="Open the match page: ${label}"></button>` : ''}<div class="gm-side">${mine}</div><div class="gm-pills"><span class="gm-fmt">${esc(g.fmt)}</span>${wc ? (o.wcMid ? `<button type="button" class="gm-fmt gm-wc" data-act="openWinChance" data-mid="${esc(o.wcMid)}" data-lead="${esc(who.name)}" aria-haspopup="dialog" aria-label="Win chance ${wc.l.pct}% and ${wc.r.pct}%. Explain">${wc.text}</button>` : `<span class="gm-fmt gm-wc" title="Win chance ${wc.text}">${wc.text}</span>`) + (wc.upset ? '<span class="gm-fmt gm-wc up">Upset</span>' : '') : ''}</div>${ctx && !partial ? `<button type="button" class="gm-share" data-act="openShare" data-kind="game" data-sid="${esc(ctx.sid)}" data-gi="${ctx.gi}" aria-label="Share this game" title="Share this game">${I.share}</button>` : ''}<div class="gm-res">${score}${res}</div><div class="gm-side">${theirs}</div></div>${g.note ? `<div class="gm-note small">${esc(g.note)}${g.kind === 'unranked' ? '' : ' · not counted'}</div>` : ''}</div>`;
 }
 // Owner, November 13, 2026: "in profile it should show latest sessions joined · when they click on the session then they will see their matches from there".
 // Replaces the Latest matches card: the four latest sessions this player played in, newest first; a row opens that session's matches in a dialog.
@@ -1871,7 +1938,7 @@ function viewMatch() {
   const lead = meName && (meName === owner.name || g.partner.includes(meName) || g.opp.includes(meName)) ? meName : owner.name;
   const drawn = gameFrom(g, owner.name, lead), at = (i) => ({ s, gi: i, ownerName: owner.name });
   const shareCtx = (n, i) => (owner.id === S.me && n === owner.name ? { sid: s.id, gi: i } : null);
-  const court = gameRow(funNote(drawn), matchWho(lead, owner), shareCtx(lead, gi), at(gi), { open: false, rings: true, mask: true });
+  const court = gameRow(funNote(drawn), matchWho(lead, owner), shareCtx(lead, gi), at(gi), { open: false, rings: true, mask: true, wcMid: S.viewId });
   const title = s.pageGone ? esc(s.title) : `<button type="button" class="sh-linkish" data-act="sessionPage" data-title="${esc(s.title)}">${esc(s.title)}</button>`;
   // Owner artifact comment, November 26, 2026: "design it like this [ COURT ] [ vs card ], only show stats when a person is clicked
   // from the vs card. The person click will show the stats, will show the win rate, will show the games played before the match."
@@ -1890,8 +1957,10 @@ function viewMatch() {
   // skill group (the court's colours); the accessible name still says it.
   const vsP = (x, side) => { const g = x.who.guest ? 'none' : skillGroupOf(x.who), gl = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced', none: x.who.guest ? 'Guest' : 'No skill group shown' }[g];
     return `<button type="button" class="vs-p lv-${g}${isOn(x) ? ' on' : ''}" data-act="mtPick" data-n="${esc(x.n)}" aria-pressed="${isOn(x)}" aria-label="${esc(x.shown)}, ${gl}. Show stats">${x.pic}<span class="vs-n"><b>${esc(x.shown)}</b></span></button>`; };
+  const wcg = partial ? null : wcGame(left.map((x) => x.n), right.map((x) => x.n), drawn.res);
   const vsTeam = (list, side, w) => { const on = list.length > 1 && list.every(isOn), lab = !partial ? (w ? 'Won' : 'Lost') : 'Not counted';
-    return `<div class="vs-team ${side}${!partial && w ? ' won' : ''}${on ? ' on' : ''}">${list.length > 1 ? `<button type="button" class="vs-teamhd" data-act="mtPickTeam" data-side="${side}" aria-pressed="${on}" aria-label="${lab} team: show stats for ${esc(list.map((x) => x.shown).join(' and '))}"><span class="label">${lab}</span><span class="vs-both">${on ? 'Showing both' : `See ${list.length === 2 ? 'both' : `all ${list.length}`}`}</span></button>` : `<span class="label">${lab}</span>`}${list.map((x) => vsP(x, side)).join('')}</div>`; };
+    const wcs = wcg ? wcg[side] : null, wchip = wcs ? `<button type="button" class="chip wc-chip${wcs.fav ? ' ok' : ''}" data-act="openWinChance" data-mid="${esc(S.viewId)}" data-lead="${esc(lead)}" aria-haspopup="dialog" aria-label="Win chance ${wcs.pct}%${wcs.fav ? ', favored' : ''}. Explain">${wcs.pct}%</button>` : '';
+    return `<div class="vs-team ${side}${!partial && w ? ' won' : ''}${on ? ' on' : ''}"><div class="vs-hdrow">${list.length > 1 ? `<button type="button" class="vs-teamhd" data-act="mtPickTeam" data-side="${side}" aria-pressed="${on}" aria-label="${lab} team: show stats for ${esc(list.map((x) => x.shown).join(' and '))}"><span class="label">${lab}</span><span class="vs-both">${on ? 'Showing both' : `See ${list.length === 2 ? 'both' : `all ${list.length}`}`}</span></button>` : `<span class="label">${lab}</span>`}${wchip}</div>${list.map((x) => vsP(x, side)).join('')}</div>`; };
   const vs = `<section class="card vs-card" aria-label="Players"><div class="vs-head"><span class="chip solid">${esc(drawn.fmt)}</span><span class="small muted">Tap a player or a team for stats</span></div>
     <div class="vs-body">${vsTeam(left, 'l', won)}<div class="vs-mid"><span class="vs-badge">VS</span>${drawn.score ? `<span class="vs-score tnum">${esc(drawn.score)}</span>` : '<span class="small muted">No score</span>'}</div>${vsTeam(right, 'r', !won)}</div></section>`;
   const statCard = (pick) => {
@@ -4093,8 +4162,35 @@ const SHEETS_SESSION = (sh) => {
     <div><span class="label">${who} matches · ${r.n}</span>${x.games.map((g, gi) => gameRow(g.kind === 'fun' ? { ...g, note: 'Fun game' } : g, p, p.id === S.me ? { sid: x.id, gi } : null, { s: x, gi })).join('')}</div>`,
     `<button class="btn" data-act="closeSheet" data-autofocus>Close</button>${p.id === S.me ? `<button class="btn" data-act="openShare" data-kind="perf" data-sid="${esc(x.id)}">${I.share} Share performance</button>` : ''}${x.pageGone ? '' : `<button class="btn primary" data-act="sessionPage" data-title="${esc(x.title)}">Session page ${I.ext}</button>`}`);
 };
+// P-WIN-CHANCE (D-2026-11-27-03): the breakdown behind the win chance on a game. Opened from the Game page; rows and numbers come from wcGame.
+const SHEETS_WINCHANCE = (sh) => {
+  const x = matchOf(sh.mid);
+  if (!x) return sheetWrap('Win chance', '<div class="empty">This game could not be found.</div>', '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>');
+  const { owner, g } = x, drawn = gameFrom(g, owner.name, sh.lead), wc = wcGame([sh.lead, ...drawn.partner], drawn.opp, drawn.res);
+  const foot = '<button class="btn" data-act="closeSheet" data-autofocus>Close</button>';
+  if (!wc) return sheetWrap('Win chance', '<div class="empty">This game has no two sides.</div>', foot);
+  const view = (pl) => { const guest = !pl.p || pl.p.guest, q = guest ? { real: false, name: pl.n } : { real: true, p: pl.p }, hid = faceMasked(q);
+    return { hid, name: hid ? maskName(pl.n) : pl.n, short: hid ? maskName(pl.p ? firstName(pl.p) : pl.n.split(' ')[0]) : (pl.p && !guest ? firstName(pl.p) : pl.n.split(' ')[0]),
+      pic: avatar(guest ? { id: `x-${pl.n}`, name: hid ? maskName(pl.n) : pl.n, photo: hashStr(pl.n) % 4 !== 0 } : hid ? maskedView(pl.p) : pl.p) }; };
+  const rows = (pl) => [
+    ['Level', LEVELS[pl.level].label, String(pl.level), true],
+    ['Club win rate', pl.rec ? `${Math.round(pl.winRate * 100)}%` : 'No record · counts as 50%', wcSigned(pl.wr), true],
+    ['Best day', 'Plays best on this weekday', wcSigned(pl.best), pl.best !== 0],
+    ['Club leaderboard', pl.place > 0 ? 'Top quarter' : 'Bottom quarter', wcSigned(pl.place), pl.place !== 0],
+    ['Leaderboard direction', pl.trend > 0 ? 'Rising' : 'Falling', wcSigned(pl.trend), pl.trend !== 0],
+  ].filter((r) => r[3]).map((r) => `<div class="wcd-row"><span>${r[0]}</span><span class="d">${esc(r[1])}</span><span class="v">${r[2]}</span></div>`).join('');
+  const team = (t) => { const vs = t.players.map(view);
+    return `<section class="wcd-team${t.fav ? ' fav' : ''}" aria-label="${esc(vs.map((v) => v.short).join(' and '))}, ${t.pct}%">
+      <div class="wcd-hd"><b>${esc(vs.map((v) => v.short).join(' & '))}</b></div>
+      <div class="wcd-pct"><span class="big">${t.pct}%</span>${t.fav ? chip('Favored', 'ok') : ''}</div>
+      ${t.players.map((pl, i) => `<div class="wcd-pl"><div class="wcd-who">${vs[i].pic}<span><b>${esc(vs[i].name)}</b><span class="small muted">Form rating ${pl.rating.toFixed(1)}</span></span></div>${rows(pl)}</div>`).join('')}
+      <div class="wcd-avg"><span>Team average</span><span class="v">${t.avg.toFixed(1)}</span></div></section>`; };
+  return sheetWrap(`Win chance${wc.upset ? ` ${chip('Upset', 'warn')}` : ''}`, `<div class="wcd-teams">${team(wc.l)}${team(wc.r)}</div>
+    <p class="small muted">Each pair's chance comes from the gap between the two team averages: one level apart is about 76%. Favored means 65% or more. An Upset is a match the Favored pair lost. A finished match is read from the lasting signals only: level, club win rate, best day and leaderboard.</p>`, foot, true);
+};
 const SHEETS = {
   sessionGames: SHEETS_SESSION,
+  winChance: SHEETS_WINCHANCE,
   lbPlace: lbPlaceSheet,
   // Owner, November 13, 2026: a club profile dialog in the same style as the player card (banner strip, logo over it, name block, About).
   // Opened from the Clubs card on a profile; Open club page goes to the club page.
@@ -4341,6 +4437,7 @@ const ACT = {
   matchBack: () => { const f = S.ui.matchFrom; S.ui.matchFrom = null; if (f) go(f.to, f.id); else go('board'); },
   // Artifact comment, November 13, 2026: leaderboard rows and the podium open this card first; its Open full profile goes to the profile page.
   openClubCard: (el) => { S.ui.sheet = { type: 'clubCard', id: el.dataset.id }; render(); },
+  openWinChance: (el) => { S.ui.sheet = { type: 'winChance', mid: el.dataset.mid, lead: el.dataset.lead }; render(); },
   openSessionGames: (el) => { S.ui.sheet = { type: 'sessionGames', id: el.dataset.id, sid: el.dataset.sid }; render(); },
   openProfileCard: (el) => { S.ui.sheet = { type: 'profileCard', id: el.dataset.id || null, name: el.dataset.name || null }; render(); },
   gateLogin: () => { S.ui.after = { to: S.screen, id: S.viewId }; go('login'); },

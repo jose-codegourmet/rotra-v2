@@ -1,8 +1,10 @@
 import { clubNicknameOf } from '../club-player/clubNickname.rules'
 import { genderOf } from '../club-player/gender.rules'
+import { sampleForm } from '../match/winChance.rules'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
+import { sessionWeekday } from '../player/player.rules'
 import { isRealDataMode } from '../real/mode'
 import { realGetSessionNoShows, realGetSessionRoster } from '../real/queue'
 
@@ -31,6 +33,11 @@ export async function getSessionRoster(sessionId: string) {
   const returning = new Set(
     state.roster.filter((row) => priorSessionIds.has(row.sessionId)).map((row) => row.clubPlayerId),
   )
+  const guestIds = new Set(
+    state.clubPlayers
+      .filter((p) => p.identity === 'guest' || p.identity === 'pending')
+      .map((p) => p.id),
+  )
   return {
     roster: state.roster
       .filter((r) => r.sessionId === sessionId)
@@ -41,6 +48,10 @@ export async function getSessionRoster(sessionId: string) {
         // The Queue Master's own read only: public and player reads never get the club nickname.
         clubNickname: clubNicknameOf(state, r.clubPlayerId),
         gender: genderOf(state, r.clubPlayerId),
+        // Win chance inputs (D-2026-11-27-02): sample history; a guest has none.
+        form: guestIds.has(r.clubPlayerId)
+          ? undefined
+          : sampleForm(r.clubPlayerId, sessionWeekday(new Date(session.scheduledStartAt))),
       })),
     waitlist: state.waitlist
       .filter((w) => w.sessionId === sessionId)

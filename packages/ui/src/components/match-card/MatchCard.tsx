@@ -1,4 +1,5 @@
 import type { MatchFormat, MatchOrigin, MatchStatus } from '@rotra/data/match/types'
+import type { WinChance } from '@rotra/data/match/win-chance'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
@@ -10,7 +11,8 @@ import { levelLabel } from '@rotra/ui/level-pill'
 import { PlayerFaceButton, type PlayerWait } from '@rotra/ui/player-face-button'
 import { PlayerNameBlock } from '@rotra/ui/player-name-block'
 import { SwappablePlayer } from '@rotra/ui/swap-sides-area/swappable-player'
-import { type ComponentProps, Fragment } from 'react'
+import { WinChanceChip } from '@rotra/ui/win-chance-chip'
+import { type ComponentProps, Fragment, type ReactNode } from 'react'
 import { matchCardVariants } from './MatchCard.variants'
 
 /** One player on a queue card: picture and short name, full name and level for the label. */
@@ -134,6 +136,13 @@ export type MatchCardProps = {
    * `variant="compact"` and without `swappable`.
    */
   slide?: boolean
+  /**
+   * Win chance (D-2026-11-27-02): one chip beside each pair with that pair's percent (under the
+   * names on the compact variant). Queue Master only: never pass it to a read-only card.
+   */
+  winChance?: WinChance
+  /** Makes both win chance chips buttons that open WinChanceDialog */
+  onOpenWinChance?: () => void
   className?: string
 }
 
@@ -215,8 +224,11 @@ function Faces({
   onOpenGames,
   gamesBadge,
   highlightedPlayerIds = [],
+  after,
 }: {
   highlightedPlayerIds?: string[]
+  /** The pair's win chance chip, after the faces */
+  after?: ReactNode
   players: MatchCardPlayer[]
   team: MatchCardTeam
   swappable: boolean
@@ -259,6 +271,7 @@ function Faces({
           <Fragment key={p.id}>{face}</Fragment>
         )
       })}
+      {after}
     </div>
   )
 }
@@ -282,7 +295,9 @@ function StaticFaces({
   players,
   onOpenGames,
   gamesBadge,
+  after,
 }: {
+  after?: ReactNode
   players: MatchCardPlayer[]
   onOpenGames?: (playerId: string) => void
   gamesBadge: 'button' | 'static'
@@ -318,6 +333,7 @@ function StaticFaces({
           <GamesBadge player={p} mode={gamesBadge} onOpenGames={onOpenGames} />
         </div>
       ))}
+      {after}
     </div>
   )
 }
@@ -398,7 +414,9 @@ function CompactFaces({
   readOnly,
   onSelectPlayer,
   highlightedPlayerIds = [],
+  after,
 }: {
+  after?: ReactNode
   players: MatchCardPlayer[]
   team: MatchCardTeam
   swappable: boolean
@@ -432,6 +450,7 @@ function CompactFaces({
       <span className="min-w-0 truncate text-[13px] font-semibold text-fg">
         {players.map((p) => p.shortName).join(' & ')}
       </span>
+      {after}
     </div>
   )
 }
@@ -473,8 +492,20 @@ export function MatchCard({
   highlightedPlayerIds,
   variant = 'default',
   slide = false,
+  winChance,
+  onOpenWinChance,
 }: MatchCardProps) {
   const compact = variant === 'compact'
+  const chanceNames = { a: teamNames(teamA), b: teamNames(teamB) }
+  const chanceChip = (team: MatchCardTeam) =>
+    winChance && !readOnly ? (
+      <WinChanceChip
+        chance={winChance}
+        team={team}
+        teamNames={chanceNames}
+        onOpen={onOpenWinChance}
+      />
+    ) : null
   const ready = status.kind === 'ready'
   const badgeMode = gamesBadge ?? (onOpenGames ? 'button' : 'static')
   const formatLabel = categoryPrefix
@@ -541,9 +572,19 @@ export function MatchCard({
           <Chip>Draft</Chip>
           <Chip tone="solid">{formatLabel}</Chip>
         </div>
-        <StaticFaces players={teamA} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
+        <StaticFaces
+          players={teamA}
+          onOpenGames={onOpenGames}
+          gamesBadge={badgeMode}
+          after={chanceChip('A')}
+        />
         <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
-        <StaticFaces players={teamB} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
+        <StaticFaces
+          players={teamB}
+          onOpenGames={onOpenGames}
+          gamesBadge={badgeMode}
+          after={chanceChip('B')}
+        />
         {statusLine}
       </div>
     )
@@ -614,6 +655,7 @@ export function MatchCard({
             readOnly={readOnly}
             onSelectPlayer={onSelectPlayer}
             highlightedPlayerIds={highlightedPlayerIds}
+            after={chanceChip('A')}
           />
           <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
           <CompactFaces
@@ -623,12 +665,18 @@ export function MatchCard({
             readOnly={readOnly}
             onSelectPlayer={onSelectPlayer}
             highlightedPlayerIds={highlightedPlayerIds}
+            after={chanceChip('B')}
           />
         </div>
       ) : (
         <>
           {readOnly ? (
-            <StaticFaces players={teamA} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
+            <StaticFaces
+              players={teamA}
+              onOpenGames={onOpenGames}
+              gamesBadge={badgeMode}
+              after={chanceChip('A')}
+            />
           ) : (
             <Faces
               players={teamA}
@@ -638,11 +686,17 @@ export function MatchCard({
               onOpenGames={onOpenGames}
               gamesBadge={badgeMode}
               highlightedPlayerIds={highlightedPlayerIds}
+              after={chanceChip('A')}
             />
           )}
           <div className="text-center text-[10px] font-extrabold tracking-[1px] text-fg3">VS</div>
           {readOnly ? (
-            <StaticFaces players={teamB} onOpenGames={onOpenGames} gamesBadge={badgeMode} />
+            <StaticFaces
+              players={teamB}
+              onOpenGames={onOpenGames}
+              gamesBadge={badgeMode}
+              after={chanceChip('B')}
+            />
           ) : (
             <Faces
               players={teamB}
@@ -652,6 +706,7 @@ export function MatchCard({
               onOpenGames={onOpenGames}
               gamesBadge={badgeMode}
               highlightedPlayerIds={highlightedPlayerIds}
+              after={chanceChip('B')}
             />
           )}
         </>

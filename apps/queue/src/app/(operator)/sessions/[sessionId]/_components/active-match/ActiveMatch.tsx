@@ -25,6 +25,7 @@ import { useSetAlmostDone } from '@rotra/data/match/useSetAlmostDone'
 import { useSubstitutePlayer } from '@rotra/data/match/useSubstitutePlayer'
 import { useSwapFromMatch } from '@rotra/data/match/useSwapFromMatch'
 import { useSwapPlayers } from '@rotra/data/match/useSwapPlayers'
+import { winChance } from '@rotra/data/match/win-chance'
 import { MockError } from '@rotra/data/mock/errors'
 import {
   type QueueSession,
@@ -62,6 +63,7 @@ import {
   type NextMatchRequest,
 } from '@/app/(operator)/sessions/[sessionId]/_components/next-match/NextMatch'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 
 export type ActiveMatchProps = {
   sessionId: string
@@ -228,6 +230,7 @@ function OpenActiveMatch({
   const swapPlayers = useSwapPlayers()
   const swapFromMatch = useSwapFromMatch()
   const setAlmostDone = useSetAlmostDone()
+  const winChanceDialog = useWinChanceDialog(roster, matches)
   const [message, setMessage] = useState<string | undefined>()
   const [step, setStep] = useState<Step>(
     moveFirst
@@ -845,6 +848,8 @@ function OpenActiveMatch({
         teamA={teamA}
         teamB={teamB}
         minimumGames={session.minimumGames}
+        winChance={winChance(match, roster, matches)}
+        onOpenWinChance={() => winChanceDialog.open((all) => all.find((x) => x.id === match.id))}
         substitutions={substitutions}
         onSelectPlayer={(playerId) => go({ kind: 'player', playerId })}
         onOpenProfile={openProfile}
@@ -857,6 +862,7 @@ function OpenActiveMatch({
         onMatchDone={() => go({ kind: 'result', input: {} })}
       />
       {profile}
+      {winChanceDialog.dialog}
     </>
   )
 }

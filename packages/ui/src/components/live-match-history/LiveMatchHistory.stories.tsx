@@ -157,3 +157,14 @@ export const FiveVsFiveTwoCourts: Story = {
     ],
   },
 }
+
+export const WithWinChance: Story = {
+  args: {
+    matches: matches.map((m, i) => ({
+      ...m,
+      winChance: { a: 39, b: 61, favored: 'B', strong: false } as const,
+      upset: i === 0,
+    })),
+    onOpenWinChance: fn(),
+  },
+}

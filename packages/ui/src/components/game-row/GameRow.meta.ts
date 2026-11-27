@@ -12,6 +12,7 @@ export const gameRowMeta = {
     'Pass `onShare` only on your own games: the round share icon opens Share game. Partial games never show it.',
     'A game with `counting: "not_ranked"` (a session run with Record games off, D-2026-11-20-02) keeps Won / Lost and the share icon and shows “Not ranked session · doesn’t count toward win rate or the leaderboards” under the court, without “· not counted”. The note is NOT_RANKED_NOTE; a partial game’s own note still ends “· not counted”.',
     'Read-only: no result editing controls. A thin mapping onto MatchCourt’s Player variant; the court art lives there only.',
+    'Win chance (D-2026-11-27-03): a game with `game.winChance` (`a` = the left side) shows “41% · 59%” after the format pill and an Upset pill when `game.upset`; a partial game shows neither. Display only in lists. Pass `onOpenWinChance` on the Game page only, where both pills become buttons that open WinChanceDialog.',
     'Best of 3 (Q22): set `game.gameScores` (read from the player’s side) and `game.score` to the games won; each game score shows in a pill under the format pill.',
   ],
   prototype: {
@@ -24,7 +25,18 @@ export const gameRowMeta = {
     'docs/mockup-changes/2026-11-13-player-game-row-court.md',
     'docs/mockup-changes/2026-11-14-player-game-row-games-badge.md',
     'docs/mockup-changes/2026-11-20-player-not-ranked-games.md',
+    'docs/mockup-changes/2026-11-27-player-win-chance.md',
   ],
-  variants: ['won', 'lost', 'no score', 'fun', 'partial with note', 'not ranked', 'best of 3'],
+  variants: [
+    'won',
+    'lost',
+    'no score',
+    'fun',
+    'partial with note',
+    'not ranked',
+    'best of 3',
+    'win chance',
+    'win chance upset',
+  ],
   related: ['MatchCourt'],
 } satisfies ComponentMeta

@@ -17,6 +17,7 @@ import { useMoveMatch } from '@rotra/data/match/useMoveMatch'
 import { useRemoveWaitingMatch } from '@rotra/data/match/useRemoveWaitingMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { useSwapPlayers } from '@rotra/data/match/useSwapPlayers'
+import { winChance } from '@rotra/data/match/win-chance'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { Button } from '@rotra/ui/button'
@@ -35,6 +36,7 @@ import { useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { usePlayerGames } from '@/app/(operator)/sessions/[sessionId]/_components/player-games/PlayerGames'
 import type { ConsoleViewProps } from '@/app/(operator)/sessions/[sessionId]/_components/session-console/SessionConsole'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 
 export type QueueViewProps = ConsoleViewProps & {
   /** Add match: opens the Add match sheet (Q-MANUAL, Queue › Match editing). Disabled until given. */
@@ -89,6 +91,7 @@ export function QueueView({
   const removeWaitingMatch = useRemoveWaitingMatch()
   const swapPlayers = useSwapPlayers()
   const playerGames = usePlayerGames()
+  const winChanceDialog = useWinChanceDialog(roster.data?.roster, matches.data)
 
   const options = {
     onSuccess: (result: { message: string }) => toast(result.message),
@@ -187,6 +190,8 @@ export function QueueView({
     status: matchStatus(m, ctx),
     teamA: m.teamA.map(player),
     teamB: m.teamB.map(player),
+    winChance: winChance(m, ctx.roster, ctx.matches),
+    onOpenWinChance: () => winChanceDialog.open((all) => all.find((x) => x.id === m.id)),
     onSelectPlayer: openProfile,
     onOpenGames: playerGames.open,
     onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
@@ -277,6 +282,7 @@ export function QueueView({
           })
         }
       />
+      {winChanceDialog.dialog}
     </section>
   )
 }

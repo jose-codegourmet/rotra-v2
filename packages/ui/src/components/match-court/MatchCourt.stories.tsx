@@ -1,5 +1,6 @@
 import { Icon } from '@rotra/ui/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
 import { MatchCourt, type MatchCourtPlayer } from './MatchCourt'
 
 const face = (name: string, label = name.split(' ')[0] ?? name): MatchCourtPlayer => ({
@@ -120,3 +121,21 @@ export const OpensMatchPage: Story = {
   globals: { theme: 'dark' },
 }
 export const OpensMatchPageLight: Story = { ...OpensMatchPage, globals: { theme: 'light' } }
+
+/** Queue variant: the win chance and Upset pills are buttons with winChance.onOpen. */
+export const WinChanceClickable: Story = {
+  args: {
+    mine: false,
+    winChance: { text: '39% · 61%', title: 'Win chance', upset: true, onOpen: fn() },
+    onOpen: fn(),
+  },
+}
+/** Player variant: the pill follows the corner label. */
+export const WinChancePlayerVariant: Story = {
+  args: {
+    cornerLabel: 'Doubles',
+    number: undefined,
+    timeLabel: undefined,
+    winChance: { text: '39% · 61%', title: 'Win chance', upset: false, onOpen: fn() },
+  },
+}

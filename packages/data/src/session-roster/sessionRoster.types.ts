@@ -53,6 +53,24 @@ export type SessionPlayer = {
    * set on Payments. Missing means false.
    */
   isFree?: boolean
+  /**
+   * Win chance inputs from the player's history (D-2026-11-27-02). Derived by the Queue Master
+   * roster read; never stored on the roster row and never in public or player reads. Missing = no
+   * record (a guest): the level alone is used.
+   */
+  form?: PlayerForm
+}
+/**
+ * The lasting signals behind a player's win chance. `clubWinRate` is 0 to 1 from the player's
+ * counted games at this club, null with fewer than 10 (counts as 50%). `bestDay`: this session is
+ * on the weekday of their best record at this club. `place`: 1 in the top quarter of the club
+ * leaderboard, -1 in the bottom quarter. `trend`: 1 rising, -1 falling.
+ */
+export type PlayerForm = {
+  clubWinRate: number | null
+  bestDay: boolean
+  place: -1 | 0 | 1
+  trend: -1 | 0 | 1
 }
 /**
  * No show (cancelled): a live roster player who was away, played no games and was in no match,

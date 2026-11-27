@@ -339,3 +339,11 @@ export const CompactSlideBlocked: Story = {
   },
   decorators: compactDecorators,
 }
+
+/** Win chance chips beside each pair, clickable with onOpenWinChance. */
+export const WithWinChance: Story = {
+  args: {
+    winChance: { a: 39, b: 61, favored: 'B', strong: false } as const,
+    onOpenWinChance: fn(),
+  },
+}

@@ -321,6 +321,7 @@ const wireRosterEntryOf = (r: SessionPlayer): WireRosterEntry => ({
   ...(r.hasPlayedAtClubBefore === undefined
     ? {}
     : { hasPlayedAtClubBefore: r.hasPlayedAtClubBefore }),
+  ...(r.form === undefined ? {} : { form: r.form }),
   ...(r.gamesAdjustment === undefined ? {} : { gamesAdjustment: r.gamesAdjustment }),
   ...(r.handicapSpots === undefined ? {} : { handicapSpots: [...r.handicapSpots] }),
 })

@@ -606,3 +606,11 @@ export const GamesBadgeDisplayOnly: Story = {
     onOpenProfile: fn(),
   }),
 }
+
+/** The win chance chip in the head is a button with onOpenWinChance. */
+export const WithWinChance: Story = {
+  args: {
+    winChance: { a: 39, b: 61, favored: 'B', strong: false } as const,
+    onOpenWinChance: fn(),
+  },
+}

@@ -93,3 +93,10 @@ export const Phone: Story = {
   globals: { viewport: { value: 'phone' } },
 }
 export const Desktop: Story = { globals: { viewport: { value: 'desktop' } } }
+
+export const WithWinChance: Story = {
+  args: {
+    winChance: { a: 39, b: 61, favored: 'B', strong: false } as const,
+    onOpenWinChance: fn(),
+  },
+}

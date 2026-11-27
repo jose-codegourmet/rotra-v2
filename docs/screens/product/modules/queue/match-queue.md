@@ -83,7 +83,7 @@ Sheet titled “Choose Team A · player N”.
 Sheet **Suggested match**: format chip and “MODE mode” chip, then **Team A** VS **Team B**, each player a clickable card with their picture (or initials), name, level, and games against the minimum (“0/7 games”, amber when below). Tapping a card opens that player's profile dialog, whose footer is **Back to suggestion**; it returns to the same lineup with focus on that player. Then a **Why this lineup** card:
 
 - “Kat and Jo are below the minimum (Kat 2/6, Jo 3/6).” or “Everyone here has met the minimum; they have the fewest games among present players.”
-- “Teams are split by assigned levels to suit MODE mode.”
+- “Teams are split by win chance to suit MODE mode.”
 
 Actions: **Skip suggestion** (shows a new one), **Edit then add** (opens Q-MANUAL; saving protects it), **Add to queue** (adds as Suggested, unprotected unless players were switched). Under the teams: “Drag a player onto someone on the other team to switch sides.” No win probabilities or fatigue scores.
 

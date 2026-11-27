@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { MatchFormat, MatchLineup } from '@rotra/data/match/types'
+import type { WinChance } from '@rotra/data/match/win-chance'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
@@ -13,6 +14,7 @@ import { type PlayerPickerCandidate, PlayerPickerSheet } from '@rotra/ui/player-
 import { Sheet } from '@rotra/ui/sheet'
 import { SwapSidesArea, type SwapSlot } from '@rotra/ui/swap-sides-area'
 import { SwappablePlayer } from '@rotra/ui/swap-sides-area/swappable-player'
+import { WinChanceChip } from '@rotra/ui/win-chance-chip'
 import { useId, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import {
@@ -58,7 +60,17 @@ export type MatchLineupFormProps = {
   /** A slot opened the picker ("+ Choose player" or "Change") */
   onPickSlot?: (team: 'A' | 'B', index: number) => void
   defaultValues?: Partial<MatchLineupFormInput>
+  /**
+   * Win chance (D-2026-11-27-02) of the lineup as filled right now: read on every render with the
+   * filled slot ids, only while both teams are non-empty and every slot is filled. Null shows no chip.
+   */
+  winChanceOf?: (lineup: SlotLineup) => WinChance | null
+  /** Makes the chips buttons that open WinChanceDialog for the lineup as filled now */
+  onOpenWinChance?: (lineup: SlotLineup) => void
 }
+
+/** The filled slots of both teams */
+export type SlotLineup = { teamA: string[]; teamB: string[] }
 
 type Team = 'A' | 'B'
 type Picking = { team: Team; index: number }
@@ -88,6 +100,8 @@ export function MatchLineupForm({
   onCancel,
   onPickSlot,
   defaultValues,
+  winChanceOf,
+  onOpenWinChance,
 }: MatchLineupFormProps) {
   const formId = useId()
   const errorId = `${formId}-slots-error`
@@ -99,6 +113,11 @@ export function MatchLineupForm({
   const { errors } = form.formState
   const [format, teamA, teamB] = form.watch(['format', 'teamA', 'teamB'])
   const slotsError = errors.teamA?.message
+  const filledLineup: SlotLineup | null =
+    teamA.length > 0 && teamB.length > 0 && [...teamA, ...teamB].every((id) => !!id)
+      ? { teamA: teamA as string[], teamB: teamB as string[] }
+      : null
+  const winChance = filledLineup && winChanceOf ? winChanceOf(filledLineup) : null
   const playerById = new Map(players.map((p) => [p.id, p]))
 
   // Which slots to outline in error: every empty one for "Fill every slot", the repeated players
@@ -213,7 +232,18 @@ export function MatchLineupForm({
 
   const renderColumn = (team: Team, slots: SlotValues) => (
     <div className="flex min-w-0 flex-col gap-2 rounded-lg border border-border-strong p-3">
-      <span className="text-xs font-semibold tracking-[0.5px] text-fg2 uppercase">Team {team}</span>
+      <span className="flex min-w-0 items-center justify-between gap-2">
+        <span className="text-xs font-semibold tracking-[0.5px] text-fg2 uppercase">
+          Team {team}
+        </span>
+        {winChance && filledLineup ? (
+          <WinChanceChip
+            chance={winChance}
+            team={team}
+            onOpen={onOpenWinChance ? () => onOpenWinChance(filledLineup) : undefined}
+          />
+        ) : null}
+      </span>
       {slots.map((_, index) => renderSlot(team, index, slots))}
     </div>
   )

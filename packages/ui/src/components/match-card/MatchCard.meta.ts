@@ -5,6 +5,7 @@ export const matchCardMeta = {
   description:
     'One waiting match in the shared queue: queue position, format, origin, flow arrow and drag handle; Team A, VS, Team B (44 px faces, 15 px names, optional per-name wait); a status line (ready, needs attention, blocked, waiting for courts) that is always icon + text; Start, Edit and Remove.',
   usage: [
+    'Pass onOpenWinChance with winChance to make both pair chips buttons that open WinChanceDialog.',
     'Compact (owner, November 25, 2026): the two teams side by side with VS between, each a picture stack above its names joined by "&".',
     "Each live face shows a StatusPill through PlayerFaceButton's wait (owner, November 25, 2026): In queue Nm, Playing Nm with the court on hover, Getting ready, or Away.",
     'Search highlights matching players and dims other cards without modifying the queue.',

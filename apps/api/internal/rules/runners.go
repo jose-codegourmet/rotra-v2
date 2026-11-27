@@ -122,6 +122,9 @@ func (rs Ruleset) Runners(strict bool) map[string]Runner {
 		"match/canMoveCourt": clocked(strict, func(i matchCourts, now int64) any {
 			return rs.CanMoveCourt(i.Match, i.CourtIDs, i.context(now))
 		}),
+		"match/canMovePlaying": clocked(strict, func(i matchCourts, now int64) any {
+			return rs.CanMovePlaying(i.Match, i.CourtIDs, i.context(now))
+		}),
 		"match/canReplacePlayer": plain(strict, func(i struct {
 			world
 			Match model.Match `json:"match"`

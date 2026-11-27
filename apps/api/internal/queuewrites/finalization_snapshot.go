@@ -27,10 +27,6 @@ func (s *server) writeResultSnapshot(ctx context.Context, q *sqlcgen.Queries, se
 	if err != nil {
 		return err
 	}
-	// Record games off (D-2026-11-18-06): Session done enqueues no snapshot job; never write one.
-	if !sess.RecordGames {
-		return nil
-	}
 	mc, err := signedin.MatchContextOf(ctx, q, session)
 	if err != nil {
 		return err

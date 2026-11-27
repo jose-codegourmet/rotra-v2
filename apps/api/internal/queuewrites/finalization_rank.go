@@ -36,7 +36,9 @@ func (s *server) recomputeRank(ctx context.Context, q *sqlcgen.Queries, playerID
 	}
 	window := time.Duration(player.WindowDays) * 24 * time.Hour
 	windowStart := now.Add(-window)
-	counts := func(f sqlcgen.ListPlayerRankFactsRow) bool { return f.FullParticipation && f.StandardMatch }
+	counts := func(f sqlcgen.ListPlayerRankFactsRow) bool {
+		return f.FullParticipation && f.StandardMatch && f.SessionRanked
+	}
 	inWindow := 0
 	var lastValid, oldest *time.Time
 	var watermark int64

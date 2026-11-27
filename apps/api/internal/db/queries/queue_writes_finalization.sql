@@ -155,7 +155,9 @@ SELECT club_id, club_player_id FROM player_history_attributions WHERE player_id 
 -- name: ListPlayerRankFacts :many
 -- playerFacts: the player's own snapshots plus confirmed, unrevoked guest history, newest first. The caller keeps the facts whose club and saved
 -- player are one of the attributions (this query matches on the saved player alone).
-SELECT club_id, club_player_id, player_id_at_finalization, match_id, session_player_id, played_at, created_at, full_participation, standard_match
+-- session_ranked is false for a session run with Record games off (D-2026-11-20-02): its facts are kept as evidence, never counted (notRankedSessions).
+SELECT club_id, club_player_id, player_id_at_finalization, match_id, session_player_id, played_at, created_at, full_participation, standard_match,
+  COALESCE((SELECT s.record_games FROM queue_sessions s WHERE s.id = player_match_facts.session_id), true)::boolean AS session_ranked
 FROM player_match_facts
 WHERE player_id_at_finalization = @player_id OR club_player_id = ANY(@club_player_ids::uuid[])
 ORDER BY played_at DESC, match_id, session_player_id;

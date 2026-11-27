@@ -30,8 +30,8 @@ func TestEveryV1CaseFilePassesThroughForOne(t *testing.T) {
 	if want := len(onDisk) - len(rulecases.GoCopyPending); total.Files != want {
 		t.Errorf("ran %d case files, %d are on disk: an area has no test", total.Files, want)
 	}
-	if total.Files != 47 || total.Cases != 406 {
-		t.Errorf("ran %d files and %d cases, want 47 and 406", total.Files, total.Cases)
+	if total.Files != 48 || total.Cases != 424 {
+		t.Errorf("ran %d files and %d cases, want 48 and 424", total.Files, total.Cases)
 	}
 }
 
@@ -51,8 +51,8 @@ func TestRunnersAreOnePerRuleAndFollowTheRuleset(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if n := len(rs.Runners(true)); n != 47 {
-		t.Errorf("%d runners, want 47", n)
+	if n := len(rs.Runners(true)); n != 48 {
+		t.Errorf("%d runners, want 48", n)
 	}
 	// A later version that changes one rule changes what its runner returns.
 	rs.CourtsNeeded = func(model.Format) int { return 9 }

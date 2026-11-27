@@ -250,25 +250,18 @@ func (t *txn) finalize(command pgtype.UUID) ([]signedin.Shortfall, error) {
 	if err != nil {
 		return nil, err
 	}
-	recorded := t.sess.RecordGames
-	var facts []fact
-	if recorded {
-		if facts, err = t.buildFacts(); err != nil {
-			return nil, err
-		}
+	// Record games off (D-2026-11-20-02): the facts, summaries, snapshot and history job are written as for any session; only the rank job is
+	// left out (the games never count toward rank).
+	facts, err := t.buildFacts()
+	if err != nil {
+		return nil, err
 	}
 	digest, err := factsDigest(facts)
 	if err != nil {
 		return nil, err
 	}
-	state, stage := sqlcgen.FinalizationStateDone, sqlcgen.FinalizationStageFinishing
+	state, stage := sqlcgen.FinalizationStateCommitted, sqlcgen.FinalizationStagePlayerRecords
 	var completedAt pgtype.Timestamptz
-	if recorded {
-		// Recorded: the facts are final and the jobs still run after the commit. Unrecorded: nothing runs after it, so the row is finished here.
-		state, stage = sqlcgen.FinalizationStateCommitted, sqlcgen.FinalizationStagePlayerRecords
-	} else {
-		completedAt = now
-	}
 	manifestSum := sha256.Sum256(manifestJSON)
 	if err := t.q.InsertSessionFinalization(t.ctx, sqlcgen.InsertSessionFinalizationParams{
 		SessionID: t.sess.ID, ClubID: t.club, CommandID: command, State: state, Stage: stage, StreamManifest: manifestJSON, ManifestDigest: manifestSum[:],
@@ -276,15 +269,13 @@ func (t *txn) finalize(command pgtype.UUID) ([]signedin.Shortfall, error) {
 	}); err != nil {
 		return nil, err
 	}
-	if recorded {
-		for _, f := range facts {
-			if err := t.insertFact(f); err != nil {
-				return nil, err
-			}
-		}
-		if err := t.insertSummaries(facts, now); err != nil {
+	for _, f := range facts {
+		if err := t.insertFact(f); err != nil {
 			return nil, err
 		}
+	}
+	if err := t.insertSummaries(facts, now); err != nil {
+		return nil, err
 	}
 	if err := t.dropUnstarted(now); err != nil {
 		return nil, err
@@ -299,14 +290,15 @@ func (t *txn) finalize(command pgtype.UUID) ([]signedin.Shortfall, error) {
 	if err := t.q.DeleteQueueSessionReservations(t.ctx, sqlcgen.DeleteQueueSessionReservationsParams{ClubID: t.club, SessionID: t.sess.ID}); err != nil {
 		return nil, err
 	}
-	// No summaries, snapshot, history or rank work for an unrecorded session: no jobs at all.
-	if !recorded {
-		return warnings, nil
-	}
 	if err := t.insertJob(sqlcgen.ProjectionKindClubSessionSummaries, summaryVersion, sqlcgen.ProjectionJobStatusDone, now); err != nil {
 		return nil, err
 	}
-	for _, kind := range []sqlcgen.ProjectionKind{sqlcgen.ProjectionKindResultSnapshot, sqlcgen.ProjectionKindPlayerHistory, sqlcgen.ProjectionKindPlayerRank} {
+	kinds := []sqlcgen.ProjectionKind{sqlcgen.ProjectionKindResultSnapshot, sqlcgen.ProjectionKindPlayerHistory}
+	// A not ranked session never moves the skill rank, so it enqueues no rank job.
+	if t.sess.RecordGames {
+		kinds = append(kinds, sqlcgen.ProjectionKindPlayerRank)
+	}
+	for _, kind := range kinds {
 		if err := t.insertJob(kind, 1, sqlcgen.ProjectionJobStatusPending, pgtype.Timestamptz{}); err != nil {
 			return nil, err
 		}

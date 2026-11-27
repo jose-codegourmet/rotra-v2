@@ -3,6 +3,7 @@
 import {
   autoFillPlacements,
   canMoveCourt,
+  canMovePlaying,
   canPlace,
   canReplacePlayer,
   canSendBack,
@@ -87,6 +88,9 @@ export const WRAPPER_RUNNERS: Record<string, Runner> = {
   'match/canSendBack': rule<{ match: Pick<Match, 'state'> }>((i) => canSendBack(i.match)),
   'match/canMoveCourt': rule<World & { match: Match; courtIds: string[] }>((i, now) =>
     canMoveCourt(i.match, i.courtIds, ctxOf(i, now)),
+  ),
+  'match/canMovePlaying': rule<World & { match: Match; courtIds: string[] }>((i, now) =>
+    canMovePlaying(i.match, i.courtIds, ctxOf(i, now)),
   ),
   'match/canReplacePlayer': rule<World & { match: Match; outId: string; inId: string }>((i, now) =>
     canReplacePlayer(i.match, i.outId, i.inId, ctxOf(i, now)),
@@ -222,6 +226,7 @@ export const CLOCK_RULES: ReadonlySet<string> = new Set([
   'match/canPlace',
   'match/canStart',
   'match/canMoveCourt',
+  'match/canMovePlaying',
   'match/swapTarget',
   'courtfill/autoFillPlacements',
   'courtfill/nextEligibleForCourt',

@@ -43,3 +43,7 @@ WHERE club_id = @club_id AND id = @id;
 UPDATE club_player_private_inputs
 SET state = 'resolved', resolved_player_id = @player_id, resolved_at = @now, revision = revision + 1, updated_at = @now
 WHERE club_player_id = @club_player_id;
+
+-- name: GetLocationCode :one
+-- The founding city a registration from the Admin link picked (location_codes, Admin-managed).
+SELECT id, country_code, city_code FROM location_codes WHERE id = @id;

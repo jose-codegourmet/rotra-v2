@@ -51,6 +51,24 @@ func (q *Queries) GetClubFoundingLocation(ctx context.Context, clubID pgtype.UUI
 	return i, err
 }
 
+const getLocationCode = `-- name: GetLocationCode :one
+SELECT id, country_code, city_code FROM location_codes WHERE id = $1
+`
+
+type GetLocationCodeRow struct {
+	ID          pgtype.UUID
+	CountryCode string
+	CityCode    string
+}
+
+// The founding city a registration from the Admin link picked (location_codes, Admin-managed).
+func (q *Queries) GetLocationCode(ctx context.Context, id pgtype.UUID) (GetLocationCodeRow, error) {
+	row := q.db.QueryRow(ctx, getLocationCode, id)
+	var i GetLocationCodeRow
+	err := row.Scan(&i.ID, &i.CountryCode, &i.CityCode)
+	return i, err
+}
+
 const insertPlayerIDAllocation = `-- name: InsertPlayerIDAllocation :exec
 INSERT INTO player_id_allocations (player_id, rtr_id, creating_club_id, location_code_id, country_code, city_code, sync_date, sequence, allocated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7::date, $8, $9)

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/claim"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/google"
@@ -21,8 +22,8 @@ import (
 // registerGuestWithGoogle): the same link rules, staging and joins as the password registration, with the Google account the
 // callback verified and holds instead of an email and a password. Not found while the player_google_sign_in flag is off.
 //
-// The Admin link's registration (no club: POST /api/register and /api/register/google, which place the RTR ID by the city the
-// player picks, D-2026-11-20-01) is not in Go yet, for the password form or for Google; both stay in the Player app.
+// POST /api/register/google is the Admin link's registration (D-2026-11-20-01): no club and no session, the RTR ID placed by the city the
+// player picks, and the player joins no club. (The password form's Admin link is POST /api/register in register.go.)
 func RegisterGoogle(d Deps, g *google.Handlers) (func(*http.ServeMux), error) {
 	if g == nil {
 		return nil, errors.New("register: Google registration needs the Google handlers")
@@ -39,11 +40,12 @@ func RegisterGoogle(d Deps, g *google.Handlers) (func(*http.ServeMux), error) {
 		h.log = slog.New(slog.DiscardHandler)
 	}
 	return func(mux *http.ServeMux) {
-		mux.Handle("POST /api/register/{clubId}/google", g.Gate(h.postGoogle(g)))
+		mux.Handle("POST /api/register/{clubId}/google", g.Gate(h.postGoogle(g, false)))
+		mux.Handle("POST /api/register/google", g.Gate(h.postGoogle(g, true)))
 	}, nil
 }
 
-func (h *handlers) postGoogle(g *google.Handlers) http.HandlerFunc {
+func (h *handlers) postGoogle(g *google.Handlers, admin bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		if err := h.svc.Limiter().CheckClaim(ctx, httpapi.ClientIPFrom(ctx)); err != nil {
@@ -75,19 +77,28 @@ func (h *handlers) postGoogle(g *google.Handlers) http.HandlerFunc {
 			return
 		}
 		clubText := r.PathValue("clubId")
-		where, err := linkOf(ctx, sqlcgen.New(h.pool), clubText, r.URL.Query())
-		if err != nil {
-			writes.Write(w, r, h.log, err)
-			return
+		var where link
+		if !admin {
+			if where, err = linkOf(ctx, sqlcgen.New(h.pool), clubText, r.URL.Query()); err != nil {
+				writes.Write(w, r, h.log, err)
+				return
+			}
 		}
 		if _, ferr := profile.Parse(f.details); ferr != nil {
 			writes.Write(w, r, h.log, writes.Fail(httpapi.ErrInvalid, map[string]string{ferr.Field: ferr.Message}))
 			return
 		}
+		var place pgtype.UUID
+		if admin {
+			if place, err = placeOf(ctx, sqlcgen.New(h.pool), f.cityCode); err != nil {
+				writes.Write(w, r, h.log, err)
+				return
+			}
+		}
 		f.email = held.Email
 		// The attempt is keyed on the Google account, so a retry resumes the same registration.
 		token := "registration:google:" + held.Email
-		staged, err := h.stage(ctx, stageInput{token: token, clubText: clubText, club: where.club, email: f.email, phone: f.phone, name: f.details.FullName, nickname: f.details.Nickname})
+		staged, err := h.stage(ctx, stageInput{token: token, clubText: clubText, club: where.club, place: place, email: f.email, phone: f.phone, name: f.details.FullName, nickname: f.details.Nickname})
 		if err != nil {
 			writes.Write(w, r, h.log, err)
 			return

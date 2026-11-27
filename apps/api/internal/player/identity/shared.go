@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
@@ -58,6 +59,59 @@ func AllocateRTRIDFor(ctx context.Context, tx pgx.Tx, playerID, clubID uuid.UUID
 		return adopted, nil
 	}
 	return AllocateRTRID(ctx, tx, playerID, clubID, at)
+}
+
+// ErrCityRequired is CITY_REQUIRED: a registration from the Admin link with no city, for an email no club saved, has no place for the RTR ID.
+var ErrCityRequired = errors.New("identity: pick your city or province")
+
+// Place is where an RTR ID takes its place from: the club's founding city, or for the Admin link (no club) the founding city the player
+// picked. A zero Place has none.
+type Place struct {
+	ClubID       uuid.UUID
+	LocationCode pgtype.UUID
+}
+
+// AllocateRTRIDAt is allocateRtrId for a place: an open shared entry with one of the emails keeps its RTR ID and needs no city (no
+// allocation without a club has a creating club); otherwise the club's founding city or the picked one gives it, and without either it is
+// ErrCityRequired.
+func AllocateRTRIDAt(ctx context.Context, tx pgx.Tx, playerID uuid.UUID, place Place, at time.Time, emails ...string) (string, error) {
+	adopted, err := adoptEntryAllocation(ctx, tx, playerID, emails)
+	if err != nil {
+		return "", err
+	}
+	if adopted != "" {
+		return adopted, nil
+	}
+	if place.ClubID != uuid.Nil {
+		return AllocateRTRID(ctx, tx, playerID, place.ClubID, at)
+	}
+	if !place.LocationCode.Valid {
+		return "", ErrCityRequired
+	}
+	q := sqlcgen.New(tx)
+	loc, err := q.GetLocationCode(ctx, place.LocationCode)
+	if err != nil {
+		return "", fmt.Errorf("identity: reading the founding location: %w", err)
+	}
+	syncDay := SyncDate(at)
+	day, err := time.Parse("2006-01-02", syncDay)
+	if err != nil {
+		return "", fmt.Errorf("identity: sync day %q: %w", syncDay, err)
+	}
+	date := pgtype.Date{Time: day, Valid: true}
+	seq, err := q.NextPlayerSequence(ctx, sqlcgen.NextPlayerSequenceParams{LocationCodeID: loc.ID, SyncDate: date})
+	if err != nil {
+		return "", fmt.Errorf("identity: advancing the player counter: %w", err)
+	}
+	rtrID := FormatRTRID(loc.CountryCode, loc.CityCode, syncDay, seq)
+	err = q.InsertPlayerIDAllocation(ctx, sqlcgen.InsertPlayerIDAllocationParams{
+		PlayerID: pgUUID(playerID), RtrID: rtrID, LocationCodeID: loc.ID,
+		CountryCode: loc.CountryCode, CityCode: loc.CityCode, SyncDate: date, Sequence: seq, Now: pgTime(at),
+	})
+	if err != nil {
+		return "", fmt.Errorf("identity: recording the allocation: %w", err)
+	}
+	return rtrID, nil
 }
 
 func adoptEntryAllocation(ctx context.Context, tx pgx.Tx, playerID uuid.UUID, emails []string) (string, error) {

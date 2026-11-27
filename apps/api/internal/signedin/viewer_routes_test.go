@@ -31,6 +31,11 @@ func TestViewerReadsAreServedToTheSignedInPlayerAndTheVisitorOfThePlayerAppOnly(
 		if p == "/api/players/"+carlaID || p == "/api/players/"+carlaID+"/games" {
 			adminCode = 401
 		}
+		// The Queue app serves the ROTRA leaderboard too (Q-LEADERBOARDS), as a visitor: it cannot verify a Player sign-in.
+		queueCode := 404
+		if p == "/api/leaderboard" {
+			queueCode = 200
+		}
 		for _, c := range []struct {
 			name string
 			req  req
@@ -40,7 +45,7 @@ func TestViewerReadsAreServedToTheSignedInPlayerAndTheVisitorOfThePlayerAppOnly(
 			{"signed in", req{path: p, app: "player", bearer: e.accessPass(t, aliceSubject)}, 200},
 			{"no app header", req{path: p}, 404},
 			{"Admin app", req{path: p, app: "admin"}, adminCode},
-			{"Queue app", req{path: p, app: "club"}, 404},
+			{"Queue app", req{path: p, app: "club"}, queueCode},
 			{"no proxy secret", req{path: p, app: "player", noSecret: true}, 404},
 		} {
 			if w := e.do(c.req); w.Code != c.code {

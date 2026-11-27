@@ -8,7 +8,7 @@
 SELECT l.id AS link_id,
        l.state,
        l.expires_at,
-       c.name AS club_name,
+       COALESCE(c.name, 'ROTRA')::text AS club_name,
        p.id AS player_id,
        p.full_name,
        p.nickname,
@@ -22,7 +22,7 @@ SELECT l.id AS link_id,
        pc.email AS contact_email,
        (acct.player_id IS NOT NULL)::bool AS has_account
 FROM player_claim_links l
-JOIN clubs c ON c.id = l.issuing_club_id
+LEFT JOIN clubs c ON c.id = l.issuing_club_id
 JOIN players p ON p.id = l.player_id
 LEFT JOIN player_id_allocations a ON a.player_id = p.id
 LEFT JOIN player_private_contacts pc ON pc.player_id = p.id

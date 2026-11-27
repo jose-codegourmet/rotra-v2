@@ -70,7 +70,7 @@ func TestGoldenAfterGoogle(t *testing.T) {
 			reset.Routes()(mux)
 			for _, pattern := range []string{
 				"GET /api/auth/google/outcome", "POST /api/auth/google/outcome", "POST /api/auth/google/link", "GET /api/auth/google/unclaimed",
-				"POST /api/claim/{token}/google", "POST /api/register/{clubId}/google",
+				"POST /api/claim/{token}/google", "POST /api/register/{clubId}/google", "POST /api/register/google",
 			} {
 				mux.Handle(pattern, sealed)
 			}

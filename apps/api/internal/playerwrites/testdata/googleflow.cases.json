@@ -1472,6 +1472,580 @@
    }
   },
   {
+   "name": "flow_register_admin_link_in_cebu",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": "PH-CEB"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_in_another_city",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": "PH-MNL"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_with_no_city_asks_for_one",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_with_an_unknown_city_is_refused",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": "PH-ZZZ"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_with_an_empty_city_asks_for_one",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": ""
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_with_the_email_of_a_clubs_open_entry_needs_no_city",
+   "scenario": "flow_cards",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6InNoYXJlZEBleGFtcGxlLnRlc3QiLCJuYW1lIjoiU2hhcmVkIFBlcnNvbiIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_a_phone_an_account_has_is_a_match",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0001",
+       "cityCode": "PH-CEB"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_the_email_of_an_account_is_a_match",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": "PH-CEB"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwMDIiLCJlbWFpbCI6ImJvYkBleGFtcGxlLnRlc3QiLCJuYW1lIjoiQm9iIFNhbnRvcyIsImdvb2dsZU9ubHkiOmZhbHNlfX0",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_with_nothing_held",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": "PH-CEB"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_twice_resumes_the_same_registration",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": "PH-CEB"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": "PH-CEB"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_after_a_club_link_attempt_is_refused",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/c9000000-0000-4000-8000-000000000001/google?k=SMASHSS123",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": "PH-CEB"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_with_the_flag_off",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": "PH-CEB"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
+   "name": "flow_register_admin_link_joins_no_club",
+   "scenario": "gate_on",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/register/google",
+     "who": null,
+     "body": {
+      "values": {
+       "fullName": "Gina Google",
+       "nickname": "",
+       "playingStyle": "",
+       "experienceYears": "",
+       "experienceMonths": "",
+       "facebook": "",
+       "instagram": "",
+       "youtube": "",
+       "linkedin": "",
+       "phone": "0917 555 0305",
+       "cityCode": "PH-CEB"
+      }
+     },
+     "redact": [
+      "playerId",
+      "session.account.id"
+     ],
+     "cookie": "capture-google=eyJoZWxkIjp7InN1YmplY3QiOiJmNDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwODAiLCJlbWFpbCI6ImdpbmEuZ29vZ2xlQGV4YW1wbGUudGVzdCIsIm5hbWUiOiJHaW5hIEdvb2dsZSIsImdvb2dsZU9ubHkiOnRydWV9fQ",
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "redactOptional": true
+    }
+   ],
+   "redact": {
+    "player_claim_links": [
+     "token_digest"
+    ]
+   }
+  },
+  {
    "name": "flow_reset_a_google_only_account_signs_in_with_google",
    "scenario": "flow_reset_on",
    "steps": [

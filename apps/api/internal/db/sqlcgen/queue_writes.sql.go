@@ -402,46 +402,48 @@ SELECT id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id
        cancelled_at, cancel_reason, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
        expected_players, queue_revision, started_at, finalized_at, series_id, start_license_term_id, public_slug, accept_join_requests,
        always_require_request, court_fill_mode, record_games, request_formats::text[] AS request_formats, source_command_id,
-       created_at, updated_at, revision
+       created_at, updated_at, revision, planned_start_before_start_at, planned_end_before_start_at
 FROM queue_sessions WHERE id = $1
 `
 
 type GetQueueSessionRow struct {
-	ID                   pgtype.UUID
-	ClubID               pgtype.UUID
-	Title                string
-	Notes                pgtype.Text
-	ScheduledStartAt     pgtype.Timestamptz
-	ScheduledEndAt       pgtype.Timestamptz
-	VenueID              pgtype.UUID
-	VenueName            pgtype.Text
-	VenueAddress         pgtype.Text
-	State                QueueSessionState
-	InvalidReason        pgtype.Text
-	CancelledAt          pgtype.Timestamptz
-	CancelReason         pgtype.Text
-	SessionMode          SessionMode
-	AllowSingles         bool
-	AllowDoubles         bool
-	MinimumGames         int32
-	MinimumIsCalculated  bool
-	PlayersPerCourt      int16
-	ExpectedPlayers      pgtype.Int4
-	QueueRevision        int64
-	StartedAt            pgtype.Timestamptz
-	FinalizedAt          pgtype.Timestamptz
-	SeriesID             pgtype.UUID
-	StartLicenseTermID   pgtype.UUID
-	PublicSlug           string
-	AcceptJoinRequests   bool
-	AlwaysRequireRequest bool
-	CourtFillMode        CourtFillMode
-	RecordGames          bool
-	RequestFormats       []string
-	SourceCommandID      pgtype.UUID
-	CreatedAt            pgtype.Timestamptz
-	UpdatedAt            pgtype.Timestamptz
-	Revision             int64
+	ID                        pgtype.UUID
+	ClubID                    pgtype.UUID
+	Title                     string
+	Notes                     pgtype.Text
+	ScheduledStartAt          pgtype.Timestamptz
+	ScheduledEndAt            pgtype.Timestamptz
+	VenueID                   pgtype.UUID
+	VenueName                 pgtype.Text
+	VenueAddress              pgtype.Text
+	State                     QueueSessionState
+	InvalidReason             pgtype.Text
+	CancelledAt               pgtype.Timestamptz
+	CancelReason              pgtype.Text
+	SessionMode               SessionMode
+	AllowSingles              bool
+	AllowDoubles              bool
+	MinimumGames              int32
+	MinimumIsCalculated       bool
+	PlayersPerCourt           int16
+	ExpectedPlayers           pgtype.Int4
+	QueueRevision             int64
+	StartedAt                 pgtype.Timestamptz
+	FinalizedAt               pgtype.Timestamptz
+	SeriesID                  pgtype.UUID
+	StartLicenseTermID        pgtype.UUID
+	PublicSlug                string
+	AcceptJoinRequests        bool
+	AlwaysRequireRequest      bool
+	CourtFillMode             CourtFillMode
+	RecordGames               bool
+	RequestFormats            []string
+	SourceCommandID           pgtype.UUID
+	CreatedAt                 pgtype.Timestamptz
+	UpdatedAt                 pgtype.Timestamptz
+	Revision                  int64
+	PlannedStartBeforeStartAt pgtype.Timestamptz
+	PlannedEndBeforeStartAt   pgtype.Timestamptz
 }
 
 // The session as it is now, with the columns of LockQueueSession (a write reads its session again after it changed it).
@@ -484,6 +486,8 @@ func (q *Queries) GetQueueSession(ctx context.Context, id pgtype.UUID) (GetQueue
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Revision,
+		&i.PlannedStartBeforeStartAt,
+		&i.PlannedEndBeforeStartAt,
 	)
 	return i, err
 }
@@ -968,7 +972,7 @@ SELECT id, club_id, title, notes, scheduled_start_at, scheduled_end_at, venue_id
        cancelled_at, cancel_reason, session_mode, allow_singles, allow_doubles, minimum_games, minimum_is_calculated, players_per_court,
        expected_players, queue_revision, started_at, finalized_at, series_id, start_license_term_id, public_slug, accept_join_requests,
        always_require_request, court_fill_mode, record_games, request_formats::text[] AS request_formats, source_command_id,
-       created_at, updated_at, revision
+       created_at, updated_at, revision, planned_start_before_start_at, planned_end_before_start_at
 FROM queue_sessions WHERE club_id = $1 AND id = $2 FOR UPDATE
 `
 
@@ -978,41 +982,43 @@ type LockQueueSessionParams struct {
 }
 
 type LockQueueSessionRow struct {
-	ID                   pgtype.UUID
-	ClubID               pgtype.UUID
-	Title                string
-	Notes                pgtype.Text
-	ScheduledStartAt     pgtype.Timestamptz
-	ScheduledEndAt       pgtype.Timestamptz
-	VenueID              pgtype.UUID
-	VenueName            pgtype.Text
-	VenueAddress         pgtype.Text
-	State                QueueSessionState
-	InvalidReason        pgtype.Text
-	CancelledAt          pgtype.Timestamptz
-	CancelReason         pgtype.Text
-	SessionMode          SessionMode
-	AllowSingles         bool
-	AllowDoubles         bool
-	MinimumGames         int32
-	MinimumIsCalculated  bool
-	PlayersPerCourt      int16
-	ExpectedPlayers      pgtype.Int4
-	QueueRevision        int64
-	StartedAt            pgtype.Timestamptz
-	FinalizedAt          pgtype.Timestamptz
-	SeriesID             pgtype.UUID
-	StartLicenseTermID   pgtype.UUID
-	PublicSlug           string
-	AcceptJoinRequests   bool
-	AlwaysRequireRequest bool
-	CourtFillMode        CourtFillMode
-	RecordGames          bool
-	RequestFormats       []string
-	SourceCommandID      pgtype.UUID
-	CreatedAt            pgtype.Timestamptz
-	UpdatedAt            pgtype.Timestamptz
-	Revision             int64
+	ID                        pgtype.UUID
+	ClubID                    pgtype.UUID
+	Title                     string
+	Notes                     pgtype.Text
+	ScheduledStartAt          pgtype.Timestamptz
+	ScheduledEndAt            pgtype.Timestamptz
+	VenueID                   pgtype.UUID
+	VenueName                 pgtype.Text
+	VenueAddress              pgtype.Text
+	State                     QueueSessionState
+	InvalidReason             pgtype.Text
+	CancelledAt               pgtype.Timestamptz
+	CancelReason              pgtype.Text
+	SessionMode               SessionMode
+	AllowSingles              bool
+	AllowDoubles              bool
+	MinimumGames              int32
+	MinimumIsCalculated       bool
+	PlayersPerCourt           int16
+	ExpectedPlayers           pgtype.Int4
+	QueueRevision             int64
+	StartedAt                 pgtype.Timestamptz
+	FinalizedAt               pgtype.Timestamptz
+	SeriesID                  pgtype.UUID
+	StartLicenseTermID        pgtype.UUID
+	PublicSlug                string
+	AcceptJoinRequests        bool
+	AlwaysRequireRequest      bool
+	CourtFillMode             CourtFillMode
+	RecordGames               bool
+	RequestFormats            []string
+	SourceCommandID           pgtype.UUID
+	CreatedAt                 pgtype.Timestamptz
+	UpdatedAt                 pgtype.Timestamptz
+	Revision                  int64
+	PlannedStartBeforeStartAt pgtype.Timestamptz
+	PlannedEndBeforeStartAt   pgtype.Timestamptz
 }
 
 // Queue writes (go-writes-queue): the session lock and the roster commands of packages/db/src/queue/session-roster.ts and
@@ -1059,6 +1065,8 @@ func (q *Queries) LockQueueSession(ctx context.Context, arg LockQueueSessionPara
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Revision,
+		&i.PlannedStartBeforeStartAt,
+		&i.PlannedEndBeforeStartAt,
 	)
 	return i, err
 }

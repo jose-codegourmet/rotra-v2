@@ -40,6 +40,7 @@ func (s *server) registerSessionPrep(rt *signedin.Router) {
 	rt.Handle("PATCH /api/sessions/{sessionId}", store.AudienceClub, s.club(s.patchSession))
 	rt.Handle("DELETE /api/sessions/{sessionId}", store.AudienceClub, s.club(s.deleteSession))
 	rt.Handle("POST /api/sessions/{sessionId}/start", store.AudienceClub, s.club(s.startSession))
+	rt.Handle("POST /api/sessions/{sessionId}/back-to-preparation", store.AudienceClub, s.club(s.backToPreparation))
 }
 
 // number is a JSON number as JavaScript reads it, NaN for anything else.
@@ -875,6 +876,10 @@ func (t *txn) start(expectedRevision string, term pgtype.UUID, newEnd *int64) (a
 	params := sqlcgen.StartQueueSessionParams{Now: t.stamp(), StartLicenseTermID: term, ID: session.ID}
 	if late && newEnd != nil {
 		params.ScheduledEndAt = timestamp(*newEnd)
+		// Started on an earlier day than planned (owner, November 25, 2026): the planned start moves to now, so the window is now to the new end.
+		if plannedStartAt > now {
+			params.ScheduledStartAt = timestamp(now)
+		}
 	}
 	if err := t.q.StartQueueSession(t.ctx, params); err != nil {
 		return nil, err
@@ -905,4 +910,71 @@ func modelCourts(rows []sqlcgen.SessionCourt) []model.Court {
 		}
 	}
 	return out
+}
+
+// backToPreparationResult is what Back to preparation answers: the session and how many matches it removed.
+type backToPreparationResult struct {
+	signedin.Session
+	MatchesRemoved int32 `json:"matchesRemoved"`
+}
+
+// backToPreparation is POST /api/sessions/{sessionId}/back-to-preparation, Q-CONSOLE Back to preparation (owner, November 25, 2026): undoes Start while no
+// game has started. It refuses once a match is Playing, done or invalid; removes every waiting and On court match (holds released), closes open match
+// requests and drop-out notices, sets the session prepared with no start time or license term, puts the planned window back to what it was at Start,
+// clears early-opened courts and unlocks every level. Join requests closed at Start stay closed. A retry of a prepared session answers it (0 removed).
+func (s *server) backToPreparation(r *http.Request, club pgtype.UUID) (writes.Result, error) {
+	body, err := writes.ReadBody(r)
+	if err != nil {
+		return writes.Result{}, err
+	}
+	out, err := s.inSession(r.Context(), club, r.PathValue("sessionId"), func(t *txn) (any, error) {
+		session := t.sess
+		if session.State == sqlcgen.QueueSessionStatePrepared && !session.StartedAt.Valid {
+			return backToPreparationResult{Session: signedin.SessionOf(session)}, nil
+		}
+		if err := requireState(session, "Only a live session can go back to preparation.", sqlcgen.QueueSessionStateActive); err != nil {
+			return nil, err
+		}
+		if err := requireRevision(session.Revision, body.Text("expectedRevision")); err != nil {
+			return nil, err
+		}
+		played, err := t.q.CountPlayedMatches(t.ctx, session.ID)
+		if err != nil {
+			return nil, err
+		}
+		if played > 0 {
+			return nil, writes.Fail(httpapi.ErrConflict, map[string]string{"session": "Not available once a game has started."})
+		}
+		removed, err := t.q.CountUnstartedMatches(t.ctx, session.ID)
+		if err != nil {
+			return nil, err
+		}
+		now := t.stamp()
+		if err := t.dropUnstarted(now); err != nil {
+			return nil, err
+		}
+		if err := t.closeSessionMatchRequests(now); err != nil {
+			return nil, err
+		}
+		if err := t.q.BackToPreparationQueueSession(t.ctx, sqlcgen.BackToPreparationQueueSessionParams{Now: now, ID: session.ID}); err != nil {
+			return nil, err
+		}
+		if err := t.q.ClearCourtsOpenedEarly(t.ctx, sqlcgen.ClearCourtsOpenedEarlyParams{Now: now, SessionID: session.ID}); err != nil {
+			return nil, err
+		}
+		if err := t.q.UnlockSessionPlayerLevels(t.ctx, sqlcgen.UnlockSessionPlayerLevelsParams{Now: now, SessionID: session.ID}); err != nil {
+			return nil, err
+		}
+		if session, err = t.reload(session.ID); err != nil {
+			return nil, err
+		}
+		if session, err = t.recomputeMinimum(session); err != nil {
+			return nil, err
+		}
+		return backToPreparationResult{Session: signedin.SessionOf(session), MatchesRemoved: removed}, nil
+	})
+	if err != nil {
+		return writes.Result{}, mapDatabaseError(err)
+	}
+	return writes.Result{Body: out}, nil
 }

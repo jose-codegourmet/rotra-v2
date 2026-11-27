@@ -4514,7 +4514,7 @@ function paymentsPanel(s) {
   const stillDue = due != null ? payersAll.reduce((t, x) => t + Math.max(due - got(x) - (x.paid ? x.paid.waived || 0 : 0), 0), 0) : null;
   const toReturn = due != null ? payersAll.reduce((t, x) => t + (x.paid ? Math.max(got(x) - due, 0) : 0), 0) : 0;
   const cost = s.finance ? financeCalc(s.finance, s.courts.length, Math.round((s.end - s.start) / 60000), s.roster.length || 1).total : null;
-  const f = S.ui.payF === 'free' && !freeN ? 'all' : (S.ui.payF || 'all');
+  const f = S.ui.payF || 'all';
   const rows = all.filter((x) => f === 'all' || (f === 'free' ? x.free : f === 'paid' ? payCovered(x.st) : !x.free && !payCovered(x.st)));
   return `<section class="card stack" id="payments"><div class="between"><div><h2>Payments</h2><p class="small muted">${due != null ? `${peso(due)} per player (${s.finance.custom ? 'custom amount' : 'break-even share'}${freeN ? `, ${freeN} free not counted` : ''}${s.finance.entryFee ? `, includes the ${peso(s.finance.entryFee)} entrance fee` : ''}).` : 'No fee set for this session.'} Tick players as they pay, or tap a card to record a partial amount. ROTRA only records it; money is collected outside the app.</p></div>
       <div class="row">${all.length ? `<button class="btn sm" data-act="openPayShare" aria-haspopup="dialog">${I.share} Share status</button>` : ''}${all.some((x) => !x.paid && !x.free) ? '<button class="btn sm" data-act="markAllPaid">Mark all paid</button>' : ''}</div></div>
@@ -4525,14 +4525,14 @@ function paymentsPanel(s) {
       <div class="card"><span class="label">Still due</span><b class="big tnum">${stillDue != null ? peso(stillDue) : '—'}</b></div>
       <div class="card"><span class="label">Against costs</span><b class="big tnum" style="color:${cost == null ? 'inherit' : collected >= cost ? 'var(--accent)' : 'var(--warn)'}">${cost == null ? '—' : collected >= cost ? `+${peso(collected - cost)}` : `−${peso(cost - collected)}`}</b>${cost != null ? `<span class="small muted">of ${peso(cost)} cost</span>` : ''}</div>
     </div>
-    <div class="seg" role="group" aria-label="Show">${[['all', `Everyone · ${all.length}`], ['unpaid', `Not paid · ${payersAll.length - paidN}`], ['paid', `Paid · ${paidN}`], ...(freeN ? [['free', `Free · ${freeN}`]] : [])].map(([k, l]) => `<button aria-pressed="${f === k}" data-act="payFilter" data-k="${k}">${l}</button>`).join('')}</div>
+    <div class="seg" role="group" aria-label="Show">${[['all', `Everyone · ${all.length}`], ['unpaid', `Not paid · ${payersAll.length - paidN}`], ['paid', `Paid · ${paidN}`], ['free', `Free · ${freeN}`]].map(([k, l]) => `<button aria-pressed="${f === k}" data-act="payFilter" data-k="${k}">${l}</button>`).join('')}</div>
     ${rows.length ? `<div class="pay-grid">${rows.map(({ r, p, paid, st, moved, free }) => `<div class="pay-card ${payCovered(st) ? 'paid' : st.kind === 'partial' ? 'partial' : free ? 'free' : ''}">
       <div class="pay-top">${faceBtn(p)}${free ? '' : sw(!!paid, 'togglePaid', `data-pid="${r.pid}"${moved ? ' disabled title="Paid through a slot transfer"' : ''}`, `${p.name} paid`)}</div>
       ${moved ? `<button class="pay-body" data-act="slotHistory" data-pid="${r.pid}" aria-label="${esc(`Slot history for ${p.name}`)}" aria-haspopup="dialog"><b class="pay-name">${esc(p.name)}</b>${payChip(st)}
       <span class="pay-st">${peso(got({ paid }))} received · via transfer</span>${paid.waived ? `<span class="pay-st">${peso(paid.waived)} waived</span>` : ''}</button>`
       : `<button class="pay-body" data-act="payAmount" data-sid="${s.id}" data-pid="${r.pid}" aria-label="${esc(`Payment from ${p.name}`)}"><b class="pay-name">${esc(p.name)}</b>${payChip(st)}
       <span class="pay-st">${free ? 'Not counted in the split' : paid ? `${peso(got({ paid }))} received · ${fmtWhen(paid.at, { lower: true })}` : due != null ? `${peso(due)} due` : ''}</span></button>`}</div>`).join('')}</div>`
-      : `<p class="small muted">${f === 'unpaid' ? 'Everyone has paid.' : f === 'paid' ? 'Nobody has paid yet.' : f === 'free' ? 'Nobody is free.' : 'No players yet.'}</p>`}
+      : `<p class="small muted">${f === 'unpaid' ? 'Everyone has paid.' : f === 'paid' ? 'Nobody has paid yet.' : f === 'free' ? 'Nobody plays free. Tap a card, then Plays free.' : 'No players yet.'}</p>`}
   </section>`;
 }
 function histFinancePane(s) {
@@ -9302,7 +9302,6 @@ const ACT = {
     if (on && s.payments && s.payments[d.pid]) { delete s.payments[d.pid]; if (S.ui.sheet && S.ui.sheet.pid === d.pid) S.ui.payAmt = ''; }
     if (on && slotPay(s, d.pid)) { toast('This slot was paid on a transfer, so it cannot be set free.'); return; }
     if (on) s.free[d.pid] = true; else delete s.free[d.pid];
-    if (!freeCountOf(s) && S.ui.payF === 'free') S.ui.payF = 'all';
     commit(on ? `${nm(d.pid)} plays free` : `${nm(d.pid)} pays again`); render();
   },
   markAllPaid: () => {

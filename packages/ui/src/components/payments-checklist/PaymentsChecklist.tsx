@@ -29,7 +29,7 @@ export type PaymentsChecklistProps = {
     toReimburse: number
     againstCosts: number | null
     cost: number | null
-    /** Free players (D-2026-11-27-01), left out of `total`; the Free tab shows while above 0 */
+    /** Free players (D-2026-11-27-01), left out of `total`; the Free tab always shows */
     free?: number
   }
   filter: PaymentFilter
@@ -73,7 +73,7 @@ export function PaymentsChecklist({
   const covered = (p: PaymentPlayer) =>
     !p.free && (p.status.kind === 'paid' || p.status.kind === 'reimburse')
   const free = totals.free ?? 0
-  const shown: PaymentFilter = filter === 'free' && !free ? 'all' : filter
+  const shown: PaymentFilter = filter
   const rows = players
     .filter(
       (p) =>
@@ -172,7 +172,7 @@ export function PaymentsChecklist({
           { value: 'all', label: `Everyone · ${totals.total}` },
           { value: 'unpaid', label: `Not paid · ${totals.total - totals.paid}` },
           { value: 'paid', label: `Paid · ${totals.paid}` },
-          ...(free ? [{ value: 'free', label: `Free · ${free}` }] : []),
+          { value: 'free', label: `Free · ${free}` },
         ]}
       />
       {rows.length ? (
@@ -197,7 +197,7 @@ export function PaymentsChecklist({
             : shown === 'paid'
               ? 'Nobody has paid yet.'
               : shown === 'free'
-                ? 'Nobody is free.'
+                ? 'Nobody plays free. Tap a card, then Plays free.'
                 : 'No players yet.'}
         </p>
       )}

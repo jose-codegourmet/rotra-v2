@@ -7,6 +7,12 @@
   "gate_on": [
    "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
   ],
+  "alice_male": [
+   "UPDATE players SET gender = 'male' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "alice_answered": [
+   "UPDATE players SET personal_details = '{\"version\":1,\"playingStyle\":\"Smash\",\"court_position\":\"front\",\"skills\":[\"smash\"],\"skills_other\":[],\"favorite_player\":null,\"favorite_player_other\":\"\"}'::jsonb, details_version = 1 WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
   "alice_hidden_banner": [
    "UPDATE players SET banner_id = 'ember' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
   ],
@@ -29,7 +35,7 @@
  "snapshot": [
   {
    "name": "players",
-   "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id",
+   "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, gender, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id",
    "redact": []
   },
   {
@@ -2718,6 +2724,1160 @@
      "who": "f4000000-0000-4000-8000-000000000002",
      "body": {
       "showProfileStats": false,
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_set_male",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "male",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_set_female",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "female",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_set_on_a_player_with_none_beyond_a_double",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "gender": "male",
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_clear",
+   "scenario": "alice_male",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": null,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_change",
+   "scenario": "alice_male",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "female",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_the_same_value_with_a_stale_revision_is_fine",
+   "scenario": "alice_male",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "male",
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_the_same_value_with_a_bad_revision_is_fine",
+   "scenario": "alice_male",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "male",
+      "expectedRevision": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_clearing_when_none_is_fine_with_a_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": null,
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "male",
+      "expectedRevision": "2"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_revision_missing_is_zero",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "male"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_revision_not_a_number",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "male",
+      "expectedRevision": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_missing_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_other_text_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "other",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_upper_case_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "MALE",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_number_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": 1,
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_empty_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "gender_twice_the_second_is_stale",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "male",
+      "expectedRevision": "3"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "female",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_twice_with_the_new_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "male",
+      "expectedRevision": "3"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "gender": "female",
+      "expectedRevision": "4"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_answers_the_card_with_verified_and_gender",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "gender": "female",
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": null,
+     "body": {
+      "gender": "male",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "gender_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/gender",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "gender": "male",
+      "expectedRevision": "9007199254740993"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_all_set",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": "front",
+       "shots": [
+        "smash",
+        "drop"
+       ],
+       "shotsOther": [
+        "Flick"
+       ],
+       "favoritePlayer": "lindan",
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_empty_on_a_player_with_none_changes_nothing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_play_style_only",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": "back",
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_favorite_other_keeps_the_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": "other",
+       "favoritePlayerOther": "  Carolina   Marin "
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_favorite_listed_drops_the_typed_name",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": "momota",
+       "favoritePlayerOther": "Someone"
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_shots_are_put_in_list_order_and_deduplicated",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [
+        "drop",
+        "smash",
+        "smash",
+        "netting"
+       ],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_own_shots_are_trimmed",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [
+        "  Cross   court  ",
+        "Tweener"
+       ],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_the_same_answers_again_with_a_stale_revision_is_fine",
+   "scenario": "alice_answered",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": "front",
+       "shots": [
+        "smash"
+       ],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_changed_keeps_the_playing_style_key",
+   "scenario": "alice_answered",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": "all",
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_cleared",
+   "scenario": "alice_answered",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_stale_revision",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": "front",
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "2"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_revision_missing_is_zero",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": "front",
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_unknown_play_style",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": "middle",
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_play_style_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": 5,
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_unknown_shot",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [
+        "slam"
+       ],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_shot_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [
+        1
+       ],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_shots_not_a_list",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": "smash",
+       "shotsOther": [],
+       "favoritePlayer": null
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_shots_missing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shotsOther": [],
+       "favoritePlayer": null
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_shots_other_missing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "favoritePlayer": null
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_unknown_favorite",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": "nobody",
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_favorite_not_text",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": 3,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_favorite_other_not_text_reads_empty",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": "other",
+       "favoritePlayerOther": 5
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_play_style_missing_is_invalid",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_seven_own_shots",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7"
+       ],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_six_own_shots",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6"
+       ],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_own_shot_blank",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [
+        "  "
+       ],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_own_shot_25_characters",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [
+        "xxxxxxxxxxxxxxxxxxxxxxxxx"
+       ],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_own_shot_24_characters",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [
+        "xxxxxxxxxxxxxxxxxxxxxxxx"
+       ],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_own_shot_repeats_a_listed_one",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [
+        "Jump SMASH"
+       ],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_own_shot_repeats_the_label_with_spaces",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [
+        "net   kill"
+       ],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_own_shots_repeat_each_other",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": null,
+       "shots": [],
+       "shotsOther": [
+        "Flick",
+        "flick"
+       ],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_answers_not_an_object_reads_empty",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": "x",
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_answers_missing",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_body_not_json",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "rawBody": "nope"
+    }
+   ]
+  },
+  {
+   "name": "answers_twice_the_second_is_stale",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": "front",
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "body": {
+      "answers": {
+       "playStyle": "back",
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_signed_out",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": null,
+     "body": {
+      "answers": {
+       "playStyle": "front",
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
+      "expectedRevision": "3"
+     }
+    }
+   ]
+  },
+  {
+   "name": "answers_google_gate",
+   "scenario": "gate_on",
+   "now": "2027-01-02T04:00:00.000Z",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/me/onboarding-answers",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "body": {
+      "answers": {
+       "playStyle": "front",
+       "shots": [],
+       "shotsOther": [],
+       "favoritePlayer": null,
+       "favoritePlayerOther": ""
+      },
       "expectedRevision": "9007199254740993"
      }
     }

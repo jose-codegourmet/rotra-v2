@@ -6,6 +6,7 @@ import (
 	"errors"
 	"math"
 	"net/http"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
@@ -18,6 +19,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/auth/store"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/answers"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/fields"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/player/profile"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
@@ -35,6 +37,8 @@ func (s *server) registerProfile(rt *signedin.Router) {
 	rt.Handle("PATCH /api/me/profile", store.AudiencePlayer, s.player(s.patchProfile))
 	rt.Handle("POST /api/me/profile-banner", store.AudiencePlayer, s.player(s.setBanner))
 	rt.Handle("POST /api/me/stats-visibility", store.AudiencePlayer, s.player(s.setStatsVisibility))
+	rt.Handle("POST /api/me/gender", store.AudiencePlayer, s.player(s.setGender))
+	rt.Handle("POST /api/me/onboarding-answers", store.AudiencePlayer, s.player(s.saveAnswers))
 }
 
 // profileAnswer is `{ profile, revision }`.
@@ -328,6 +332,149 @@ func (s *server) setStatsVisibility(r *http.Request, p session.Principal) (write
 				return err
 			}
 			if err := q.SetPlayerStatsVisibility(ctx, sqlcgen.SetPlayerStatsVisibilityParams{ShowProfileStats: stats, ShowWeeklyPerformance: weekly, Now: s.stamp(), ID: id}); err != nil {
+				return err
+			}
+		}
+		card, err = publicreads.ReadOwnProfileCard(ctx, q, id, s.at())
+		return err
+	})
+	if err != nil {
+		return writes.Result{}, err
+	}
+	return s.answerProfile(r.Context(), id, card)
+}
+
+// setGender is P-EDIT-PROFILE › Name › Gender: `{ gender: 'male' | 'female' | null, expectedRevision }` under the account revision the
+// screen loaded (D-2026-11-19-01). The player's own gender only. Setting the same value again is not a write. It takes no row lock.
+func (s *server) setGender(r *http.Request, p session.Principal) (writes.Result, error) {
+	body, err := writes.ReadBody(r)
+	if err != nil {
+		return writes.Result{}, err
+	}
+	gender := sqlcgen.NullPlayerGender{}
+	switch v := body["gender"].(type) {
+	case nil:
+		if _, given := body["gender"]; !given {
+			return writes.Result{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"gender": "Choose Male or Female."})
+		}
+	case string:
+		if v != "male" && v != "female" {
+			return writes.Result{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"gender": "Choose Male or Female."})
+		}
+		gender = sqlcgen.NullPlayerGender{PlayerGender: sqlcgen.PlayerGender(v), Valid: true}
+	default:
+		return writes.Result{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"gender": "Choose Male or Female."})
+	}
+	expected := body.Text("expectedRevision")
+	id := self(p)
+	var card any
+	err = writes.InTx(r.Context(), s.pool, func(ctx context.Context, q *sqlcgen.Queries) error {
+		row, err := q.GetPlayerGenderState(ctx, id)
+		if err != nil {
+			return err
+		}
+		if gender != row.Gender {
+			if err := writes.RequireRevision(row.Revision, expected); err != nil {
+				return err
+			}
+			if err := q.SetPlayerGender(ctx, sqlcgen.SetPlayerGenderParams{Gender: gender, Now: s.stamp(), ID: id}); err != nil {
+				return err
+			}
+		}
+		card, err = publicreads.ReadOwnProfileCard(ctx, q, id, s.at())
+		return err
+	})
+	if err != nil {
+		return writes.Result{}, err
+	}
+	return s.answerProfile(r.Context(), id, card)
+}
+
+// answersOf is answersOf in the Route Handler: the body's `answers`, shaped only; the service checks the ids, lengths and repeats. A
+// play style or favourite player must be null or text, the two shot lists lists of text; anything else is one message.
+func answersOf(body writes.Body) (answers.Input, error) {
+	bad := writes.Fail(httpapi.ErrInvalid, map[string]string{"answers": "Check your answers and try again."})
+	input, _ := body["answers"].(map[string]any)
+	nullable := func(key string) (*string, error) {
+		switch v := input[key].(type) {
+		case string:
+			return &v, nil
+		case nil:
+			if _, given := input[key]; given {
+				return nil, nil
+			}
+		}
+		return nil, bad
+	}
+	list := func(key string) ([]string, error) {
+		raw, ok := input[key].([]any)
+		if !ok {
+			return nil, bad
+		}
+		out := make([]string, 0, len(raw))
+		for _, v := range raw {
+			t, ok := v.(string)
+			if !ok {
+				return nil, bad
+			}
+			out = append(out, t)
+		}
+		return out, nil
+	}
+	var in answers.Input
+	var err error
+	if in.PlayStyle, err = nullable("playStyle"); err != nil {
+		return in, err
+	}
+	if in.Shots, err = list("shots"); err != nil {
+		return in, err
+	}
+	if in.ShotsOther, err = list("shotsOther"); err != nil {
+		return in, err
+	}
+	if in.FavoritePlayer, err = nullable("favoritePlayer"); err != nil {
+		return in, err
+	}
+	in.FavoritePlayerOther, _ = input["favoritePlayerOther"].(string)
+	return in, nil
+}
+
+// saveAnswers is P-EDIT-PROFILE › Playing style and P-ONBOARD steps 2 to 4: `{ answers, expectedRevision }` under the account revision the
+// screen loaded (D-2026-11-19-11). The player's own getting-to-know answers, checked and merged into personal_details (other keys such as
+// playingStyle stay). Saved answers that are unchanged are not a write.
+func (s *server) saveAnswers(r *http.Request, p session.Principal) (writes.Result, error) {
+	body, err := writes.ReadBody(r)
+	if err != nil {
+		return writes.Result{}, err
+	}
+	input, err := answersOf(body)
+	if err != nil {
+		return writes.Result{}, err
+	}
+	next, problem := answers.Normalize(input)
+	if problem != "" {
+		return writes.Result{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"answers": problem})
+	}
+	expected := body.Text("expectedRevision")
+	id := self(p)
+	var card any
+	err = writes.InTx(r.Context(), s.pool, func(ctx context.Context, q *sqlcgen.Queries) error {
+		row, err := q.LockPlayerDetails(ctx, id)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return writes.Fail(httpapi.ErrNotFound, nil)
+		}
+		if err != nil {
+			return err
+		}
+		if !reflect.DeepEqual(answers.Of(row.PersonalDetails), next) {
+			if err := writes.RequireRevision(row.Revision, expected); err != nil {
+				return err
+			}
+			merged, err := answers.Merge(row.PersonalDetails, next)
+			if err != nil {
+				return err
+			}
+			if err := q.SetPlayerAnswers(ctx, sqlcgen.SetPlayerAnswersParams{Details: merged, Now: s.stamp(), ID: id}); err != nil {
 				return err
 			}
 		}

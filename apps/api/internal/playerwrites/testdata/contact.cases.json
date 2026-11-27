@@ -7,6 +7,12 @@
   "gate_on": [
    "UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"
   ],
+  "alice_male": [
+   "UPDATE players SET gender = 'male' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
+  "alice_answered": [
+   "UPDATE players SET personal_details = '{\"version\":1,\"playingStyle\":\"Smash\",\"court_position\":\"front\",\"skills\":[\"smash\"],\"skills_other\":[],\"favorite_player\":null,\"favorite_player_other\":\"\"}'::jsonb, details_version = 1 WHERE id = 'd4000000-0000-4000-8000-000000000001'"
+  ],
   "alice_hidden_banner": [
    "UPDATE players SET banner_id = 'ember' WHERE id = 'd4000000-0000-4000-8000-000000000001'"
   ],
@@ -57,7 +63,7 @@
   },
   {
    "name": "players",
-   "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id",
+   "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, gender, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id",
    "redact": []
   },
   {

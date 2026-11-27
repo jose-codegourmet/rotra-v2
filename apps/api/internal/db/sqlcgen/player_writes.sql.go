@@ -60,6 +60,23 @@ func (q *Queries) GetClubPlayerLink(ctx context.Context, arg GetClubPlayerLinkPa
 	return i, err
 }
 
+const getPlayerGenderState = `-- name: GetPlayerGenderState :one
+SELECT gender, revision FROM players WHERE id = $1
+`
+
+type GetPlayerGenderStateRow struct {
+	Gender   NullPlayerGender
+	Revision int64
+}
+
+// setMyGender: tx.player.findUniqueOrThrow, no lock.
+func (q *Queries) GetPlayerGenderState(ctx context.Context, id pgtype.UUID) (GetPlayerGenderStateRow, error) {
+	row := q.db.QueryRow(ctx, getPlayerGenderState, id)
+	var i GetPlayerGenderStateRow
+	err := row.Scan(&i.Gender, &i.Revision)
+	return i, err
+}
+
 const getPlayerNames = `-- name: GetPlayerNames :one
 SELECT full_name, nickname FROM players WHERE id = $1
 `
@@ -166,6 +183,23 @@ func (q *Queries) LockPlayerBanner(ctx context.Context, id pgtype.UUID) (LockPla
 	return i, err
 }
 
+const lockPlayerDetails = `-- name: LockPlayerDetails :one
+SELECT revision, personal_details FROM players WHERE id = $1 FOR UPDATE
+`
+
+type LockPlayerDetailsRow struct {
+	Revision        int64
+	PersonalDetails []byte
+}
+
+// saveMyGettingToKnowAnswers: the player's row is locked, then read.
+func (q *Queries) LockPlayerDetails(ctx context.Context, id pgtype.UUID) (LockPlayerDetailsRow, error) {
+	row := q.db.QueryRow(ctx, lockPlayerDetails, id)
+	var i LockPlayerDetailsRow
+	err := row.Scan(&i.Revision, &i.PersonalDetails)
+	return i, err
+}
+
 const markMyNotificationsRead = `-- name: MarkMyNotificationsRead :execrows
 UPDATE player_notifications SET read_at = $1
 WHERE player_id = $2 AND created_at > $3 AND read_at IS NULL
@@ -242,6 +276,21 @@ func (q *Queries) ReviveClubPlayer(ctx context.Context, arg ReviveClubPlayerPara
 	return err
 }
 
+const setPlayerAnswers = `-- name: SetPlayerAnswers :exec
+UPDATE players SET personal_details = $1::jsonb, details_version = 1, revision = revision + 1, updated_at = $2 WHERE id = $3
+`
+
+type SetPlayerAnswersParams struct {
+	Details []byte
+	Now     pgtype.Timestamptz
+	ID      pgtype.UUID
+}
+
+func (q *Queries) SetPlayerAnswers(ctx context.Context, arg SetPlayerAnswersParams) error {
+	_, err := q.db.Exec(ctx, setPlayerAnswers, arg.Details, arg.Now, arg.ID)
+	return err
+}
+
 const setPlayerBanner = `-- name: SetPlayerBanner :exec
 UPDATE players SET banner_id = $1, revision = revision + 1, updated_at = $2 WHERE id = $3
 `
@@ -254,6 +303,21 @@ type SetPlayerBannerParams struct {
 
 func (q *Queries) SetPlayerBanner(ctx context.Context, arg SetPlayerBannerParams) error {
 	_, err := q.db.Exec(ctx, setPlayerBanner, arg.BannerID, arg.Now, arg.ID)
+	return err
+}
+
+const setPlayerGender = `-- name: SetPlayerGender :exec
+UPDATE players SET gender = $1::player_gender, revision = revision + 1, updated_at = $2 WHERE id = $3
+`
+
+type SetPlayerGenderParams struct {
+	Gender NullPlayerGender
+	Now    pgtype.Timestamptz
+	ID     pgtype.UUID
+}
+
+func (q *Queries) SetPlayerGender(ctx context.Context, arg SetPlayerGenderParams) error {
+	_, err := q.db.Exec(ctx, setPlayerGender, arg.Gender, arg.Now, arg.ID)
 	return err
 }
 

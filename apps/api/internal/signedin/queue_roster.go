@@ -12,6 +12,7 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/publicreads"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/winchance"
 )
 
 // GET /api/sessions/{sessionId}/roster: the Queue Master's roster read. Port of readSessionRoster in
@@ -35,6 +36,17 @@ type queueRosterEntryDTO struct {
 	Revision             string  `json:"revision"`
 	HasPlayedAtClubBfore *bool   `json:"hasPlayedAtClubBefore,omitempty"`
 	NoShowAt             *string `json:"noShowAt,omitempty"`
+	// Form is the player's lasting signals at this club (Win chance, D-2026-11-27-02); absent for a first-timer.
+	Form *queueFormDTO `json:"form,omitempty"`
+}
+
+// queueFormDTO is PlayerForm: the club win rate (null under 10 decided games), whether tonight is their best weekday, and the
+// leaderboard place and direction (0 until rank calculation is real).
+type queueFormDTO struct {
+	ClubWinRate *float64 `json:"clubWinRate"`
+	BestDay     bool     `json:"bestDay"`
+	Place       int      `json:"place"`
+	Trend       int      `json:"trend"`
 }
 
 type queueWaitlistDTO struct {
@@ -159,6 +171,7 @@ func (s *server) rosterOf(ctx context.Context, q *sqlcgen.Queries, club pgtype.U
 		}
 	}
 	returning := map[pgtype.UUID]bool{}
+	forms := map[pgtype.UUID]*queueFormDTO{}
 	if len(ids) > 0 {
 		before := sess.FinalizedAt
 		if !before.Valid {
@@ -168,8 +181,18 @@ func (s *server) rosterOf(ctx context.Context, q *sqlcgen.Queries, club pgtype.U
 		if err != nil {
 			return nil, err
 		}
+		// Win chance inputs: each player's win and loss record at this club, by the weekday of the session (Manila). A player with no
+		// finalized session here (a first-timer) has no form.
+		weekday := func(t time.Time) int { return int(t.Add(8 * time.Hour).UTC().Weekday()) }
+		history := map[pgtype.UUID][]winchance.SessionRecord{}
 		for _, p := range prior {
-			returning[p] = true
+			returning[p.ClubPlayerID] = true
+			history[p.ClubPlayerID] = append(history[p.ClubPlayerID], winchance.SessionRecord{Weekday: weekday(p.ScheduledStartAt.Time), Wins: int(p.Wins), Losses: int(p.Losses)})
+		}
+		tonight := weekday(sess.ScheduledStartAt.Time)
+		for id, rows := range history {
+			f := winchance.FormFromHistory(rows, tonight)
+			forms[id] = &queueFormDTO{ClubWinRate: f.ClubWinRate, BestDay: f.BestDay, Place: f.Place, Trend: f.Trend}
 		}
 	}
 	reqs, err := q.ListQueuePendingJoinRequests(ctx, sess.ID)
@@ -197,6 +220,7 @@ func (s *server) rosterOf(ctx context.Context, q *sqlcgen.Queries, club pgtype.U
 		d := rosterEntryOf(e)
 		played := returning[e.ClubPlayerID]
 		d.HasPlayedAtClubBfore = &played
+		d.Form = forms[e.ClubPlayerID]
 		out.Roster = append(out.Roster, d)
 	}
 	for _, e := range noShows {

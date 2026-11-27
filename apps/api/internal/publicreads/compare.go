@@ -136,7 +136,7 @@ func ReadCompare(ctx context.Context, q *sqlcgen.Queries, viewer pgtype.UUID, ot
 		if err != nil {
 			return comparePlayer{}, fmt.Errorf("listing facts: %w", err)
 		}
-		history, err := readHistory(ctx, q, historyFactsOf(facts), viewerRef{}, true)
+		history, err := readHistory(ctx, q, historyFactsOf(facts), viewerRef{}, true, false)
 		if err != nil {
 			return comparePlayer{}, err
 		}

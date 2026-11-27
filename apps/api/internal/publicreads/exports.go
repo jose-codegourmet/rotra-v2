@@ -85,7 +85,7 @@ func AdminPlayerHistory(ctx context.Context, q *sqlcgen.Queries, playerID pgtype
 	if err != nil {
 		return nil, fmt.Errorf("listing facts: %w", err)
 	}
-	return readHistory(ctx, q, historyFactsOf(facts), viewerRef{}, false)
+	return readHistory(ctx, q, historyFactsOf(facts), viewerRef{}, false, false)
 }
 
 // AdminClubPlayerHistory is readClubPlayerMatchHistory: the games of one club record, scoped to that club.
@@ -94,7 +94,7 @@ func AdminClubPlayerHistory(ctx context.Context, q *sqlcgen.Queries, clubID, clu
 	if err != nil {
 		return nil, fmt.Errorf("listing club facts: %w", err)
 	}
-	return readHistory(ctx, q, clubHistoryFactsOf(facts), viewerRef{}, false)
+	return readHistory(ctx, q, clubHistoryFactsOf(facts), viewerRef{}, false, false)
 }
 
 // IsJSSpace is whether a rune is whitespace for a JavaScript regular expression's \s and for trim().
@@ -111,7 +111,7 @@ func PlayerYearStats(ctx context.Context, q *sqlcgen.Queries, playerID pgtype.UU
 	if err != nil {
 		return nil, fmt.Errorf("listing facts: %w", err)
 	}
-	sessions, err := readHistory(ctx, q, historyFactsOf(facts), viewerRef{}, true)
+	sessions, err := readHistory(ctx, q, historyFactsOf(facts), viewerRef{}, true, false)
 	if err != nil {
 		return nil, err
 	}

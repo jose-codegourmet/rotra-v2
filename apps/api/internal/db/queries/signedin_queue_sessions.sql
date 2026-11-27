@@ -69,9 +69,12 @@ WHERE session_id = @session_id;
 
 -- Club players who played here before this session was finalized (or now): their entries show Played here before.
 -- name: ListQueueReturningPlayers :many
-SELECT DISTINCT s.club_player_id
+-- One row per finalized session of each player before this one: who has played here before, and their record by weekday (Win chance,
+-- D-2026-11-27-02: formFromHistory).
+SELECT s.club_player_id, s.session_id, s.wins, s.losses, qs.scheduled_start_at
 FROM club_session_player_summaries s
 JOIN session_finalizations f ON f.club_id = s.club_id AND f.session_id = s.session_id
+JOIN queue_sessions qs ON qs.id = s.session_id
 WHERE s.club_id = @club_id
   AND s.club_player_id = ANY (@club_player_ids::uuid[])
   AND s.session_id <> @session_id

@@ -7,12 +7,14 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/db/sqlcgen"
 	httpapi "github.com/jose-codegourmet/rotra-v2/apps/api/internal/http"
+	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/rules/winchance"
 )
 
 // P-MATCH-HISTORY: GET /api/players/{playerId}/games, readPublicMatchHistory(playerId, viewerId): the games of a
@@ -39,6 +41,17 @@ type gameDTO struct {
 	Counting          string           `json:"counting"`
 	Result            string           `json:"result"`
 	Score             *string          `json:"score"`
+	// WinChance and Upset are only on the Player app's games read (D-2026-11-27-03): the pair chance of a finished game from the lasting
+	// signals, and whether the Favored pair lost. Never on a partial game.
+	WinChance *winChanceDTO `json:"winChance,omitempty"`
+	Upset     *bool         `json:"upset,omitempty"`
+}
+
+type winChanceDTO struct {
+	A       int     `json:"a"`
+	B       int     `json:"b"`
+	Favored *string `json:"favored"`
+	Strong  bool    `json:"strong"`
 }
 
 type historySession struct {
@@ -137,7 +150,7 @@ func (p *players) games(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return fmt.Errorf("listing facts: %w", err)
 		}
-		sessions, err = readHistory(r.Context(), q, historyFactsOf(facts), v, true)
+		sessions, err = readHistory(r.Context(), q, historyFactsOf(facts), v, true, true)
 		return err
 	})
 	if err != nil {
@@ -165,7 +178,7 @@ type entryKey struct{ session, entry, match pgtype.UUID }
 // readHistory is historyFromFacts: valid finalized sessions only, grouped by session, newest first.
 // Games keep the order of the facts (newest played first). Two sessions finalized in the same millisecond
 // have no order in the TypeScript (the database's); here they keep the order of their newest game.
-func readHistory(ctx context.Context, q *sqlcgen.Queries, facts []historyFact, v viewerRef, maskFaces bool) ([]historySession, error) {
+func readHistory(ctx context.Context, q *sqlcgen.Queries, facts []historyFact, v viewerRef, maskFaces, withWinChance bool) ([]historySession, error) {
 	var sessionIDs []pgtype.UUID
 	seen := map[pgtype.UUID]bool{}
 	for _, f := range facts {
@@ -207,6 +220,13 @@ func readHistory(ctx context.Context, q *sqlcgen.Queries, facts []historyFact, v
 		numbers[entryKey{n.SessionID, n.SessionPlayerID, n.MatchID}] = n.GameNumber
 	}
 
+	var chanceOf func(f historyFact, s sqlcgen.ListCompletedSessionsRow) *winchance.Game
+	if withWinChance {
+		var err error
+		if chanceOf, err = winChanceReader(ctx, q, completed, done, entryRows); err != nil {
+			return nil, err
+		}
+	}
 	gamesOf := map[pgtype.UUID][]gameDTO{}
 	for _, f := range facts {
 		if _, ok := bySession[f.SessionID]; !ok {
@@ -229,12 +249,21 @@ func readHistory(ctx context.Context, q *sqlcgen.Queries, facts []historyFact, v
 		}
 		partners, partnerPlayers := people(f.PartnerEntryIds)
 		opponents, opponentPlayers := people(f.OpponentEntryIds)
-		gamesOf[f.SessionID] = append(gamesOf[f.SessionID], gameDTO{
+		game := gameDTO{
 			ID: f.MatchID.String(), Format: string(f.Format), SessionGameNumber: number(f.SessionPlayerID),
 			Partners: partners, Opponents: opponents, PartnerPlayers: partnerPlayers, OpponentPlayers: opponentPlayers,
 			Counting: counting(f.FullParticipation, f.StandardMatch, bySession[f.SessionID].RecordGames), Result: result(f.Team, f.WinningTeam),
 			Score: score(f.Team, f.TeamAScore, f.TeamBScore),
-		})
+		}
+		if chanceOf != nil && game.Counting != "partial" {
+			if g := chanceOf(f, bySession[f.SessionID]); g != nil {
+				game.WinChance, game.Upset = &winChanceDTO{A: g.Chance.A, B: g.Chance.B, Strong: g.Chance.Strong}, &g.Upset
+				if g.Chance.Favored != "" {
+					game.WinChance.Favored = &g.Chance.Favored
+				}
+			}
+		}
+		gamesOf[f.SessionID] = append(gamesOf[f.SessionID], game)
 	}
 
 	out := make([]historySession, 0, len(sessionIDs))
@@ -317,4 +346,81 @@ func score(team sqlcgen.TeamSide, a, b pgtype.Int4) *string {
 		s = fmt.Sprintf("%d–%d", b.Int32, a.Int32)
 	}
 	return &s
+}
+
+// winChanceReader is readClubForms with the levels: it reads, in two queries, the level each entry played its session at and the lasting
+// form of every saved player on these courts, and answers the win chance of one finished game. A face with no finalized session before
+// the game's session at that club counts as its level only.
+func winChanceReader(ctx context.Context, q *sqlcgen.Queries, sessions []sqlcgen.ListCompletedSessionsRow, sessionIDs []pgtype.UUID,
+	entryRows []sqlcgen.ListSessionEntriesRow) (func(f historyFact, s sqlcgen.ListCompletedSessionsRow) *winchance.Game, error) {
+
+	levelRows, err := q.ListSessionEntryLevels(ctx, sessionIDs)
+	if err != nil {
+		return nil, fmt.Errorf("reading levels: %w", err)
+	}
+	level := make(map[pgtype.UUID]int, len(levelRows))
+	for _, l := range levelRows {
+		level[l.SessionPlayerID] = int(l.SkillLevelSnapshotID)
+	}
+	clubOf := map[pgtype.UUID]pgtype.UUID{}
+	clubs, players := []pgtype.UUID{}, []pgtype.UUID{}
+	for _, s := range sessions {
+		clubs = append(clubs, s.ClubID)
+	}
+	for _, e := range entryRows {
+		if e.ClubPlayerID.Valid {
+			clubOf[e.ID] = e.ClubPlayerID
+			players = append(players, e.ClubPlayerID)
+		}
+	}
+	history := map[pgtype.UUID][]sqlcgen.ListClubFormRowsRow{}
+	if len(players) > 0 {
+		rows, err := q.ListClubFormRows(ctx, sqlcgen.ListClubFormRowsParams{ClubIds: clubs, ClubPlayerIds: players})
+		if err != nil {
+			return nil, fmt.Errorf("reading club forms: %w", err)
+		}
+		for _, r := range rows {
+			history[r.ClubPlayerID] = append(history[r.ClubPlayerID], r)
+		}
+	}
+	weekday := func(t time.Time) int { return int(t.Add(8 * time.Hour).UTC().Weekday()) } // Manila, Sunday 0
+	formOf := func(entry pgtype.UUID, s sqlcgen.ListCompletedSessionsRow) *winchance.Form {
+		clubPlayer, ok := clubOf[entry]
+		if !ok {
+			return nil
+		}
+		before := time.Now()
+		if s.FinalizedAt.Valid {
+			before = s.FinalizedAt.Time
+		}
+		var prior []winchance.SessionRecord
+		for _, r := range history[clubPlayer] {
+			if r.SessionID != s.ID && r.CommittedAt.Valid && r.CommittedAt.Time.Before(before) {
+				prior = append(prior, winchance.SessionRecord{Weekday: weekday(r.ScheduledStartAt.Time), Wins: int(r.Wins), Losses: int(r.Losses)})
+			}
+		}
+		if len(prior) == 0 {
+			return nil
+		}
+		form := winchance.FormFromHistory(prior, weekday(s.ScheduledStartAt.Time))
+		return &form
+	}
+	face := func(entry pgtype.UUID, s sqlcgen.ListCompletedSessionsRow) winchance.Face {
+		lv, ok := level[entry]
+		if !ok {
+			lv = -1
+		}
+		return winchance.Face{Level: lv, Form: formOf(entry, s)}
+	}
+	return func(f historyFact, s sqlcgen.ListCompletedSessionsRow) *winchance.Game {
+		left := []winchance.Face{face(f.SessionPlayerID, s)}
+		for _, id := range f.PartnerEntryIds {
+			left = append(left, face(id, s))
+		}
+		right := make([]winchance.Face, 0, len(f.OpponentEntryIds))
+		for _, id := range f.OpponentEntryIds {
+			right = append(right, face(id, s))
+		}
+		return winchance.OfGame(left, right, result(f.Team, f.WinningTeam) == "won")
+	}, nil
 }

@@ -251,6 +251,57 @@ func (q *Queries) GetPublicProfile(ctx context.Context, playerID pgtype.UUID) (G
 	return i, err
 }
 
+const listClubFormRows = `-- name: ListClubFormRows :many
+SELECT s.club_player_id, s.session_id, s.wins, s.losses, fin.committed_at, qs.scheduled_start_at
+FROM club_session_player_summaries s
+JOIN session_finalizations fin ON fin.club_id = s.club_id AND fin.session_id = s.session_id
+JOIN queue_sessions qs ON qs.id = s.session_id
+WHERE s.club_id = ANY ($1::uuid[]) AND s.club_player_id = ANY ($2::uuid[])
+`
+
+type ListClubFormRowsParams struct {
+	ClubIds       []pgtype.UUID
+	ClubPlayerIds []pgtype.UUID
+}
+
+type ListClubFormRowsRow struct {
+	ClubPlayerID     pgtype.UUID
+	SessionID        pgtype.UUID
+	Wins             int32
+	Losses           int32
+	CommittedAt      pgtype.Timestamptz
+	ScheduledStartAt pgtype.Timestamptz
+}
+
+// Win chance (readClubForms): every finalized session of the given saved players at their clubs, with its result for them, when it was
+// committed and when it was scheduled (its weekday).
+func (q *Queries) ListClubFormRows(ctx context.Context, arg ListClubFormRowsParams) ([]ListClubFormRowsRow, error) {
+	rows, err := q.db.Query(ctx, listClubFormRows, arg.ClubIds, arg.ClubPlayerIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListClubFormRowsRow
+	for rows.Next() {
+		var i ListClubFormRowsRow
+		if err := rows.Scan(
+			&i.ClubPlayerID,
+			&i.SessionID,
+			&i.Wins,
+			&i.Losses,
+			&i.CommittedAt,
+			&i.ScheduledStartAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listCompletedSessions = `-- name: ListCompletedSessions :many
 SELECT qs.id,
        qs.title,
@@ -258,6 +309,8 @@ SELECT qs.id,
        qs.finalized_at,
        qs.public_slug,
        qs.record_games,
+       qs.club_id,
+       qs.scheduled_start_at,
        sp.published_at
 FROM queue_sessions qs
 JOIN clubs c ON c.id = qs.club_id
@@ -267,13 +320,15 @@ WHERE qs.id = ANY ($1::uuid[])
 `
 
 type ListCompletedSessionsRow struct {
-	ID          pgtype.UUID
-	Title       string
-	ClubName    string
-	FinalizedAt pgtype.Timestamptz
-	PublicSlug  string
-	RecordGames bool
-	PublishedAt pgtype.Timestamptz
+	ID               pgtype.UUID
+	Title            string
+	ClubName         string
+	FinalizedAt      pgtype.Timestamptz
+	PublicSlug       string
+	RecordGames      bool
+	ClubID           pgtype.UUID
+	ScheduledStartAt pgtype.Timestamptz
+	PublishedAt      pgtype.Timestamptz
 }
 
 // Valid finalized sessions only.
@@ -293,6 +348,8 @@ func (q *Queries) ListCompletedSessions(ctx context.Context, sessionIds []pgtype
 			&i.FinalizedAt,
 			&i.PublicSlug,
 			&i.RecordGames,
+			&i.ClubID,
+			&i.ScheduledStartAt,
 			&i.PublishedAt,
 		); err != nil {
 			return nil, err
@@ -480,6 +537,7 @@ func (q *Queries) ListPlayerSocialLinks(ctx context.Context, playerID pgtype.UUI
 const listSessionEntries = `-- name: ListSessionEntries :many
 SELECT e.id,
        e.name_snapshot,
+       e.club_player_id,
        pl.id                  AS player_id,
        pl.avatar_ref,
        pl.profile_visibility,
@@ -493,6 +551,7 @@ WHERE e.session_id = ANY ($1::uuid[])
 type ListSessionEntriesRow struct {
 	ID                pgtype.UUID
 	NameSnapshot      string
+	ClubPlayerID      pgtype.UUID
 	PlayerID          pgtype.UUID
 	AvatarRef         pgtype.Text
 	ProfileVisibility NullProfileVisibility
@@ -511,11 +570,45 @@ func (q *Queries) ListSessionEntries(ctx context.Context, sessionIds []pgtype.UU
 		if err := rows.Scan(
 			&i.ID,
 			&i.NameSnapshot,
+			&i.ClubPlayerID,
 			&i.PlayerID,
 			&i.AvatarRef,
 			&i.ProfileVisibility,
 			&i.HasRtrID,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listSessionEntryLevels = `-- name: ListSessionEntryLevels :many
+SELECT DISTINCT ON (f.session_player_id) f.session_player_id, f.skill_level_snapshot_id
+FROM player_match_facts f
+WHERE f.session_id = ANY ($1::uuid[])
+ORDER BY f.session_player_id, f.played_at ASC, f.match_id ASC
+`
+
+type ListSessionEntryLevelsRow struct {
+	SessionPlayerID      pgtype.UUID
+	SkillLevelSnapshotID int16
+}
+
+// Win chance: the level each entry played its session at (its first fact, as the match page reads it).
+func (q *Queries) ListSessionEntryLevels(ctx context.Context, sessionIds []pgtype.UUID) ([]ListSessionEntryLevelsRow, error) {
+	rows, err := q.db.Query(ctx, listSessionEntryLevels, sessionIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSessionEntryLevelsRow
+	for rows.Next() {
+		var i ListSessionEntryLevelsRow
+		if err := rows.Scan(&i.SessionPlayerID, &i.SkillLevelSnapshotID); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

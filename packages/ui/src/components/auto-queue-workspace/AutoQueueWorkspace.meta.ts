@@ -5,6 +5,7 @@ export const autoQueueWorkspaceMeta = {
   description:
     'The Generate Queue tab (Q-AUTO): the Generate Queue heading, the Bagging mode switch, five generation tabs and draft review actions.',
   usage: [
+    "Pass onOpenWinChance(draftId) to make each draft's win chance chips open WinChanceDialog.",
     'The console renders it as its own Generate Queue tab, next to the Main Queue tab; the Main Queue is not part of this component. Adding reviewed drafts calls onAddToMainQueue and the container then returns to the Main Queue tab.',
     'The container owns batches, cross-tab selection order, generation, clearing and transfer validation. The UI never appends a draft itself.',
     'Pass minimumGames for the Catch Up example and placeholder, and noEligibleText (autoQueueEmptyText from @rotra/data/match/planAhead.rules: null when someone can be used, otherwise the empty card text for the current strategy). The target is always an explicit choice; its placeholder never supplies a default.',

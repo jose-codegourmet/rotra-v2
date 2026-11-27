@@ -33,6 +33,7 @@ const propsFor = (
   present: p.present,
   onToggleSelect: fn(),
   onPresentChange: fn(),
+  onEdit: fn(),
 })
 
 // Fixture roles: 0–3 are on Court 1 (match 1), 4 waits in match 2 (queue #1), 5 is away, 10 is free.
@@ -88,6 +89,20 @@ export const SelectedWithOrder: Story = { args: { selected: true, pickOrder: 2 }
 export const NoLevel: Story = { args: { level: null } }
 /** The live console passes onSetGames: Current is a button (dashed underline, hover tint) that opens Set games played */
 export const WithSetGames: Story = { args: { onSetGames: fn() } }
+/** The Edit player pencil is a 28 px accent circle on the top-right corner, over the border */
+export const CornerPencil: Story = { args: { onEdit: fn() } }
+export const CornerPencilLight: Story = { ...CornerPencil, globals: { theme: 'light' } }
+/** Selected: the pick badge on the left corner, the pencil on the right */
+export const SelectedWithPencil: Story = { args: { selected: true, pickOrder: 1, onEdit: fn() } }
+export const SelectedWithPencilLight: Story = {
+  ...SelectedWithPencil,
+  globals: { theme: 'light' },
+}
+/** A full name uses almost the whole card width now the pencil has left the name row */
+export const FullNameWidth: Story = {
+  args: { name: 'Ysa Fernandez', onEdit: fn() },
+}
+
 /** The picture opens the profile card; the rest of the card still selects. */
 export const WithProfileButton: Story = { args: { onOpenProfile: fn(), onSetGames: fn() } }
 /** Clamped at two lines with an ellipsis */
@@ -201,8 +216,12 @@ export const LevelRings: Story = {
 }
 export const LevelRingsLight: Story = { ...LevelRings, globals: { theme: 'light' } }
 
-/** One name: club nickname first, then nickname, then the full name; hover shows the full name */
-export const ClubNickname: Story = { args: { nickname: 'Migs', clubNickname: 'Migo' } }
-export const NicknameOnly: Story = { args: { nickname: 'Migs' } }
-export const FullNameOnly: Story = {}
+/** The name stack (D-2026-11-26-09): club nickname on top, then nickname, then the full name in smaller lines; hover shows the full name */
+export const ClubNickname: Story = {
+  args: { name: 'Miguel Santos', nickname: 'Migs', clubNickname: 'Kuya Migs' },
+}
+export const NicknameOnly: Story = { args: { name: 'Paulo Garcia', nickname: 'Pau' } }
+export const FullNameOnly: Story = { args: { name: 'Ysa Fernandez' } }
 export const ClubNicknameLight: Story = { ...ClubNickname, globals: { theme: 'light' } }
+export const NicknameOnlyLight: Story = { ...NicknameOnly, globals: { theme: 'light' } }
+export const FullNameOnlyLight: Story = { ...FullNameOnly, globals: { theme: 'light' } }

@@ -170,34 +170,96 @@ export const OneVersusTwoInGame: Story = {
   }),
 }
 export const MergedFiveVersusFive: Story = { args: inGame(merged) }
-/** Q27.5: the expected finish line under the match line, one story per phase */
-export const PlayingEndsInAboutMinutes: Story = {
-  args: inGame(playing, { expectedFinish: { text: 'Ends in about 6 min', tone: 'muted' } }),
+/** Owner, November 26, 2026: the top-right status. Playing (first half of a typical game), Ending, Ending soon, Running long (warn). */
+export const PlayingStatusPlaying: Story = {
+  args: inGame(playing, { status: { label: 'Playing', tone: 'accent' } }),
 }
-export const PlayingFinishingSoon: Story = {
-  args: inGame(playing, { expectedFinish: { text: 'Finishing soon', tone: 'accent' } }),
-}
-export const PlayingCouldEndAnyTime: Story = {
-  args: inGame(playing, { expectedFinish: { text: 'Could end any time', tone: 'muted' } }),
-}
-export const PlayingCouldEndAnyTimeDeuce: Story = {
+export const PlayingStatusEnding: Story = {
   args: inGame(playing, {
-    expectedFinish: { text: 'Could end any time · may be in deuce', tone: 'muted' },
+    status: { label: 'Ending', tone: 'accent', title: 'Ends in about 4 min' },
   }),
 }
-export const PlayingRunningLong: Story = {
-  args: inGame(playing, { expectedFinish: { text: 'Running long', tone: 'warn' } }),
+export const PlayingStatusEndingSoon: Story = {
+  args: inGame(playing, {
+    status: { label: 'Ending soon', tone: 'accent', title: 'Finishing soon' },
+  }),
 }
-export const PlayingRunningLongLight: Story = {
-  ...PlayingRunningLong,
+export const PlayingStatusRunningLong: Story = {
+  args: inGame(playing, {
+    status: { label: 'Ending soon', tone: 'warn', title: 'Running long' },
+  }),
+}
+export const PlayingStatusRunningLongLight: Story = {
+  ...PlayingStatusRunningLong,
   globals: { theme: 'light' },
 }
+export const PlayingStatusEndingLight: Story = {
+  ...PlayingStatusEnding,
+  globals: { theme: 'light' },
+}
+/** D-2026-11-25-02: the Almost done row under the #N row, switch off (status as the time estimate gives it) */
+export const AlmostDoneOff: Story = {
+  args: inGame(playing, {
+    status: { label: 'Ending', tone: 'accent', title: 'Ends in about 4 min' },
+    almostDone: false,
+    onAlmostDoneChange: fn(),
+    onPause: fn(),
+    onMatchDone: fn(),
+  }),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const row = within(canvasElement).getByRole('switch', { name: /^Almost done, / })
+    await expect(row).not.toBeChecked()
+    await userEvent.click(row)
+  },
+}
+/** Almost done on: the top right reads Ending soon and its hover reads "Almost done" */
+export const AlmostDoneOn: Story = {
+  args: inGame(playing, {
+    status: { label: 'Ending soon', tone: 'accent', title: 'Almost done' },
+    almostDone: true,
+    onAlmostDoneChange: fn(),
+    onPause: fn(),
+    onMatchDone: fn(),
+  }),
+}
+export const AlmostDoneOnLight: Story = { ...AlmostDoneOn, globals: { theme: 'light' } }
+export const AlmostDoneMerged: Story = {
+  args: inGame(merged, {
+    status: { label: 'Ending soon', tone: 'accent', title: 'Almost done' },
+    almostDone: true,
+    onAlmostDoneChange: fn(),
+    onPause: fn(),
+    onMatchDone: fn(),
+  }),
+}
+/** Pause match above Match done; at 640 px and narrower they stack full width, 44 px tall */
+export const PlayingButtons: Story = {
+  args: inGame(playing, { onPause: fn(), onMatchDone: fn(), onAlmostDoneChange: fn() }),
+}
+export const PlayingButtonsPhone: Story = {
+  ...PlayingButtons,
+  globals: { viewport: { value: 'phone' } },
+}
 export const Merged5v5: Story = {
-  args: inGame(merged, { expectedFinish: { text: 'Ends in about 8 min', tone: 'muted' } }),
+  args: inGame(merged, {
+    status: { label: 'Ending', tone: 'accent', title: 'Ends in about 8 min' },
+    onAlmostDoneChange: fn(),
+    onPause: fn(),
+    onMatchDone: fn(),
+  }),
 }
+/** "N substitution(s)" as muted text after the time pill */
 export const WithSubstitutions: Story = {
-  args: inGame({ ...playing, substitutions: withSubs.substitutions }),
+  args: inGame(
+    { ...playing, substitutions: withSubs.substitutions },
+    { substitutions: withSubs.substitutions.length },
+  ),
 }
+/** Owner, November 26, 2026: an open free court's picture is a button: dashed + disc, FREE, Tap to fill */
+export const FreeTapToFill: Story = {
+  args: free(courtAt(1), [ready, absent], { onFill: fn() }),
+}
+export const FreeTapToFillLight: Story = { ...FreeTapToFill, globals: { theme: 'light' } }
 export const FreeWithNextEligible: Story = { args: free(courtAt(1), [ready, absent]) }
 export const FreeWithSkippedFirst: Story = { args: free(courtAt(1), [playing, blocked, ready]) }
 export const FreeNoneReady: Story = { args: free(courtAt(1), [playing, blocked]) }
@@ -231,7 +293,7 @@ export const NotEnoughFreePlayers: Story = {
   args: free(courtAt(1), [playing, blocked], { notEnoughFreePlayers: true }),
 }
 
-/** Getting ready: On court, not started. Normal border, chip Getting ready, Start match + Open match */
+/** Getting ready: On court, not started. Normal border, status Waiting, the Waiting to start pill, Start match only */
 export const GettingReady: Story = { args: onCourt(ready) }
 /** A player in the On court match is not present: the reason in warn, Start match disabled */
 export const GettingReadyPlayerAway: Story = {
@@ -271,7 +333,9 @@ export const CourtsGrid: Story = {
   decorators: [gridDecorator],
   render: () => (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
-      <CourtCard {...inGame(playing)} />
+      <CourtCard
+        {...inGame(playing, { onPause: fn(), onMatchDone: fn(), onAlmostDoneChange: fn() })}
+      />
       <CourtCard {...onCourt(ready, { swapWith: null })} />
       <CourtCard {...free(courtAt(2), [playing, blocked])} />
       <AddCourtTile nextNumber={courts.length + 1} onAdd={fn()} />
@@ -454,9 +518,9 @@ export const ReadOnlyMerged: Story = {
   },
 }
 
-/** Q25.1: Playing with Pause match (pause icon) beside Open match, and Move to a free court in the menu */
+/** Q25.1: Playing with Pause match (pause icon) above Match done, and Move to a free court in the menu */
 export const PlayingWithPause: Story = {
-  args: inGame(playing, { onPause: fn(), onMoveToFree: fn(), onDragMove: fn() }),
+  args: inGame(playing, { onPause: fn(), onMatchDone: fn(), onMoveToFree: fn(), onDragMove: fn() }),
 }
 export const PlayingWithPauseLight: Story = { ...PlayingWithPause, globals: { theme: 'light' } }
 export const PlayingWithPauseMerged: Story = {
@@ -472,7 +536,7 @@ export const PlayingNoFreeCourt: Story = {
   play: openBusyMenu,
 }
 export const PlayingNoFreeCourtLight: Story = { ...PlayingNoFreeCourt, globals: { theme: 'light' } }
-/** The drawing is a button on Getting ready too (tooltip "Open match"), draggable */
+/** The drawing is the Open match button on Getting ready too (tooltip "Open match", Enter or Space), draggable */
 export const GettingReadyDraggable: Story = { args: onCourt(ready, { onDragMove: fn() }) }
 export const GettingReadyMergedDraggable: Story = {
   args: onCourt(merged, { onDragMove: fn() }),
@@ -541,4 +605,12 @@ export const GamesBadgeDisplayOnly: Story = {
     teamB: withGames(playing.teamB, [4, 1]),
     onOpenProfile: fn(),
   }),
+}
+
+/** The win chance chip in the head is a button with onOpenWinChance. */
+export const WithWinChance: Story = {
+  args: {
+    winChance: { a: 39, b: 61, favored: 'B', strong: false } as const,
+    onOpenWinChance: fn(),
+  },
 }

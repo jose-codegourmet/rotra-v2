@@ -112,3 +112,17 @@ export const GridDesktop: Story = {
   render: grid,
   globals: { viewport: { value: 'desktop' } },
 }
+
+/** Name stack (D-2026-11-26-09): club nickname, nickname, full name */
+export const ClubNickname: Story = {
+  args: { name: 'Miguel Santos', nickname: 'Migs', clubNickname: 'Kuya Migs' },
+}
+export const NicknameOnly: Story = { args: { name: 'Paulo Garcia', nickname: 'Pau' } }
+export const FullNameOnly: Story = { args: { name: 'Ysa Fernandez' } }
+/** Getting ready: "On court · Court 1" */
+export const OnCourt: Story = {
+  args: propsFor(playerAt(1), { kind: 'playing', courtLabel: 'Court 1', gettingReady: true }),
+}
+export const ClubNicknameLight: Story = { ...ClubNickname, globals: { theme: 'light' } }
+export const NicknameOnlyLight: Story = { ...NicknameOnly, globals: { theme: 'light' } }
+export const FullNameOnlyLight: Story = { ...FullNameOnly, globals: { theme: 'light' } }

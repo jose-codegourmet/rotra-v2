@@ -21,5 +21,6 @@ export const paymentsChecklistMeta = {
     'transferred-slot',
     'empty',
     'as-sheet',
+    'free-players',
   ],
 } satisfies ComponentMeta

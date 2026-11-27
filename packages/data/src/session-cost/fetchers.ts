@@ -20,6 +20,8 @@ export function sessionCostIn(state: MockState, id: string) {
       state.roster.filter((p) => p.sessionId === id).length ||
       session.expectedPlayers ||
       slotCapacity(courts, session.playersPerCourt),
+    // D-2026-11-27-01: free roster players leave the break-even head count.
+    freePlayers: state.roster.filter((p) => p.sessionId === id && p.isFree).length,
     inventory: state.inventory.filter((i) => i.clubId === session.clubId),
   })
   const shuttleLines = saved.shuttles.map((line, index) => ({

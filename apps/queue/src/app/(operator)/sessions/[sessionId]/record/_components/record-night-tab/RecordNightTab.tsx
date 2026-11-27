@@ -12,6 +12,7 @@ import { RecordCourtColumns } from '@rotra/ui/record-court-columns'
 import { RecordTabHeader } from '@rotra/ui/record-tab-header'
 import { ReplayCard } from '@rotra/ui/replay-card'
 import { Skeleton } from '@rotra/ui/skeleton'
+import { WinChanceDialog, type WinChanceDialogPlayer } from '@rotra/ui/win-chance-dialog'
 import { useEffect, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
@@ -43,6 +44,7 @@ export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
   const [moment, setMoment] = useState<number | null>(null)
   const [playing, setPlaying] = useState(false)
   const [profileId, setProfileId] = useState<string | null>(null)
+  const [chanceId, setChanceId] = useState<string | null>(null)
 
   const h = history.data
   useEffect(() => {
@@ -128,9 +130,17 @@ export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
         invalid: m.invalid,
         substitutions: m.substitutions,
         substitutionCredits: m.substitutionCredits,
+        winChance: m.winChance?.chance,
+        upset: m.winChance?.upset,
         highlighted: onCourtAt(m, t),
       })),
   }))
+
+  // The match whose win chance dialog is open, with the faces its court shows.
+  const chanceMatch = faces.matches.find((m) => m.id === chanceId)
+  const chancePlayers: Record<string, WinChanceDialogPlayer> = {}
+  for (const p of chanceMatch ? [...chanceMatch.teamA, ...chanceMatch.teamB] : [])
+    chancePlayers[p.id] = { name: p.name, shortName: p.shortName, photoUrl: p.photoUrl }
 
   return (
     <div className="flex flex-col gap-4">
@@ -154,7 +164,17 @@ export function RecordNightTab({ sessionId, record }: RecordNightTabProps) {
         summary={replaySummaryAt(h, t)}
         onSelectPlayer={openProfile}
       />
-      <RecordCourtColumns columns={columns} onSelectPlayer={openProfile} />
+      <RecordCourtColumns
+        columns={columns}
+        onSelectPlayer={openProfile}
+        onOpenWinChance={setChanceId}
+      />
+      <WinChanceDialog
+        open={chanceMatch != null}
+        onClose={() => setChanceId(null)}
+        breakdown={chanceMatch?.winChance ?? null}
+        players={chancePlayers}
+      />
       <PlayerProfile clubPlayerId={profileId} onClose={() => setProfileId(null)} />
     </div>
   )

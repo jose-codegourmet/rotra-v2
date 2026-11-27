@@ -177,6 +177,12 @@ export function buildWorkingState(bodies: Bodies, sessionId: string): WorkingSta
   const payments = (bodies.get(paths.payments) as { payments: WirePayments | null } | undefined)
     ?.payments
   if (payments) {
+    // D-2026-11-27-01: the roster carries Plays free so offline reducers keep the split right.
+    for (const player of payments.players)
+      if (player.free) {
+        const entry = state.roster.find((r) => r.id === player.sessionPlayerId)
+        if (entry) entry.isFree = true
+      }
     for (const player of payments.players)
       if (player.paid)
         state.paymentMarks.push({
@@ -315,6 +321,7 @@ const wireRosterEntryOf = (r: SessionPlayer): WireRosterEntry => ({
   ...(r.hasPlayedAtClubBefore === undefined
     ? {}
     : { hasPlayedAtClubBefore: r.hasPlayedAtClubBefore }),
+  ...(r.form === undefined ? {} : { form: r.form }),
   ...(r.gamesAdjustment === undefined ? {} : { gamesAdjustment: r.gamesAdjustment }),
   ...(r.handicapSpots === undefined ? {} : { handicapSpots: [...r.handicapSpots] }),
 })
@@ -384,17 +391,21 @@ function wirePaymentsOf(original: WirePayments, state: MockState, sessionId: str
           sessionPlayerId: r.id,
           clubPlayerId: r.clubPlayerId,
           name: r.nameSnapshot,
+          free: !!r.isFree && !mark,
           paid: mark
             ? { amount: { amountMinor: mark.amountMinor, currency: 'PHP' }, at: iso(mark.markedAt) }
             : null,
         }
       })
       .sort((a, b) => Number(!!a.paid) - Number(!!b.paid) || a.name.localeCompare(b.name)),
+    // D-2026-11-27-01: free players are left out of the totals. The amount due is the server's
+    // until the next sync (the break-even share is not recomputed offline).
     totals: paymentTotals({
       marks,
-      total: roster.length,
+      total: roster.filter((r) => !(r.isFree && !markOf(r) && !transferOf(r))).length,
       amountDue: original.amountDue,
       cost: original.totals.cost,
+      free: roster.filter((r) => r.isFree && !markOf(r) && !transferOf(r)).length,
     }),
   }
 }

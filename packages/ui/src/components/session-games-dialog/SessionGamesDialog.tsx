@@ -1,5 +1,6 @@
 'use client'
 
+import type { WinChance } from '@rotra/data/match/win-chance'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { queueTime } from '@rotra/schema/queue-time'
 import { Avatar } from '@rotra/ui/avatar'
@@ -14,6 +15,7 @@ import { substitutionCreditLine } from '@rotra/ui/match-record-card'
 import { Notice } from '@rotra/ui/notice'
 import { formatTime, formatTimeRange } from '@rotra/ui/now-card/helpers'
 import { Sheet } from '@rotra/ui/sheet'
+import { winChanceText, winChanceTitle } from '@rotra/ui/win-chance-chip'
 import { useState } from 'react'
 
 /** The two pills (the Match History pill filter) */
@@ -54,6 +56,10 @@ export type SessionGamesMatch = {
   score?: { teamA: number; teamB: number } | null
   /** Best of 3: every game, Team A first */
   games?: { a: number; b: number }[] | null
+  /** Win chance (D-2026-11-27-02): the corner pill "39% · 61%" */
+  winChance?: WinChance
+  /** Adds the Upset pill beside the win chance */
+  upset?: boolean
   /** One line under the court per substitution */
   substitutionCredits?: {
     outName: string
@@ -73,6 +79,9 @@ export type SessionGamesPlannedMatch = {
   formatLabel: string
   teamA: CourtPlayer[]
   teamB: CourtPlayer[]
+  /** Win chance (D-2026-11-27-02): the corner pill "39% · 61%" */
+  winChance?: WinChance
+  upset?: boolean
 }
 
 /** The player is on a court right now */
@@ -109,6 +118,8 @@ export type SessionGamesDialogProps = {
    * Back button “Back to games”, sets `open` true again; the player and tab are the caller's to keep.
    */
   onOpenProfile: (playerId: string) => void
+  /** A match's win chance pill (or Upset pill) was tapped: open WinChanceDialog for that match */
+  onOpenWinChance?: (matchId: string) => void
   className?: string
 }
 
@@ -147,6 +158,7 @@ export function SessionGamesDialog({
   tab,
   onTabChange,
   onOpenProfile,
+  onOpenWinChance,
   className,
 }: SessionGamesDialogProps) {
   const [ownTab, setOwnTab] = useState<SessionGamesTab>('matches')
@@ -167,6 +179,21 @@ export function SessionGamesDialog({
     onOpen: () => onOpenProfile(p.id),
   })
   const names = (players: CourtPlayer[]) => players.map((p) => p.name).join(' and ')
+  const chanceOf = (m: {
+    id: string
+    teamA: CourtPlayer[]
+    teamB: CourtPlayer[]
+    winChance?: WinChance
+    upset?: boolean
+  }) =>
+    m.winChance
+      ? {
+          text: winChanceText(m.winChance),
+          title: winChanceTitle(m.winChance, { a: names(m.teamA), b: names(m.teamB) }),
+          upset: m.upset ?? false,
+          onOpen: onOpenWinChance ? () => onOpenWinChance(m.id) : undefined,
+        }
+      : undefined
 
   const playingNotice = onCourt ? (
     <Notice>
@@ -206,6 +233,7 @@ export function SessionGamesDialog({
                   timeLabel={formatTimeRange(m.startedAt, m.endedAt)}
                   ariaLabel={`Match ${m.number}: ${names(m.teamA)} versus ${names(m.teamB)}`}
                   fun={m.fun}
+                  winChance={chanceOf(m)}
                   left={m.teamA.map(face)}
                   right={m.teamB.map(face)}
                   winner={
@@ -263,6 +291,7 @@ export function SessionGamesDialog({
                 winner={null}
                 score={null}
                 versus
+                winChance={chanceOf(m)}
                 highlightedPlayerKey={player.id}
               />
             </li>

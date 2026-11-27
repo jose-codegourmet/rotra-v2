@@ -93,9 +93,9 @@ function bestDay(days: WeeklyPerformanceDay[]) {
 
 /**
  * P-MATCH-HISTORY and the profile's Weekly performance (2026-11-13 log; the prototype's weeklyPerf):
- * four summary tiles, then per weekday a win-rate pill over two side-by-side bars (wins in the
- * accent, losses in the error colour; heights relative to the largest single count) and the short
- * day name. The best day (highest win rate, 3+ games) is lifted on an accent column. On the Games
+ * a summary box with four figures and a won/lost split, then per weekday a win-rate pill over two
+ * side-by-side bars (wins in the accent, losses in the error colour; heights relative to the
+ * largest single count) and the short day name. The best day (highest win rate, 3+ games) is lifted on an accent column. On the Games
  * page each bar is a button that filters the games below. Hidden when there are no counted games.
  */
 export function WeeklyPerformanceChart({
@@ -163,40 +163,55 @@ export function WeeklyPerformanceChart({
     )
   }
 
-  const tile = 'flex min-w-0 flex-col gap-0.5 rounded-md bg-elev px-3 py-2.5'
-  const label = 'text-[11px] font-semibold tracking-[0.5px] text-fg2 uppercase'
+  const cell =
+    'flex min-w-0 flex-col gap-1 border-border px-4 py-3.5 not-first:border-l @max-[520px]:nth-3:border-l-0 @max-[520px]:nth-[n+3]:border-t'
+  const figure =
+    'flex min-w-0 items-center gap-1.5 overflow-hidden text-2xl leading-[1.1] font-extrabold whitespace-nowrap tabular-nums @max-[520px]:text-xl'
+  const bestDayName = DAYS[best]
+  const label = 'text-xs leading-normal font-semibold tracking-[0.5px] text-fg2 uppercase'
   return (
     <Card className={cn('flex flex-col gap-4', className)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-extrabold">{year} Weekly Performance</h2>
         {visibility ? <div className="flex items-center gap-1.5">{visibility}</div> : null}
       </div>
-      <div className="grid grid-cols-4 gap-2 max-[480px]:grid-cols-2">
-        <div className={tile}>
-          <span className={label}>Games</span>
-          <b className="text-lg font-extrabold tabular-nums">{total}</b>
+      <div className="@container overflow-hidden rounded-lg border border-border-strong bg-[linear-gradient(135deg,var(--elev),var(--surface)_70%)]">
+        <div className="grid grid-cols-4 @max-[520px]:grid-cols-2">
+          <div className={cell}>
+            <span className={label}>Games</span>
+            <b className={figure}>{total}</b>
+          </div>
+          <div className={cell}>
+            <span className={label}>Record</span>
+            <b className={figure}>
+              <span className="text-accent">{wins}W</span>{' '}
+              <span className="text-error">{losses}L</span>
+            </b>
+          </div>
+          <div className={cell}>
+            <span className={label}>Win rate</span>
+            <b className={figure}>{rate}%</b>
+          </div>
+          <div className={cn(cell, bestDayName && 'bg-accent-subtle')}>
+            <span className={label}>Best day</span>
+            <b className={cn(figure, bestDayName && 'text-accent')}>
+              {bestDayName ? (
+                <>
+                  <Icon name="trophy" className="shrink-0" />
+                  <span className="truncate @max-[520px]:sr-only">{bestDayName}</span>
+                  <span aria-hidden="true" className="hidden @max-[520px]:inline">
+                    {bestDayName.slice(0, 3)}
+                  </span>
+                </>
+              ) : (
+                '—'
+              )}
+            </b>
+          </div>
         </div>
-        <div className={tile}>
-          <span className={label}>Record</span>
-          <b className="truncate text-lg font-extrabold tabular-nums">
-            <span className="text-accent">{wins}W</span>{' '}
-            <span className="text-error">{losses}L</span>
-          </b>
-        </div>
-        <div className={tile}>
-          <span className={label}>Win rate</span>
-          <b className="text-lg font-extrabold tabular-nums">{rate}%</b>
-        </div>
-        <div
-          className={cn(
-            tile,
-            best >= 0 && 'bg-accent-subtle shadow-[inset_0_0_0_1px] shadow-accent/45',
-          )}
-        >
-          <span className={label}>Best day</span>
-          <b className={cn('truncate text-lg font-extrabold', best >= 0 && 'text-accent')}>
-            {best >= 0 ? DAYS[best] : '—'}
-          </b>
+        <div className="flex h-1.5 gap-0.5" role="img" aria-label={`${wins} won, ${losses} lost`}>
+          <span className="min-w-0.5 basis-0 bg-accent" style={{ flexGrow: wins }} />
+          <span className="min-w-0.5 basis-0 bg-error" style={{ flexGrow: losses }} />
         </div>
       </div>
       <ul

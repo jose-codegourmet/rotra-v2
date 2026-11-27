@@ -21,6 +21,11 @@ export type Match = {
   /** Set only at Start match, never at placement. */
   startedAt: number | null
   endedAt: number | null
+  /**
+   * When the Queue Master switched the Playing match to Almost done; null (or missing) when off.
+   * Only counts while `active`: Match done, Pause match and Mark invalid clear it (D-2026-11-25-02).
+   */
+  almostDoneAt?: number | null
   substitutions: {
     outId: string
     inId: string

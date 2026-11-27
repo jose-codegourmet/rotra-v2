@@ -20,6 +20,8 @@ export type MySession = {
   subtitle: string
   href: string
   status: 'live' | 'confirmed' | 'waitlist' | 'requested'
+  /** Scheduled start in ISO format. Mock rows may omit it. */
+  startsAt?: string
   waitlistPosition?: number
 }
 export type MyFinishedSession = { id: string; title: string; subtitle: string; published: boolean }
@@ -44,6 +46,7 @@ async function realMySessions(signal?: AbortSignal) {
     subtitle: `${date(s.start)} · ${time(s.start)}–${time(s.end)} · ${s.clubName}`,
     href: queueSessionUrl(s.slug),
     status: s.status,
+    startsAt: s.start,
     waitlistPosition: s.waitlistPosition ?? undefined,
   }))
   const finished: MyFinishedSession[] = body.finished.slice(0, 2).map((s) => ({

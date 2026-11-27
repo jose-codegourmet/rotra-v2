@@ -164,3 +164,12 @@ export const Desktop: Story = {
   args: { mode: 'edit', lineup: blocked },
   globals: { viewport: { value: 'desktop' } },
 }
+
+export const EditWithWinChance: Story = {
+  ...EditFilled,
+  args: {
+    ...EditFilled.args,
+    winChanceOf: () => ({ a: 39, b: 61, favored: 'B', strong: false }) as const,
+    onOpenWinChance: fn(),
+  },
+}

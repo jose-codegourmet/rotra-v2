@@ -1,6 +1,6 @@
 # Queue generation and dispatch
 
-**Last verified:** 2026-11-25 for Match making factors and Almost done in Plan Ahead ([D-2026-11-25-01](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-01), [D-2026-11-25-02](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-02); mockup only); 2026-11-11 for Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11), #739); 2026-11-06 for the rest.
+**Last verified:** 2026-11-27 for Win chance and Even game ([D-2026-11-27-02](../../../../../mvp/decisions/2026-11-27.md#d-2026-11-27-02)); 2026-11-25 for Match making factors and Almost done in Plan Ahead ([D-2026-11-25-01](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-01), [D-2026-11-25-02](../../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-02); mockup only); 2026-11-11 for Bagging mode ([D-2026-11-11-11](../../../../../mvp/decisions/2026-11-11.md#d-2026-11-11-11), #739); 2026-11-06 for the rest.
 
 **Status:** Confirmed v1 target rules. Updated October 26, 2026 to match the [ROTRA Queue prototype](../../../../../../apps/mockup/queue-app/rotra-queue.html). Updated November 6, 2026 for the owner's On court step and the Auto Queue / Manual Queue court switch ([log](../../../../../mockup-changes/2026-11-06-queue-on-court-and-sub-credit.md)).
 
@@ -82,11 +82,33 @@ Balanced teams matter, but reaching the minimum-game target takes priority over 
    - Within one batch, drafts are taken in order: a player in a draft adds one to their streak, and a player left out of a draft counts as sitting it out.
    - When there are too few players otherwise, rested players are used first, and exhausted players only to make the match possible.
 2. **Fresh faces.** A player is not put with or against anyone they partnered or faced in either of **their last 2 games**: completed, On court or Playing, and earlier drafts in this batch. A **strong avoid**, inside Whose turn: the players more due than the last one Whose turn would pick always play; among the players tied with that last one, Generate matches takes the first group with no repeat. Only when no such group exists does it keep the repeat. A [bagging pair](#bagging-mode-and-bagging-pairs) still wins over Fresh faces for that pair.
-3. **Even game.** Teams are split by level adjusted by **tonight's results only**: effective level = level + 0.25 × (wins − losses tonight), capped at ±1 level. Wins and losses come from completed counted games (a player with no level counts as a mid level, 4). No long-term win rate and no leaderboard place: rank math is still [open](../../../open-decisions.md). Doubles takes the split with the smallest difference in summed effective levels. **Chill** (about 30%) and **Fair** (about 10%) still pick the most uneven split on purpose for an easy game, as before.
+3. **Even game.** Teams are split by each player's [Win chance](#win-chance) form rating (level, club win rate, best day, leaderboard, tonight's results and Upsets, games in a row, handicap), so the split is the one closest to 50% ([D-2026-11-27-02](../../../../../mvp/decisions/2026-11-27.md#d-2026-11-27-02); before that, level plus tonight's results only). Doubles takes the split with the smallest difference in summed ratings. **Chill** (about 30%) and **Fair** (about 10%) still pick the most uneven split on purpose for an easy game, as before.
 
 **Reason line.** Each draft tile says what drove it, in a few words: the bagging pair ("Bagging pair: A and B are partners") or Whose turn ("Rested N matches" when everyone in it rested at least one match, otherwise "Fewest games", "Longest wait" or, in Catch Up, "Below N games"; "Not enough rested players" when an exhausted player had to be used), then Fresh faces when it mattered ("Avoided repeat partners", "Avoided repeat opponents", or "Couldn't avoid a repeat"), joined by " · ". Example: "Rested 2 matches · Avoided repeat partners". A draft with a player still on court shows its "Waits for Court N" line instead, as before.
 
-Auto Queue (court filling), Suggest, Main Queue regeneration, Add match and Make match are unchanged; Make match's Arrange to balance still uses the assigned level.
+Auto Queue (court filling), Main Queue regeneration, Add match and Make match are unchanged; Make match's Arrange to balance still uses the assigned level. Suggest picks its players as before but splits its teams by the same Win chance form rating ([D-2026-11-27-02](../../../../../mvp/decisions/2026-11-27.md#d-2026-11-27-02)).
+
+### Win chance
+
+**Owner decision, November 27, 2026 ([D-2026-11-27-02](../../../../../mvp/decisions/2026-11-27.md#d-2026-11-27-02); built in the mockup, the mock app and real mode, `@rotra/data` match/winChance.rules.ts; [log](../../../../../mockup-changes/2026-11-27-queue-win-chance.md)).** Every Queue Master match card shows each pair's **Win chance**; the two percents add up to 100. A pair at 65% or more is **Favored** (accent colour). A completed match the Favored pair lost is marked **Upset**. Queue Master only: never on the public page, in the Player app, in results or in exports.
+
+Each player has a form rating in level steps (Beginner Low = 0 … Advanced High = 8; no level = 4):
+
+| Signal | Adjustment | Cap |
+|---|---|---|
+| Club win rate | (win rate − 50%) × 2 | ±1 |
+| Guest, or fewer than 10 decided games at the club | Counts as 50% | |
+| Best day | +0.25 when the session is on the weekday of their highest win rate (3 games at least) | |
+| Club leaderboard place | +0.25 top quarter, −0.25 bottom quarter | |
+| Leaderboard direction | +0.25 rising, −0.25 falling | |
+| Tonight's results | 0.25 × (wins − losses) | ±1 |
+| Upsets tonight | +0.25 per Upset win, −0.25 per Upset loss | ±0.5 |
+| Games in a row before the match | −0.25 each | −0.5 |
+| Handicap tonight | −0.5 | |
+
+A team is the average of its players. **Win chance = 1 ÷ (1 + 10^((opponents − own team) ÷ 2))**, kept between 5% and 95% (the awards curve). A completed or invalid match is read from the first five rows only, so its Upset mark never moves later; nothing is stored on the match.
+
+**Real mode today:** club win rate and best day come from the club's finalized sessions. Leaderboard place and direction are 0 until rank calculation is real (rank math is still [open](../../../open-decisions.md)). The mockup and the mock app use sample history per player.
 
 ### Previous prototype reference heuristic
 
@@ -104,7 +126,7 @@ Errors are explained, not hidden: "Singles and doubles are both off for this ses
 
 ### Suggest
 
-The suggestion explains why: who is below the minimum (with games/target), or that everyone has met it and these players have the fewest games. Teams are split by assigned level to suit the mode. No win probabilities are shown.
+The suggestion explains why: who is below the minimum (with games/target), or that everyone has met it and these players have the fewest games. Teams are split by assigned level to suit the mode. The suggestion text gives no win probabilities; the match cards carry the [Win chance](#win-chance) chips.
 
 ### Generate matches workspace
 

@@ -41,12 +41,21 @@ A club has a public page in the Player app at `/clubs/[clubId]`, opened from the
 
 ## Public match page
 
-Owner decision, November 25, 2026 ([mockup log](../../../mockup-changes/2026-11-25-player-match-page.md), screen [P-MATCH-PAGE](../../../screens/product/modules/player-information/match-page.md)). Mockup only so far; not ticketed.
+Owner decision, November 25, 2026 ([mockup log](../../../mockup-changes/2026-11-25-player-match-page.md), screen [P-MATCH-PAGE](../../../screens/product/modules/player-information/match-page.md)). Built in the mockup, the mock app and real-mode services; not ticketed.
 
 - **One page per match.** Every recorded game has a public page at `/matches/[matchId]`. The id is the match's own id, so every player in that match opens the same page. Anyone can open it, signed out too. It is read-only, like all history: no edit, dispute or score-later action.
-- **What it shows.** The game as a court (format, score or “No score”, Won / Lost read from the left side, the games badge on each face, each player's skill group), the session title, date and club, then **Before this game**: for each player in the game, their earlier games of the same session in play order.
+- **What it shows.** The game as a court (format, score or “No score”, Won / Lost read from the left side, the games badge on each face, each player's skill group), the session title, date and club, and beside it a **VS card** with both teams. No stats show by default; tapping a player on the VS card shows their win rate and record in this session before this game, their win rate this year (registered, visible profiles), and their earlier games of the same session in play order (owner, November 26, 2026).
 - **Who is on the left.** A signed-in player who played in the game sees their own side on the left as “You”. Everyone else sees the first team (Team A) on the left.
 - **Privacy.** Names follow each player's profile visibility for the viewer, as on profiles and the public session page: a visitor sees Private players and guests masked, an Always private player is masked for everyone but themselves, pictures stay visible. A player whose level is hidden from the viewer shows no skill group.
 - **What counts is unchanged.** Fun, partial and not ranked games keep their notes; the page adds no counting rule.
 - **Opening it.** Tapping any game court in ROTRA Player opens its match page; the faces still open the profile card and the share icon still shares. **Share game** links to the match page (see [What a player may share](modules/ranking/README.md#what-a-player-may-share)).
 - **Unknown id.** A match id that doesn't exist shows a not-found state.
+
+## Win chance
+
+Owner decision, November 27, 2026 ([D-2026-11-27-03](../../../mvp/decisions/2026-11-27.md#d-2026-11-27-03), [mockup log](../../../mockup-changes/2026-11-27-player-win-chance.md)); amends the Queue Master only rule of [D-2026-11-27-02](../../../mvp/decisions/2026-11-27.md#d-2026-11-27-02). Built in the mockup, the mock app and real-mode services.
+
+- **Where.** Every finished game court in ROTRA Player with two sides: the Games list, Recent games and the match history of any profile, the session matches dialog, and the match page (the court and the Won / Lost team cards). A second pill after the format reads "41% · 59%", left pair first; an **Upset** pill follows when the Favored pair (65% or more) lost. Not on a game that is not counted as a result (partial).
+- **Breakdown.** On the match page the pill and each team card's percent open a dialog with each player's form rating and its rows: level, club win rate, best day, club leaderboard place and direction, then the team average. In lists the pill is display only; the court still opens the match page.
+- **Lasting signals only.** A finished game is read from level, club win rate, best day and leaderboard place and direction. Tonight's signals and Handicap · tonight stay Queue Master only. The formula is the one in [queueing › Win chance](queue/modules/queueing/README.md#win-chance); a guest or a player with no record counts as level only.
+- **Never** on the public session page, in results slides or in exports.

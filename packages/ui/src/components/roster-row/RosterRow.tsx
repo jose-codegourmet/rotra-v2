@@ -4,6 +4,7 @@ import type { PlayingLevel } from '@rotra/data/player/types'
 import { Avatar } from '@rotra/ui/avatar'
 import { Button } from '@rotra/ui/button'
 import { cn } from '@rotra/ui/cn'
+import { EditPencilButton } from '@rotra/ui/edit-pencil-button'
 import { Icon } from '@rotra/ui/icon'
 import { IconButton } from '@rotra/ui/icon-button'
 import { IdentityChip } from '@rotra/ui/identity-chip'
@@ -41,6 +42,8 @@ export type RosterRowProps = {
   onLevelChange: (level: PlayingLevel) => void
   onPresentChange: (present: boolean) => void
   onRemove: () => void
+  /** Edit player (mockup change 2026-11-27): the pencil before the remove × before Start. Omit to hide it. */
+  onEdit?: () => void
   /**
    * Move to waitlist (#735): a secondary button next to remove, before and after Start (also in
    * the read-only summary). Omit to hide it.
@@ -74,6 +77,7 @@ export function RosterRow({
   onLevelChange,
   onPresentChange,
   onRemove,
+  onEdit,
   onStepDown,
   className,
 }: RosterRowProps) {
@@ -147,6 +151,7 @@ export function RosterRow({
                   aria-label={`${name} present`}
                 />
               ) : null}
+              {!levelLocked && onEdit ? <EditPencilButton name={name} onClick={onEdit} /> : null}
               {!levelLocked ? (
                 <IconButton
                   size="xs"

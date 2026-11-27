@@ -57,7 +57,7 @@ Players in a Getting ready match are busy: other matches that include them show 
 
 Elapsed times here and on the court cards follow Correct Queue Time Format: “N min”, then “N h”, from 24 hours “started long time ago” (owner, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-correct-time-format.md)).
 
-**Pause match** (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-pause-match.md)): a secondary button with a pause icon, first in the footer (before **Mark invalid** and **Match done**), and on the Playing court card next to **Open match**. It takes the match back to Getting ready on the same court(s) at once, closes the sheet and toasts “Match N paused · back to Getting ready on Court X”. **Start match** starts it again with a fresh start time.
+**Pause match** (owner artifact comment, November 19, 2026; [log](../../../../mockup-changes/2026-11-19-queue-pause-match.md)): a secondary button with a pause icon, first in the footer (before **Mark invalid** and **Match done**), and on the Playing court card above **Match done**. It takes the match back to Getting ready on the same court(s) at once, closes the sheet and toasts “Match N paused · back to Getting ready on Court X”. **Start match** starts it again with a fresh start time.
 
 **Almost done** (owner decision, November 25, 2026, [D-2026-11-25-02](../../../../mvp/decisions/2026-11-25.md#d-2026-11-25-02); mockup only): the switch lives on the Playing court card ([session console](session-console.md)), not in this sheet. Pause match, Mark invalid and Match done all turn it off; it only counts while the match is Playing.
 

@@ -120,3 +120,18 @@ export const WithRefund: Story = {
   args: { totals: { ...paymentTotalsFixture, collected: 1030000, refunded: 70000 } },
 }
 export const WithRefundLight: Story = { ...WithRefund, globals: { theme: 'light' } }
+/** D-2026-11-27-01: two players free, left out of Paid X/Y and the split. */
+export const FreePlayers: Story = {
+  args: {
+    players: unpaidPaymentPlayers.map((p, index) => (index < 2 ? { ...p, free: true } : p)),
+    totals: {
+      ...paymentTotalsFixture,
+      paid: 0,
+      partial: 0,
+      collected: 0,
+      total: unpaidPaymentPlayers.length - 2,
+      free: 2,
+    },
+  },
+}
+export const FreePlayersLight: Story = { ...FreePlayers, globals: { theme: 'light' } }

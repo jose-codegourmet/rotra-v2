@@ -1,3 +1,4 @@
+import type { WinChance } from '@rotra/data/match/win-chance'
 import { queueTime } from '@rotra/schema/queue-time'
 import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
@@ -6,6 +7,7 @@ import type { CourtPlayer } from '@rotra/ui/court-drawing'
 import { MatchCourt, type MatchCourtPlayer } from '@rotra/ui/match-court'
 import { substitutionCreditLine } from '@rotra/ui/match-record-card'
 import { formatTime, formatTimeRange } from '@rotra/ui/now-card/helpers'
+import { winChanceText, winChanceTitle } from '@rotra/ui/win-chance-chip'
 
 export type LiveMatchHistoryCourt = {
   id: string
@@ -32,6 +34,9 @@ export type LiveMatchHistoryMatch = {
   /** Best of 3: every game, Team A first */
   games?: { a: number; b: number }[] | null
   invalid?: boolean
+  /** Win chance (D-2026-11-27-02): the corner pill "39% · 61%"; `upset` adds the Upset pill */
+  winChance?: WinChance
+  upset?: boolean
   /** One line under the court per substitution */
   substitutionCredits?: {
     outName: string
@@ -49,6 +54,8 @@ export type LiveMatchHistoryProps = {
   onCourtFilterChange: (value: string) => void
   /** A face opens the player's profile */
   onOpenPlayer: (playerId: string) => void
+  /** A match's win chance pill (or Upset pill) was tapped: open WinChanceDialog for that match */
+  onOpenWinChance?: (matchId: string) => void
   className?: string
 }
 
@@ -75,6 +82,7 @@ export function LiveMatchHistory({
   courtFilter,
   onCourtFilterChange,
   onOpenPlayer,
+  onOpenWinChance,
   className,
 }: LiveMatchHistoryProps) {
   const filter = courts.some((c) => c.id === courtFilter) ? courtFilter : 'all'
@@ -152,6 +160,19 @@ export function LiveMatchHistory({
                           timeLabel={formatTimeRange(m.startedAt, m.endedAt)}
                           ariaLabel={`Match ${m.number}: ${names(m.teamA)} versus ${names(m.teamB)}`}
                           fun={m.fun}
+                          winChance={
+                            m.winChance
+                              ? {
+                                  text: winChanceText(m.winChance),
+                                  title: winChanceTitle(m.winChance, {
+                                    a: names(m.teamA),
+                                    b: names(m.teamB),
+                                  }),
+                                  upset: m.upset ?? false,
+                                  onOpen: onOpenWinChance ? () => onOpenWinChance(m.id) : undefined,
+                                }
+                              : undefined
+                          }
                           left={m.teamA.map(face)}
                           right={m.teamB.map(face)}
                           winner={

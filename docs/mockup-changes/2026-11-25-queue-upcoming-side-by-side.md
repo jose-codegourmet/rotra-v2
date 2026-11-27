@@ -1,6 +1,6 @@
 # Courts tab: pairs side by side on upcoming cards, faces on Next eligible
 
-Status: NEW
+Status: IN REAL MODE — #1121
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › queueTile() compact (`.qt-vs`), free court card (`nePair()`, `.ne-line`)

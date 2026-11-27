@@ -55,6 +55,13 @@ export function tradedLineup(m: MatchLineup, a: string, b: string): MatchLineup 
 export const pausedText = (matchNo: number, courts: string) =>
   `Match ${matchNo} paused · back to Getting ready on ${courts}`
 
+/** Almost done is offered on a Playing match only, like Pause match (D-2026-11-25-02). */
+export const canSetAlmostDone = canPauseMatch
+
+/** “Match 17 almost done · Court 3” (merged: “Court 1 + Court 2”), or “Match 17 · Almost done off”. */
+export const almostDoneText = (matchNo: number, courts: string, on: boolean) =>
+  on ? `Match ${matchNo} almost done · ${courts}` : `Match ${matchNo} · Almost done off`
+
 /** “Match 17 moved from Court 3 to Court 4 · still playing” (or “· getting ready”). */
 export const movedCourtText = (matchNo: number, from: string, to: string, playing: boolean) =>
   `Match ${matchNo} moved from ${from} to ${to} · ${playing ? 'still playing' : 'getting ready'}`

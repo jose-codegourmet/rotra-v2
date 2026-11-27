@@ -33,6 +33,18 @@ export const Filtered: Story = {
   args: { filter: { day: 6, result: 'won' } },
   globals: { theme: 'dark' },
 }
+export const FilteredLight: Story = {
+  ...Filtered,
+  globals: { theme: 'light' },
+}
+export const FilteredPhone: Story = {
+  ...Filtered,
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}
+export const FilteredPhoneLight: Story = {
+  ...Filtered,
+  globals: { theme: 'light', viewport: { value: 'phone' } },
+}
 export const SingleWeekday: Story = {
   args: { days: days.map((d, i) => (i === 4 ? d : { wins: 0, losses: 0 })) },
 }
@@ -53,6 +65,14 @@ export const ProfileReadOnly: Story = {
 export const ProfileReadOnlyLight: Story = {
   args: { readOnly: true, onSeeAllGames: () => {} },
   globals: { theme: 'light' },
+}
+export const ProfileReadOnlyPhone: Story = {
+  ...ProfileReadOnly,
+  globals: { theme: 'dark', viewport: { value: 'phone' } },
+}
+export const ProfileReadOnlyPhoneLight: Story = {
+  ...ProfileReadOnlyLight,
+  globals: { theme: 'light', viewport: { value: 'phone' } },
 }
 /** Show my weekly performance is off: only you see it, the chip reads Hidden */
 export const ProfileHidden: Story = {

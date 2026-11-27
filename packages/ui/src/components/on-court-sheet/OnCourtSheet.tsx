@@ -1,6 +1,7 @@
 'use client'
 
 import type { MatchFormat } from '@rotra/data/match/types'
+import type { WinChance } from '@rotra/data/match/win-chance'
 import { Button } from '@rotra/ui/button'
 import { Chip } from '@rotra/ui/chip'
 import { Notice } from '@rotra/ui/notice'
@@ -26,6 +27,10 @@ export type OnCourtPendingAction = 'start' | 'send-back'
 
 export type OnCourtSheetProps = {
   open: boolean
+  /** Win chance (D-2026-11-27-02): a chip beside each team's label; none when missing */
+  winChance?: WinChance
+  /** Makes the chips buttons that open WinChanceDialog */
+  onOpenWinChance?: () => void
   onOpenChange: (open: boolean) => void
   matchNo: number
   /** "Court 1", or "Court 1 + Court 2" for a merged 5v5 */
@@ -93,6 +98,8 @@ const isFun = (format: MatchFormat) => format.startsWith('fun_')
  */
 export function OnCourtSheet({
   open,
+  winChance,
+  onOpenWinChance,
   onOpenChange,
   matchNo,
   courtLabel,
@@ -148,6 +155,8 @@ export function OnCourtSheet({
         <Chip>Getting ready</Chip>
       </div>
       <TeamLineup
+        winChance={winChance}
+        onOpenWinChance={onOpenWinChance}
         teamA={teamA}
         teamB={teamB}
         minimumGames={minimumGames}

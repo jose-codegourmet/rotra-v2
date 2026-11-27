@@ -6,7 +6,6 @@ import { useSaveMyOnboardingAnswers } from '@rotra/data/player/useSaveMyOnboardi
 import { useSetMyGender } from '@rotra/data/player/useSetMyGender'
 import { useUpdateMyProfile } from '@rotra/data/player/useUpdateMyProfile'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
-import { isRealDataMode } from '@rotra/data/real/mode'
 import { Button } from '@rotra/ui/button'
 import { Card } from '@rotra/ui/card'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
@@ -232,8 +231,6 @@ export function EditProfile() {
           }
           update.mutate(personal, {
             onSuccess: () => {
-              // Real mode has nowhere to store the answers yet (D-2026-11-19-11).
-              if (isRealDataMode()) return saveGenderThen(saved)
               saveAnswers.mutate(answers, {
                 onSuccess: () => saveGenderThen(saved),
                 onError: failed,

@@ -587,9 +587,38 @@ export async function pauseMatch(
       data: {
         state: 'on_court',
         startedAt: null,
+        // Almost done only counts while Playing (D-2026-11-25-02).
+        almostDoneAt: null,
         placedAt: match.placedAt ?? new Date(),
         revision: { increment: 1 },
       },
+    })
+    return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
+  })
+}
+
+/**
+ * Q-CONSOLE court card / Q-MATCH · Almost done (D-2026-11-25-02; real mode November 26, 2026): the
+ * Queue Master's switch on a Playing match. On stores the time, off clears it; Plan Ahead reads it
+ * as 0 minutes left. Only a Playing match can change: one that left Playing meanwhile (Match done,
+ * Mark invalid, Pause match) is refused with "Something changed". Nothing else moves: no court
+ * frees, so Auto Queue does nothing. A retry finds the switch where it asked and returns the match.
+ * Online only: there is no sync replay for it.
+ */
+export async function setAlmostDone(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; matchId: string; on: boolean },
+) {
+  if (!input.operationId.trim())
+    throw new ServiceError('invalid', { operationId: 'A confirmation ID is required.' })
+  return matchCommand(context, sessionId, {}, async (tx, session) => {
+    const match = await activeMatch(tx, session.id, input.matchId)
+    if (match.state !== 'active' || match.decision) throw conflict()
+    if ((match.almostDoneAt != null) === input.on) return matchDto(match)
+    await tx.match.update({
+      where: { id: match.id },
+      data: { almostDoneAt: input.on ? new Date() : null, revision: { increment: 1 } },
     })
     return matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow)
   })
@@ -904,7 +933,8 @@ async function decide(
     })
     await tx.match.update({
       where: { id: match.id },
-      data: { state: outcome.kind, endedAt: now, revision: { increment: 1 } },
+      // Almost done ends with the match (Match done and Mark invalid both clear it).
+      data: { state: outcome.kind, endedAt: now, almostDoneAt: null, revision: { increment: 1 } },
     })
     const result = {
       match: matchDto((await loadMatch(tx, session.id, match.id)) as MatchRow),

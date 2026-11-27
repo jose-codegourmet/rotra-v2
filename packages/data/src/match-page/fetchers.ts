@@ -3,6 +3,8 @@ import { getSession } from '../auth/fetchers'
 import { requireOnline } from '../mock/bridge'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
+import { gameWinChanceBreakdown, gameWinChanceFields } from '../player/gameWinChance.rules'
+import { mockGameWinChanceFaces } from '../player/mockGameWinChance'
 import type {
   PlayerGame,
   PlayerGamePlayer,
@@ -133,6 +135,12 @@ function mockMatchPage(
   // That person's games in the session up to and including game `upTo`, as profile games count.
   const played = (person: Person, upTo: number) =>
     session.games.slice(0, upTo + 1).filter((g) => playedIn(person, g)).length
+  // Win chance (D-2026-11-27-03): the same inputs as the profile games read, so the numbers agree.
+  const chanceFaceOf = mockGameWinChanceFaces(state, session)
+  const chanceFace = (person: Person) => {
+    const { identity } = face(person)
+    return chanceFaceOf(identity.kind === 'player' ? identity.playerId : null)
+  }
   const courtFace = (person: Person, at: number): PlayerGamePlayer => {
     const f = face(person)
     return {
@@ -158,16 +166,24 @@ function mockMatchPage(
       opponentPlayers,
       sessionGameNumber: played(person, at),
     }
-    if (person === OWNER) return { ...game, ...base }
+    const drawnLeft: Person[] = [person, ...mine]
+    const chance = (drawn: Pick<PlayerGame, 'format' | 'counting' | 'result'>) =>
+      gameWinChanceFields(drawn, drawnLeft.map(chanceFace), theirs.map(chanceFace))
+    if (person === OWNER) return { ...game, ...base, ...chance(game) }
     // A partial game is the owner's participation; for everyone else it reads at match level.
-    return {
-      ...base,
+    const drawn = {
+      format: game.format,
       counting: matchCounting(isStandardFormat(game.format), ranked),
       result: onOwnerSide ? game.result : flipResult(game.result),
+    }
+    return {
+      ...base,
+      ...drawn,
       score: game.score === null || onOwnerSide ? game.score : flipScore(game.score),
       ...(game.gameScores
         ? { gameScores: onOwnerSide ? game.gameScores : game.gameScores.map(flipScore) }
         : {}),
+      ...chance(drawn),
     }
   }
   const player = (person: Person): MatchPagePlayer => {
@@ -196,6 +212,12 @@ function mockMatchPage(
     }
   }
   const [teamA, teamB] = sides(match)
+  const winChance = gameWinChanceBreakdown(
+    match.format,
+    teamA.map(chanceFace),
+    teamB.map(chanceFace),
+    match.result === 'won' ? 'left' : 'right',
+  )
   return {
     matchId: match.id,
     format: match.format,
@@ -214,6 +236,7 @@ function mockMatchPage(
     teamA: teamA.map(player),
     teamB: teamB.map(player),
     viewerPlayerId,
+    ...(winChance ? { winChance } : {}),
   }
 }
 

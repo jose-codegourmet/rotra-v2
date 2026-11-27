@@ -14,12 +14,12 @@ import { type ReactNode, useId, useMemo } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { listNames, matchResultFormDefaultValues } from './MatchResultForm.defaultValues'
 import {
-  anyBoxTyped,
   boxesForPick,
   gamesState,
   type MatchResultFormInput,
   type MatchResultFormValues,
   matchResultSchemaFor,
+  scoreTyped,
   scoreWinner,
   type Team,
 } from './MatchResultForm.schema'
@@ -101,9 +101,10 @@ export function MatchResultForm({
     rowErrors?.message ??
     [0, 1, 2].map(rowError).find(Boolean)
 
+  // Clear score shows once both boxes of a game are filled (the prototype's gameEntered).
   const anyScore = best3
-    ? st.visible.some((i) => games[i] && anyBoxTyped(games[i]))
-    : anyBoxTyped({ a: values.scoreA, b: values.scoreB })
+    ? st.visible.some((i) => games[i] && scoreTyped(games[i]))
+    : scoreTyped({ a: values.scoreA, b: values.scoreB })
 
   const teamNames: Record<Team, string> = {
     A: listNames(teamANames),

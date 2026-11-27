@@ -29,7 +29,6 @@ import {
   partnersIn,
   restAfter,
   streakOf,
-  tonightLevel,
   whoseTurnText,
 } from './matchMaking.rules'
 import {
@@ -39,6 +38,7 @@ import {
   planAheadMinutesLeft,
 } from './planAhead.rules'
 import { splitTeams } from './queue.rules'
+import { formRating } from './winChance.rules'
 
 export const AUTO_QUEUE_MODES: AutoQueueMode[] = ['available', 'ahead', 'wait', 'fewest', 'catchup']
 export function emptyAutoQueueDraftState(): AutoQueueDraftState {
@@ -373,8 +373,8 @@ export function generateAutoQueueMatches({
         .filter((y) => clash(x, y))
         .map((y) => [x.id, y.id] as const),
     )
-  // 3. Even game: teams split by tonight's level.
-  const levelTonight = (p: SessionPlayer) => tonightLevel(p, ctx.matches)
+  // 3. Even game: teams split by the form rating behind Win chance (D-2026-11-27-02).
+  const levelTonight = (p: SessionPlayer) => formRating(p, ctx.roster, ctx.matches)
   // A player already in a draft of this batch (kept or new) is not free for a pair.
   const drafted = () => new Set([...retained, ...matches].flatMap(allPlayers))
   for (let i = 0; i < limit; i++) {

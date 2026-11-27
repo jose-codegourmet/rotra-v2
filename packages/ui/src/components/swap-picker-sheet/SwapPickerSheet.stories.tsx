@@ -133,3 +133,18 @@ export const Substitute: Story = {
 export const SomethingChanged: Story = {
   args: { message: 'Something changed. Review the match again.' },
 }
+
+// Name stacks (D-2026-11-26-09): club nickname + nickname + full name, nickname only, none.
+const withStacks = (list: SwapPickerPlayer[]): SwapPickerPlayer[] =>
+  list.map((p, i) =>
+    i % 3 === 0
+      ? { ...p, name: 'Miguel Santos', nickname: 'Migs', clubNickname: 'Kuya Migs' }
+      : i % 3 === 1
+        ? { ...p, name: 'Paulo Garcia', nickname: 'Pau', clubNickname: null }
+        : { ...p, name: 'Ysa Fernandez', nickname: null, clubNickname: null },
+  )
+/** Each tile's name is the stack: top name, then the others in smaller lines */
+export const NameStacks: Story = {
+  args: { inMatch: withStacks(inMatch) as typeof inMatch, players: withStacks(others) },
+}
+export const NameStacksLight: Story = { ...NameStacks, globals: { theme: 'light' } }

@@ -73,3 +73,17 @@ export const BestOfThreeGames: Story = {
   },
 }
 export const BestOfThreeGamesLight: Story = { ...BestOfThreeGames, globals: { theme: 'light' } }
+
+export const WithWinChance: Story = {
+  args: {
+    columns: columns.map((c) => ({
+      ...c,
+      matches: c.matches.map((m, i) => ({
+        ...m,
+        winChance: { a: 39, b: 61, favored: 'B', strong: false } as const,
+        upset: i === 0,
+      })),
+    })),
+    onOpenWinChance: fn(),
+  },
+}

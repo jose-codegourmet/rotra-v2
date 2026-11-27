@@ -1,5 +1,7 @@
 import 'server-only'
+import { gameWinChanceFields } from '@rotra/data/player/game-win-chance'
 import { WINDOW_DAYS, yearGameStats } from '@rotra/data/player/rules'
+import type { PlayerGame } from '@rotra/data/player/types'
 import { maskPublicName } from '@rotra/data/public-session/rules'
 import { awardBaseline, createResultSnapshot } from '@rotra/data/session-result/sessionResult.rules'
 import type { ClubContext } from '../auth/account-context'
@@ -11,6 +13,7 @@ import { ServiceError } from '../service/errors'
 import { toIso, toIsoOrNull } from '../service/serialize'
 import { isMasked } from './masking'
 import { writePlayerNotifications } from './notification-events'
+import { readClubForms, winChanceFace } from './win-chance'
 
 type Tx = Prisma.TransactionClient
 
@@ -554,12 +557,16 @@ function courtPlayer(
  * session, with each game's counting status and the faces on its court (`partnerPlayers` /
  * `opponentPlayers`, in the order of `partners` / `opponents`). No costs, levels, Off Day or
  * private identity; always-private players are masked unless `maskAlwaysPrivate` is false (Admin).
+ * With `winChance` (ROTRA Player's games read only, D-2026-11-27-03) every game with a full
+ * participation and two sides carries `winChance` (`a` = this player's side) and `upset`, from each
+ * face's level in that session and its club form before it (`readClubForms`).
  */
 async function historyFromFacts(
   tx: Tx,
   facts: PlayerMatchFact[],
   maskAlwaysPrivate = true,
   viewerId: string | null = null,
+  winChance = false,
 ) {
   const sessionIds = [...new Set(facts.map((f) => f.sessionId))]
   const [sessions, entries, allFacts] = await Promise.all([
@@ -571,6 +578,7 @@ async function historyFromFacts(
         finalizedAt: true,
         publicSlug: true,
         recordGames: true,
+        scheduledStartAt: true,
         club: { select: { name: true } },
         publication: { select: { publishedAt: true } },
       },
@@ -579,6 +587,7 @@ async function historyFromFacts(
       where: { sessionId: { in: sessionIds } },
       select: {
         id: true,
+        clubPlayerId: true,
         nameSnapshot: true,
         clubPlayer: { select: { avatarRef: true } },
         playerAtEntry: {
@@ -595,11 +604,27 @@ async function historyFromFacts(
     // log): how many games that entry had played in the session up to and including a match.
     tx.playerMatchFact.findMany({
       where: { sessionId: { in: sessionIds } },
-      select: { sessionId: true, sessionPlayerId: true, matchId: true },
+      select: { sessionId: true, sessionPlayerId: true, matchId: true, skillLevelSnapshotId: true },
       orderBy: [{ playedAt: 'asc' }, { matchId: 'asc' }],
     }),
   ])
   const byId = new Map(entries.map((e) => [e.id, e]))
+  // Win chance: the level each entry played the session at (its first fact, as the match page
+  // reads it) and the club form of everyone on these courts, in one query.
+  const levelOf = new Map<string, number>()
+  for (const f of allFacts)
+    if (!levelOf.has(f.sessionPlayerId)) levelOf.set(f.sessionPlayerId, f.skillLevelSnapshotId)
+  const formOf = winChance
+    ? await readClubForms(
+        tx,
+        facts.map((f) => f.clubId),
+        facts.flatMap((f) =>
+          [f.sessionPlayerId, ...f.partnerEntryIds, ...f.opponentEntryIds].flatMap(
+            (id) => byId.get(id)?.clubPlayerId ?? [],
+          ),
+        ),
+      )
+    : null
   const gameNumbers = new Map<string, number>()
   const running = new Map<string, number>()
   for (const f of allFacts) {
@@ -629,6 +654,18 @@ async function historyFromFacts(
         .map((f) => {
           const partnerPlayers = people(f.partnerEntryIds, f.sessionId, f.matchId)
           const opponentPlayers = people(f.opponentEntryIds, f.sessionId, f.matchId)
+          // A full standard game of a not ranked session (D-2026-11-20-02) is `not_ranked`: it
+          // shows with its win or loss but stays out of every count that reads `counted`.
+          const counting: PlayerGame['counting'] = !f.fullParticipation
+            ? 'partial'
+            : !f.standardMatch
+              ? 'fun'
+              : s.recordGames
+                ? 'counted'
+                : 'not_ranked'
+          const result: PlayerGame['result'] = f.team === f.winningTeam ? 'won' : 'lost'
+          const chanceFace = (id: string) =>
+            winChanceFace(levelOf.get(id), formOf?.(byId.get(id)?.clubPlayerId, s))
           return {
             id: f.matchId,
             format: f.format,
@@ -637,32 +674,34 @@ async function historyFromFacts(
             opponents: opponentPlayers.map((p) => p.name),
             partnerPlayers,
             opponentPlayers,
-            // A full standard game of a not ranked session (D-2026-11-20-02) is `not_ranked`: it
-            // shows with its win or loss but stays out of every count that reads `counted`.
-            counting: !f.fullParticipation
-              ? 'partial'
-              : !f.standardMatch
-                ? 'fun'
-                : s.recordGames
-                  ? 'counted'
-                  : 'not_ranked',
-            result: f.team === f.winningTeam ? 'won' : 'lost',
+            counting,
+            result,
             score:
               f.teamAScore == null || f.teamBScore == null
                 ? null
                 : f.team === 'A'
                   ? `${f.teamAScore}–${f.teamBScore}`
                   : `${f.teamBScore}–${f.teamAScore}`,
+            ...(formOf
+              ? gameWinChanceFields(
+                  { format: f.format, counting, result },
+                  [f.sessionPlayerId, ...f.partnerEntryIds].map(chanceFace),
+                  f.opponentEntryIds.map(chanceFace),
+                )
+              : {}),
           }
         }),
     }))
     .sort((a, b) => (b.finishedAt ?? '').localeCompare(a.finishedAt ?? ''))
 }
 
-/** `maskAlwaysPrivate: false` only behind the Admin account boundary (A-PLAYER games). */
+/**
+ * `maskAlwaysPrivate: false` only behind the Admin account boundary (A-PLAYER games). `winChance:
+ * true` only for ROTRA Player's games read (D-2026-11-27-03): never for Admin, Queue or exports.
+ */
 export async function readPlayerMatchHistory(
   playerId: string,
-  { maskAlwaysPrivate = true, viewerId = null as string | null } = {},
+  { maskAlwaysPrivate = true, viewerId = null as string | null, winChance = false } = {},
 ) {
   if (!UUID.test(playerId)) return []
   // An unclaimed player saved by clubs (a shared entry, no `players` row): every club record's games.
@@ -673,11 +712,11 @@ export async function readPlayerMatchHistory(
   if (entry) {
     const sessions: Awaited<ReturnType<typeof readClubPlayerMatchHistory>> = []
     for (const record of entry.clubPlayers)
-      sessions.push(...(await readClubPlayerMatchHistory(record.clubId, record.id)))
+      sessions.push(...(await readClubPlayerMatchHistory(record.clubId, record.id, { winChance })))
     return sessions
   }
   return prisma.$transaction(async (tx) =>
-    historyFromFacts(tx, await playerFacts(tx, playerId), maskAlwaysPrivate, viewerId),
+    historyFromFacts(tx, await playerFacts(tx, playerId), maskAlwaysPrivate, viewerId, winChance),
   )
 }
 
@@ -685,14 +724,18 @@ export async function readPlayerMatchHistory(
  * The games read behind `/api/players/{id}/games` (B-54): a masked player has no game history, and
  * the other faces on a court follow the same masking rule for this viewer.
  */
-export async function readPublicMatchHistory(playerId: string, viewerId: string | null) {
+export async function readPublicMatchHistory(
+  playerId: string,
+  viewerId: string | null,
+  winChance = false,
+) {
   if (!UUID.test(playerId)) return []
   const owner = await prisma.player.findUnique({
     where: { id: playerId },
     select: { profileVisibility: true },
   })
   if (owner && isMasked(owner.profileVisibility, viewerId, playerId)) return []
-  return readPlayerMatchHistory(playerId, { viewerId })
+  return readPlayerMatchHistory(playerId, { viewerId, winChance })
 }
 
 /** The most sessions one games page may hold (`limit` above it is lowered to it). */
@@ -718,14 +761,18 @@ export function pageGames<T>(sessions: T[], page: { limit: number; offset: numbe
 }
 
 /** Admin history for a club-only unclaimed record, scoped to that club's existing match facts. */
-export async function readClubPlayerMatchHistory(clubId: string, clubPlayerId: string) {
+export async function readClubPlayerMatchHistory(
+  clubId: string,
+  clubPlayerId: string,
+  { winChance = false } = {},
+) {
   if (!UUID.test(clubId) || !UUID.test(clubPlayerId)) return []
   return prisma.$transaction(async (tx) => {
     const facts = await tx.playerMatchFact.findMany({
       where: { clubId, clubPlayerId },
       orderBy: [{ playedAt: 'desc' }, { matchId: 'asc' }],
     })
-    return historyFromFacts(tx, facts, false)
+    return historyFromFacts(tx, facts, false, null, winChance)
   })
 }
 

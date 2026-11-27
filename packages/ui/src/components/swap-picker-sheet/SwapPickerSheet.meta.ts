@@ -6,6 +6,7 @@ export const swapPickerSheetMeta = {
     'The player picker for Replace (before and during play) and Substitute. Opens compact (about 620 px, one column): the title, Who\'s coming out/off (the match\'s players, 4 per row), Suggestion (seven free players with the fewest games, longest rest first, plus a dashed "+ Other · All players" tile), the extra choice and the one primary action. Other shows All players — a full-width search, a skill-level filter, a sort that reverses on a second tap (Longest/Shortest wait, Fewest/Most games, Name A–Z/Z–A) and pages of 24, free players first and the rest greyed out with Away / Playing / On court.',
   usage: [
     'Each tile (owner, November 25, 2026): the picture has the level ring and the games badge, like the Main Queue faces, and the line under the name is the status alone (no "N/M ·"); a free player\'s "rest Nm" is warning from 10 min and error from 16 (StatusPill\'s thresholds).',
+    "Name stack (owner, November 26, 2026, D-2026-11-26-09): give each player nickname and clubNickname (null counts; name is the full name) and the tile's name becomes the stack, the first present of club nickname, nickname, full name on top and the others in smaller lines; without them it shows shortName. The ring, the games badge and the rest tones stay.",
     '900 px and wider: Other widens the dialog to about 75% of the screen with All players as an edge-to-edge panel on the right; the tile becomes "− Hide".',
     'Under 900 px: Other opens All players as a second dialog stacked over the picker; tapping a player picks them and closes it; × or the backdrop closes it without picking.',
     'A player picked from All players takes the first Suggestion slot so the compact view always shows the choice.',
@@ -18,6 +19,7 @@ export const swapPickerSheetMeta = {
     screen: 'swapPicker(), SHEETS.replace, SHEETS.sub, ACT.spOther / ACT.spSort, .sp-* styles',
   },
   docs: [
+    'docs/mockup-changes/2026-11-26-queue-name-hierarchy.md',
     'docs/mockup-changes/2026-11-25-queue-picker-level-games-rest.md',
     'docs/screens/product/modules/queue/match-control.md',
     'docs/mockup-changes/2026-11-13-queue-replace-during-play.md',

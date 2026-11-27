@@ -5,6 +5,7 @@ export const teamLineupMeta = {
   description:
     'Team A VS Team B on a match dialog: two labelled groups of MatchPlayerCards with the VS mark between them. In swap mode players can be switched to the other team.',
   usage: [
+    "Pass winChance (and onOpenWinChance to open WinChanceDialog) to draw a win chance chip beside each team's label; the Suggested, Playing and Getting ready sheets pass it through.",
     'Use on the Suggested match, Start match, Active match and Invalid match sheets.',
     'Pass onSwap where sides can be switched (Suggested match, Start match): the cards become SwappablePlayers inside a SwapSidesArea (drag onto the other team, or ← / →), and the owner applies the reported swap to its lineup.',
     'Do not use on queue cards (MatchCard draws its own faces) or for picking players (Q-MANUAL slots).',

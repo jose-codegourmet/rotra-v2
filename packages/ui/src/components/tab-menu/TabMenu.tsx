@@ -19,11 +19,13 @@ function Badges({ badges }: { badges?: TabBadge[] }) {
       key={badge.text + (badge.longText ?? '')}
       className={cn(
         'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold whitespace-nowrap',
-        badge.tone === 'warn'
-          ? 'border-warn/45 bg-warn-subtle text-warn'
-          : badge.tone === 'error'
-            ? 'border-error/45 bg-error-subtle text-error'
-            : 'border-border-strong text-fg2',
+        badge.tone === 'accent'
+          ? 'border-accent/45 bg-accent-subtle text-accent'
+          : badge.tone === 'warn'
+            ? 'border-warn/45 bg-warn-subtle text-warn'
+            : badge.tone === 'error'
+              ? 'border-error/45 bg-error-subtle text-error'
+              : 'border-border-strong text-fg2',
       )}
     >
       {badge.text}

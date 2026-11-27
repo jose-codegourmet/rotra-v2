@@ -356,3 +356,22 @@ export const StackedPhone: Story = {
   args: { count: 2, exemption: exemptionArgs(exemptionPlayers.slice(0, 3).map((p) => p.id)) },
   globals: { viewport: { value: 'phone' } },
 }
+
+export const WithWinChance: Story = {
+  args: {
+    count: 2,
+    batches: Object.fromEntries(
+      Object.entries(fixture).map(([mode, batch]) => [
+        mode,
+        {
+          ...batch,
+          drafts: batch.drafts.map((d) => ({
+            ...d,
+            winChance: { a: 39, b: 61, favored: 'B', strong: false } as const,
+          })),
+        },
+      ]),
+    ),
+    onOpenWinChance: fn(),
+  },
+}

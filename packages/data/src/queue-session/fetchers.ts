@@ -6,11 +6,13 @@ import {
   courtNames,
   onCourtMatches,
 } from '../match/match.rules'
+import { sampleForm } from '../match/winChance.rules'
 import { sessionRequestCount } from '../match-request/fetchers'
 import { MockError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, readMockState } from '../mock/store'
 import { sessionIn } from '../mock/transaction'
+import { sessionWeekday } from '../player/player.rules'
 import { realGetFinalizationStatus, realGetSessionDoneReview } from '../real/finalization'
 import { realGetSessionMatches } from '../real/match'
 import { isRealDataMode } from '../real/mode'
@@ -129,9 +131,21 @@ async function recordInputs(id: string) {
   await delay()
   const state = readMockState(),
     session = sessionIn(state, id)
+  // Win chance inputs (D-2026-11-27-02), as the roster read gives them: a guest has none.
+  const weekday = sessionWeekday(new Date(session.scheduledStartAt)),
+    guestIds = new Set(
+      state.clubPlayers
+        .filter((p) => p.identity === 'guest' || p.identity === 'pending')
+        .map((p) => p.id),
+    )
   return {
     session,
-    roster: state.roster.filter((r) => r.sessionId === id),
+    roster: state.roster
+      .filter((r) => r.sessionId === id)
+      .map((r) => ({
+        ...r,
+        form: guestIds.has(r.clubPlayerId) ? undefined : sampleForm(r.clubPlayerId, weekday),
+      })),
     matches: state.matches.filter((m) => m.sessionId === id),
     courts: state.courts.filter((c) => c.sessionId === id),
   }
@@ -196,5 +210,6 @@ export async function getSessionRecordHistory(id: string): Promise<SessionRecord
     courts,
     roster,
     matches: session.state === 'invalid' ? [] : matches,
+    winChance: true,
   })
 }

@@ -7,11 +7,13 @@ import {
   countedGames,
   courtNames,
   courtsNeeded,
+  FORMAT_LABELS,
   freeCourts,
   queueMasterName,
   substitutionCandidates,
   waitMinutes,
 } from '@rotra/data/match/match.rules'
+import { isAlmostDone, matchCourtStatus } from '@rotra/data/match/plan-ahead-rules'
 import type { Match } from '@rotra/data/match/types'
 import { useCompleteMatch } from '@rotra/data/match/useCompleteMatch'
 import { useInvalidateMatch } from '@rotra/data/match/useInvalidateMatch'
@@ -19,9 +21,11 @@ import { useMoveCourt } from '@rotra/data/match/useMoveCourt'
 import { usePauseMatch } from '@rotra/data/match/usePauseMatch'
 import { useReplacePlayer } from '@rotra/data/match/useReplacePlayer'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { useSetAlmostDone } from '@rotra/data/match/useSetAlmostDone'
 import { useSubstitutePlayer } from '@rotra/data/match/useSubstitutePlayer'
 import { useSwapFromMatch } from '@rotra/data/match/useSwapFromMatch'
 import { useSwapPlayers } from '@rotra/data/match/useSwapPlayers'
+import { winChance } from '@rotra/data/match/win-chance'
 import { MockError } from '@rotra/data/mock/errors'
 import {
   type QueueSession,
@@ -59,6 +63,7 @@ import {
   type NextMatchRequest,
 } from '@/app/(operator)/sessions/[sessionId]/_components/next-match/NextMatch'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 
 export type ActiveMatchProps = {
   sessionId: string
@@ -72,6 +77,8 @@ export type ActiveMatchProps = {
    * the active sheet.
    */
   moveFirst?: { courtId?: string } | null
+  /** Open straight on the Match done result step (Match done on a Playing court card); Back returns to the match */
+  resultFirst?: boolean
   onClose: () => void
 }
 
@@ -143,6 +150,7 @@ export function ActiveMatch({
   now,
   matchId,
   moveFirst = null,
+  resultFirst = false,
   onClose,
 }: ActiveMatchProps) {
   /** The next-match picker after a confirmed result; it outlives the active match sheet */
@@ -178,6 +186,7 @@ export function ActiveMatch({
         matches={matches.data}
         match={match}
         moveFirst={moveFirst}
+        resultFirst={resultFirst}
         onClose={onClose}
         onRefresh={refresh}
         onCompleted={setNext}
@@ -186,8 +195,9 @@ export function ActiveMatch({
   )
 }
 
-type OpenActiveMatchProps = Omit<ActiveMatchProps, 'matchId' | 'moveFirst'> & {
+type OpenActiveMatchProps = Omit<ActiveMatchProps, 'matchId' | 'moveFirst' | 'resultFirst'> & {
   moveFirst: { courtId?: string } | null
+  resultFirst: boolean
   session: QueueSession & { courts: SessionCourt[] }
   roster: SessionPlayer[]
   matches: Match[]
@@ -206,6 +216,7 @@ function OpenActiveMatch({
   matches,
   match,
   moveFirst,
+  resultFirst,
   onClose,
   onRefresh,
   onCompleted,
@@ -218,6 +229,8 @@ function OpenActiveMatch({
   const moveCourt = useMoveCourt()
   const swapPlayers = useSwapPlayers()
   const swapFromMatch = useSwapFromMatch()
+  const setAlmostDone = useSetAlmostDone()
+  const winChanceDialog = useWinChanceDialog(roster, matches)
   const [message, setMessage] = useState<string | undefined>()
   const [step, setStep] = useState<Step>(
     moveFirst
@@ -226,7 +239,9 @@ function OpenActiveMatch({
           courtIds: moveFirst.courtId ? [moveFirst.courtId] : [],
           operationId: newOperationId(),
         }
-      : { kind: 'active' },
+      : resultFirst
+        ? { kind: 'result', input: {} }
+        : { kind: 'active' },
   )
   // One Pause match operation per opening: a retry after a save failure replays it.
   const pauseOperationId = useRef(newOperationId())
@@ -254,6 +269,8 @@ function OpenActiveMatch({
       id,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       level: p?.level ?? null,
       games: countedGames(id, matches),
       photoUrl: photoOf(p),
@@ -262,6 +279,9 @@ function OpenActiveMatch({
   const substitutionPlayer = (p: SessionPlayer): SubstitutionPlayer => ({
     id: p.id,
     name: queueMasterName(p),
+    fullName: p.nameSnapshot,
+    nickname: p.nicknameSnapshot ?? null,
+    clubNickname: p.clubNickname ?? null,
     photoUrl: photoOf(p),
     level: p.level,
     games: countedGames(p.id, matches),
@@ -433,6 +453,21 @@ function OpenActiveMatch({
           if (isRecheckFailure(err)) onRefresh()
         },
         onSettled,
+      },
+    )
+  }
+
+  /** The Almost done switch: one tap, the command's toast; a match that left Playing meanwhile is refused */
+  const onAlmostDoneChange = (on: boolean) => {
+    if (setAlmostDone.isPending) return
+    setAlmostDone.mutate(
+      { matchId: match.id, on, operationId: newOperationId() },
+      {
+        onSuccess: (result) => toast(result.message),
+        onError: (err) => {
+          toast.error(errorMessage(err))
+          if (isRecheckFailure(err)) onRefresh()
+        },
       },
     )
   }
@@ -803,12 +838,18 @@ function OpenActiveMatch({
         matchNo={match.matchNo}
         courtLabel={courtLabel}
         format={match.format}
+        formatLabel={FORMAT_LABELS[match.format]}
+        status={matchCourtStatus(match, scoring, now)}
+        almostDone={isAlmostDone(match)}
+        onAlmostDoneChange={onAlmostDoneChange}
         scoringLabel={SCORING[scoring].label}
         startedAt={match.startedAt ?? now}
         now={now}
         teamA={teamA}
         teamB={teamB}
         minimumGames={session.minimumGames}
+        winChance={winChance(match, roster, matches)}
+        onOpenWinChance={() => winChanceDialog.open((all) => all.find((x) => x.id === match.id))}
         substitutions={substitutions}
         onSelectPlayer={(playerId) => go({ kind: 'player', playerId })}
         onOpenProfile={openProfile}
@@ -821,6 +862,7 @@ function OpenActiveMatch({
         onMatchDone={() => go({ kind: 'result', input: {} })}
       />
       {profile}
+      {winChanceDialog.dialog}
     </>
   )
 }

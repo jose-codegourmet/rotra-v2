@@ -40,7 +40,7 @@ flowchart TD
 ## Product navigation
 
 - **Queue:** top bar with sync status and a light/dark mode switch on every operator screen. A collapsible left nav on every operator screen (burger in the top bar on wide screens, icon rail when collapsed; on phones a bottom dock with Menu, a highlighted Create/Continue session, and Settings): Live session (while live), Dashboard, Saved players, Leaderboards (`/leaderboards`, `?tab=rotra` for the ROTRA board; [D-2026-11-25-04](../../mvp/decisions/2026-11-25.md#d-2026-11-25-04)), Venues, Inventory, Club settings, License, This device. Sign out is in Club settings. Home dashboard: club header with Create session, now card, calendar. Club settings has its own left-hand menu (on phones a button that opens it as a left drawer, closing the main menu first) and is unavailable offline. Each session's public page is also its session link; guests reach it from wherever the club shares it, never from the operator app's navigation. The live console has Session / Queue / Players / Leaderboard views and a footer with Session done. License gates remain global. Public session pages are a separate audience.
-- **Player Information:** overall leaderboard and public profile reading; sign-in adds Home (`/home`: current session, upcoming sessions, clubs and stats), own profile, ID/QR, privacy, and contact requests. No World discovery entry.
+- **Player Information:** overall leaderboard and public profile reading; sign-in adds Home (`/home`: current session, upcoming sessions, clubs and stats), own profile, ID/QR, privacy, contact requests, and Settings (`/settings`). Open Settings from the main navigation when available or from My profile’s Your account card. No World discovery entry.
 - **Admin:** clubs/licenses, players/contact requests, ranking configuration, feature flags. No speculative analytics dashboard is required.
 
 ## Surface inventory
@@ -69,6 +69,7 @@ flowchart TD
 | [Player sign-in, registration claim, and password recovery](modules/player-information/access-registration.md) | `P-LOGIN`, `P-CLAIM`, `P-CLAIM-STATUS`, `P-FORGOT`, `P-RESET` |
 | [Player ID, profile visibility, phone privacy, and contact-change request](modules/player-information/identity-privacy.md) | `P-ID-QR`, `P-PROFILE-PRIVACY`, `P-PHONE-PRIVACY`, `P-CONTACT-REQUEST` |
 | [Public and own player profile](modules/player-information/profile.md) | `P-PUBLIC-PROFILE`, `P-OWN-PROFILE`, `P-EDIT-PROFILE` |
+| [Settings (`/settings`)](modules/player-information/README.md#reference-prototype) | `P-SETTINGS` |
 | [Public club page and club members](modules/player-information/club-page.md) | `P-CLUB-PAGE`, `P-CLUB-MEMBERS` |
 | [Global leaderboard, rank explanation, and game history](modules/player-information/ranking-history.md) | `P-LEADERBOARD`, `P-RANK-DETAIL`, `P-ELIGIBILITY`, `P-MATCH-HISTORY` |
 | [Public match page](modules/player-information/match-page.md) | `P-MATCH-PAGE` |
@@ -106,6 +107,8 @@ P-COMPARE is `/players/[playerId]/compare` ([D-2026-11-08-02](../../mvp/decision
 needs a signed-in player, so signed out it goes to `/login` and returns there.
 
 P-VERIFICATION is `/profile/verification` and requires a signed-in player. Signed-out players go to `/login` and return to Verification after signing in.
+
+P-SETTINGS is `/settings` and requires a signed-in player. Signed-out players go to `/login` and return to Settings after signing in.
 
 Guest registration invitations (#490) open `/register/[clubId]` in Player Information, with no
 sign-in required. The club is RTR allocation context only; existing profiles still use `/claim/[token]`.

@@ -6,7 +6,6 @@ import { useSaveMyOnboardingAnswers } from '@rotra/data/player/useSaveMyOnboardi
 import { useSetMyGender } from '@rotra/data/player/useSetMyGender'
 import { useUpdateMyProfile } from '@rotra/data/player/useUpdateMyProfile'
 import { useMyAccount } from '@rotra/data/player-account/useMyAccount'
-import { isRealDataMode } from '@rotra/data/real/mode'
 import type { GettingToKnowValues } from '@rotra/schema/getting-to-know'
 import { maskPhone } from '@rotra/schema/phone'
 import {
@@ -88,11 +87,7 @@ export function OnboardingFlow({
   const finish = (final: GettingToKnowValues) => {
     save.mutate(toAnswers(final), {
       onSuccess: () => onFinish(),
-      onError: (error) => {
-        // Real mode has no storage for the answers yet: the account is made, so carry on to the done page.
-        if (isRealDataMode()) return onFinish()
-        toast.error(error.message)
-      },
+      onError: (error) => toast.error(error.message),
     })
   }
   const advance = (step: OnboardingQuestionStep, next: GettingToKnowValues) => {

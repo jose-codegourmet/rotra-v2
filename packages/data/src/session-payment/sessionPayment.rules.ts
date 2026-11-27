@@ -12,6 +12,13 @@ export type PaymentStatus =
   | { kind: 'reimburse'; toReturn: number }
 
 /**
+ * Free players (D-2026-11-27-01): a slot paid through a slot transfer (#1013) or refunded (#1014)
+ * keeps its payment history, so it can't be set free.
+ */
+export const FREE_PAYMENT_LOCKED_ERROR =
+  'This slot was paid on a transfer, so it can’t be set free.'
+
+/**
  * The amount a mark counts as received. A legacy mark with no amount (null) meant "paid in full",
  * so it counts as the current amount due (0 with no fee set). No mark: nothing received.
  */
@@ -69,17 +76,20 @@ export function isFullyPaid(status: PaymentStatus) {
  * - still due = Σ max(due − received − waived, 0) over the roster (null with no fee set)
  * - to reimburse = Σ max(received − due, 0) (0 with no fee set)
  * - against costs = collected (net kept) − total cost (null without an estimate)
+ * - free (D-2026-11-27-01): free players the caller left out of `marks` and `total`; a count only
  */
 export function paymentTotals({
   marks,
   total,
   amountDue,
   cost,
+  free = 0,
 }: {
   marks: { amountMinor: number | null; waivedMinor?: number; refundedMinor?: number }[]
   total: number
   amountDue: number | null
   cost: number | null
+  free?: number
 }) {
   let paid = 0,
     partial = 0,
@@ -113,6 +123,20 @@ export function paymentTotals({
     toReimburse,
     againstCosts: cost === null ? null : collected - cost,
     cost,
+    // Only while someone is free, so totals with no free players keep their old shape.
+    ...(free ? { free } : {}),
+  } as {
+    paid: number
+    partial: number
+    total: number
+    collected: number
+    waived: number
+    refunded: number
+    stillDue: number | null
+    toReimburse: number
+    againstCosts: number | null
+    cost: number | null
+    free?: number
   }
 }
 export type PaymentTotals = ReturnType<typeof paymentTotals>

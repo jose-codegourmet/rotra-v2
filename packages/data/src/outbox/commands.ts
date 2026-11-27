@@ -2,6 +2,7 @@ import {
   realMarkAllPaid,
   realSetPaymentAmount,
   realSetPaymentMarks,
+  realSetPlayerFree,
   realTogglePaid,
 } from '../real/financials'
 import {
@@ -132,6 +133,7 @@ export const COMMANDS = {
   'payments.amount': bySession(realSetPaymentAmount),
   'payments.toggle': bySession(realTogglePaid),
   'payments.markAll': bySessionId(realMarkAllPaid),
+  'payments.free': bySession(realSetPlayerFree),
 } satisfies Record<string, CommandDefinition>
 
 export type CommandName = keyof typeof COMMANDS

@@ -10,6 +10,7 @@ import { prisma } from '../client/prisma'
 import {
   currentExperienceMonths,
   experienceUpdate,
+  mergeDetails,
   PERSONAL_DETAILS_VERSION,
 } from '../player/profile'
 import { requireAdmin, requireRevision } from '../service/authorize'
@@ -181,7 +182,9 @@ export async function saveAdminPlayerCore(
             : {}),
           ...(coreChanged.includes('playing style')
             ? {
-                personalDetails: { playingStyle: values.playingStyle },
+                personalDetails: mergeDetails(player.personalDetails, {
+                  playingStyle: values.playingStyle,
+                }),
                 detailsVersion: PERSONAL_DETAILS_VERSION,
               }
             : {}),

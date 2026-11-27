@@ -11,6 +11,7 @@ import {
   waitingMatches,
 } from '@rotra/data/match/match.rules'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { isUpset, winChance } from '@rotra/data/match/win-chance'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
@@ -21,6 +22,7 @@ import {
 } from '@rotra/ui/session-games-dialog'
 import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from 'react'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 import { useClubPlayerPictures } from '@/lib/useClubPlayerPictures'
 
 type PlayerGamesApi = {
@@ -54,6 +56,7 @@ export function PlayerGamesProvider({ sessionId, children }: PlayerGamesProvider
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
   const { pictureOf } = useClubPlayerPictures()
+  const winChanceDialog = useWinChanceDialog(roster.data?.roster, matches.data)
   /** The roster id whose games are shown; kept while the profile is open so Back can return */
   const [playerId, setPlayerId] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
@@ -110,6 +113,8 @@ export function PlayerGamesProvider({ sessionId, children }: PlayerGamesProvider
           fun: m.format.startsWith('fun_'),
           teamA: m.teamA.map(face),
           teamB: m.teamB.map(face),
+          winChance: winChance(m, rosterList, matchList),
+          upset: isUpset(m, rosterList),
           winningTeam: m.decision?.winningTeam ?? null,
           score:
             m.decision?.teamAScore != null && m.decision.teamBScore != null
@@ -133,6 +138,7 @@ export function PlayerGamesProvider({ sessionId, children }: PlayerGamesProvider
               formatLabel: FORMAT_LABELS[m.format],
               teamA: m.teamA.map(face),
               teamB: m.teamB.map(face),
+              winChance: winChance(m, rosterList, matchList),
             },
           ]
         : [],
@@ -159,6 +165,9 @@ export function PlayerGamesProvider({ sessionId, children }: PlayerGamesProvider
               }
             : null
         }
+        onOpenWinChance={(matchId) =>
+          winChanceDialog.open((all) => all.find((x) => x.id === matchId))
+        }
         tab={tab}
         onTabChange={setTab}
         onOpenProfile={(rosterId) => {
@@ -173,6 +182,7 @@ export function PlayerGamesProvider({ sessionId, children }: PlayerGamesProvider
     <PlayerGamesContext.Provider value={api}>
       {children}
       {dialog}
+      {winChanceDialog.dialog}
       <PlayerProfile
         clubPlayerId={profileId}
         onClose={() => {

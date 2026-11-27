@@ -47,3 +47,12 @@ export function freeCourtDropClass({
     dragOver && 'outline-2 outline-accent outline-offset-2 bg-accent-subtle!',
   )
 }
+
+/**
+ * A court's button row (the mockup's .court-acts): the buttons fill the row at every width; at 640 px
+ * and narrower they stack full width, 44 px tall, in DOM order (Pause match above Match done).
+ */
+export const courtActsClass = cn(
+  'mt-auto flex items-center gap-2 *:min-w-0 *:flex-1',
+  'max-[640px]:flex-col max-[640px]:items-stretch max-[640px]:*:min-h-11 max-[640px]:*:w-full max-[640px]:*:flex-none',
+)

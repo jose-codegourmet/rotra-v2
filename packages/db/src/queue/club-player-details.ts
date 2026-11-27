@@ -1,4 +1,6 @@
 import 'server-only'
+import { FULL_NAME_TOO_SHORT_MESSAGE, fullNameSchema } from '@rotra/schema/name'
+import { NICKNAME_MAX } from '@rotra/schema/personal-details'
 import type { ClubContext } from '../auth/account-context'
 import { prisma } from '../client/prisma'
 import type { SocialProvider } from '../generated/prisma/client'
@@ -24,6 +26,7 @@ import { levelCodeFor } from './session-store'
 const E164 = /^\+639\d{9}$/
 const NOT_EDITABLE = 'This player registered, so they keep their own details.'
 const EMAIL_ERROR = 'Enter an email address, like name@example.com.'
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /**
  * Q-SAVED-PLAYERS › Edit details (owner decision 2026-11-08; D-2026-11-16-04 since P15.8). The
@@ -284,5 +287,51 @@ export async function updateClubPlayerDetails(
       message: `${message} · ${emailWords(resolution)}`,
       samePerson: null,
     }
+  })
+}
+
+/**
+ * Edit player › Save changes for a guest or unclaimed player (D-2026-11-26-07, rotra-queue.html
+ * saveEditLive()): the club renames a profile it made and sets its one nickname. A registered
+ * player's name is their own (`loadEditable` refuses). The full name follows the shared rule
+ * (spaces collapsed, 2–60); the nickname is trimmed with spaces collapsed, and empty removes it.
+ *
+ * One transaction: the saved player (`display_name`, `nickname`) and `name_snapshot` on their live
+ * roster entries (not released, not a no show) in this club's prepared or active sessions, so the
+ * console, courts, queue and public page show the new name at once. The nickname has no snapshot
+ * column: reads take it from the saved player. Finished sessions keep the name they finished with.
+ */
+export async function renameClubPlayer(
+  context: ClubContext,
+  input: { clubPlayerId: string; fullName: string; nickname: string | null },
+) {
+  await requireClubEntitlement(context)
+  if (!UUID.test(input.clubPlayerId)) throw new ServiceError('not_found')
+  const parsed = fullNameSchema.safeParse(input.fullName)
+  if (!parsed.success)
+    throw new ServiceError('invalid', {
+      fullName: parsed.error.issues[0]?.message ?? FULL_NAME_TOO_SHORT_MESSAGE,
+    })
+  const fullName = parsed.data
+  const nickname = (input.nickname ?? '').replace(/\s+/g, ' ').trim() || null
+  if (nickname && nickname.length > NICKNAME_MAX)
+    throw new ServiceError('invalid', { nickname: `Use ${NICKNAME_MAX} characters or fewer.` })
+  const row = await loadEditable(context, input.clubPlayerId)
+  return prisma.$transaction(async (tx) => {
+    await tx.clubPlayer.update({
+      where: { clubId_id: { clubId: context.clubId, id: row.id } },
+      data: { displayName: fullName, nickname, revision: { increment: 1 } },
+    })
+    await tx.sessionPlayer.updateMany({
+      where: {
+        clubId: context.clubId,
+        clubPlayerId: row.id,
+        releasedAt: null,
+        noShowAt: null,
+        session: { state: { in: ['prepared', 'active'] } },
+      },
+      data: { nameSnapshot: fullName, revision: { increment: 1 } },
+    })
+    return { clubPlayerId: row.id, fullName, nickname, message: `Details saved · ${fullName}` }
   })
 }

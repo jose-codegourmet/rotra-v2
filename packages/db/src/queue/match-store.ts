@@ -83,6 +83,8 @@ export function matchView(row: MatchRow): MatchView {
     placedAt: row.placedAt?.getTime() ?? null,
     startedAt: row.startedAt?.getTime() ?? null,
     endedAt: row.endedAt?.getTime() ?? null,
+    // Only a Playing match carries it (the commands that leave Playing clear it).
+    almostDoneAt: row.state === 'active' ? (row.almostDoneAt?.getTime() ?? null) : null,
     substitutions,
     decision: row.decision
       ? {
@@ -104,6 +106,7 @@ export function matchDto(row: MatchRow) {
     placedAt: toIsoOrNull(row.placedAt),
     startedAt: toIsoOrNull(row.startedAt),
     endedAt: toIsoOrNull(row.endedAt),
+    almostDoneAt: view.almostDoneAt == null ? null : new Date(view.almostDoneAt).toISOString(),
     substitutions: view.substitutions.map((s) => ({ ...s, at: new Date(s.at).toISOString() })),
     decision: view.decision && {
       ...view.decision,

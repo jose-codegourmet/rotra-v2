@@ -25,15 +25,18 @@ import {
   waitMinutes,
 } from '@rotra/data/match/match.rules'
 import { matchCategoryFor } from '@rotra/data/match/matchCategory.rules'
-import { matchExpectedFinish } from '@rotra/data/match/plan-ahead-rules'
+import { isAlmostDone, matchCourtStatus } from '@rotra/data/match/plan-ahead-rules'
 import type { Match } from '@rotra/data/match/types'
 import { useMoveCourt } from '@rotra/data/match/useMoveCourt'
 import { usePauseMatch } from '@rotra/data/match/usePauseMatch'
 import { usePlaceOnCourt } from '@rotra/data/match/usePlaceOnCourt'
 import { useRemoveWaitingMatch } from '@rotra/data/match/useRemoveWaitingMatch'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
+import { useSetAlmostDone } from '@rotra/data/match/useSetAlmostDone'
 import { useStartMatch } from '@rotra/data/match/useStartMatch'
 import { useTradeCourts } from '@rotra/data/match/useTradeCourts'
+import { winChance } from '@rotra/data/match/win-chance'
+import { MockError } from '@rotra/data/mock/errors'
 import { courtFillModeOf } from '@rotra/data/queue-session/courtFill'
 import type { SessionCourt } from '@rotra/data/queue-session/types'
 import { sessionScoring } from '@rotra/data/queue-session/types'
@@ -50,14 +53,17 @@ import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { courtNextDay } from '@rotra/schema/court-window'
 import { AddCourtTile } from '@rotra/ui/add-court-tile'
 import { Button } from '@rotra/ui/button'
+import { CardCarousel, COURT_SLIDE_CLASS } from '@rotra/ui/card-carousel'
 import { ConfirmSheet } from '@rotra/ui/confirm-sheet'
 import { CourtCard, type CourtCardProps } from '@rotra/ui/court-card'
 import type { CourtPlayer } from '@rotra/ui/court-drawing'
+import { CourtFillInfoSheet } from '@rotra/ui/court-fill-info-sheet'
 import { CourtFillSwitch } from '@rotra/ui/court-fill-switch'
 import { CourtLabelForm } from '@rotra/ui/forms/court-label-form'
 import type { MatchCardPlayer } from '@rotra/ui/match-card'
 import { formatTime } from '@rotra/ui/now-card/helpers'
 import { profilePictureSrc } from '@rotra/ui/profile-picture'
+import { QueueViewSwitch, useQueueViewMode } from '@rotra/ui/queue-view-switch'
 import { ShortOnPlayersBanner } from '@rotra/ui/short-on-players-banner'
 import { Skeleton } from '@rotra/ui/skeleton'
 import { toast } from '@rotra/ui/toaster'
@@ -66,6 +72,7 @@ import { useEffect, useRef, useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { OnCourt } from '@/app/(operator)/sessions/[sessionId]/_components/on-court/OnCourt'
 import { usePlayerGames } from '@/app/(operator)/sessions/[sessionId]/_components/player-games/PlayerGames'
+import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
 
 export type SessionViewProps = {
   sessionId: string
@@ -98,7 +105,20 @@ export type SessionViewProps = {
    * card's Open match opens the On court sheet here.
    */
   onOpenMatch?: (matchId: string, move?: { courtId?: string }) => void
+  /**
+   * Match done on a Playing court card: open the active match sheet straight on the result step
+   * (Queue › Match control). Hidden until given.
+   */
+  onMatchDone?: (matchId: string) => void
+  /**
+   * The picture of a free open court (Tap to fill): open the Court N is free sheet (Q29.7). The
+   * picture stays plain until this is given.
+   */
+  onFillCourt?: (courtId: string) => void
 }
+
+/** Where the Courts layout (Grid or Slide) is remembered on this device (the prototype's rotra.courtView) */
+const COURT_VIEW_STORAGE_KEY = 'rotra.courtView'
 
 /**
  * Q-COURTS, the console's Session view: "Courts" with "F of C free", one CourtCard per court from
@@ -139,6 +159,8 @@ export function SessionView({
   onStartMatch,
   onPickAnother,
   onOpenMatch,
+  onMatchDone,
+  onFillCourt,
 }: SessionViewProps) {
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
@@ -155,9 +177,15 @@ export function SessionView({
   const moveCourt = useMoveCourt()
   const tradeCourts = useTradeCourts()
   const setCourtFill = useSetCourtFillMode()
+  const setAlmostDone = useSetAlmostDone()
+  /** Grid (default) or Slide, kept on this device */
+  const [courtView, setCourtView] = useQueueViewMode('grid', COURT_VIEW_STORAGE_KEY)
+  /** How courts get matches (the ⓘ next to Auto Queue) */
+  const [fillInfoOpen, setFillInfoOpen] = useState(false)
   const fillOpened = useFillOpenedCourts()
   const updateCourt = useUpdateCourt()
   const playerGames = usePlayerGames()
+  const winChanceDialog = useWinChanceDialog(roster.data?.roster, matches.data)
   // One placement or start per tap: a second tap can land before isPending reaches this render.
   const committing = useRef(false)
   /** The On court match whose sheet is open (Open match on a Getting ready card) */
@@ -235,6 +263,8 @@ export function SessionView({
       id,
       name: p?.nameSnapshot ?? 'Player',
       shortName: p ? queueMasterName(p) : 'Player',
+      nickname: p?.nicknameSnapshot ?? null,
+      clubNickname: p?.clubNickname ?? null,
       level: p?.level ?? null,
       photoUrl: clubPlayer
         ? profilePictureSrc(
@@ -252,19 +282,6 @@ export function SessionView({
   })
   const names = (ids: string[]) => ids.map((id) => player(id).shortName)
   const scoring = sessionScoring(s)
-  /** The expected finish line of a Playing court: Finishing soon is accent, Running long is warn */
-  const finishLine = (m: Match) => {
-    const finish = matchExpectedFinish(m, scoring, now)
-    return {
-      text: finish.text,
-      tone:
-        finish.phase === 'soon'
-          ? ('accent' as const)
-          : finish.phase === 'long'
-            ? ('warn' as const)
-            : ('muted' as const),
-    }
-  }
   const live = s.state === 'active'
   /** A queue face: the wait timer while the session is live (prototype queueCard wait()) */
   const queuePlayer = (id: string): MatchCardPlayer => {
@@ -296,16 +313,45 @@ export function SessionView({
     if (mode === fillMode || setCourtFill.isPending) return
     setCourtFill.mutate({ sessionId, mode }, options)
   }
+  /** The info sheet's primary button: the same change and toasts as the switch, then it closes */
+  const onSwitchFromInfo = (mode: 'manual' | 'auto') => {
+    if (mode === fillMode) return setFillInfoOpen(false)
+    if (setCourtFill.isPending) return
+    setCourtFill.mutate(
+      { sessionId, mode },
+      {
+        ...options,
+        onSuccess: (result) => {
+          options.onSuccess(result)
+          setFillInfoOpen(false)
+        },
+      },
+    )
+  }
   const onCourts = courtMatches(ctx.matches)
   const free = freeCourts(courts, ctx.matches, now)
   const untilLabel = (c: SessionCourt) =>
     `${formatTime(c.openUntil ?? s.scheduledEndAt)}${courtNextDay(c.openUntil ?? s.scheduledEndAt, s.scheduledStartAt) ? ' · next day' : ''}`
   const startLabel = (c: SessionCourt) =>
     `${formatTime(c.startsAt ?? s.scheduledStartAt)}${courtNextDay(c.startsAt ?? s.scheduledStartAt, s.scheduledStartAt) ? ' · next day' : ''}`
+  /**
+   * A command refused because the match changed meanwhile (another tab, another host: Almost done on
+   * a match that left Playing, a trade onto a court whose match changed, Put on court on a match
+   * that is no longer ready) shows the refusal toast and refreshes the cards.
+   */
+  const refreshOnConflict = (error: unknown) => {
+    if (error instanceof MockError && error.kind === 'conflict') {
+      void session.refetch()
+      void roster.refetch()
+      void matches.refetch()
+    }
+  }
   const options = {
     onSuccess: (result: { message: string }) => toast(result.message),
-    onError: (error: unknown) =>
-      toast.error(error instanceof Error ? error.message : 'Something went wrong. Try again.'),
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Something went wrong. Try again.')
+      refreshOnConflict(error)
+    },
   }
   const onRemoveCourt = (c: SessionCourt) => {
     if (removeCourt.isPending) return
@@ -404,6 +450,11 @@ export function SessionView({
     startMatch.mutate({ matchId: m.id, courtIds: [], operationId: crypto.randomUUID() }, commit)
   }
 
+  /** Almost done switch on a Playing card: one tap, the command's toast */
+  const setMatchAlmostDone = (m: Match, on: boolean) => {
+    if (setAlmostDone.isPending) return
+    setAlmostDone.mutate({ matchId: m.id, on, operationId: crypto.randomUUID() }, options)
+  }
   /** Pause match from the card: back to Getting ready at once, no confirmation */
   const pauseOnCourt = (m: Match) => {
     if (committing.current || pauseMatch.isPending) return
@@ -445,6 +496,7 @@ export function SessionView({
     )
   }
 
+  const grid = courtView === 'grid'
   // A 5v5 on two courts draws once, as one merged card, under its first court.
   const covered = new Set<string>()
   const cards: CourtCardProps[] = []
@@ -464,13 +516,16 @@ export function SessionView({
         bookingEnded: isBookingEnded(c, s.scheduledEndAt, now),
         teamA: m.teamA.map(courtPlayer),
         teamB: m.teamB.map(courtPlayer),
+        winChance: winChance(m, ctx.roster, ctx.matches),
+        onOpenWinChance: () => winChanceDialog.open((all) => all.find((x) => x.id === m.id)),
         onOpenProfile: openProfile,
         onOpenGames: playerGames.open,
         formatLabel: FORMAT_LABELS[m.format],
         matchNo: m.matchNo,
-        onDragMove: (courtId: string) => dropOnCourt(m, courtId),
+        // Grid only (owner, November 26, 2026): in Slide the drawing is not draggable, so a drag swipes.
+        onDragMove: grid ? (courtId: string) => dropOnCourt(m, courtId) : undefined,
         // Owner, November 25, 2026: a one-court match's court takes a dropped drawing (trade courts).
-        dropCourtId: merged ? undefined : c.id,
+        dropCourtId: grid && !merged ? c.id : undefined,
         ...menuFor(c),
       }
       if (m.state === 'on_court') {
@@ -502,7 +557,10 @@ export function SessionView({
         variant: 'in-game',
         minutes: Math.max(0, Math.round((now - (m.startedAt ?? now)) / 60000)),
         substitutions: m.substitutions.length,
-        expectedFinish: finishLine(m),
+        status: matchCourtStatus(m, scoring, now),
+        almostDone: isAlmostDone(m),
+        onAlmostDoneChange: live ? (on: boolean) => setMatchAlmostDone(m, on) : undefined,
+        onMatchDone: onMatchDone ? () => onMatchDone(m.id) : undefined,
         onOpenMatch: onOpenMatch ? () => onOpenMatch(m.id) : undefined,
         onPause: live && canPauseMatch(m) ? () => pauseOnCourt(m) : undefined,
         onMoveToFree: onOpenMatch ? () => onOpenMatch(m.id, {}) : undefined,
@@ -519,7 +577,11 @@ export function SessionView({
       untilLabel: untilLabel(c),
       startLabel: startLabel(c),
       notOpen: !courtOpen(c, now),
-      dropCourtId: free.some((f) => f.id === c.id) ? c.id : undefined,
+      dropCourtId: grid && free.some((f) => f.id === c.id) ? c.id : undefined,
+      onFill:
+        live && onFillCourt && free.some((f) => f.id === c.id)
+          ? () => onFillCourt(c.id)
+          : undefined,
       // "Free · N min": since the last match on it ended, or from the planned start, even when opened early (plain "Free" until then), or the session start.
       freeMinutes: live
         ? freeCourtMinutes(
@@ -565,6 +627,8 @@ export function SessionView({
     status: matchStatus(m, ctx),
     teamA: m.teamA.map(queuePlayer),
     teamB: m.teamB.map(queuePlayer),
+    winChance: winChance(m, ctx.roster, ctx.matches),
+    onOpenWinChance: () => winChanceDialog.open((all) => all.find((x) => x.id === m.id)),
     onSelectPlayer: openProfile,
     onOpenGames: playerGames.open,
     onStart: onStartMatch ? () => onStartMatch(m.id) : undefined,
@@ -591,13 +655,57 @@ export function SessionView({
             </span>
           </div>
         </div>
-        {live ? <CourtFillSwitch value={fillMode} onChange={onChangeFill} /> : null}
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
-          {cards.map((card) => (
-            <CourtCard key={card.label} {...card} />
-          ))}
-          <AddCourtTile nextNumber={courts.length + 1} onAdd={onAddCourt} />
-        </div>
+        {live ? (
+          <CourtFillSwitch
+            value={fillMode}
+            onChange={onChangeFill}
+            onOpenInfo={() => setFillInfoOpen(true)}
+            trailing={
+              <QueueViewSwitch
+                value={courtView}
+                onChange={setCourtView}
+                label="Court layout"
+                gridFirst
+                slideIcon="list"
+              />
+            }
+          />
+        ) : (
+          <div className="flex justify-end">
+            <QueueViewSwitch
+              value={courtView}
+              onChange={setCourtView}
+              label="Court layout"
+              gridFirst
+              slideIcon="list"
+            />
+          </div>
+        )}
+        {grid ? (
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-3">
+            {cards.map((card) => (
+              <CourtCard key={card.label} {...card} />
+            ))}
+            <AddCourtTile nextNumber={courts.length + 1} onAdd={onAddCourt} />
+          </div>
+        ) : (
+          <CardCarousel
+            label="Courts"
+            previousLabel="Previous court"
+            nextLabel="Next court"
+            slideClassName={COURT_SLIDE_CLASS}
+            items={[
+              ...cards.map((card) => ({
+                id: card.label,
+                node: <CourtCard {...card} />,
+              })),
+              {
+                id: 'add-court',
+                node: <AddCourtTile nextNumber={courts.length + 1} onAdd={onAddCourt} />,
+              },
+            ]}
+          />
+        )}
         <p className="text-[13px] text-fg2">
           A match never starts by itself when a court frees up. You start each one.
         </p>
@@ -625,6 +733,13 @@ export function SessionView({
         isPending={openCourtEarly.isPending || openAllCourtsEarly.isPending}
         error={openError}
       />
+      <CourtFillInfoSheet
+        open={fillInfoOpen}
+        onOpenChange={setFillInfoOpen}
+        mode={fillMode}
+        onSwitch={onSwitchFromInfo}
+        busy={setCourtFill.isPending}
+      />
       {labelCourt ? (
         <CourtLabelForm
           key={labelCourt.id}
@@ -650,6 +765,7 @@ export function SessionView({
           setMoveFirst(null)
         }}
       />
+      {winChanceDialog.dialog}
     </>
   )
 }

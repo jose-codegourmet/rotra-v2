@@ -16,6 +16,8 @@ const onCourt = new Set(
 )
 const counts = {
   available: roster.filter((p) => p.present && !onCourt.has(p.id)).length,
+  queue: 0,
+  playing: onCourt.size,
   present: roster.filter((p) => p.present).length,
   away: roster.filter((p) => !p.present).length,
   waitlist: 2,
@@ -40,6 +42,9 @@ type Story = StoryObj<typeof meta>
 /** Available · 9 is on by default; the sort is Wait, longest first (its arrow points down) */
 export const Counts: Story = {}
 /** Games, fewest first (arrow up); tapping Games again would flip it to most games */
+/** In queue · N and Playing · N follow Available */
+export const InQueueAndPlaying: Story = { args: { show: 'playing' } }
+export const InQueueAndPlayingLight: Story = { ...InQueueAndPlaying, globals: { theme: 'light' } }
 export const Present: Story = { args: { show: 'present', sort: { key: 'games', dir: 1 } } }
 /** Name Z–A: the second direction */
 export const NameZToA: Story = { args: { show: 'everyone', sort: { key: 'name', dir: -1 } } }

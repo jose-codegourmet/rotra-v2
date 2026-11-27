@@ -3,6 +3,7 @@
 import type { BaggingGames } from '@rotra/data/match/auto-queue-types'
 import { PLAN_AHEAD_DESCRIPTION } from '@rotra/data/match/plan-ahead-rules'
 import type { MatchFormat } from '@rotra/data/match/types'
+import type { WinChance } from '@rotra/data/match/win-chance'
 import type { PlayingLevel } from '@rotra/data/player/types'
 import { BaggingPairSheet } from '@rotra/ui/bagging-pair-sheet'
 import {
@@ -58,6 +59,8 @@ export type AutoQueueDraft = {
   categoryPrefix?: string
   /** A transfer conflict that needs the Queue Master's attention. */
   attentionReason?: string
+  /** Win chance (D-2026-11-27-02): the chip beside each pair */
+  winChance?: WinChance
 }
 
 export type AutoQueueBatch = {
@@ -137,6 +140,8 @@ export type AutoQueueWorkspaceProps = {
   exemption?: AutoQueueExemptionProps
   /** Opens "NAME's games" from a draft face's games badge (the roster player id) */
   onOpenGames?: (playerId: string) => void
+  /** A draft's win chance chip was tapped: open WinChanceDialog for that draft */
+  onOpenWinChance?: (draftId: string) => void
 }
 
 const MODE_ITEMS: { value: AutoQueueMode; label: string; shortLabel: string }[] = [
@@ -202,6 +207,7 @@ export function AutoQueueWorkspace({
   bagging,
   exemption,
   onOpenGames,
+  onOpenWinChance,
 }: AutoQueueWorkspaceProps) {
   const hintId = useId()
   const hasSide = Boolean(bagging?.enabled || exemption)
@@ -506,6 +512,10 @@ export function AutoQueueWorkspace({
                               }
                               teamA={draft.teamA.map(cardPlayer)}
                               teamB={draft.teamB.map(cardPlayer)}
+                              winChance={draft.winChance}
+                              onOpenWinChance={
+                                onOpenWinChance ? () => onOpenWinChance(draft.id) : undefined
+                              }
                               onOpenGames={onOpenGames}
                               draft={{
                                 statusTone: draft.statusTone,

@@ -5,6 +5,7 @@ import { statusForReceived } from '@rotra/data/session-payment/rules'
 import { useSessionPayments } from '@rotra/data/session-payment/useSessionPayments'
 import { useSetPaymentAmount } from '@rotra/data/session-payment/useSetPaymentAmount'
 import { useSetPaymentMarks } from '@rotra/data/session-payment/useSetPaymentMarks'
+import { useSetPlayerFree } from '@rotra/data/session-payment/useSetPlayerFree'
 import { PaymentAmountForm } from '@rotra/ui/forms/payment-amount-form'
 import { paymentAmountInputFrom } from '@rotra/ui/forms/payment-amount-form/default-values'
 import type { PaymentAmountFormValues } from '@rotra/ui/forms/payment-amount-form/schema'
@@ -29,6 +30,7 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
     onError: (error) => toast.error(error.message),
   })
   const amount = useSetPaymentAmount()
+  const freeing = useSetPlayerFree()
   const session = useQueueSession(sessionId)
   const [sharing, setSharing] = useState(false)
   const [filter, setFilter] = useState<PaymentFilter>('all')
@@ -46,7 +48,7 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
   const historyPlayer = payments.data.players.find((p) => p.clubPlayerId === history && p.transfer)
 
   const closeEditor = () => {
-    if (amount.isPending) return
+    if (amount.isPending || freeing.isPending) return
     setEditing(null)
     amount.reset()
   }
@@ -74,6 +76,31 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
           amount.reset()
           toast(outcome.message)
         },
+      },
+    )
+  }
+
+  /**
+   * D-2026-11-27-01: Plays free on the open sheet. Pending switch changes save first; turning it on
+   * clears the amount received, so the form starts again from the saved state.
+   */
+  const setFree = async (next: boolean) => {
+    if (!editingPlayer || freeing.isPending || sending.current) return
+    sending.current = true
+    try {
+      await marks.flush()
+    } catch {
+      sending.current = false
+      return
+    }
+    freeing.mutate(
+      { sessionId, clubPlayerId: editingPlayer.clubPlayerId, free: next },
+      {
+        onSettled: () => {
+          sending.current = false
+        },
+        onSuccess: (outcome) => toast(outcome.message),
+        onError: (error) => toast.error(error.message),
       },
     )
   }
@@ -114,13 +141,16 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
             : 'Session'
         }
         amountDue={amountDue}
-        rows={payments.data.players.map((p) => ({
-          name: p.name,
-          receivedMinor: p.paid?.amount ?? null,
-          // #1013: a transferred slot's waivers lower its balance; they are never collected.
-          waivedMinor: p.transfer?.waivedMinor ?? 0,
-          viaTransfer: !!p.transfer,
-        }))}
+        // D-2026-11-27-01: free players owe nothing, so the share leaves them out.
+        rows={payments.data.players
+          .filter((p) => !p.free)
+          .map((p) => ({
+            name: p.name,
+            receivedMinor: p.paid?.amount ?? null,
+            // #1013: a transferred slot's waivers lower its balance; they are never collected.
+            waivedMinor: p.transfer?.waivedMinor ?? 0,
+            viaTransfer: !!p.transfer,
+          }))}
       />
       <Sheet
         open={!!historyPlayer}
@@ -149,14 +179,28 @@ export function PaymentsPanel({ sessionId, asSheet, className }: PaymentsPanelPr
       >
         {editingPlayer ? (
           <PaymentAmountForm
-            key={editingPlayer.clubPlayerId}
+            // Plays free changes the saved amount, so the form remounts from it.
+            key={`${editingPlayer.clubPlayerId}-${editingPlayer.free ? 'free' : 'pays'}`}
             amountDue={amountDue}
-            defaultValues={paymentAmountInputFrom(editingPlayer.paid?.amount, amountDue)}
+            defaultValues={paymentAmountInputFrom(
+              editingPlayer.paid?.amount,
+              editingPlayer.free ? 0 : amountDue,
+            )}
             previewStatus={(received) => statusForReceived(received, amountDue)}
             onSubmit={saveAmount}
             onCancel={closeEditor}
-            isPending={amount.isPending}
+            isPending={amount.isPending || freeing.isPending}
             serverError={amount.error?.message}
+            free={
+              editingPlayer.transfer
+                ? undefined
+                : {
+                    checked: !!editingPlayer.free,
+                    hasCash: !!editingPlayer.paid,
+                    name: editingPlayer.name,
+                    onChange: setFree,
+                  }
+            }
           />
         ) : null}
       </Sheet>

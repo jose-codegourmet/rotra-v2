@@ -160,6 +160,45 @@ export function weeklyPerformance(
 }
 
 const MANILA_OFFSET_MS = 8 * 3600000
+const DAY_MS = 86_400_000
+
+type SessionSlotRow = {
+  status: 'live' | 'confirmed' | 'waitlist' | 'requested'
+  startsAt?: string
+  href: string
+  title: string
+}
+
+export type PlayerSessionSlot<T extends SessionSlotRow = SessionSlotRow> = {
+  kind: 'play' | 'ready' | 'next-up'
+  session: T
+  showSettings: boolean
+}
+
+/** D-2026-11-26-02: a live session leads, then the next session starting today or later in Manila. */
+export function playerSessionSlot<T extends SessionSlotRow>(
+  sessions: readonly T[],
+  now: Date | number,
+): PlayerSessionSlot<T> | null {
+  const live = sessions.find((session) => session.status === 'live')
+  if (live) return { kind: 'play', session: live, showSettings: false }
+
+  const manilaNow = Number(now) + MANILA_OFFSET_MS
+  const todayStart = Math.floor(manilaNow / DAY_MS) * DAY_MS - MANILA_OFFSET_MS
+  let next: T | undefined
+  let nextStart = Infinity
+  for (const session of sessions) {
+    const start = Date.parse(session.startsAt ?? '')
+    if (start >= todayStart && start < nextStart) {
+      next = session
+      nextStart = start
+    }
+  }
+  if (!next) return null
+
+  const today = nextStart < todayStart + DAY_MS
+  return { kind: today ? 'ready' : 'next-up', session: next, showSettings: !today }
+}
 
 /** The calendar year the profile stats count (Asia/Manila), e.g. 2026 for “Stats · 2026”. */
 export function statsYear(now: Date | number) {
@@ -208,7 +247,10 @@ export function yearGameStats(
 
 /** Counted games and wins this calendar year (the profile card and Share profile “In YEAR”). */
 export function countYearCountedWins(
-  sessions: readonly PlayerSessionRecord[],
+  sessions: readonly {
+    finishedAt: string | null
+    games: readonly { counting: string; result: string }[]
+  }[],
   now: Date | number,
 ): { games: number; wins: number } {
   const end = Number(now),
@@ -216,8 +258,8 @@ export function countYearCountedWins(
   let games = 0,
     wins = 0
   for (const session of sessions) {
-    const at = Date.parse(session.finishedAt)
-    if (at < start || at > end) continue
+    const at = session.finishedAt ? Date.parse(session.finishedAt) : Number.NaN
+    if (!Number.isFinite(at) || at < start || at > end) continue
     for (const game of session.games)
       if (game.counting === 'counted') {
         games += 1

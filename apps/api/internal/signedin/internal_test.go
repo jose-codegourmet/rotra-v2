@@ -45,14 +45,16 @@ func TestOwnStandingPosition(t *testing.T) {
 		raw  string
 		want *float64
 	}{
-		"first row of mine":         {`[{"clubPlayerId":"b","position":1},{"clubPlayerId":"a","position":3}]`, num(3)},
-		"the first match decides":   {`[{"clubPlayerId":"a","position":"2"},{"clubPlayerId":"a","position":3}]`, nil},
-		"null position":             {`[{"clubPlayerId":"a","position":null}]`, nil},
-		"missing position":          {`[{"clubPlayerId":"a"}]`, nil},
+		// The saved standings are shown with shared positions without gaps (1, 1, 2), whatever position they were saved with.
+		"first row of mine":         {`[{"clubPlayerId":"b","wins":3,"losses":0,"position":1},{"clubPlayerId":"a","wins":1,"losses":1,"position":3}]`, num(2)},
+		"saved with a gap":          {`[{"clubPlayerId":"b","wins":3,"losses":0,"position":1},{"clubPlayerId":"c","wins":3,"losses":0,"position":1},{"clubPlayerId":"a","wins":1,"losses":1,"position":3}]`, num(2)},
+		"the first match decides":   {`[{"clubPlayerId":"a","wins":2,"losses":0,"position":"2"},{"clubPlayerId":"a","wins":1,"losses":0,"position":3}]`, num(1)},
+		"null position":             {`[{"clubPlayerId":"a","position":null}]`, num(1)},
+		"missing position":          {`[{"clubPlayerId":"a"}]`, num(1)},
 		"clubPlayerId not a string": {`[{"clubPlayerId":5,"position":1}]`, nil},
 		"not an array":              {`{"clubPlayerId":"a","position":1}`, nil},
 		"no snapshot":               {``, nil},
-		"row is not an object":      {`[1,"a",{"clubPlayerId":"a","position":2.5}]`, num(2.5)},
+		"row is not an object":      {`[1,"a",{"clubPlayerId":"a","position":2.5}]`, num(1)},
 	} {
 		got := ownStandingPosition([]byte(tc.raw), mine)
 		if (got == nil) != (tc.want == nil) || (got != nil && *got != *tc.want) {

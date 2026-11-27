@@ -16,6 +16,9 @@ import (
 	"github.com/jose-codegourmet/rotra-v2/apps/api/internal/writes"
 )
 
+// cityRequired is CITY_REQUIRED.
+const cityRequired = "Pick your city or province."
+
 // claimLinkDays is CLAIM_LINK_DAYS: a staging link lasts as long as a club's registration link.
 const claimLinkDays = 7
 
@@ -25,6 +28,8 @@ type stageInput struct {
 	// clubText is the club id as the visitor wrote it; the staging link remembers the club, and a retry must come from it.
 	clubText string
 	club     pgtype.UUID
+	// place is where the RTR ID takes its place from when there is no club: the city the Admin link's player picked.
+	place    pgtype.UUID
 	email    string
 	phone    string
 	name     string
@@ -57,7 +62,11 @@ func (h *handlers) stageOnce(ctx context.Context, in stageInput) (bool, error) {
 		// An attempt that was staged before is resumed, as long as it is the same registration.
 		prev, err := q.GetStagedRegistration(ctx, digest)
 		if err == nil {
-			if uuid.UUID(prev.IssuingClubID.Bytes).String() != in.clubText || !prev.ContactPhone.Valid || prev.ContactPhone.String != in.phone ||
+			previous := ""
+			if prev.IssuingClubID.Valid {
+				previous = uuid.UUID(prev.IssuingClubID.Bytes).String()
+			}
+			if previous != in.clubText || !prev.ContactPhone.Valid || prev.ContactPhone.String != in.phone ||
 				!prev.ContactEmail.Valid || prev.ContactEmail.String != in.email {
 				return writes.Fail(httpapi.ErrInvalid, map[string]string{"registration": "Start a new registration with these details."})
 			}
@@ -101,7 +110,10 @@ func (h *handlers) stageOnce(ctx context.Context, in stageInput) (bool, error) {
 			return err
 		}
 		// An email clubs already saved keeps its RTR ID (D-2026-11-16-04).
-		if _, err := identity.AllocateRTRIDFor(ctx, tx, id, uuid.UUID(in.club.Bytes), now, in.email); err != nil {
+		if _, err := identity.AllocateRTRIDAt(ctx, tx, id, identity.Place{ClubID: uuid.UUID(in.club.Bytes), LocationCode: in.place}, now, in.email); err != nil {
+			if errors.Is(err, identity.ErrCityRequired) {
+				return writes.Fail(httpapi.ErrInvalid, map[string]string{"cityCode": cityRequired})
+			}
 			return err
 		}
 		link, err := uuid.NewV7()

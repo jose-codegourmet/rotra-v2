@@ -20,6 +20,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -77,6 +78,8 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	}
 	return func(mux *http.ServeMux) {
 		mux.Handle("POST /api/register/{clubId}", http.HandlerFunc(h.post))
+		// The Admin link (D-2026-11-20-01): no club and no session; the player picks a city for the RTR ID.
+		mux.Handle("POST /api/register", http.HandlerFunc(h.postAdmin))
 	}, nil
 }
 
@@ -86,7 +89,13 @@ func (h *handlers) stamp() time.Time { return h.now().Truncate(time.Millisecond)
 // post is the route. In order: the app header; the claim's per-address limit; the body (readJsonBody) and the form's checks
 // (zod); the link (404); the password policy and the details the table can hold (checks the TypeScript makes only after the
 // account exists, or never: see the deviations log); the staging; the claim; the sign-in.
-func (h *handlers) post(w http.ResponseWriter, r *http.Request) {
+func (h *handlers) post(w http.ResponseWriter, r *http.Request) { h.handle(w, r, false) }
+
+// postAdmin is the Admin link's route: the same registration with no club or session link, the RTR ID's place from the picked city,
+// and the player joins no club.
+func (h *handlers) postAdmin(w http.ResponseWriter, r *http.Request) { h.handle(w, r, true) }
+
+func (h *handlers) handle(w http.ResponseWriter, r *http.Request, admin bool) {
 	ctx := r.Context()
 	if store.Audience(r.Header.Get(AppHeader)) != store.AudiencePlayer {
 		httpapi.WriteError(w, httpapi.ErrNotFound, nil)
@@ -107,10 +116,13 @@ func (h *handlers) post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	clubText := r.PathValue("clubId")
-	where, err := linkOf(ctx, sqlcgen.New(h.pool), clubText, r.URL.Query())
-	if err != nil {
-		writes.Write(w, r, h.log, err)
-		return
+	var where link
+	if !admin {
+		var err error
+		if where, err = linkOf(ctx, sqlcgen.New(h.pool), clubText, r.URL.Query()); err != nil {
+			writes.Write(w, r, h.log, err)
+			return
+		}
 	}
 	if err := password.Validate(f.password); err != nil {
 		writes.Write(w, r, h.log, writes.Fail(httpapi.ErrInvalid, map[string]string{"password": password.Message(err)}))
@@ -121,8 +133,17 @@ func (h *handlers) post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Where the RTR ID takes its place from: the club's founding city, or for the Admin link the founding city the player picked.
+	var place pgtype.UUID
+	if admin {
+		if place, err = placeOf(ctx, sqlcgen.New(h.pool), f.cityCode); err != nil {
+			writes.Write(w, r, h.log, err)
+			return
+		}
+	}
+
 	token := "registration:" + f.attempt
-	staged, err := h.stage(ctx, stageInput{token: token, clubText: clubText, club: where.club, email: f.email, phone: f.phone, name: f.details.FullName, nickname: f.details.Nickname})
+	staged, err := h.stage(ctx, stageInput{token: token, clubText: clubText, club: where.club, place: place, email: f.email, phone: f.phone, name: f.details.FullName, nickname: f.details.Nickname})
 	if err != nil {
 		writes.Write(w, r, h.log, err)
 		return
@@ -172,7 +193,7 @@ type registered struct {
 		} `json:"account"`
 	} `json:"session"`
 	JoinedClubs  []string `json:"joinedClubs,omitempty"`
-	ClubName     string   `json:"clubName"`
+	ClubName     *string  `json:"clubName"`
 	SessionSlug  *string  `json:"sessionSlug"`
 	SessionTitle *string  `json:"sessionTitle"`
 }
@@ -188,7 +209,10 @@ func (h *handlers) signedIn(w http.ResponseWriter, r *http.Request, ident store.
 		}
 	}
 	joined := h.joinRecords(ctx, playerID, f)
-	h.joinClub(ctx, playerID, where.club)
+	// The Admin link adds the player to no club (D-2026-11-09-06).
+	if where.club.Valid {
+		h.joinClub(ctx, playerID, where.club)
+	}
 
 	row, err := sqlcgen.New(h.pool).GetPlayerClaimResult(ctx, pgtype.UUID{Bytes: playerID, Valid: true})
 	if err != nil {
@@ -202,7 +226,10 @@ func (h *handlers) signedIn(w http.ResponseWriter, r *http.Request, ident store.
 	if row.Nickname.Valid {
 		nick = &row.Nickname.String
 	}
-	b := registered{Status: "registered", JoinedClubs: joined, ClubName: where.clubName, SessionSlug: where.sessionSlug, SessionTitle: where.sessionTitle}
+	b := registered{Status: "registered", JoinedClubs: joined, SessionSlug: where.sessionSlug, SessionTitle: where.sessionTitle}
+	if where.club.Valid {
+		b.ClubName = &where.clubName
+	}
 	b.PlayerID, b.FirstName = playerID, fields.FirstName(row.FullName, nick)
 	if row.RtrID.Valid {
 		b.RTRID = row.RtrID.String
@@ -284,4 +311,19 @@ func (h *handlers) limited(w http.ResponseWriter, r *http.Request, err error) {
 func digestOf(token string) []byte {
 	d := sha256.Sum256([]byte(token))
 	return d[:]
+}
+
+// placeOf is placeOf for the Admin link: the founding city `PH-CEB` the player picked, one ROTRA knows (location_codes, Admin-managed). No
+// city is allowed only for an email with an open shared entry, which keeps that RTR ID; the allocation refuses the rest with the city
+// question. A city ROTRA does not know is refused here, before anything is staged.
+func placeOf(ctx context.Context, q *sqlcgen.Queries, cityCode string) (pgtype.UUID, error) {
+	parts := strings.Split(strings.ToUpper(fields.JSTrim(cityCode)), "-")
+	if len(parts) < 2 || parts[0] == "" || parts[1] == "" {
+		return pgtype.UUID{}, nil
+	}
+	id, err := q.FindLocationCode(ctx, sqlcgen.FindLocationCodeParams{CountryCode: parts[0], CityCode: parts[1]})
+	if errors.Is(err, pgx.ErrNoRows) {
+		return pgtype.UUID{}, writes.Fail(httpapi.ErrInvalid, map[string]string{"cityCode": cityRequired})
+	}
+	return id, err
 }

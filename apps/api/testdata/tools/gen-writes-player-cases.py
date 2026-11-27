@@ -890,6 +890,61 @@ case("registering_with_another_email_leaves_the_shared_entry_open", [reg()], sce
 case("registering_with_a_shared_email_and_a_matching_phone_record", [reg(vals=V(email="shared@example.test"))], scenario="shared_and_phone")
 case("registering_with_a_shared_email_whose_rtr_id_is_taken_allocates_a_new_one", [reg(vals=V(email="shared@example.test"))], scenario="shared_entry_taken_id")
 case("registering_with_the_email_of_a_retired_entry_allocates_a_new_one", [reg(vals=V(email="shared@example.test"))], scenario="shared_entry_retired")
+# The Admin link (D-2026-11-20-01): POST /api/register, no club and no session. The city the player picks gives the RTR ID its place.
+ADM = "/api/register"
+def adm(attempt=1, city="PH-CEB", **kw):
+    vals = kw.pop("vals", None)
+    if vals is None:
+        vals = V(cityCode=city) if city is not MISSING else V()
+    return reg(attempt=attempt, path=ADM, vals=vals, **kw)
+case("admin_link_register_in_cebu", [adm()])
+case("admin_link_register_in_another_city", [adm(city="PH-MNL")])
+case("admin_link_register_with_the_city_in_lower_case", [adm(city="ph-ceb")])
+case("admin_link_register_with_the_city_in_spaces", [adm(city="  PH-CEB \t")])
+case("admin_link_register_with_a_third_part_is_ignored", [adm(city="PH-CEB-EXTRA")])
+case("admin_link_register_with_no_city_asks_for_one", [adm(city=MISSING)])
+case("admin_link_register_with_an_empty_city_asks_for_one", [adm(city="")])
+case("admin_link_register_with_a_blank_city_asks_for_one", [adm(city="   ")])
+case("admin_link_register_with_a_country_only_asks_for_one", [adm(city="PH")])
+case("admin_link_register_with_a_city_only_asks_for_one", [adm(city="CEB")])
+case("admin_link_register_with_a_dash_only_asks_for_one", [adm(city="-")])
+case("admin_link_register_with_a_trailing_dash_asks_for_one", [adm(city="PH-")])
+case("admin_link_register_with_an_unknown_city_is_refused", [adm(city="PH-ZZZ")])
+case("admin_link_register_with_an_unknown_country_is_refused", [adm(city="XX-CEB")])
+case("admin_link_register_with_the_city_a_number_is_invalid", [adm(vals=V(cityCode=5))])
+case("admin_link_register_with_the_city_null_is_invalid", [adm(vals=V(cityCode=None))])
+case("admin_link_register_two_players_in_one_city_take_the_next_number", [adm(), adm(attempt=2, vals=V(cityCode="PH-CEB", fullName="Second Person", email="second@example.test", phone="0917 555 0302"))])
+case("admin_link_register_two_players_in_two_cities", [adm(), adm(attempt=2, city="PH-MNL", vals=V(cityCode="PH-MNL", fullName="Second Person", email="second@example.test", phone="0917 555 0302"))])
+case("admin_link_register_joins_no_club", [adm()], scenario="unclaimed_records")
+case("admin_link_register_links_the_records_with_the_same_phone", [adm()], scenario="unclaimed_records")
+case("admin_link_register_with_a_shared_email_needs_no_city", [adm(city=MISSING, vals=V(email="shared@example.test"))], scenario="shared_entry")
+case("admin_link_register_with_a_shared_email_ignores_the_city", [adm(city="PH-MNL", vals=V(cityCode="PH-MNL", email="shared@example.test"))], scenario="shared_entry")
+case("admin_link_register_with_a_shared_email_and_an_unknown_city_asks_the_city_first", [adm(vals=V(cityCode="PH-ZZZ", email="shared@example.test"))], scenario="shared_entry")
+case("admin_link_register_with_a_shared_email_whose_rtr_id_is_taken_needs_a_city", [adm(city=MISSING, vals=V(email="shared@example.test"))], scenario="shared_entry_taken_id")
+case("admin_link_register_with_a_shared_email_whose_rtr_id_is_taken_allocates_in_the_city", [adm(vals=V(cityCode="PH-CEB", email="shared@example.test"))], scenario="shared_entry_taken_id")
+case("admin_link_register_with_the_email_of_a_retired_entry_needs_a_city", [adm(city=MISSING, vals=V(email="shared@example.test"))], scenario="shared_entry_retired")
+case("admin_link_register_phone_of_a_registered_player_is_a_match", [adm(vals=V(cityCode="PH-CEB", phone="0917 555 0002"))])
+case("admin_link_register_email_of_a_registered_player_is_a_match", [adm(vals=V(cityCode="PH-CEB", email="bob@example.test"))])
+case("admin_link_register_email_of_a_club_login_is_a_match", [adm(vals=V(cityCode="PH-CEB", email="owner@example.test"))], scenario="club_login_holds_email")
+case("admin_link_register_a_match_is_checked_before_the_city", [adm(city=MISSING, vals=V(phone="0917 555 0002"))])
+case("admin_link_register_the_same_attempt_again_signs_in_again", [adm(), adm()])
+case("admin_link_register_the_same_attempt_again_with_another_phone_is_refused", [adm(), adm(vals=V(cityCode="PH-CEB", phone="0917 555 0399"))])
+case("admin_link_register_the_same_attempt_again_with_another_email_is_refused", [adm(), adm(vals=V(cityCode="PH-CEB", email="other@example.test"))])
+case("admin_link_register_the_same_attempt_again_with_another_city_is_the_same", [adm(), adm(city="PH-MNL", vals=V(cityCode="PH-MNL"))])
+case("admin_link_register_the_same_attempt_again_from_a_club_link_is_refused", [adm(), reg()])
+case("admin_link_register_the_same_attempt_again_from_the_admin_link_after_a_club_link_is_refused", [reg(), adm()])
+case("admin_link_register_a_new_attempt_with_the_same_details_is_a_match", [adm(), adm(attempt=2)])
+case("admin_link_register_with_a_bad_attempt_is_invalid", [reg(path=ADM, body={"attempt": "short", "values": V(cityCode="PH-CEB")})])
+case("admin_link_register_with_a_bad_attempt_is_checked_before_the_city", [reg(path=ADM, body={"attempt": "short", "values": V(cityCode="PH-ZZZ")})])
+case("admin_link_register_with_an_invalid_form", [adm(vals=V(cityCode="PH-CEB", email="nope", fullName=""))])
+# Not pinned: a weak password. The TypeScript checks the policy at the provider after the account is staged (503, leaving the staged
+# registration); Go checks it before staging (422, nothing staged): the logged deviation of the club route too.
+case("admin_link_register_with_the_details_the_table_cannot_hold", [adm(vals=V(cityCode="PH-CEB", experienceYears="80", experienceMonths="11"))])
+case("admin_link_register_body_not_json", [regraw("not json", path=ADM)])
+case("admin_link_register_body_null", [regraw("null", path=ADM)])
+case("admin_link_register_body_without_values", [reg(path=ADM, body={"attempt": ATT(1)})])
+case("admin_link_register_ignores_the_query_string", [reg(path=ADM + "?k=BIRDIE2026&session=friday-night", vals=V(cityCode="PH-CEB"))], scenario="sessions")
+case("admin_link_register_answers_no_club_session_or_title", [adm(vals=V(cityCode="PH-CEB", nickname=""))])
 # Races. Which request wins is not decided, so a race is pinned only where the rows it leaves do not say who won: the winner's own
 # columns are redacted by name. Two taps of one attempt and two attempts for one email are Go-only tests (apps/api/internal/auth/register).
 WIN = ["playerId", "session.account.id"]
@@ -1185,6 +1240,25 @@ case("flow_register_with_the_email_of_a_clubs_open_entry", [rg(held=H_SHARED)], 
 case("flow_register_with_a_wrong_invite_code", [rg(held=H_GINA, path="/api/register/%s/google?k=WRONG" % SMASH)], scenario="gate_on", redact=LINK_TOKEN)
 case("flow_register_with_nothing_held", [rg()], scenario="gate_on", redact=LINK_TOKEN)
 case("flow_register_twice_resumes_the_same_registration", [rg(held=H_GINA), rg(held=H_GINA)], scenario="gate_on", redact=LINK_TOKEN)
+
+
+# POST registration with Google from the Admin link (D-2026-11-20-01): no club, the RTR ID placed by the picked city.
+REG_GA = "/api/register/google"
+def rga(held=None, vals=None, **kw):
+    return rg(held=held, vals=vals if vals is not None else dict(G_BODY, cityCode="PH-CEB"), path=REG_GA, **kw)
+case("flow_register_admin_link_in_cebu", [rga(held=H_GINA)], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_admin_link_in_another_city", [rga(held=H_GINA, vals=dict(G_BODY, cityCode="PH-MNL"))], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_admin_link_with_no_city_asks_for_one", [rga(held=H_GINA, vals=dict(G_BODY))], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_admin_link_with_an_unknown_city_is_refused", [rga(held=H_GINA, vals=dict(G_BODY, cityCode="PH-ZZZ"))], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_admin_link_with_an_empty_city_asks_for_one", [rga(held=H_GINA, vals=dict(G_BODY, cityCode=""))], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_admin_link_with_the_email_of_a_clubs_open_entry_needs_no_city", [rga(held=H_SHARED, vals=dict(G_BODY))], scenario="flow_cards", redact=LINK_TOKEN)
+case("flow_register_admin_link_a_phone_an_account_has_is_a_match", [rga(held=H_GINA, vals=dict(G_BODY, cityCode="PH-CEB", phone="0917 555 0001"))], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_admin_link_the_email_of_an_account_is_a_match", [rga(held=H_BOB)], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_admin_link_with_nothing_held", [rga()], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_admin_link_twice_resumes_the_same_registration", [rga(held=H_GINA), rga(held=H_GINA)], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_admin_link_after_a_club_link_attempt_is_refused", [rg(held=H_GINA), rga(held=H_GINA)], scenario="gate_on", redact=LINK_TOKEN)
+case("flow_register_admin_link_with_the_flag_off", [rga(held=H_GINA)], redact=LINK_TOKEN)
+case("flow_register_admin_link_joins_no_club", [rga(held=H_GINA)], scenario="gate_on", redact=LINK_TOKEN)
 
 # P-FORGOT with Google on: an account that signs in with Google and has no password is told so, and no request is made for Admin review.
 RESETS = {"name": "player_password_reset_requests", "sql": "SELECT email, player_id, status::text AS status FROM player_password_reset_requests ORDER BY email, id", "redact": []}

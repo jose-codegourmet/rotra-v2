@@ -43,6 +43,8 @@ type form struct {
 	phone    string // E.164
 	password string
 	details  profile.Input
+	// cityCode is the Admin link's city or province (`PH-CEB`); a club or session link ignores it.
+	cityCode string
 }
 
 // providers are the links the form carries, in the schema's order, with the text of their refusal.
@@ -147,11 +149,13 @@ func parseForm(b writes.Body, withGoogle bool) (form, map[string]string) {
 			f.password = s
 		}
 	}
-	// cityCode is optional text the route ignores; only its type is checked.
+	// cityCode is optional text: the Admin link reads it, a club or session link ignores it; only its type is checked here.
 	if raw, has := vals["cityCode"]; has {
-		if _, isString := raw.(string); !isString {
+		city, isString := raw.(string)
+		if !isString {
 			issues["cityCode"] = notA("string", raw, true)
 		}
+		f.cityCode = city
 	}
 	if len(issues) > 0 {
 		return f, issues

@@ -155,7 +155,7 @@ COMMIT;
 open(os.path.join(OUT, "player.seed.sql"), "w").write(seed)
 
 # ---------------------------------------------------------------- snapshot specs
-PLAYERS = {"name": "players", "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id", "redact": []}
+PLAYERS = {"name": "players", "sql": "SELECT id, full_name, nickname, avatar_ref, banner_id, profile_visibility, hide_phone_from_clubs, hidden_from_directory, show_profile_stats, show_weekly_performance, gender, experience_months, experience_recorded_at, personal_details::text AS personal_details, details_version, revision::text AS revision, updated_at FROM players ORDER BY id", "redact": []}
 LINKS = {"name": "player_social_links", "sql": "SELECT player_id, provider, url, id, created_at, updated_at FROM player_social_links ORDER BY player_id, provider", "redact": ["id", "created_at"]}
 NOTES = {"name": "player_notifications", "sql": "SELECT id, player_id, kind, title, target, source_type, created_at, read_at FROM player_notifications ORDER BY id", "redact": []}
 ACCOUNTS = {"name": "player_accounts", "sql": "SELECT player_id, google_email, verification_reminder_read_at, disabled_at, contact_sync_version::text AS contact_sync_version, updated_at, revision::text AS revision FROM player_accounts ORDER BY player_id", "redact": []}
@@ -171,6 +171,8 @@ SCENARIOS = {
     "base": [],
     # The flag on (the Google gate also needs the deadline to have passed; the Google routes need only the flag).
     "gate_on": ["UPDATE feature_flags SET value = true WHERE key = 'player_google_sign_in'"],
+    "alice_male": ["UPDATE players SET gender = 'male' WHERE id = '%s'" % ALICE],
+    "alice_answered": ["UPDATE players SET personal_details = '{\"version\":1,\"playingStyle\":\"Smash\",\"court_position\":\"front\",\"skills\":[\"smash\"],\"skills_other\":[],\"favorite_player\":null,\"favorite_player_other\":\"\"}'::jsonb, details_version = 1 WHERE id = '%s'" % ALICE],
     "alice_hidden_banner": ["UPDATE players SET banner_id = 'ember' WHERE id = '%s'" % ALICE],
     "dan_left_smash": ["UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-06-01 00:00:00+00' WHERE id = 'e7000000-0000-4000-8000-000000000002'"],
     "dan_verified": ["UPDATE players SET verification_override = 'verified', verification_override_by = '%s', verification_override_at = %s WHERE id = '%s'" % (ADMIN1, TS, DAN)],
@@ -354,6 +356,79 @@ case("stats_body_not_json", [stats(raw="[1]")])
 case("stats_twice_the_second_is_stale", [stats({"showProfileStats": True, "expectedRevision": "3"}), stats({"showWeeklyPerformance": False, "expectedRevision": "3"})])
 case("stats_signed_out", [stats({"showProfileStats": True, "expectedRevision": "3"}, who=None)])
 case("stats_google_gate", [stats({"showProfileStats": False, "expectedRevision": BIG}, who=B_S)], scenario="gate_on", now=AFTER_DEADLINE)
+
+GEN = "/api/me/gender"
+def gender(body=None, who=A_S, **kw):
+    return step("POST", GEN, who, body, **kw)
+case("gender_set_male", [gender({"gender": "male", "expectedRevision": "3"})])
+case("gender_set_female", [gender({"gender": "female", "expectedRevision": "3"})])
+case("gender_set_on_a_player_with_none_beyond_a_double", [gender({"gender": "male", "expectedRevision": BIG}, who=B_S)])
+case("gender_clear", [gender({"gender": None, "expectedRevision": "3"})], scenario="alice_male")
+case("gender_change", [gender({"gender": "female", "expectedRevision": "3"})], scenario="alice_male")
+case("gender_the_same_value_with_a_stale_revision_is_fine", [gender({"gender": "male", "expectedRevision": "1"})], scenario="alice_male")
+case("gender_the_same_value_with_a_bad_revision_is_fine", [gender({"gender": "male", "expectedRevision": "x"})], scenario="alice_male")
+case("gender_clearing_when_none_is_fine_with_a_stale_revision", [gender({"gender": None, "expectedRevision": "1"})])
+case("gender_stale_revision", [gender({"gender": "male", "expectedRevision": "2"})])
+case("gender_revision_missing_is_zero", [gender({"gender": "male"})])
+case("gender_revision_not_a_number", [gender({"gender": "male", "expectedRevision": "x"})])
+case("gender_missing_is_invalid", [gender({"expectedRevision": "3"})])
+case("gender_other_text_is_invalid", [gender({"gender": "other", "expectedRevision": "3"})])
+case("gender_upper_case_is_invalid", [gender({"gender": "MALE", "expectedRevision": "3"})])
+case("gender_number_is_invalid", [gender({"gender": 1, "expectedRevision": "3"})])
+case("gender_empty_is_invalid", [gender({"gender": "", "expectedRevision": "3"})])
+case("gender_body_not_json", [gender(raw="nope")])
+case("gender_twice_the_second_is_stale", [gender({"gender": "male", "expectedRevision": "3"}), gender({"gender": "female", "expectedRevision": "3"})])
+case("gender_twice_with_the_new_revision", [gender({"gender": "male", "expectedRevision": "3"}), gender({"gender": "female", "expectedRevision": "4"})])
+case("gender_answers_the_card_with_verified_and_gender", [gender({"gender": "female", "expectedRevision": BIG}, who=B_S)])
+case("gender_signed_out", [gender({"gender": "male", "expectedRevision": "3"}, who=None)])
+case("gender_google_gate", [gender({"gender": "male", "expectedRevision": BIG}, who=B_S)], scenario="gate_on", now=AFTER_DEADLINE)
+
+ANS = "/api/me/onboarding-answers"
+def answers(body=None, who=A_S, **kw):
+    return step("POST", ANS, who, body, **kw)
+def ans(**kw):
+    a = {"playStyle": None, "shots": [], "shotsOther": [], "favoritePlayer": None, "favoritePlayerOther": ""}
+    a.update(kw)
+    return a
+def put(a, rev="3"):
+    return {"answers": a, "expectedRevision": rev}
+case("answers_all_set", [answers(put(ans(playStyle="front", shots=["smash", "drop"], shotsOther=["Flick"], favoritePlayer="lindan")))])
+case("answers_empty_on_a_player_with_none_changes_nothing", [answers(put(ans(), rev="1"))])
+case("answers_play_style_only", [answers(put(ans(playStyle="back")))])
+case("answers_favorite_other_keeps_the_name", [answers(put(ans(favoritePlayer="other", favoritePlayerOther="  Carolina   Marin ")))])
+case("answers_favorite_listed_drops_the_typed_name", [answers(put(ans(favoritePlayer="momota", favoritePlayerOther="Someone")))])
+case("answers_shots_are_put_in_list_order_and_deduplicated", [answers(put(ans(shots=["drop", "smash", "smash", "netting"])))])
+case("answers_own_shots_are_trimmed", [answers(put(ans(shotsOther=["  Cross   court  ", "Tweener"])))])
+case("answers_the_same_answers_again_with_a_stale_revision_is_fine", [answers(put(ans(playStyle="front", shots=["smash"]), rev="1"))], scenario="alice_answered")
+case("answers_changed_keeps_the_playing_style_key", [answers(put(ans(playStyle="all")))], scenario="alice_answered")
+case("answers_cleared", [answers(put(ans()))], scenario="alice_answered")
+case("answers_stale_revision", [answers(put(ans(playStyle="front"), rev="2"))])
+case("answers_revision_missing_is_zero", [answers({"answers": ans(playStyle="front")})])
+case("answers_unknown_play_style", [answers(put(ans(playStyle="middle")))])
+case("answers_play_style_not_text", [answers(put(ans(playStyle=5)))])
+case("answers_unknown_shot", [answers(put(ans(shots=["slam"])))])
+case("answers_shot_not_text", [answers(put(ans(shots=[1])))])
+case("answers_shots_not_a_list", [answers(put({"playStyle": None, "shots": "smash", "shotsOther": [], "favoritePlayer": None}))])
+case("answers_shots_missing", [answers(put({"playStyle": None, "shotsOther": [], "favoritePlayer": None}))])
+case("answers_shots_other_missing", [answers(put({"playStyle": None, "shots": [], "favoritePlayer": None}))])
+case("answers_unknown_favorite", [answers(put(ans(favoritePlayer="nobody")))])
+case("answers_favorite_not_text", [answers(put(ans(favoritePlayer=3)))])
+case("answers_favorite_other_not_text_reads_empty", [answers(put(ans(favoritePlayer="other", favoritePlayerOther=5)))])
+case("answers_play_style_missing_is_invalid", [answers(put({"shots": [], "shotsOther": [], "favoritePlayer": None}))])
+case("answers_seven_own_shots", [answers(put(ans(shotsOther=["a1", "a2", "a3", "a4", "a5", "a6", "a7"])))])
+case("answers_six_own_shots", [answers(put(ans(shotsOther=["a1", "a2", "a3", "a4", "a5", "a6"])))])
+case("answers_own_shot_blank", [answers(put(ans(shotsOther=["  "])))])
+case("answers_own_shot_25_characters", [answers(put(ans(shotsOther=["x" * 25])))])
+case("answers_own_shot_24_characters", [answers(put(ans(shotsOther=["x" * 24])))])
+case("answers_own_shot_repeats_a_listed_one", [answers(put(ans(shotsOther=["Jump SMASH"])))])
+case("answers_own_shot_repeats_the_label_with_spaces", [answers(put(ans(shotsOther=["net   kill"])))])
+case("answers_own_shots_repeat_each_other", [answers(put(ans(shotsOther=["Flick", "flick"])))])
+case("answers_answers_not_an_object_reads_empty", [answers({"answers": "x", "expectedRevision": "3"})])
+case("answers_answers_missing", [answers({"expectedRevision": "3"})])
+case("answers_body_not_json", [answers(raw="nope")])
+case("answers_twice_the_second_is_stale", [answers(put(ans(playStyle="front"))), answers(put(ans(playStyle="back")))])
+case("answers_signed_out", [answers(put(ans(playStyle="front")), who=None)])
+case("answers_google_gate", [answers(put(ans(playStyle="front"), rev=BIG), who=B_S)], scenario="gate_on", now=AFTER_DEADLINE)
 write("profile", [PLAYERS, LINKS, NOTES, ACCOUNTS, MEMBERS, AUDIT, CONTACTS], profile_cases)
 
 # ---------------------------------------------------------------- privacy switches

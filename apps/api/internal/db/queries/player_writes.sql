@@ -74,3 +74,17 @@ VALUES (@id, @club_id, @player_id, @display_name, @nickname, @now, @now, @now);
 -- leaveMyClub: the row stays for history.
 UPDATE club_players SET removed_at = @now, revision = revision + 1, updated_at = @now
 WHERE club_id = @club_id AND player_id = @player_id AND removed_at IS NULL;
+
+-- name: GetPlayerGenderState :one
+-- setMyGender: tx.player.findUniqueOrThrow, no lock.
+SELECT gender, revision FROM players WHERE id = @id;
+
+-- name: SetPlayerGender :exec
+UPDATE players SET gender = sqlc.narg('gender')::player_gender, revision = revision + 1, updated_at = @now WHERE id = @id;
+
+-- name: LockPlayerDetails :one
+-- saveMyGettingToKnowAnswers: the player's row is locked, then read.
+SELECT revision, personal_details FROM players WHERE id = @id FOR UPDATE;
+
+-- name: SetPlayerAnswers :exec
+UPDATE players SET personal_details = @details::jsonb, details_version = 1, revision = revision + 1, updated_at = @now WHERE id = @id;

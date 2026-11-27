@@ -68,6 +68,24 @@ func (q *Queries) ClearSegmentCredits(ctx context.Context, arg ClearSegmentCredi
 	return err
 }
 
+const clearWaitingMatches = `-- name: ClearWaitingMatches :execrows
+UPDATE matches SET removed_at = $1, queue_position = NULL, revision = revision + 1, updated_at = $1 WHERE session_id = $2 AND state = 'waiting' AND removed_at IS NULL
+`
+
+type ClearWaitingMatchesParams struct {
+	Now       pgtype.Timestamptz
+	SessionID pgtype.UUID
+}
+
+// Clear queue: every waiting match stays as a removed draft. The count is the answer.
+func (q *Queries) ClearWaitingMatches(ctx context.Context, arg ClearWaitingMatchesParams) (int64, error) {
+	result, err := q.db.Exec(ctx, clearWaitingMatches, arg.Now, arg.SessionID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const closeMatchSegment = `-- name: CloseMatchSegment :exec
 UPDATE match_participations SET left_at = $1, left_operation_id = $2, updated_at = $1 WHERE id = $3
 `
@@ -925,6 +943,21 @@ func (q *Queries) MarkMatchSegmentsStarted(ctx context.Context, arg MarkMatchSeg
 	return err
 }
 
+const pauseMatch = `-- name: PauseMatch :exec
+UPDATE matches SET state = 'on_court', started_at = NULL, placed_at = COALESCE(placed_at, $1), revision = revision + 1, updated_at = $1 WHERE id = $2
+`
+
+type PauseMatchParams struct {
+	Now pgtype.Timestamptz
+	ID  pgtype.UUID
+}
+
+// Pause match: a Playing match goes back to Getting ready on its court(s). The start time clears; placed_at is kept when it has one.
+func (q *Queries) PauseMatch(ctx context.Context, arg PauseMatchParams) error {
+	_, err := q.db.Exec(ctx, pauseMatch, arg.Now, arg.ID)
+	return err
+}
+
 const publishSessionPublication = `-- name: PublishSessionPublication :exec
 UPDATE session_publications
 SET state = 'published', published_snapshot_id = $1, published_slides = CAST($2::text[] AS result_slide[]), include_off_day = $3,
@@ -1041,6 +1074,22 @@ type SetMatchQueuePositionOfParams struct {
 // Swap with the queue: the match that goes back takes the other's place.
 func (q *Queries) SetMatchQueuePositionOf(ctx context.Context, arg SetMatchQueuePositionOfParams) error {
 	_, err := q.db.Exec(ctx, setMatchQueuePositionOf, arg.OtherID, arg.Now, arg.ID)
+	return err
+}
+
+const setParticipationTeam = `-- name: SetParticipationTeam :exec
+UPDATE match_participations SET team = $1, updated_at = $2 WHERE id = $3
+`
+
+type SetParticipationTeamParams struct {
+	Team TeamSide
+	Now  pgtype.Timestamptz
+	ID   pgtype.UUID
+}
+
+// Switch sides and Swap from match: one open segment changes team in place.
+func (q *Queries) SetParticipationTeam(ctx context.Context, arg SetParticipationTeamParams) error {
+	_, err := q.db.Exec(ctx, setParticipationTeam, arg.Team, arg.Now, arg.ID)
 	return err
 }
 

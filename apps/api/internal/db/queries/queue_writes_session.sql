@@ -179,3 +179,7 @@ DELETE FROM session_courts WHERE session_id = @session_id;
 
 -- name: DeleteQueueSession :exec
 DELETE FROM queue_sessions WHERE id = @id;
+
+-- name: SetSessionCourtPosition :one
+-- Reorder courts: a court takes its new place, with a revision bump.
+UPDATE session_courts SET position = @position, revision = revision + 1, updated_at = @now WHERE id = @id RETURNING *;

@@ -108,6 +108,7 @@ func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerClubPlayerDetails(rt)
 	s.registerPublicSession(rt)
 	s.registerMatchControl(rt)
+	s.registerMatchArrange(rt)
 	s.registerMatchQueue(rt)
 	s.registerSessionFinish(rt)
 	s.registerResultsPublication(rt)

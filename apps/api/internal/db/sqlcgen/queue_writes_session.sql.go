@@ -736,6 +736,37 @@ func (q *Queries) SetSessionCourtEarlyOpen(ctx context.Context, arg SetSessionCo
 	return i, err
 }
 
+const setSessionCourtPosition = `-- name: SetSessionCourtPosition :one
+UPDATE session_courts SET position = $1, revision = revision + 1, updated_at = $2 WHERE id = $3 RETURNING id, club_id, session_id, label, open_until, removed_at, created_at, updated_at, revision, opened_early_at, starts_at, position
+`
+
+type SetSessionCourtPositionParams struct {
+	Position int32
+	Now      pgtype.Timestamptz
+	ID       pgtype.UUID
+}
+
+// Reorder courts: a court takes its new place, with a revision bump.
+func (q *Queries) SetSessionCourtPosition(ctx context.Context, arg SetSessionCourtPositionParams) (SessionCourt, error) {
+	row := q.db.QueryRow(ctx, setSessionCourtPosition, arg.Position, arg.Now, arg.ID)
+	var i SessionCourt
+	err := row.Scan(
+		&i.ID,
+		&i.ClubID,
+		&i.SessionID,
+		&i.Label,
+		&i.OpenUntil,
+		&i.RemovedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Revision,
+		&i.OpenedEarlyAt,
+		&i.StartsAt,
+		&i.Position,
+	)
+	return i, err
+}
+
 const startQueueSession = `-- name: StartQueueSession :exec
 UPDATE queue_sessions
 SET state = 'active', started_at = $1, scheduled_end_at = COALESCE($2::timestamptz, scheduled_end_at),

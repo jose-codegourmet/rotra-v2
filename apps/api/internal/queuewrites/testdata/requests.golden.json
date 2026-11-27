@@ -17429,5 +17429,965 @@
       "session_drop_out_notices": [],
       "session_drop_out_notices (removed)": []
     }
+  },
+  "confirm_restricted_beginners_refuses_an_intermediate": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "This session is for beginners only."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": []
+    }
+  },
+  "confirm_restricted_beginners_allows_a_beginner": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "request": {
+            "id": "a3400000-0000-4000-8000-000000000001",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "name": "Walk In Wendy",
+            "nickname": "Wen",
+            "phoneE164": "+639175550801",
+            "statedBand": "beginner",
+            "placement": "slot",
+            "status": "confirmed",
+            "requestedAt": "2026-11-19T02:10:00.123Z",
+            "decidedAt": "2026-11-19T04:00:00.000Z",
+            "clubPlayerId": "cd9f0b47-2e57-8ad3-9bf4-1739be296513",
+            "playerId": null,
+            "picture": null,
+            "pictureName": null
+          },
+          "rosterEntry": {
+            "id": "a548371b-4354-8085-a5a9-5282534d51cd",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "cd9f0b47-2e57-8ad3-9bf4-1739be296513",
+            "nameSnapshot": "Walk In Wendy",
+            "nicknameSnapshot": "Wen",
+            "clubNickname": null,
+            "present": false,
+            "presentChangedAt": "2026-11-19T04:00:00.000Z",
+            "level": "beginner_low",
+            "levelLockedAt": null,
+            "confirmedAt": "2026-11-19T04:00:00.000Z",
+            "gamesAdjustment": 0,
+            "handicapSpots": [],
+            "selfCheckedInAt": null,
+            "leftAt": null,
+            "revision": "2"
+          },
+          "waitlist": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1",
+          "court_fill_mode": "manual"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1",
+          "court_fill_mode": "manual"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "a548371b-4354-8085-a5a9-5282534d51cd",
+          "left_at": null,
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Walk In Wendy",
+          "club_player_id": "cd9f0b47-2e57-8ad3-9bf4-1739be296513",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 0,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "self_checked_in_at": null,
+          "assessment_operation_id": "b3000000-0000-4000-8000-000000000041"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "cd9f0b47-2e57-8ad3-9bf4-1739be296513",
+          "skill_level_id": 0,
+          "accepted_revision": "5",
+          "session_player_id": "a548371b-4354-8085-a5a9-5282534d51cd",
+          "source_operation_id": "b3000000-0000-4000-8000-000000000041",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000001",
+          "name": "Walk In Wendy",
+          "status": "confirmed",
+          "nickname": "Wen",
+          "revision": "2",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T02:10:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": "+639175550801",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "requested_at": "2026-11-19T02:10:00.123+00:00",
+          "club_player_id": "cd9f0b47-2e57-8ad3-9bf4-1739be296513",
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000001",
+          "name": "Walk In Wendy",
+          "status": "pending",
+          "nickname": "Wen",
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T02:10:00+00:00",
+          "decided_at": null,
+          "phone_e164": "+639175550801",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T02:10:00+00:00",
+          "requested_at": "2026-11-19T02:10:00.123+00:00",
+          "club_player_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "club_players": [
+        {
+          "id": "cd9f0b47-2e57-8ad3-9bf4-1739be296513",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": "Wen",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Walk In Wendy",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": []
+    }
+  },
+  "confirm_restricted_after_the_warning": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "request": {
+            "id": "a3400000-0000-4000-8000-000000000001",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "name": "Walk In Wendy",
+            "nickname": "Wen",
+            "phoneE164": "+639175550801",
+            "statedBand": "beginner",
+            "placement": "slot",
+            "status": "confirmed",
+            "requestedAt": "2026-11-19T02:10:00.123Z",
+            "decidedAt": "2026-11-19T04:00:00.000Z",
+            "clubPlayerId": "8667d7b9-7e29-83e5-aad8-47af6440839a",
+            "playerId": null,
+            "picture": null,
+            "pictureName": null
+          },
+          "rosterEntry": {
+            "id": "710d27bd-2a3b-8c78-815c-877e78cbc08f",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "8667d7b9-7e29-83e5-aad8-47af6440839a",
+            "nameSnapshot": "Walk In Wendy",
+            "nicknameSnapshot": "Wen",
+            "clubNickname": null,
+            "present": false,
+            "presentChangedAt": "2026-11-19T04:00:00.000Z",
+            "level": "intermediate_low",
+            "levelLockedAt": null,
+            "confirmedAt": "2026-11-19T04:00:00.000Z",
+            "gamesAdjustment": 0,
+            "handicapSpots": [],
+            "selfCheckedInAt": null,
+            "leftAt": null,
+            "revision": "2"
+          },
+          "waitlist": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1",
+          "court_fill_mode": "manual"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1",
+          "court_fill_mode": "manual"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "710d27bd-2a3b-8c78-815c-877e78cbc08f",
+          "left_at": null,
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Walk In Wendy",
+          "club_player_id": "8667d7b9-7e29-83e5-aad8-47af6440839a",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "self_checked_in_at": null,
+          "assessment_operation_id": "b3000000-0000-4000-8000-000000000043"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "8667d7b9-7e29-83e5-aad8-47af6440839a",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "710d27bd-2a3b-8c78-815c-877e78cbc08f",
+          "source_operation_id": "b3000000-0000-4000-8000-000000000043",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000001",
+          "name": "Walk In Wendy",
+          "status": "confirmed",
+          "nickname": "Wen",
+          "revision": "2",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T02:10:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": "+639175550801",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "requested_at": "2026-11-19T02:10:00.123+00:00",
+          "club_player_id": "8667d7b9-7e29-83e5-aad8-47af6440839a",
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000001",
+          "name": "Walk In Wendy",
+          "status": "pending",
+          "nickname": "Wen",
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T02:10:00+00:00",
+          "decided_at": null,
+          "phone_e164": "+639175550801",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T02:10:00+00:00",
+          "requested_at": "2026-11-19T02:10:00.123+00:00",
+          "club_player_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "club_players": [
+        {
+          "id": "8667d7b9-7e29-83e5-aad8-47af6440839a",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": "Wen",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Walk In Wendy",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": []
+    }
+  },
+  "confirm_restricted_warning_flag_not_true_does_not_count": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "This session is for beginners only."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": []
+    }
+  },
+  "confirm_restricted_waitlist_placement_is_not_checked": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "request": {
+            "id": "a3400000-0000-4000-8000-000000000003",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "name": "Waiting Wade",
+            "nickname": null,
+            "phoneE164": null,
+            "statedBand": "advanced",
+            "placement": "waitlist",
+            "status": "confirmed",
+            "requestedAt": "2026-11-19T02:00:00.000Z",
+            "decidedAt": "2026-11-19T04:00:00.000Z",
+            "clubPlayerId": "2a1fb964-9016-8baa-a627-0419d06fe4a1",
+            "playerId": null,
+            "picture": null,
+            "pictureName": null
+          },
+          "rosterEntry": null,
+          "waitlist": {
+            "id": "7f189bfa-332c-8033-9503-4f0357e11dcb",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "2a1fb964-9016-8baa-a627-0419d06fe4a1",
+            "level": "intermediate_low",
+            "addedAt": "2026-11-19T02:00:00.000Z",
+            "position": 1
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 40,
+          "queue_revision": "1",
+          "court_fill_mode": "manual"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1",
+          "court_fill_mode": "manual"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [
+        {
+          "id": "7f189bfa-332c-8033-9503-4f0357e11dcb",
+          "added_at": "2026-11-19T02:00:00+00:00",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "demoted_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "2a1fb964-9016-8baa-a627-0419d06fe4a1",
+          "skill_level_id": 3,
+          "demoted_confirmed_at": null
+        }
+      ],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000003",
+          "name": "Waiting Wade",
+          "status": "confirmed",
+          "nickname": null,
+          "revision": "2",
+          "placement": "waitlist",
+          "player_id": null,
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "requested_at": "2026-11-19T02:00:00+00:00",
+          "club_player_id": "2a1fb964-9016-8baa-a627-0419d06fe4a1",
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000003",
+          "name": "Waiting Wade",
+          "status": "pending",
+          "nickname": null,
+          "revision": "1",
+          "placement": "waitlist",
+          "player_id": null,
+          "created_at": "2026-11-19T02:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T02:00:00+00:00",
+          "requested_at": "2026-11-19T02:00:00+00:00",
+          "club_player_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "club_players": [
+        {
+          "id": "2a1fb964-9016-8baa-a627-0419d06fe4a1",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Waiting Wade",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": []
+    }
+  },
+  "confirm_restricted_per_level_band_full": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "All 1 intermediate slots are taken."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": []
+    }
+  },
+  "confirm_restricted_refusal_keeps_the_request_pending": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "forbidden",
+            "message": "You do not have access to this.",
+            "fields": {
+              "levelRestriction": "This session is for beginners only."
+            }
+          }
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "request": {
+            "id": "a3400000-0000-4000-8000-000000000001",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "name": "Walk In Wendy",
+            "nickname": "Wen",
+            "phoneE164": "+639175550801",
+            "statedBand": "beginner",
+            "placement": "slot",
+            "status": "confirmed",
+            "requestedAt": "2026-11-19T02:10:00.123Z",
+            "decidedAt": "2026-11-19T04:00:00.000Z",
+            "clubPlayerId": "91b5f88a-fb85-8092-9f8d-c4d1c4631e53",
+            "playerId": null,
+            "picture": null,
+            "pictureName": null
+          },
+          "rosterEntry": {
+            "id": "acb032b2-e888-80d3-940c-b23ebd614271",
+            "sessionId": "a3000000-0000-4000-8000-000000000001",
+            "clubPlayerId": "91b5f88a-fb85-8092-9f8d-c4d1c4631e53",
+            "nameSnapshot": "Walk In Wendy",
+            "nicknameSnapshot": "Wen",
+            "clubNickname": null,
+            "present": false,
+            "presentChangedAt": "2026-11-19T04:00:00.000Z",
+            "level": "beginner_low",
+            "levelLockedAt": null,
+            "confirmedAt": "2026-11-19T04:00:00.000Z",
+            "gamesAdjustment": 0,
+            "handicapSpots": [],
+            "selfCheckedInAt": null,
+            "leftAt": null,
+            "revision": "2"
+          },
+          "waitlist": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1",
+          "court_fill_mode": "manual"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1",
+          "court_fill_mode": "manual"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "acb032b2-e888-80d3-940c-b23ebd614271",
+          "left_at": null,
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Walk In Wendy",
+          "club_player_id": "91b5f88a-fb85-8092-9f8d-c4d1c4631e53",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 0,
+          "level_locked_at": null,
+          "games_adjustment": 0,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "self_checked_in_at": null,
+          "assessment_operation_id": "b3000000-0000-4000-8000-000000000050"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "91b5f88a-fb85-8092-9f8d-c4d1c4631e53",
+          "skill_level_id": 0,
+          "accepted_revision": "5",
+          "session_player_id": "acb032b2-e888-80d3-940c-b23ebd614271",
+          "source_operation_id": "b3000000-0000-4000-8000-000000000050",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000001",
+          "name": "Walk In Wendy",
+          "status": "confirmed",
+          "nickname": "Wen",
+          "revision": "2",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T02:10:00+00:00",
+          "decided_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": "+639175550801",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "requested_at": "2026-11-19T02:10:00.123+00:00",
+          "club_player_id": "91b5f88a-fb85-8092-9f8d-c4d1c4631e53",
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": [
+        {
+          "id": "a3400000-0000-4000-8000-000000000001",
+          "name": "Walk In Wendy",
+          "status": "pending",
+          "nickname": "Wen",
+          "revision": "1",
+          "placement": "slot",
+          "player_id": null,
+          "created_at": "2026-11-19T02:10:00+00:00",
+          "decided_at": null,
+          "phone_e164": "+639175550801",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T02:10:00+00:00",
+          "requested_at": "2026-11-19T02:10:00.123+00:00",
+          "club_player_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "club_players": [
+        {
+          "id": "91b5f88a-fb85-8092-9f8d-c4d1c4631e53",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": "Wen",
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Walk In Wendy",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": []
+    }
   }
 }

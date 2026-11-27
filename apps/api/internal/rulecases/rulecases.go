@@ -47,7 +47,6 @@ type Runner func(input json.RawMessage, now *int64) (any, error)
 // (packages/rules-wasm/test/rulesWasm.test.ts, GO_COPY_PENDING).
 var GoCopyPending = map[string]bool{
 	"courts/expectedFinish": true, // Q27.6, D-2026-11-23-08
-	"roster/levelRestrictionBlock": true, // Q28.5, D-2026-11-19-12
 }
 
 // RepoRoot finds the monorepo root by walking up from the working directory (a package test's

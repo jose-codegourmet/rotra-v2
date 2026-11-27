@@ -62,9 +62,10 @@ type Ruleset struct {
 	SessionEndError         func(in courts.SessionEndInput, now int64) (string, bool)
 	SessionEndCourtConflict func(cs []model.Court, endAt, courtBase, now int64) (string, bool)
 	// roster
-	InUnfinishedMatch func(rosterID string, matches []model.Match) bool
-	SlotCapacity      func(courts, playersPerCourt int64) int64
-	OpenSlots         func(capacity, rosterCount int64) int64
+	InUnfinishedMatch     func(rosterID string, matches []model.Match) bool
+	SlotCapacity          func(courts, playersPerCourt int64) int64
+	OpenSlots             func(capacity, rosterCount int64) int64
+	LevelRestrictionBlock func(restriction *roster.LevelRestriction, band string, taken roster.LevelSlots) (string, bool)
 	// courtfill
 	AutoFillPlacements   func(ctx model.Context, opts courtfill.FillOptions) []courtfill.Placement
 	NextEligibleForCourt func(courtID string, ctx model.Context, s *model.Session) courtfill.Eligible
@@ -117,9 +118,10 @@ func V1() Ruleset {
 		SessionEndError:         courts.SessionEndError,
 		SessionEndCourtConflict: courts.SessionEndCourtConflict,
 
-		InUnfinishedMatch: roster.InUnfinishedMatch,
-		SlotCapacity:      roster.SlotCapacity,
-		OpenSlots:         roster.OpenSlots,
+		InUnfinishedMatch:     roster.InUnfinishedMatch,
+		SlotCapacity:          roster.SlotCapacity,
+		OpenSlots:             roster.OpenSlots,
+		LevelRestrictionBlock: roster.LevelRestrictionBlock,
 
 		AutoFillPlacements:   courtfill.AutoFillPlacements,
 		NextEligibleForCourt: courtfill.NextEligibleForCourt,

@@ -63,9 +63,49 @@
   "s2_ann_request_declined": [
    "UPDATE session_join_requests SET status = 'declined', decided_at = TIMESTAMPTZ '2026-11-19 02:00:00+00' WHERE id = 'a3400000-0000-4000-8000-000000000006'"
   ],
+  "s1_beginners": [
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "ben_member_s1_beginners": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000060', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000004', 'c6000000-0000-4000-8000-000000000004', (SELECT player_id FROM club_players WHERE id = 'c6000000-0000-4000-8000-000000000004'), 'Ben Santos', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) VALUES ('a0300000-0000-4000-8000-000000000201', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000004', 'a3000000-0000-4000-8000-000000000004', 'a7000000-0000-4000-8000-000000000060', 4, 'a0300000-0000-4000-8000-000000000301', TIMESTAMPTZ '2026-11-12 00:00:00+00', TIMESTAMPTZ '2026-11-12 00:00:00+00', 1, 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "ben_member_s1_beginners_always_requires": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000060', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000004', 'c6000000-0000-4000-8000-000000000004', (SELECT player_id FROM club_players WHERE id = 'c6000000-0000-4000-8000-000000000004'), 'Ben Santos', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) VALUES ('a0300000-0000-4000-8000-000000000201', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000004', 'a3000000-0000-4000-8000-000000000004', 'a7000000-0000-4000-8000-000000000060', 4, 'a0300000-0000-4000-8000-000000000301', TIMESTAMPTZ '2026-11-12 00:00:00+00', TIMESTAMPTZ '2026-11-12 00:00:00+00', 1, 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a3000000-0000-4000-8000-000000000001'",
+   "UPDATE queue_sessions SET always_require_request = true WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "ben_member_s1_beginners_intermediate": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000060', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000004', 'c6000000-0000-4000-8000-000000000004', (SELECT player_id FROM club_players WHERE id = 'c6000000-0000-4000-8000-000000000004'), 'Ben Santos', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) VALUES ('a0300000-0000-4000-8000-000000000201', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000004', 'a3000000-0000-4000-8000-000000000004', 'a7000000-0000-4000-8000-000000000060', 4, 'a0300000-0000-4000-8000-000000000301', TIMESTAMPTZ '2026-11-12 00:00:00+00', TIMESTAMPTZ '2026-11-12 00:00:00+00', 1, 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE queue_sessions SET level_restriction = 'beginners_intermediate' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "ben_member_s1_per_level_full": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000060', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000004', 'c6000000-0000-4000-8000-000000000004', (SELECT player_id FROM club_players WHERE id = 'c6000000-0000-4000-8000-000000000004'), 'Ben Santos', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) VALUES ('a0300000-0000-4000-8000-000000000201', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000004', 'a3000000-0000-4000-8000-000000000004', 'a7000000-0000-4000-8000-000000000060', 4, 'a0300000-0000-4000-8000-000000000301', TIMESTAMPTZ '2026-11-12 00:00:00+00', TIMESTAMPTZ '2026-11-12 00:00:00+00', 1, 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0 WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "ben_member_s1_per_level_open": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000060', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000004', 'c6000000-0000-4000-8000-000000000004', (SELECT player_id FROM club_players WHERE id = 'c6000000-0000-4000-8000-000000000004'), 'Ben Santos', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) VALUES ('a0300000-0000-4000-8000-000000000201', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000004', 'a3000000-0000-4000-8000-000000000004', 'a7000000-0000-4000-8000-000000000060', 4, 'a0300000-0000-4000-8000-000000000301', TIMESTAMPTZ '2026-11-12 00:00:00+00', TIMESTAMPTZ '2026-11-12 00:00:00+00', 1, 'c9000000-0000-4000-8000-000000000001')",
+   "UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 0, intermediate_slots = 2, advanced_slots = 0 WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
+  "ben_member_on_s1_beginners": [
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000060', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000004', 'c6000000-0000-4000-8000-000000000004', (SELECT player_id FROM club_players WHERE id = 'c6000000-0000-4000-8000-000000000004'), 'Ben Santos', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 00:00:00+00', TIMESTAMPTZ '2026-11-15 00:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "INSERT INTO club_assessments (id, club_id, club_player_id, session_id, session_player_id, skill_level_id, source_operation_id, assessed_at, received_at, accepted_revision, actor_club_id) VALUES ('a0300000-0000-4000-8000-000000000201', 'c9000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000004', 'a3000000-0000-4000-8000-000000000004', 'a7000000-0000-4000-8000-000000000060', 4, 'a0300000-0000-4000-8000-000000000301', TIMESTAMPTZ '2026-11-12 00:00:00+00', TIMESTAMPTZ '2026-11-12 00:00:00+00', 1, 'c9000000-0000-4000-8000-000000000001')",
+   "INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, skill_level_id, confirmed_at, joined_at, released_at, release_reason, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000061', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000001', 'c6000000-0000-4000-8000-000000000004', (SELECT player_id FROM club_players WHERE id = 'c6000000-0000-4000-8000-000000000004'), 'Ben Santos', false, TIMESTAMPTZ '2026-11-19 02:00:00+00', 3, TIMESTAMPTZ '2026-11-15 01:00:00+00', TIMESTAMPTZ '2026-11-15 01:00:00+00', NULL, NULL, TIMESTAMPTZ '2026-11-19 02:00:00+00', TIMESTAMPTZ '2026-11-19 02:00:00+00', 1)",
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
+  ],
   "s2_free_slot_ann_request_declined": [
    "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000003'",
    "UPDATE session_join_requests SET status = 'declined', decided_at = TIMESTAMPTZ '2026-11-19 02:00:00+00' WHERE id = 'a3400000-0000-4000-8000-000000000006'"
+  ],
+  "s2_free_slot_ann_request_declined_beginners": [
+   "UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed' WHERE id = 'a7000000-0000-4000-8000-000000000003'",
+   "UPDATE session_join_requests SET status = 'declined', decided_at = TIMESTAMPTZ '2026-11-19 02:00:00+00' WHERE id = 'a3400000-0000-4000-8000-000000000006'",
+   "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a3000000-0000-4000-8000-000000000002'"
   ],
   "ann_request_declined": [
    "UPDATE session_join_requests SET status = 'declined', decided_at = TIMESTAMPTZ '2026-11-19 02:00:00+00' WHERE id = 'a3400000-0000-4000-8000-000000000002'"
@@ -1087,6 +1127,231 @@
      "source_id"
     ]
    }
+  },
+  {
+   "name": "join_restricted_beginners_blocks_a_member",
+   "scenario": "ben_member_s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "join_restricted_beginners_blocks_the_waitlist_choice_too",
+   "scenario": "ben_member_s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "body": {
+      "placement": "waitlist"
+     }
+    }
+   ]
+  },
+  {
+   "name": "join_restricted_beginners_intermediate_places_a_member",
+   "scenario": "ben_member_s1_beginners_intermediate",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "body": {}
+    }
+   ],
+   "redact": {
+    "session_join_requests": [
+     "id"
+    ],
+    "session_players": [
+     "id",
+     "assessment_operation_id"
+    ],
+    "session_waitlist": [
+     "id"
+    ],
+    "club_assessments": [
+     "source_operation_id",
+     "supersedes_operation_id",
+     "session_player_id"
+    ],
+    "player_notifications": [
+     "source_id"
+    ]
+   }
+  },
+  {
+   "name": "join_restricted_per_level_band_full_blocks_a_member",
+   "scenario": "ben_member_s1_per_level_full",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "join_restricted_per_level_band_open_places_a_member",
+   "scenario": "ben_member_s1_per_level_open",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "body": {}
+    }
+   ],
+   "redact": {
+    "session_join_requests": [
+     "id"
+    ],
+    "session_players": [
+     "id",
+     "assessment_operation_id"
+    ],
+    "session_waitlist": [
+     "id"
+    ],
+    "club_assessments": [
+     "source_operation_id",
+     "supersedes_operation_id",
+     "session_player_id"
+    ],
+    "player_notifications": [
+     "source_id"
+    ]
+   }
+  },
+  {
+   "name": "join_restricted_a_player_with_no_level_may_request",
+   "scenario": "s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join",
+     "who": "f4000000-0000-4000-8000-000000000006",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "body": {},
+     "redact": [
+      "requestId"
+     ]
+    }
+   ],
+   "redact": {
+    "session_join_requests": [
+     "id"
+    ],
+    "session_players": [
+     "id",
+     "assessment_operation_id"
+    ],
+    "session_waitlist": [
+     "id"
+    ],
+    "club_assessments": [
+     "source_operation_id",
+     "supersedes_operation_id",
+     "session_player_id"
+    ],
+    "player_notifications": [
+     "source_id"
+    ]
+   }
+  },
+  {
+   "name": "join_restricted_from_waitlist_is_not_checked",
+   "scenario": "s2_free_slot_ann_request_declined_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-full/join",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "body": {
+      "placement": "from_waitlist"
+     },
+     "redact": [
+      "requestId"
+     ]
+    }
+   ],
+   "redact": {
+    "session_join_requests": [
+     "id"
+    ],
+    "session_players": [
+     "id",
+     "assessment_operation_id"
+    ],
+    "session_waitlist": [
+     "id"
+    ],
+    "club_assessments": [
+     "source_operation_id",
+     "supersedes_operation_id",
+     "session_player_id"
+    ],
+    "player_notifications": [
+     "source_id"
+    ]
+   }
+  },
+  {
+   "name": "join_restricted_a_member_already_in_is_not_checked",
+   "scenario": "ben_member_on_s1_beginners",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "join_restricted_member_always_requires_is_still_checked",
+   "scenario": "ben_member_s1_beginners_always_requires",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join",
+     "who": "f4000000-0000-4000-8000-000000000002",
+     "headers": {
+      "Origin": "http://localhost:9000"
+     },
+     "body": {}
+    }
+   ]
   },
   {
    "name": "cancel_signed_out",

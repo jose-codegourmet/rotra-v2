@@ -262,6 +262,15 @@ case('remove_on_a_lapsed_session', remove(S[7], DN(5), who=LAPSED), scenario='no
 # Keep and Remove at once race for the decision (which wins is not decided), so that is tested in race_test.go, not pinned.
 
 # ---------------------------------------------------------------- scenarios
+# Restrictions (D-2026-11-19-12, task 2.2): a join request confirmed outside the session's pick is refused, unless confirmed again after the warning.
+case('confirm_restricted_beginners_refuses_an_intermediate', confirm(RQ(1)), scenario='s1_beginners')
+case('confirm_restricted_beginners_allows_a_beginner', confirm(RQ(1), {'operationId': op_id(), 'level': 'beginner_low'}), scenario='s1_beginners')
+case('confirm_restricted_after_the_warning', confirm(RQ(1), {'operationId': op_id(), 'level': LEVEL, 'allowOutsideLevels': True}), scenario='s1_beginners')
+case('confirm_restricted_warning_flag_not_true_does_not_count', confirm(RQ(1), {'operationId': op_id(), 'level': LEVEL, 'allowOutsideLevels': 1}), scenario='s1_beginners')
+case('confirm_restricted_waitlist_placement_is_not_checked', confirm(RQ(3)), scenario='s1_beginners')
+case('confirm_restricted_per_level_band_full', confirm(RQ(1)), scenario='s1_per_level')
+case('confirm_restricted_refusal_keeps_the_request_pending', [confirm(RQ(1)), confirm(RQ(1), {'operationId': op_id(), 'level': 'beginner_low'})], scenario='s1_beginners')
+
 SCEN = dict(BASE['scenarios'])
 
 
@@ -277,6 +286,8 @@ def request_sql(n, club, session, name, status='pending'):
 
 
 LAPSED_CLUB = 'c9000000-0000-4000-8000-000000000002'
+SCEN['s1_beginners'] = [f"UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = '{S[1]}'"]
+SCEN['s1_per_level'] = [f"UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 1, intermediate_slots = 1, advanced_slots = 0 WHERE id = '{S[1]}'"]
 SCEN['request_on_s4'] = [request_sql(31, CLUB1, S[4], 'Late Lena')]
 SCEN['request_on_s7'] = [request_sql(32, LAPSED_CLUB, S[7], 'Lapsed Lou')]
 SCEN['request_on_s8'] = [request_sql(33, LAPSED_CLUB, S[8], 'Live Lou')]

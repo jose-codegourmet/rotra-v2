@@ -688,6 +688,7 @@ SELECT s.id, s.club_id, s.title, s.notes, s.scheduled_start_at, s.scheduled_end_
        s.series_id, s.public_slug, s.accept_join_requests, s.always_require_request, s.court_fill_mode,
        s.request_formats::text[] AS request_formats, s.record_games, s.revision, s.queue_revision,
        s.planned_start_before_start_at, s.planned_end_before_start_at,
+       s.level_restriction, s.beginner_slots, s.intermediate_slots, s.advanced_slots,
        (s.start_license_term_id IS NOT NULL)::bool AS has_start_term,
        (SELECT count(*) FROM session_players p WHERE p.session_id = s.id AND p.released_at IS NULL AND p.no_show_at IS NULL)::int AS roster_count,
        (SELECT count(*) FROM session_players p WHERE p.session_id = s.id AND p.released_at IS NULL AND p.no_show_at IS NULL AND p.present)::int AS present_count,
@@ -739,6 +740,10 @@ type ListQueueSessionsRow struct {
 	QueueRevision             int64
 	PlannedStartBeforeStartAt pgtype.Timestamptz
 	PlannedEndBeforeStartAt   pgtype.Timestamptz
+	LevelRestriction          LevelRestriction
+	BeginnerSlots             pgtype.Int4
+	IntermediateSlots         pgtype.Int4
+	AdvancedSlots             pgtype.Int4
 	HasStartTerm              bool
 	RosterCount               int32
 	PresentCount              int32
@@ -795,6 +800,10 @@ func (q *Queries) ListQueueSessions(ctx context.Context, arg ListQueueSessionsPa
 			&i.QueueRevision,
 			&i.PlannedStartBeforeStartAt,
 			&i.PlannedEndBeforeStartAt,
+			&i.LevelRestriction,
+			&i.BeginnerSlots,
+			&i.IntermediateSlots,
+			&i.AdvancedSlots,
 			&i.HasStartTerm,
 			&i.RosterCount,
 			&i.PresentCount,

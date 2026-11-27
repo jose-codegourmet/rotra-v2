@@ -359,6 +359,7 @@
     "./session-payment/refunds": "./src/session-payment/refunds.ts",
     "./session-payment/useRecordSessionRefund": "./src/session-payment/useRecordSessionRefund.ts",
     "./session-payment/useSetPaymentAmount": "./src/session-payment/useSetPaymentAmount.ts",
+    "./session-payment/useSetPlayerFree": "./src/session-payment/useSetPlayerFree.ts",
     "./session-payment/query-keys": "./src/session-payment/queryKeys.ts",
     "./session-payment/fetchers": "./src/session-payment/fetchers.ts",
     "./session-payment/useSessionPayments": "./src/session-payment/useSessionPayments.ts",

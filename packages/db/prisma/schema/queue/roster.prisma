@@ -57,6 +57,8 @@ model SessionPlayer {
   gamesAdjustment  Int                  @default(0) @map("games_adjustment")
   /// Handicap · tonight (D-2026-11-25-03): spot codes, session only; Session done empties it.
   handicapSpots    String[]             @default([]) @map("handicap_spots")
+  /// Plays free (D-2026-11-27-01): owes nothing and leaves the break-even head count. Session only.
+  isFree           Boolean              @default(false) @map("is_free")
   createdAt        DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
   revision         BigInt               @default(1)

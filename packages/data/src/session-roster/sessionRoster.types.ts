@@ -48,6 +48,11 @@ export type SessionPlayer = {
    * games-in-a-row limit in Generate matches. Session only; missing or empty means no handicap.
    */
   handicapSpots?: HandicapSpot[]
+  /**
+   * Plays free (D-2026-11-27-01): owes nothing and leaves the break-even head count. Session only;
+   * set on Payments. Missing means false.
+   */
+  isFree?: boolean
 }
 /**
  * No show (cancelled): a live roster player who was away, played no games and was in no match,

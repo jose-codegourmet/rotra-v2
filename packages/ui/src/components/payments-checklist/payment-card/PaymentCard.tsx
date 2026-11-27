@@ -4,6 +4,7 @@ import type { PaymentStatus } from '@rotra/data/session-payment/rules'
 import type { SlotPaymentTransfer } from '@rotra/data/slot-transfer/slotTransfer.types'
 import { formatPeso } from '@rotra/schema/money'
 import { Avatar } from '@rotra/ui/avatar'
+import { Chip } from '@rotra/ui/chip'
 import { cn } from '@rotra/ui/cn'
 import {
   PaymentStatusChip,
@@ -24,6 +25,11 @@ export type PaymentPlayer = {
    * switch is locked and the card body opens the Slot history instead of the amount editor.
    */
   transfer?: SlotPaymentTransfer
+  /**
+   * Plays free (D-2026-11-27-01): owes nothing and is not counted in the break-even share. The card
+   * is dashed with a Free chip and no paid switch; the body still opens the amount editor.
+   */
+  free?: boolean
 }
 export type PaymentCardProps = {
   player: PaymentPlayer
@@ -59,14 +65,16 @@ export function PaymentCard({
   onOpenHistory,
   disabled,
 }: PaymentCardProps) {
-  const covered = player.status.kind === 'paid' || player.status.kind === 'reimburse'
+  const free = !!player.free
+  const covered = !free && (player.status.kind === 'paid' || player.status.kind === 'reimburse')
   const transfer = player.transfer
   return (
     <article
       className={cn(
         'flex min-w-0 flex-col gap-1 rounded-lg border border-border bg-surface p-3 shadow-card',
         covered && 'border-accent bg-accent-subtle',
-        player.status.kind === 'partial' && 'border-warn',
+        !free && player.status.kind === 'partial' && 'border-warn',
+        free && 'border-dashed bg-transparent shadow-none',
       )}
     >
       <div className="mb-1.5 flex items-center justify-between gap-2">
@@ -75,33 +83,37 @@ export function PaymentCard({
           name={player.name}
           src={player.picture ?? undefined}
           onClick={onSelectPlayer}
-          className={covered ? 'ring-2 ring-accent' : undefined}
+          className={covered ? 'ring-2 ring-accent' : free ? 'opacity-75' : undefined}
         />
-        <Switch
-          aria-label={
-            transfer ? `${player.name} paid through a slot transfer` : `${player.name} paid`
-          }
-          checked={!!player.paid}
-          tone={player.status.kind === 'partial' ? 'warn' : 'accent'}
-          onChange={onTogglePaid}
-          disabled={disabled || !!transfer}
-        />
+        {free ? null : (
+          <Switch
+            aria-label={
+              transfer ? `${player.name} paid through a slot transfer` : `${player.name} paid`
+            }
+            checked={!!player.paid}
+            tone={player.status.kind === 'partial' ? 'warn' : 'accent'}
+            onChange={onTogglePaid}
+            disabled={disabled || !!transfer}
+          />
+        )}
       </div>
       <button
         type="button"
         aria-label={
           transfer
             ? `Slot history for ${player.name}: ${paymentStatusLabel(player.status)}`
-            : `Payment from ${player.name}: ${paymentStatusLabel(player.status)}`
+            : `Payment from ${player.name}: ${free ? 'Free' : paymentStatusLabel(player.status)}`
         }
         aria-haspopup={transfer ? 'dialog' : undefined}
         disabled={disabled}
         onClick={transfer ? onOpenHistory : onEditAmount}
         className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-1 rounded-sm border-0 bg-transparent p-0 text-left text-fg disabled:cursor-not-allowed"
       >
-        <b className="break-words text-sm">{player.name}</b>
-        <PaymentStatusChip status={player.status} />
-        {transfer ? (
+        <b className={cn('break-words text-sm', free && 'opacity-75')}>{player.name}</b>
+        {free ? <Chip tone="solid">Free</Chip> : <PaymentStatusChip status={player.status} />}
+        {free ? (
+          <span className="text-xs text-fg2">Not counted in the split</span>
+        ) : transfer ? (
           <>
             <span className={cn('text-xs text-fg2', covered && 'font-semibold text-accent')}>
               {`${formatPeso(player.paid?.amount ?? 0)} received · via transfer`}

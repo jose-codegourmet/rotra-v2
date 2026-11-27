@@ -15,7 +15,11 @@ import {
   REFUND_NOTHING_TO_REFUND_ERROR,
   sessionRefundToast,
 } from '@rotra/data/session-payment/refund-rules'
-import { paymentTotals, receivedAmount } from '@rotra/data/session-payment/rules'
+import {
+  FREE_PAYMENT_LOCKED_ERROR,
+  paymentTotals,
+  receivedAmount,
+} from '@rotra/data/session-payment/rules'
 import { TRANSFER_PAYMENT_LOCKED_ERROR } from '@rotra/data/slot-transfer/transferAccounting.rules'
 import { formatPeso } from '@rotra/schema/money'
 import type { ClubContext } from '../auth/account-context'
@@ -231,6 +235,8 @@ export async function estimateFor(tx: Tx, session: QueueSession) {
       roster.length ||
       session.expectedPlayers ||
       slotCapacity(courts.length, session.playersPerCourt),
+    // D-2026-11-27-01: free roster players leave the break-even head count.
+    freePlayers: roster.filter((p) => p.isFree).length,
     inventory,
   })
   return {
@@ -369,6 +375,8 @@ export async function readSessionPayments(context: ClubContext, sessionId: strin
           sessionPlayerId: p.id,
           clubPlayerId: p.clubPlayerId,
           name: p.nameSnapshot,
+          // D-2026-11-27-01: plays free (owes nothing, left out of the split and the totals)
+          free: p.isFree && !payment.mark,
           paid: payment.mark
             ? {
                 // A legacy own mark with no amount stays null (paid in full at today's due, #479).
@@ -393,12 +401,14 @@ export async function readSessionPayments(context: ClubContext, sessionId: strin
         // `amountMinor` is the cash received (#479; a legacy null counts as today's amount due),
         // `waivedMinor` a transferred slot's waivers (#1013), never collected.
         // #1014: `amountMinor` is net of a manual refund (net kept); `refundedMinor` is the refund.
+        // D-2026-11-27-01: free players are left out of Paid X/Y, still due and to reimburse.
         marks: entries.flatMap(({ payment }) =>
           payment.mark ? [{ ...payment.mark, refundedMinor: payment.refundedMinor }] : [],
         ),
-        total: roster.length,
+        total: entries.filter(({ p, payment }) => !(p.isFree && !payment.mark)).length,
         amountDue,
         cost: estimate?.total ?? null,
+        free: entries.filter(({ p, payment }) => p.isFree && !payment.mark).length,
       }),
     }
   })
@@ -424,8 +434,10 @@ export async function readPublicPaymentStatus(slug: string) {
     // #1013: a transferred slot's carried cash counts for its holder once; waivers are never cash.
     const ledger = await slotLedger(tx, session.id)
     const rows = roster
-      .map((p) => {
-        const payment = ledger.paymentOf(p.id, amountDue)
+      .map((p) => ({ p, payment: ledger.paymentOf(p.id, amountDue) }))
+      // D-2026-11-27-01: free players owe nothing, so the share leaves them out.
+      .filter(({ p, payment }) => !(p.isFree && !payment.mark))
+      .map(({ p, payment }) => {
         return {
           name: maskPublicName(p.nameSnapshot),
           // A legacy mark with no amount counts as paid in full at today's amount due (#479).
@@ -493,6 +505,9 @@ async function applyMark(
         deviceId: input.deviceId ?? null,
       },
     })
+    // D-2026-11-27-01: recording cash for a free player makes them a payer again.
+    if (entry.isFree)
+      await tx.sessionPlayer.update({ where: { id: entry.id }, data: { isFree: false } })
     return { paid: true, amount: toMoney(created.amountMinor, created.currency) }
   }
   if (mark) await tx.sessionPaymentMark.delete({ where: key })
@@ -612,7 +627,49 @@ export async function setPaymentAmount(
         actorClubId: context.clubId,
       },
     })
+    // D-2026-11-27-01: recording cash for a free player makes them a payer again.
+    if (entry.isFree)
+      await tx.sessionPlayer.update({ where: { id: entry.id }, data: { isFree: false } })
     return { paid: true, amount: toMoney(created.amountMinor, created.currency) }
+  })
+}
+
+/**
+ * D-2026-11-27-01 · **Plays free** on one roster entry, keyed by club player. A free entry owes
+ * nothing and leaves the break-even head count. Payments are a guide only, so setting a paid entry
+ * free deletes its own payment mark (nothing to reimburse). Refused for a slot paid through a slot
+ * transfer or refunded: that payment is history. Idempotent: setting the current value is a no-op.
+ */
+export async function setPlayerFree(
+  context: ClubContext,
+  sessionId: string,
+  input: { operationId: string; clubPlayerId: string; free: boolean },
+) {
+  if (!UUID.test(input.operationId)) throw new ServiceError('invalid')
+  if (!UUID.test(input.clubPlayerId)) throw new ServiceError('not_found')
+  if (typeof input.free !== 'boolean') throw new ServiceError('invalid')
+  return prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, context, sessionId)
+    await requireSessionAccess(context, session, tx)
+    requirePaymentsOpen(session)
+    const entry = await tx.sessionPlayer.findUnique({
+      where: { sessionId_clubPlayerId: { sessionId, clubPlayerId: input.clubPlayerId } },
+    })
+    if (!entry || entry.clubId !== context.clubId) throw new ServiceError('not_found')
+    if (isOffRoster(entry))
+      throw new ServiceError('invalid', { player: 'Player not in this session.' })
+    if (input.free === entry.isFree) return { free: entry.isFree, cleared: false }
+    let cleared = false
+    if (input.free) {
+      if (await paymentLockError(tx, entry))
+        throw new ServiceError('conflict', { payment: FREE_PAYMENT_LOCKED_ERROR })
+      const deleted = await tx.sessionPaymentMark.deleteMany({
+        where: { sessionId, sessionPlayerId: entry.id },
+      })
+      cleared = deleted.count > 0
+    }
+    await tx.sessionPlayer.update({ where: { id: entry.id }, data: { isFree: input.free } })
+    return { free: input.free, cleared }
   })
 }
 
@@ -642,6 +699,8 @@ export async function markAllPaid(
       if (exists) continue
       // #1013: a slot paid through a transfer is already Paid; never a second payment.
       if (ledger.isLocked(entry.id)) continue
+      // D-2026-11-27-01: a free player owes nothing.
+      if (entry.isFree) continue
       await applyMark(tx, context, entry, {
         operationId: await derivedId(input.operationId, entry.id),
         paid: true,

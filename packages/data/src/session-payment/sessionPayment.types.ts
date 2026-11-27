@@ -19,6 +19,13 @@ export type SetPaymentAmountInput = {
   amountMinor: number
 }
 
+/** Plays free (D-2026-11-27-01) on one roster player; setting it clears their amount received. */
+export type SetPlayerFreeInput = {
+  sessionId: string
+  clubPlayerId: string
+  free: boolean
+}
+
 /**
  * A manual full refund (#1014, D-2026-11-22-06): the record that the Queue Master handed a roster
  * entry's whole cash back outside ROTRA. Append-only, one per entry; never changes a payment mark.

@@ -1076,8 +1076,10 @@ export async function getPublicPaymentStatus(slug: string): Promise<{
   const ledger = slotPaymentsIn(state, session.id, amountDue)
   const rows = state.roster
     .filter((p) => p.sessionId === session.id)
-    .map((p) => {
-      const payment = ledger.paymentOf(p.id)
+    .map((p) => ({ p, payment: ledger.paymentOf(p.id) }))
+    // D-2026-11-27-01: free players owe nothing, so the share leaves them out.
+    .filter(({ p, payment }) => !(p.isFree && !payment.mark))
+    .map(({ p, payment }) => {
       return {
         name: maskPublicName(p.nameSnapshot),
         receivedMinor: payment.mark ? receivedAmount(payment.mark, amountDue) : null,

@@ -120,7 +120,7 @@ This README holds the index, the status conventions and the entry template.
 | [D-2026-11-26-08](2026-11-26.md#d-2026-11-26-08) | Free court flow (pick or generate), Suggested match rework, stacked dialogs go back | approved 2026-11-26 | not started (mockup only) | needed | [Queue](../workstreams/queue.md) |
 | [D-2026-11-26-09](2026-11-26.md#d-2026-11-26-09) | Queue player names read club nickname › nickname › full name everywhere | approved 2026-11-26 | not started (mockup only) | needed | [Queue](../workstreams/queue.md) |
 | [D-2026-11-26-10](2026-11-26.md#d-2026-11-26-10) | Player status pill uses icons; Players card footer holds the status and Present | approved 2026-11-26 | not started (mockup only) | needed | [Queue](../workstreams/queue.md) |
-| [D-2026-11-27-01](2026-11-27.md#d-2026-11-27-01) | Payments: a player can play free, even after being marked paid | approved 2026-11-27 | not started (mockup only) | needed | [Queue](../workstreams/queue.md) |
+| [D-2026-11-27-01](2026-11-27.md#d-2026-11-27-01) | Payments: a player can play free, even after being marked paid | approved 2026-11-27 | implemented (mock app and real mode; migration applied) | none | [Queue](../workstreams/queue.md) |
 
 ## Status conventions
 

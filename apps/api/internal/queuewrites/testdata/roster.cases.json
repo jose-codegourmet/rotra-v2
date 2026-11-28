@@ -17,6 +17,12 @@
   "kai_not_waiting": [
    "DELETE FROM session_waitlist WHERE id = 'a3300000-0000-4000-8000-000000000002'"
   ],
+  "una_has_a_link": [
+   "UPDATE shared_player_entries SET social_key = 'facebook.com/una' WHERE id = 'a6000000-0000-4000-8000-000000000007'"
+  ],
+  "eve_has_a_link": [
+   "UPDATE shared_player_entries SET social_key = 'facebook.com/eve.open' WHERE id = 'a6000000-0000-4000-8000-000000000009'"
+  ],
   "s3_full": [
    "INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('a7000000-0000-4000-8000-000000000009', 'c9000000-0000-4000-8000-000000000001', 'a3000000-0000-4000-8000-000000000003', 'c6000000-0000-4000-8000-000000000012', 'Lee Guest', true, TIMESTAMPTZ '2026-11-19 01:08:00+00', 'a0300000-0000-4000-8000-000000000199', 3, TIMESTAMPTZ '2026-11-19 01:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-19 01:08:00+00', 3)"
   ]
@@ -4988,6 +4994,478 @@
        }
       }
      ]
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_social_link",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000141",
+        "name": "Link Newbie",
+        "level": "intermediate_low",
+        "socialLink": "https://facebook.com/Link.Newbie/"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_without_a_scheme",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000142",
+        "name": "Link Newbie",
+        "level": "intermediate_low",
+        "socialLink": " www.fb.com/link.newbie?ref=x#top "
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_an_instagram_link_and_a_nickname",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000143",
+        "name": "Link Newbie",
+        "level": "intermediate_low",
+        "nickname": "Linky",
+        "socialLink": "instagram.com/link_newbie"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_and_a_phone",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000144",
+        "name": "Link Newbie",
+        "level": "intermediate_low",
+        "phone": "0917 555 0188",
+        "socialLink": "facebook.com/link.newbie"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_and_a_new_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000145",
+        "name": "Link Newbie",
+        "level": "intermediate_low",
+        "email": "link.newbie@example.test",
+        "socialLink": "facebook.com/link.newbie"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_and_an_open_entrys_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000146",
+        "name": "Link Newbie",
+        "level": "intermediate_low",
+        "email": "eve@example.test",
+        "socialLink": "facebook.com/link.newbie"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_and_a_bad_email",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000147",
+        "name": "Link Newbie",
+        "level": "intermediate_low",
+        "email": "nope",
+        "socialLink": "facebook.com/link.newbie"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_of_an_open_entry_finds_that_person",
+   "scenario": "eve_has_a_link",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000148",
+        "name": "Eve Open",
+        "level": "intermediate_low",
+        "socialLink": "https://facebook.com/eve.open"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_of_an_open_entry_wins_over_the_email",
+   "scenario": "eve_has_a_link",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000149",
+        "name": "Eve Open",
+        "level": "intermediate_low",
+        "email": "someone.else@example.test",
+        "socialLink": "facebook.com/Eve.Open/"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_the_club_already_saved",
+   "scenario": "una_has_a_link",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000150",
+        "name": "Una Again",
+        "level": "intermediate_low",
+        "socialLink": "facebook.com/una"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_the_club_already_saved_and_an_email",
+   "scenario": "una_has_a_link",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000151",
+        "name": "Una Again",
+        "level": "intermediate_low",
+        "email": "fresh@example.test",
+        "socialLink": "fb.com/una/"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_of_an_unknown_provider",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000152",
+        "name": "Bad Link",
+        "level": "intermediate_low",
+        "socialLink": "https://example.com/someone"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_bare_site_as_the_link",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000153",
+        "name": "Bad Link",
+        "level": "intermediate_low",
+        "socialLink": "facebook.com"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_text_that_is_not_a_link",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000154",
+        "name": "Bad Link",
+        "level": "intermediate_low",
+        "socialLink": "nope"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_bad_link_and_a_phone",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000155",
+        "name": "Bad Link",
+        "level": "intermediate_low",
+        "phone": "0917 555 0188",
+        "socialLink": "nope"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_blank_link_is_a_guest",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000156",
+        "name": "Blank Link",
+        "level": "intermediate_low",
+        "socialLink": "   "
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_to_the_waitlist",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000157",
+        "name": "Link Waiter",
+        "level": "intermediate_low",
+        "socialLink": "facebook.com/link.waiter",
+        "toWaitlist": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_retry_same_operation",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000088",
+        "name": "Link Newbie",
+        "level": "intermediate_low",
+        "socialLink": "facebook.com/link.newbie"
+       }
+      ]
+     },
+     "snapshot": true
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000088",
+        "name": "Link Newbie",
+        "level": "intermediate_low",
+        "socialLink": "facebook.com/link.newbie"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "add_new_with_a_link_twice_under_two_operations",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001/roster/batch",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "operations": [
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000158",
+        "name": "Link Newbie",
+        "level": "intermediate_low",
+        "socialLink": "facebook.com/link.newbie"
+       },
+       {
+        "op": "add",
+        "source": "new",
+        "operationId": "b0000000-0000-4000-8000-000000000159",
+        "name": "Link Again",
+        "level": "intermediate_low",
+        "socialLink": "facebook.com/link.newbie"
+       }
+      ]
+     }
     }
    ]
   }

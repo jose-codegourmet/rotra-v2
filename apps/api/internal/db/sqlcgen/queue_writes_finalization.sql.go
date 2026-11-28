@@ -86,6 +86,31 @@ func (q *Queries) CountPlayerAssessmentsInWindow(ctx context.Context, arg CountP
 	return column_1, err
 }
 
+const deductPlannedShuttles = `-- name: DeductPlannedShuttles :exec
+UPDATE inventory_items AS i
+SET stock = GREATEST(i.stock - p.tubes, 0), revision = i.revision + 1, updated_at = now()
+FROM (
+  SELECT inventory_item_id, SUM(tubes)::int AS tubes
+  FROM session_shuttle_plan_lines
+  WHERE club_id = $1 AND session_id = $2
+  GROUP BY inventory_item_id
+) AS p
+WHERE i.id = p.inventory_item_id AND i.club_id = $1 AND i.removed_at IS NULL
+`
+
+type DeductPlannedShuttlesParams struct {
+	ClubID    pgtype.UUID
+	SessionID pgtype.UUID
+}
+
+// deductPlannedShuttles (D-2026-11-26-01): Session done takes each shuttle plan line's planned tubes off its inventory item, never below zero.
+// One statement (a - / + tap racing Session done is never lost); the tubes of an item planned on several lines are summed; a removed item or
+// another club's is skipped; updated_at is the database clock (raw SQL in the TypeScript).
+func (q *Queries) DeductPlannedShuttles(ctx context.Context, arg DeductPlannedShuttlesParams) error {
+	_, err := q.db.Exec(ctx, deductPlannedShuttles, arg.ClubID, arg.SessionID)
+	return err
+}
+
 const deleteHeldCourtsOf = `-- name: DeleteHeldCourtsOf :exec
 DELETE FROM active_court_holds WHERE match_id = ANY($1::uuid[])
 `

@@ -37,6 +37,33 @@
    "UPDATE players SET banner_id = 'sun' WHERE id = 'd4000000-0000-4000-8000-000000000002'",
    "UPDATE profile_banners SET shown = false WHERE id = 'sun'"
   ],
+  "details_character_picture": [
+   "UPDATE club_players SET avatar_ref = 'character:smash-cat' WHERE id = 'c6000000-0000-4000-8000-000000000024'"
+  ],
+  "details_photo_picture": [
+   "UPDATE club_players SET avatar_ref = 'https://img.example.test/ned.jpg' WHERE id = 'c6000000-0000-4000-8000-000000000024'"
+  ],
+  "details_photo_picture_with_a_previous_photo": [
+   "UPDATE club_players SET avatar_ref = 'https://img.example.test/ned.jpg', avatar_previous_ref = 'https://img.example.test/old.jpg' WHERE id = 'c6000000-0000-4000-8000-000000000024'"
+  ],
+  "details_initials_with_a_previous_photo": [
+   "UPDATE club_players SET avatar_previous_ref = 'https://img.example.test/old.jpg' WHERE id = 'c6000000-0000-4000-8000-000000000024'"
+  ],
+  "details_previous_picture_that_is_not_a_photo": [
+   "UPDATE club_players SET avatar_ref = 'character:smash-cat', avatar_previous_ref = 'character:old-cat' WHERE id = 'c6000000-0000-4000-8000-000000000024'"
+  ],
+  "details_picture_that_is_neither": [
+   "UPDATE club_players SET avatar_ref = 'ned.png' WHERE id = 'c6000000-0000-4000-8000-000000000024'"
+  ],
+  "details_saved_level": [
+   "UPDATE club_players SET saved_skill_level_id = 4, saved_level_at = TIMESTAMPTZ '2026-11-10 00:00:00+00' WHERE id = 'c6000000-0000-4000-8000-000000000024'"
+  ],
+  "details_saved_level_newer_than_the_assessment": [
+   "UPDATE club_players SET saved_skill_level_id = 2, saved_level_at = TIMESTAMPTZ '2026-12-01 00:00:00+00' WHERE id = 'c6000000-0000-4000-8000-000000000011'"
+  ],
+  "details_saved_level_older_than_the_assessment": [
+   "UPDATE club_players SET saved_skill_level_id = 2, saved_level_at = TIMESTAMPTZ '2020-01-01 00:00:00+00' WHERE id = 'c6000000-0000-4000-8000-000000000011'"
+  ],
   "live_session_ended": [
    "UPDATE queue_sessions SET state = 'completed', finalized_at = TIMESTAMPTZ '2026-11-19 03:00:00+00' WHERE id = 'a3000000-0000-4000-8000-000000000001'"
   ],
@@ -1091,6 +1118,60 @@
    "who": "c7000000-0000-4000-8000-000000000001",
    "scenario": "base",
    "now": "2027-02-01T04:00:00.000Z"
+  },
+  {
+   "name": "details-club1-character-picture",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000024",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "details_character_picture"
+  },
+  {
+   "name": "details-club1-photo-picture",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000024",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "details_photo_picture"
+  },
+  {
+   "name": "details-club1-photo-picture-with-a-previous-photo",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000024",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "details_photo_picture_with_a_previous_photo"
+  },
+  {
+   "name": "details-club1-initials-with-a-previous-photo",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000024",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "details_initials_with_a_previous_photo"
+  },
+  {
+   "name": "details-club1-previous-picture-that-is-not-a-photo",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000024",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "details_previous_picture_that_is_not_a_photo"
+  },
+  {
+   "name": "details-club1-picture-that-is-neither",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000024",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "details_picture_that_is_neither"
+  },
+  {
+   "name": "details-club1-saved-level",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000024",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "details_saved_level"
+  },
+  {
+   "name": "details-club1-saved-level-newer-than-the-assessment",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000011",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "details_saved_level_newer_than_the_assessment"
+  },
+  {
+   "name": "details-club1-saved-level-older-than-the-assessment",
+   "path": "/api/club/players/c6000000-0000-4000-8000-000000000011",
+   "who": "c7000000-0000-4000-8000-000000000001",
+   "scenario": "details_saved_level_older_than_the_assessment"
   },
   {
    "name": "delete-impact-club1-alice",

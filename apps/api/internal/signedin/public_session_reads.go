@@ -385,9 +385,9 @@ type myNightDTO struct {
 	HasLeft          bool    `json:"hasLeft"`
 	CantMakeItSent   bool    `json:"cantMakeItSent"`
 	// CanTransfer is whether the slot can be given to someone else: a confirmed player before Start. SlotTransfer is the player's own
-	// pending transfer (#1011); slot transfers are not in Go yet (task 2.12), so there is none.
+	// pending transfer (#1011), in the MySlotTransfer shape; a transfer link nobody has claimed (#1012) comes with no recipient.
 	CanTransfer  bool             `json:"canTransfer"`
-	SlotTransfer *struct{}        `json:"slotTransfer"`
+	SlotTransfer *mySlotTransfer  `json:"slotTransfer"`
 	Offline      bool             `json:"offline"`
 	Games        int64            `json:"games"`
 	Won          int              `json:"won"`
@@ -435,6 +435,11 @@ func (s *server) readMyNight(r *http.Request, q *sqlcgen.Queries, who viewer) (a
 	night := myNightDTO{PlayerID: who.ID.String(), WaitlistPosition: st.WaitlistPosition, StartsAt: msOf(ls.row.ScheduledStartAt), Minimum: ls.row.MinimumGames}
 	night.JoinRequest = st.JoinRequest
 	night.CanTransfer = hasRow && ls.row.State == sqlcgen.QueueSessionStatePrepared
+	if night.CanTransfer {
+		if night.SlotTransfer, err = myPendingSlotTransfer(ctx, q, ownID); err != nil {
+			return nil, err
+		}
+	}
 	waitlisted := !hasRow && st.WaitlistPosition != nil
 	state := ls.row.State
 	isLive := state == sqlcgen.QueueSessionStateActive || state == sqlcgen.QueueSessionStateFinalizing
@@ -870,4 +875,35 @@ func (s *server) readMyMatchRequest(r *http.Request, q *sqlcgen.Queries, who vie
 	return struct {
 		MatchRequest *matchRequestDTO `json:"matchRequest"`
 	}{req}, nil
+}
+
+// mySlotTransfer is the MySlotTransfer shape: the Player's own pending transfer on their roster entry.
+type mySlotTransfer struct {
+	ID             string  `json:"id"`
+	RecipientName  *string `json:"recipientName"`
+	RecipientRtrID *string `json:"recipientRtrId"`
+	ViaLink        bool    `json:"viaLink"`
+	At             string  `json:"at"`
+}
+
+// myPendingSlotTransfer is myPendingSlotTransfer of slot-transfers.ts: the Player's own pending transfer on this roster entry, or nil. A
+// transfer link nobody has claimed yet comes with no recipient (and no RTR ID).
+func myPendingSlotTransfer(ctx context.Context, q *sqlcgen.Queries, entry pgtype.UUID) (*mySlotTransfer, error) {
+	t, err := q.GetMyPendingSlotTransfer(ctx, entry)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if !t.RecipientPlayerID.Valid && !t.ViaLink {
+		return nil, nil
+	}
+	out := &mySlotTransfer{ID: t.ID.String(), ViaLink: t.ViaLink, At: httpapi.ToIso(t.RequestedAt.Time)}
+	if t.RecipientPlayerID.Valid {
+		out.RecipientName = &t.RecipientName.String
+		rtr := t.RecipientRtrID.String
+		out.RecipientRtrID = &rtr
+	}
+	return out, nil
 }

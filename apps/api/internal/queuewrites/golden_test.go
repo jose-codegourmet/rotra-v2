@@ -65,6 +65,12 @@ func TestMoneyGolden(t *testing.T) { writetest.Replay(t, "testdata", "money", bu
 // captured with TZ=UTC.
 func TestTransfersGolden(t *testing.T) { writetest.Replay(t, "testdata", "transfers", build) }
 
+// Approve of a slot transfer (task 5.5), cases from gen-writes-queue-approve-cases.py.
+func TestApproveGolden(t *testing.T) { writetest.Replay(t, "testdata", "approve", build) }
+
+// The Player's seven slot-transfer routes (task 5.5), cases from gen-writes-queue-slottransfer-cases.py.
+func TestSlotTransferGolden(t *testing.T) { writetest.Replay(t, "testdata", "slottransfer", build) }
+
 // Session done and the projection jobs it drives, POST and GET /api/sessions/{id}/finalization. The stream list, the job list and a few
 // arrays the TypeScript reads with no order are compared as sets (the cases name them with "unordered").
 func TestFinalizeGolden(t *testing.T) { writetest.Replay(t, "testdata", "finalize", buildWithReads) }

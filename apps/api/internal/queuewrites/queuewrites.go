@@ -115,6 +115,7 @@ func (s *server) registerRoutes(rt *signedin.Router) {
 	s.registerInventory(rt)
 	s.registerPayments(rt)
 	s.registerTransfers(rt)
+	s.registerSlotTransfer(rt)
 	s.registerFinalization(rt)
 	s.registerVisitor(rt)
 	s.registerHosts(rt)

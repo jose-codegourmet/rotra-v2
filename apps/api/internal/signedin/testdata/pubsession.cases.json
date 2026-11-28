@@ -12,7 +12,8 @@
   "passwordless": [],
   "reset": [
     "INSERT INTO feature_flags (key, name, description, value, updated_at) VALUES ('player_google_sign_in', 'Google sign-in for players', 'x', false, now()) ON CONFLICT DO NOTHING",
-    "UPDATE feature_flags SET value = false WHERE key = 'player_google_sign_in'"
+    "UPDATE feature_flags SET value = false WHERE key = 'player_google_sign_in'",
+    "DELETE FROM session_slot_transfers"
   ],
   "scenarios": {
     "base": [],
@@ -54,6 +55,21 @@
       "UPDATE club_players SET saved_skill_level_id = 6, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000004'",
       "UPDATE club_players SET saved_skill_level_id = 0, saved_level_at = TIMESTAMPTZ '2026-11-01 00:00:00+00' WHERE id = 'e1000000-0000-4000-8000-000000000005'",
       "UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = 'a1000000-0000-4000-8000-000000000001'"
+    ],
+    "big_transfer_rtr": [
+      "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('f1000000-0000-4000-8000-000000000001', 'c1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000004', 'b1000000-0000-4000-8000-000000000011', 'e1000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000002', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)"
+    ],
+    "big_transfer_link": [
+      "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('f1000000-0000-4000-8000-000000000001', 'c1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000004', 'b1000000-0000-4000-8000-000000000011', 'e1000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000001', NULL, decode('0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b', 'hex'), NULL, 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)"
+    ],
+    "big_transfer_link_claimed": [
+      "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('f1000000-0000-4000-8000-000000000001', 'c1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000004', 'b1000000-0000-4000-8000-000000000011', 'e1000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000002', decode('0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b', 'hex'), TIMESTAMPTZ '2026-11-19 01:40:00+00', 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)"
+    ],
+    "big_transfer_rejected": [
+      "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('f1000000-0000-4000-8000-000000000001', 'c1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000004', 'b1000000-0000-4000-8000-000000000011', 'e1000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000002', NULL, NULL, 'rejected', TIMESTAMPTZ '2026-11-19 01:30:00+00', TIMESTAMPTZ '2026-11-19 02:30:00+00')"
+    ],
+    "big_transfer_other_entry": [
+      "INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, link_token_digest, claimed_at, status, requested_at, decided_at) VALUES ('f1000000-0000-4000-8000-000000000001', 'c1000000-0000-4000-8000-000000000001', 'a1000000-0000-4000-8000-000000000004', 'b1000000-0000-4000-8000-000000000012', 'e1000000-0000-4000-8000-00000000000f', 'd1000000-0000-4000-8000-000000000003', 'd1000000-0000-4000-8000-000000000002', NULL, NULL, 'pending', TIMESTAMPTZ '2026-11-19 01:30:00+00', NULL)"
     ]
   },
   "approved": [
@@ -1117,6 +1133,48 @@
       "path": "/api/public-sessions/live-now/my-night",
       "player": "f1000000-0000-4000-8000-000000000002",
       "scenario": "live_beginners",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_big_transfer_rtr",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_transfer_rtr",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_ben_big_transfer_rtr",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000002",
+      "scenario": "big_transfer_rtr",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_big_transfer_link",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_transfer_link",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_big_transfer_link_claimed",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_transfer_link_claimed",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_big_transfer_rejected",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_transfer_rejected",
+      "origin": "http://localhost:9000"
+    },
+    {
+      "name": "night_alice_big_transfer_other_entry",
+      "path": "/api/public-sessions/big-night/my-night",
+      "player": "f1000000-0000-4000-8000-000000000001",
+      "scenario": "big_transfer_other_entry",
       "origin": "http://localhost:9000"
     },
     {

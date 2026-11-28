@@ -1,0 +1,30 @@
+{
+  "name": "@rotra/session-page",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./public-session": "./src/public-session/PublicSession.tsx",
+    "./session-podium": "./src/session-podium/SessionPodium.tsx",
+    "./payment-status-share-dialog": "./src/payment-status-share-dialog/PaymentStatusShareDialog.tsx"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rotra/data": "workspace:*",
+    "@rotra/schema": "workspace:*",
+    "@rotra/ui": "workspace:*"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@rotra/config": "workspace:*",
+    "@types/react": "~19.2.14",
+    "react": "~19.2.9",
+    "typescript": "^5.9.3"
+  }
+}

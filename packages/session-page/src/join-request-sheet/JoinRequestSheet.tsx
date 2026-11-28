@@ -1,7 +1,7 @@
 'use client'
 
 import { useSignIn } from '@rotra/data/auth/use-sign-in'
-import { playerOrigin, queueSessionUrl } from '@rotra/data/public-session/context'
+import { cleanSessionUrl, playerOrigin } from '@rotra/data/public-session/context'
 import { useSendJoinRequest } from '@rotra/data/public-session/useSendJoinRequest'
 import { isRealDataMode } from '@rotra/data/real/mode'
 import { Button } from '@rotra/ui/button'
@@ -50,7 +50,7 @@ function playerLoginHref() {
   const origin = playerOrigin(location.origin)
   const back = new URL(location.href)
   back.searchParams.set('join', '1')
-  const destination = queueSessionUrl(back.href)
+  const destination = cleanSessionUrl(back.href)
   if (!origin || !destination) return undefined
   const login = new URL('/login', origin)
   login.searchParams.set('next', destination)
@@ -115,7 +115,7 @@ export function JoinRequestSheet({
   // Bumped on every open: a fresh, empty form.
   const [opened, setOpened] = useState(0)
   // One request ID per open sheet: a retry after a lost reply sends the same request.
-  const [requestId, setRequestId] = useState(() => crypto.randomUUID())
+  const [requestId, setRequestId] = useState<string>(() => crypto.randomUUID())
   const [defaultValues, setDefaultValues] = useState<Partial<JoinRequestFormInput>>()
   const saveDraft = useCallback(
     (values: JoinRequestFormInput) => {

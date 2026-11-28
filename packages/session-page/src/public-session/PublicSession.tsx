@@ -4,7 +4,12 @@ import { useSession } from '@rotra/data/auth/use-session'
 import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { freeCourtMinutes, playerFacingName } from '@rotra/data/match/match.rules'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
-import { playerLoginUrl, playerOrigin, playerRegisterUrl } from '@rotra/data/public-session/context'
+import {
+  playerLoginUrl,
+  playerOrigin,
+  playerRegisterUrl,
+  sessionLinkOrigin,
+} from '@rotra/data/public-session/context'
 import { usePlayerSessionAccess } from '@rotra/data/public-session/player-access'
 import type {
   MyJoinRequest,
@@ -54,18 +59,18 @@ import { Tabs, TabsContent } from '@rotra/ui/tabs'
 import { toast } from '@rotra/ui/toaster'
 import { TransferLinkCard } from '@rotra/ui/transfer-link-card'
 import { useEffect, useState } from 'react'
-import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
-import { ClubCard } from '@/app/(public)/s/[slug]/_components/club-card/ClubCard'
-import { JoinRequestSheet } from '@/app/(public)/s/[slug]/_components/join-request-sheet/JoinRequestSheet'
-import { MatchHistory } from '@/app/(public)/s/[slug]/_components/match-history/MatchHistory'
-import { MatchRequest } from '@/app/(public)/s/[slug]/_components/match-request/MatchRequest'
-import { useRequestMatchAction } from '@/app/(public)/s/[slug]/_components/match-request/useRequestMatchAction'
-import { MyNight } from '@/app/(public)/s/[slug]/_components/my-night/MyNight'
-import { ParticipantProfile } from '@/app/(public)/s/[slug]/_components/participant-profile/ParticipantProfile'
-import { SessionAwards } from '@/app/(public)/s/[slug]/_components/session-awards/SessionAwards'
-import { SessionInviteSheet } from '@/app/(public)/s/[slug]/_components/session-invite-sheet/SessionInviteSheet'
-import { SessionLeaderboard } from '@/app/(public)/s/[slug]/_components/session-leaderboard/SessionLeaderboard'
-import { PaymentStatusShareDialog } from '@/lib/PaymentStatusShareDialog'
+import { ClubCard } from '../club-card/ClubCard'
+import { JoinRequestSheet } from '../join-request-sheet/JoinRequestSheet'
+import { MatchHistory } from '../match-history/MatchHistory'
+import { MatchRequest } from '../match-request/MatchRequest'
+import { useRequestMatchAction } from '../match-request/useRequestMatchAction'
+import { MyNight } from '../my-night/MyNight'
+import { ParticipantProfile } from '../participant-profile/ParticipantProfile'
+import { PaymentStatusShareDialog } from '../payment-status-share-dialog/PaymentStatusShareDialog'
+import { QueryError } from '../query-error/QueryError'
+import { SessionAwards } from '../session-awards/SessionAwards'
+import { SessionInviteSheet } from '../session-invite-sheet/SessionInviteSheet'
+import { SessionLeaderboard } from '../session-leaderboard/SessionLeaderboard'
 
 export type PublicSessionProps = {
   slug: string
@@ -403,7 +408,7 @@ export function PublicSession({
     setLoginHref(
       playerLoginUrl(
         viewer === 'operator'
-          ? new URL(`/s/${encodeURIComponent(slug)}`, location.origin).href
+          ? new URL(`/s/${encodeURIComponent(slug)}`, sessionLinkOrigin()).href
           : current.href,
       ),
     )
@@ -460,6 +465,7 @@ export function PublicSession({
           : null
       }
       loginHref={loginHref ?? ''}
+      newTab={viewer === 'operator'}
       profileHref={
         barRtrId && playerBase ? `${playerBase}/find/${encodeURIComponent(barRtrId)}` : ''
       }
@@ -657,7 +663,7 @@ export function PublicSession({
   const sessionLink =
     typeof location === 'undefined'
       ? `/s/${encodeURIComponent(slug)}`
-      : new URL(`/s/${encodeURIComponent(slug)}`, location.origin).href
+      : new URL(`/s/${encodeURIComponent(slug)}`, sessionLinkOrigin()).href
   const resultsClub = { name: p.club.name, initials: p.club.initials, logoUrl: p.club.logoUrl }
   // #1012: the transfer link card goes first in the side column. Signing up goes through the
   // session link's registration (identity and RTR ID like any session link), back to this link.
@@ -952,6 +958,7 @@ export function PublicSession({
           open={clubOpen}
           onClose={() => setClubOpen(false)}
           club={{ ...p.club, id: p.club.id, logoUrl: p.club.logoUrl ?? null }}
+          newTab={viewer === 'operator'}
         />
       ) : null}
       {profileViewerId ? (
@@ -959,6 +966,7 @@ export function PublicSession({
           participant={profileOf}
           viewerPlayerId={profileViewerId}
           onClose={() => setProfileOf(null)}
+          newTab={viewer === 'operator'}
         />
       ) : null}
       {signedIn && nightViewer && sessionOpen && p.acceptJoinRequests && night.data?.canInvite ? (

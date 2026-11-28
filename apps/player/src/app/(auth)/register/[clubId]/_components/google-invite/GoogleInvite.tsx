@@ -6,7 +6,7 @@ import { useGoogleRegistration } from '@rotra/data/google-sign-in/useGoogleRegis
 import { useGoogleSignIn } from '@rotra/data/google-sign-in/useGoogleSignIn'
 import { useInviteLanding } from '@rotra/data/google-sign-in/useInviteLanding'
 import { MockError } from '@rotra/data/mock/errors'
-import { queueSessionUrl } from '@rotra/data/player/mySessions'
+import { publicSessionUrl } from '@rotra/data/player/mySessions'
 import { usePlayerProfile } from '@rotra/data/player/usePlayerProfile'
 import type { UnclaimedIdentities } from '@rotra/data/player-account/unclaimed-identity'
 import { useJoinClub } from '@rotra/data/player-club/useJoinClub'
@@ -216,7 +216,7 @@ export function GoogleInvite({
           result.sessionSlug
             ? () =>
                 window.location.assign(
-                  `${queueSessionUrl(result.sessionSlug ?? '')}?join=1${
+                  `${publicSessionUrl(result.sessionSlug ?? '')}?join=1${
                     sessionInviteCode ? `&invite=${encodeURIComponent(sessionInviteCode)}` : ''
                   }`,
                 )

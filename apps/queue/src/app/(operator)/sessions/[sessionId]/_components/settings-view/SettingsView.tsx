@@ -4,6 +4,7 @@ import { courtOpen, queueMasterName } from '@rotra/data/match/match.rules'
 import { REQUEST_FORMAT_PILL } from '@rotra/data/match/matchRequestDecisions'
 import { useSessionMatches } from '@rotra/data/match/useSessionMatches'
 import { allowedRequestFormats } from '@rotra/data/match-request/rules'
+import { sessionLinkOrigin } from '@rotra/data/public-session/context'
 import { recordsGames, sessionScoring } from '@rotra/data/queue-session/types'
 import { useExtendSession } from '@rotra/data/queue-session/useExtendSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -81,9 +82,9 @@ export function SettingsView({
   /** The court whose Change court label dialog is open (its label button in the Courts box) */
   const [labelCourtId, setLabelCourtId] = useState<string | null>(null)
   const [labelError, setLabelError] = useState<string | undefined>()
-  // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
+  // The public link is the Player origin + /s/<publicSlug> (D-2026-11-28-01), known in the browser.
   const [origin, setOrigin] = useState('')
-  useEffect(() => setOrigin(window.location.origin), [])
+  useEffect(() => setOrigin(sessionLinkOrigin()), [])
 
   const s = session.data
   if (session.isError) return <QueryError query={session} title="Couldn't load this session." />
@@ -365,7 +366,7 @@ export function SettingsView({
           link={sessionLink}
           pendingCount={pendingRequests}
           onCopyLink={() => void copyLink()}
-          onOpenAsGuest={() => router.push(publicHref)}
+          onOpenAsGuest={() => window.location.assign(sessionLink)}
           onPreviewPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
         />
         <WhoCanJoinCard

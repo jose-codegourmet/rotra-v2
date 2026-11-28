@@ -8,7 +8,7 @@ export const sessionMatchesSheetMeta = {
     '`onOpenGame` (game id) makes every court open its match page.',
     'session null keeps it closed; the container keeps the chosen session id.',
     'whose is “Your” on your own profile, else the display name (nickname first) with “’s”.',
-    'Session page opens the Queue session page in a new tab; hidden when sessionPageUrl is null (no longer available).',
+    'Session page opens the public session page in the same tab (it lives on the Player app, D-2026-11-28-01); hidden when sessionPageUrl is null (no longer available).',
     'onShareGame and onSharePerformance only on your own profile.',
     'A session with `ranked: false` (Record games off) shows a Not ranked chip after the club; its games count in the record and each carries the not ranked note.',
   ],

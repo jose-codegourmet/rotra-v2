@@ -74,7 +74,9 @@ export function PlayerShell({ children }: { children: ReactNode }) {
     current = 'sign-in'
   }
   // /card/<RTR ID> is framed by rotra.club: the card alone, no top bar or bands.
-  if (pathname.startsWith('/card/')) return <>{children}</>
+  // /s/<slug> is the public session page (D-2026-11-28-01): it keeps its own account bar, as it
+  // looked on the Queue app, with no Player top bar, nav or bands.
+  if (pathname.startsWith('/card/') || pathname.startsWith('/s/')) return <>{children}</>
   const slot =
     realMode && mySessions.data ? playerSessionSlot(mySessions.data.sessions, Date.now()) : null
   const nav: PlayerNavProps = {

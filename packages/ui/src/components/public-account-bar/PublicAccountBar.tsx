@@ -23,8 +23,13 @@ export type PublicAccountBarProps = {
   viewer: PublicAccountViewer | null
   /** The Player login that returns to this page */
   loginHref: string
-  /** The Player's profile in ROTRA Player; opens in a new tab */
+  /** The Player's profile in ROTRA Player */
   profileHref: string
+  /**
+   * Open My ROTRA profile in a new tab (default). The session page on the Player app passes false
+   * (D-2026-11-28-01); the Queue Master's preview keeps the new tab.
+   */
+  newTab?: boolean
   onSignOut: () => void
   /** Sign out is running: the row is disabled so one tap cannot fire twice */
   signingOut?: boolean
@@ -49,6 +54,7 @@ export function PublicAccountBar({
   profileHref,
   onSignOut,
   signingOut = false,
+  newTab = true,
 }: PublicAccountBarProps) {
   return (
     <header className="sticky top-[env(safe-area-inset-top,0px)] z-20 border-b border-border bg-bg/92 backdrop-blur-[8px]">
@@ -117,9 +123,13 @@ export function PublicAccountBar({
                   <DropdownMenu.Item asChild className={cn(rowClass, 'text-fg')}>
                     <a
                       href={profileHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="My ROTRA profile, opens in a new tab"
+                      {...(newTab
+                        ? {
+                            target: '_blank',
+                            rel: 'noopener noreferrer',
+                            'aria-label': 'My ROTRA profile, opens in a new tab',
+                          }
+                        : {})}
                     >
                       <Icon name="user" size={20} className="shrink-0 text-fg2" />
                       <span className="flex-1">My ROTRA profile</span>

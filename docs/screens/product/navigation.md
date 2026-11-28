@@ -98,7 +98,7 @@ Inventory total: **86 surfaces across 19 module specifications**, plus the share
 
 ## Foundation route boundary (approved October 27, 2026)
 
-All apps use `/login`. Queue public session links use `/s/[slug]`; the rest of Queue is protected. The operator preview `/sessions/[sessionId]/public-page` is the one exception to the sign-in redirect: anyone but the owning club is sent to that session's `/s/[slug]` instead of `/login`.
+All apps use `/login`. Public session links use `/s/[slug]` on the Player app ([D-2026-11-28-01](../../mvp/decisions/2026-11-28.md#d-2026-11-28-01)); Queue's `/s/[slug]` permanently redirects there, and the rest of Queue is protected. The operator preview `/sessions/[sessionId]/public-page` is the one exception to the sign-in redirect: anyone but the owning club is sent to that session's `/s/[slug]` instead of `/login`.
 Admin routes except `/login` are protected. Player `/` (leaderboard) and `/players/[playerId]` are
 public; `/home` (P-HOME, November 19, 2026), `/me` and their children are protected. The Foundation proxy wires these boundaries only;
 sign-in forms and the remaining screens arrive in their product tickets.

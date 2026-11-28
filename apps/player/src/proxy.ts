@@ -46,6 +46,8 @@ export async function proxy(request: NextRequest) {
       isGoogleDeadlinePassed(GOOGLE_SIGN_IN_DEADLINE.date) &&
       !GOOGLE_GATE_OPEN_PATHS.includes(path) &&
       !path.startsWith('/api/') &&
+      // The public session page (D-2026-11-28-01) stays open to everyone, as it was on Queue.
+      !path.startsWith('/s/') &&
       !path.startsWith('/_next/') &&
       !/\.[a-z0-9]+$/i.test(path)
     ) {

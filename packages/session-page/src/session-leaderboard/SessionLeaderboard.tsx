@@ -7,7 +7,7 @@ import { SessionStandings } from '@rotra/ui/session-standings'
 import { ShareDialog } from '@rotra/ui/share-dialog'
 import { toast } from '@rotra/ui/toaster'
 import { useState } from 'react'
-import { SessionPodium } from '@/app/(operator)/sessions/[sessionId]/_components/session-podium/SessionPodium'
+import { SessionPodium } from '../session-podium/SessionPodium'
 
 export type SessionLeaderboardProps = {
   rows: PublicStandingRow[]

@@ -294,6 +294,10 @@ func (t *txn) finalize(command pgtype.UUID) ([]signedin.Shortfall, error) {
 	if err := t.q.DeleteQueueSessionReservations(t.ctx, sqlcgen.DeleteQueueSessionReservationsParams{ClubID: t.club, SessionID: t.sess.ID}); err != nil {
 		return nil, err
 	}
+	// D-2026-11-26-01: the planned tubes come off the club's inventory, after the reservation is released and before the jobs (finalization.ts).
+	if err := t.q.DeductPlannedShuttles(t.ctx, sqlcgen.DeductPlannedShuttlesParams{ClubID: t.club, SessionID: t.sess.ID}); err != nil {
+		return nil, err
+	}
 	if err := t.insertJob(sqlcgen.ProjectionKindClubSessionSummaries, summaryVersion, sqlcgen.ProjectionJobStatusDone, now); err != nil {
 		return nil, err
 	}

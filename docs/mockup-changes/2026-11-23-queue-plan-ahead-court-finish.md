@@ -1,6 +1,6 @@
 # Queue app: Plan Ahead and the Playing court card estimate when each court finishes, from the scoring mode
 
-Status: TICKETED — #1061
+Status: IN MOCK APP — #1061
 Date: 2026-11-23
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console Courts (Playing court card), Generate Queue › Plan Ahead (tab description, sort, draft tile status line); helpers `SCORING` (`typical`, `long`), `finishOf()`

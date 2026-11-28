@@ -1,6 +1,6 @@
 # Queue match cards: Win chance per pair, Upset mark, Even game by win chance
 
-Status: NEW
+Status: IN MOCK APP — PR #1175
 Date: 2026-11-27
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `wcChip`, `wcOf`, `wcRating`, `wcBase`, `wcUpset`; `draftTile`, `queueCard`, the Session tab and Courts tab court cards, `historyMatch`

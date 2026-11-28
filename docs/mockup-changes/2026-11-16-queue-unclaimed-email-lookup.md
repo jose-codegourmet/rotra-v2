@@ -1,6 +1,6 @@
 # Queue app: unclaimed players need an email and get an RTR ID; lookup by RTR ID or email only; guest linking removed
 
-Status: TICKETED — #900
+Status: IN MOCK APP — #900
 Date: 2026-11-16
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › sheets `add`, `profile`, `editPlayer`, `invite`, `sameEmail`, `pubProfile`; `reqRow` (join requests); the guest join form; Saved players filters; seed players and `DIRECTORY`

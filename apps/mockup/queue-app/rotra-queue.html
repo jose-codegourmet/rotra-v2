@@ -7870,7 +7870,11 @@ const SHEETS = {
       const typed = sh.qi ?? sh.q ?? '';
       const waiting = typed !== (sh.q || '');
       if (waiting) { clearTimeout(addSearchTimer); addSearchTimer = setTimeout(() => { if (S.ui.sheet === sh) { sh.q = sh.qi; render(); } }, 500); }
-      const matched = saved().filter((p) => !inRoster.has(p.id) && (!q || p.name.toLowerCase().includes(q) || (p.nick || '').toLowerCase().includes(q) || clubNickOf(p).toLowerCase().includes(q) || (p.rtr || '').toLowerCase().includes(q)));
+      // November 27, 2026 (PR #1165): every word typed must appear in the full name, nickname, club nickname or RTR ID, so
+      // "ana sm" and "smith ana" both find Ana Smith.
+      const words = q.split(/\s+/).filter(Boolean);
+      const hits = (p) => { const f = [p.name, p.nick, clubNickOf(p), p.rtr].filter(Boolean).map((v) => v.toLowerCase()); return words.every((w) => f.some((v) => v.includes(w))); };
+      const matched = saved().filter((p) => !inRoster.has(p.id) && hits(p));
       // Owner, November 25, 2026 ("please add filters All, Registered, Unclaimed and Guest"; then "add a skill filter"): two
       // filters over the matches, an account filter and a skill dropdown (level bands, owner's pick). Each option's count applies
       // the other filter, so the counts always match what that option would list. Both are All every time the sheet opens; a
@@ -7885,6 +7889,11 @@ const SHEETS = {
       const list = matched.filter((p) => byWho(who)(p) && byLvl(lvl)(p));
       const added = saved().filter((p) => inRoster.has(p.id)).length;
       const filtered = who !== 'all' || lvl !== 'all';
+      // November 27, 2026 (PR #1165): the list shows 3 rows, then "Show more · N left" adds 3 more. A new search or filter
+      // starts again at the first page.
+      const pageKey = `${q}|${who}|${lvl}`;
+      if (sh.pageKey !== pageKey) { sh.pageKey = pageKey; sh.shown = 3; }
+      const shown = sh.shown || 3;
       // Owner, November 25, 2026 ("add skill label so I know if the player has a registered skill already"): each row shows the
       // club's level for the player with the Saved players level bars, or "No level yet".
       const levelTag = (p) => { const b = p.sugg == null ? 0 : ['beginner', 'intermediate', 'advanced'].indexOf(bandOf(p)) + 1; return `<span class="add-lvl${p.sugg == null ? ' none' : ''}"><span class="lvl-bars b${b}" aria-hidden="true"><i></i><i></i><i></i></span>${p.sugg == null ? 'No level yet' : esc(lvLabel(p.sugg))}</span>`; };
@@ -7892,7 +7901,7 @@ const SHEETS = {
         <div class="add-filters"><div class="seg" role="group" aria-label="Show saved players">${WHO.map(([k, l]) => `<button aria-pressed="${who === k}" data-act="sheetSet" data-k="who" data-v="${k}">${l} · ${countWho(k)}</button>`).join('')}</div>
         <select class="input inline" id="add-lvl" data-bind="ui.sheet.lvl" data-rerender aria-label="Skill">${LVL.map(([k, l]) => `<option value="${k}" ${lvl === k ? 'selected' : ''}>${k === 'all' ? 'Skill: ' : ''}${l} · ${countLvl(k)}</option>`).join('')}</select></div>
         ${added ? `<p class="small muted">${added} saved player${added > 1 ? 's are' : ' is'} already in this session and not listed.</p>` : ''}
-        <div class="sel-list"${waiting ? ' aria-busy="true"' : ''}>${waiting ? `<span class="sr-only" role="status">Searching saved players…</span>${'<div class="opt skel-row" aria-hidden="true"><span class="skel circle"></span><span class="main"><span class="skel line"></span><span class="skel line short"></span></span><span class="skel pill"></span></div>'.repeat(4)}` : list.map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main">${nameB(p)}<div class="small muted add-sub"><span>${idLine(p)}</span>${levelTag(p)}</div></div>${identChip(p)}</button>`).join('') || (filtered && matched.length ? `<div class="empty">No saved player${q ? ' matches these filters' : 's to add with these filters'}. <button class="btn sm" data-act="addClearFilters">Show all</button></div>` : added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
+        <div class="sel-list"${waiting ? ' aria-busy="true"' : ''}>${waiting ? `<span class="sr-only" role="status">Searching saved players…</span>${'<div class="opt skel-row" aria-hidden="true"><span class="skel circle"></span><span class="main"><span class="skel line"></span><span class="skel line short"></span></span><span class="skel pill"></span></div>'.repeat(4)}` : (list.slice(0, shown).map((p) => `<button class="opt" data-act="pickPlayer" data-id="${p.id}">${avatar(p)}<div class="main">${nameB(p)}<div class="small muted add-sub"><span>${idLine(p)}</span>${levelTag(p)}</div></div>${identChip(p)}</button>`).join('') + (list.length > shown ? `<button class="btn sm" data-act="addShowMore">Show more · ${list.length - shown} left</button>` : '')) || (filtered && matched.length ? `<div class="empty">No saved player${q ? ' matches these filters' : 's to add with these filters'}. <button class="btn sm" data-act="addClearFilters">Show all</button></div>` : added && !q ? '<div class="empty">Every saved player is already in this session. Add someone new or search Player Information.</div>' : '<div class="empty">No saved player matches. Try Player Information or add a new player.</div>')}</div>`;
     } else if (tab === 'global') {
       // Exact RTR ID, email or social link (D-2026-11-16-04), or (owner, November 23, 2026) part of an unclaimed player's name.
       const key = (sh.q || '').trim().toLowerCase();
@@ -9473,6 +9482,7 @@ const ACT = {
   removeRoster: (d) => { const s = cur(); s.roster = s.roster.filter((r) => r.pid !== d.pid); save(); render(); toast(`${nm(d.pid)} removed from the roster`); },
   openAdd: () => openSheet({ type: 'add', tab: 'saved', q: '' }),
   addClearFilters: () => { S.ui.sheet.who = 'all'; S.ui.sheet.lvl = 'all'; render(); },
+  addShowMore: () => { S.ui.sheet.shown = (S.ui.sheet.shown || 3) + 3; render(); },
   openAddSaved: () => openSheet({ type: 'add', tab: 'global', q: '', club: true }),
   setGender: (d) => { const sh = S.ui.sheet; if (!sh) return; if (d.path === 'd') sh.d.gender = d.v; else sh.gender = d.v; render(); },
   sheetSet: (d, el) => {

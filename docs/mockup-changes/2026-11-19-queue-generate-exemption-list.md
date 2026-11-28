@@ -1,6 +1,6 @@
 # Queue app: Generate Queue has an exemption list
 
-Status: TICKETED — #1061
+Status: IN MOCK APP — #1061
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `exemptCard()`, `exemptOf()`, `generateDrafts()` pool, `CHANGE.exemptAdd`, `exemptRemove`

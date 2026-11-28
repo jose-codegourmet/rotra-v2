@@ -1,6 +1,6 @@
 # Queue app: matches show a category (Men's, Women's, Mixed, Genderless), and guests and unclaimed players get an optional gender
 
-Status: TICKETED — #1061
+Status: IN MOCK APP — #1061
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `matchCategory()`, `matchLabel()`, `genderField()`, Add player › New player, Edit details, profile dialog

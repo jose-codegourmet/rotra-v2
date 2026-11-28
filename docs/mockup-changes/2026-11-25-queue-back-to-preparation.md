@@ -1,6 +1,6 @@
 # Back to preparation: undo Start before any game begins
 
-Status: TICKETED — #1136
+Status: IN REAL MODE — #1136
 Date: 2026-11-25
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › live console header › ⋯ More for this session › Back to preparation… (SHEETS.backToPrep, ACT.confirmBackToPrep, helper backToPrepBlocker)

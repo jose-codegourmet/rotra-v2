@@ -162,6 +162,40 @@ func (q *Queries) HasQueueAssessment(ctx context.Context, arg HasQueueAssessment
 	return exists, err
 }
 
+const insertHostSessionPlayer = `-- name: InsertHostSessionPlayer :exec
+INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at,
+                             confirmed_at, joined_at, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, false, $7,
+        $7, $7, $8, $8)
+`
+
+type InsertHostSessionPlayerParams struct {
+	ID              pgtype.UUID
+	ClubID          pgtype.UUID
+	SessionID       pgtype.UUID
+	ClubPlayerID    pgtype.UUID
+	PlayerIDAtEntry pgtype.UUID
+	NameSnapshot    string
+	At              pgtype.Timestamptz
+	Now             pgtype.Timestamptz
+}
+
+// sessionPlayer.create of a host with no saved level (assignSessionHostsIn): the slot is taken at @at (the n-th new host of the save is stamped n
+// milliseconds after the first), the row itself is created and touched at @now.
+func (q *Queries) InsertHostSessionPlayer(ctx context.Context, arg InsertHostSessionPlayerParams) error {
+	_, err := q.db.Exec(ctx, insertHostSessionPlayer,
+		arg.ID,
+		arg.ClubID,
+		arg.SessionID,
+		arg.ClubPlayerID,
+		arg.PlayerIDAtEntry,
+		arg.NameSnapshot,
+		arg.At,
+		arg.Now,
+	)
+	return err
+}
+
 const insertQueueSessionHost = `-- name: InsertQueueSessionHost :exec
 INSERT INTO session_hosts (id, club_id, session_id, club_player_id, assigned_at, name_snapshot, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $7)

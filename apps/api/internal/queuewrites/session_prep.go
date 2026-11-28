@@ -323,7 +323,7 @@ type createResult struct {
 	FirstSessionID string `json:"firstSessionId"`
 	Created        int    `json:"created"`
 	Skipped        *int   `json:"skipped"`
-	// Hosts is what the first date's save did with its hosts. The setup save's hostClubPlayerIds is not ported yet (see hosts.go), so it is always null.
+	// Hosts is what the first date's save did with its hosts (hostClubPlayerIds, see hosts.go); null without hosts.
 	Hosts *hostRegistration `json:"hosts"`
 }
 
@@ -365,6 +365,10 @@ func (s *server) createSession(r *http.Request, club pgtype.UUID) (writes.Result
 }
 
 func (t *txn) createSessions(commandID string, in writes.Body) (createResult, error) {
+	hostIDs, hasHosts, err := hostIdsInput(in["hostClubPlayerIds"])
+	if err != nil {
+		return createResult{}, err
+	}
 	existing, err := t.q.GetQueueSessionBySourceCommand(t.ctx, derivedID(commandID, "session:0"))
 	if err == nil {
 		if existing.ClubID != t.club {
@@ -427,6 +431,7 @@ func (t *txn) createSessions(commandID string, in writes.Body) (createResult, er
 		recordGames = false
 	}
 	var first pgtype.UUID
+	var hosts *hostRegistration
 	created := 0
 	for index, date := range occurrences {
 		if date.clash != "" {
@@ -478,13 +483,24 @@ func (t *txn) createSessions(commandID string, in writes.Body) (createResult, er
 		if err != nil {
 			return createResult{}, err
 		}
+		// Q-SETUP > Hosts (#1004): host rows and their roster places in the same transaction, the same hosts for every date of a series.
+		if hasHosts && len(hostIDs) > 0 {
+			t.sess = session
+			placed, err := t.assignHosts(hostIDs, derivedID(commandID, "hosts:"+strconv.Itoa(index)).String(), t.stamp())
+			if err != nil {
+				return createResult{}, err
+			}
+			if hosts == nil {
+				hosts = &placed
+			}
+		}
 		if _, err := t.recomputeMinimum(session); err != nil {
 			return createResult{}, err
 		}
 		created++
 	}
 	skipped := len(occurrences) - created
-	return createResult{FirstSessionID: first.String(), Created: created, Skipped: &skipped}, nil
+	return createResult{FirstSessionID: first.String(), Created: created, Skipped: &skipped, Hosts: hosts}, nil
 }
 
 // patchSession is PATCH /api/sessions/{sessionId}: `{ acceptJoinRequests }` or `{ alwaysRequireRequest }` turns one join
@@ -522,9 +538,13 @@ func (s *server) patchSession(r *http.Request, club pgtype.UUID) (writes.Result,
 	if err := requireClubEntitlement(r.Context(), sqlcgen.New(s.pool), club, s.at()); err != nil {
 		return writes.Result{}, err
 	}
-	in := writes.Body(body.Object("input")) // a list is an object in JavaScript, with none of the fields
+	in := writes.Body(body.Object("input"))                         // a list is an object in JavaScript, with none of the fields
+	hostIDs, hasHosts, err := hostIdsInput(in["hostClubPlayerIds"]) // read before the session is looked up, as the service does
+	if err != nil {
+		return writes.Result{}, err
+	}
 	out, err := s.lockedSession(r.Context(), club, sessionID, false, func(t *txn) (any, error) {
-		return t.updateSession(commandID, body.Text("expectedRevision"), in)
+		return t.updateSession(commandID, body.Text("expectedRevision"), in, hostIDs, hasHosts)
 	})
 	if err != nil {
 		return writes.Result{}, mapDatabaseError(err)
@@ -563,7 +583,7 @@ type updateResult struct {
 // updateSession is updateQueueSession: prepared sessions only, at the expected revision. It reconciles the courts, then applies the
 // new budget first come, first served: entries beyond it are released (kept, never deleted) and moved to the front of the waitlist
 // in their slot order; a larger budget fills from the waitlist.
-func (t *txn) updateSession(commandID, expectedRevision string, in writes.Body) (any, error) {
+func (t *txn) updateSession(commandID, expectedRevision string, in writes.Body, hostIDs []string, hasHosts bool) (any, error) {
 	if err := requireState(t.sess, "Only prepared sessions can be edited.", sqlcgen.QueueSessionStatePrepared); err != nil {
 		return nil, err
 	}
@@ -657,11 +677,20 @@ func (t *txn) updateSession(commandID, expectedRevision string, in writes.Body) 
 			movedIn++
 		}
 	}
+	// Q-SETUP > Hosts (#1004): after the new budget, so new hosts take what is open now.
+	var hosts *hostRegistration
+	if hasHosts {
+		placed, err := t.assignHosts(hostIDs, derivedID(commandID, "hosts").String(), t.stamp())
+		if err != nil {
+			return nil, err
+		}
+		hosts = &placed
+	}
 	session, err = t.recomputeMinimum(session)
 	if err != nil {
 		return nil, err
 	}
-	return updateResult{Session: signedin.SessionOf(session), MovedToWaitlist: len(movedOut), MovedFromWaitlist: movedIn}, nil
+	return updateResult{Session: signedin.SessionOf(session), MovedToWaitlist: len(movedOut), MovedFromWaitlist: movedIn, Hosts: hosts}, nil
 }
 
 // notifyDemoted tells each demoted player who is registered their new place on the waitlist (the other entries are not told).

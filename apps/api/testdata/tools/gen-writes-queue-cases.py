@@ -253,6 +253,29 @@ twice = [saved(CP(1), op_id(10)), new('Newbie', op_id(12), email='eli@example.te
 case('parallel_the_same_batch_twice', {'parallel': [step(S[1], twice), step(S[1], twice)]})
 case('parallel_a_retry_and_its_original_on_a_live_session', {'parallel': [step(S[3], [saved(CP(1), op_id(10))]), step(S[3], [saved(CP(1), op_id(10))])]})
 
+# ---------------------------------------------------------------- add: a new player with a social link (last, so the operation ids above keep their numbers)
+# The social link of a new player (#1019): an entry key like the email, and it wins over the email. The club group has the same cases for POST /api/club/players;
+# both routes share createClubPlayer.
+case('add_new_with_a_social_link', step(S[1], [new('Link Newbie', socialLink='https://facebook.com/Link.Newbie/')]))
+case('add_new_with_a_link_without_a_scheme', step(S[1], [new('Link Newbie', socialLink=' www.fb.com/link.newbie?ref=x#top ')]))
+case('add_new_with_an_instagram_link_and_a_nickname', step(S[1], [new('Link Newbie', nickname='Linky', socialLink='instagram.com/link_newbie')]))
+case('add_new_with_a_link_and_a_phone', step(S[1], [new('Link Newbie', phone='0917 555 0188', socialLink='facebook.com/link.newbie')]))
+case('add_new_with_a_link_and_a_new_email', step(S[1], [new('Link Newbie', email='link.newbie@example.test', socialLink='facebook.com/link.newbie')]))
+case('add_new_with_a_link_and_an_open_entrys_email', step(S[1], [new('Link Newbie', email='eve@example.test', socialLink='facebook.com/link.newbie')]))
+case('add_new_with_a_link_and_a_bad_email', step(S[1], [new('Link Newbie', email='nope', socialLink='facebook.com/link.newbie')]))
+case('add_new_with_a_link_of_an_open_entry_finds_that_person', step(S[1], [new('Eve Open', socialLink='https://facebook.com/eve.open')]), scenario='eve_has_a_link')
+case('add_new_with_a_link_of_an_open_entry_wins_over_the_email', step(S[1], [new('Eve Open', email='someone.else@example.test', socialLink='facebook.com/Eve.Open/')]), scenario='eve_has_a_link')
+case('add_new_with_a_link_the_club_already_saved', step(S[1], [new('Una Again', socialLink='facebook.com/una')]), scenario='una_has_a_link')
+case('add_new_with_a_link_the_club_already_saved_and_an_email', step(S[1], [new('Una Again', email='fresh@example.test', socialLink='fb.com/una/')]), scenario='una_has_a_link')
+case('add_new_with_a_link_of_an_unknown_provider', step(S[1], [new('Bad Link', socialLink='https://example.com/someone')]))
+case('add_new_with_a_bare_site_as_the_link', step(S[1], [new('Bad Link', socialLink='facebook.com')]))
+case('add_new_with_text_that_is_not_a_link', step(S[1], [new('Bad Link', socialLink='nope')]))
+case('add_new_with_a_bad_link_and_a_phone', step(S[1], [new('Bad Link', phone='0917 555 0188', socialLink='nope')]))
+case('add_new_with_a_blank_link_is_a_guest', step(S[1], [new('Blank Link', socialLink='   ')]))
+case('add_new_with_a_link_to_the_waitlist', step(S[2], [new('Link Waiter', socialLink='facebook.com/link.waiter', toWaitlist=True)]))
+case('add_new_with_a_link_retry_same_operation', [step(S[1], [new('Link Newbie', op_id(88), socialLink='facebook.com/link.newbie')], snapshot=True), step(S[1], [new('Link Newbie', op_id(88), socialLink='facebook.com/link.newbie')])])
+case('add_new_with_a_link_twice_under_two_operations', step(S[1], [new('Link Newbie', socialLink='facebook.com/link.newbie'), new('Link Again', socialLink='facebook.com/link.newbie')]))
+
 SNAPSHOT = [
     {'name': 'queue_sessions', 'sql': "SELECT id, state, revision::text AS revision, queue_revision::text AS queue_revision, minimum_games, updated_at FROM queue_sessions ORDER BY id"},
     {'name': 'session_players', 'sql': "SELECT id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at, (SELECT a.source_operation_id FROM club_assessments a WHERE a.id = session_players.assessment_id) AS assessment_operation_id, skill_level_id, level_locked_at, confirmed_at, joined_at, over_budget_at, released_at, release_reason, no_show_at, revision::text AS revision, created_at, updated_at FROM session_players ORDER BY id"},
@@ -277,6 +300,9 @@ SCENARIOS = {
     's2_free_slot': [f"UPDATE session_players SET released_at = TIMESTAMPTZ '2026-11-16 00:00:00+00', release_reason = 'removed' WHERE id = '{SP(3)}'"],
     # Kai was taken off the live waitlist; the live night has no free slot (a fourth player is in).
     'kai_not_waiting': ["DELETE FROM session_waitlist WHERE id = 'a3300000-0000-4000-8000-000000000002'"],
+    # Una's and Eve's shared entries carry a social link key (club group, same seed rows).
+    'una_has_a_link': ["UPDATE shared_player_entries SET social_key = 'facebook.com/una' WHERE id = 'a6000000-0000-4000-8000-000000000007'"],
+    'eve_has_a_link': ["UPDATE shared_player_entries SET social_key = 'facebook.com/eve.open' WHERE id = 'a6000000-0000-4000-8000-000000000009'"],
     's3_full': [f"INSERT INTO session_players (id, club_id, session_id, club_player_id, name_snapshot, present, present_changed_at, assessment_id, skill_level_id, level_locked_at, confirmed_at, joined_at, created_at, updated_at, revision) VALUES ('{SP(9)}', 'c9000000-0000-4000-8000-000000000001', '{S[3]}', '{CP(12)}', 'Lee Guest', true, TIMESTAMPTZ '2026-11-19 01:08:00+00', 'a0300000-0000-4000-8000-000000000199', 3, TIMESTAMPTZ '2026-11-19 01:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-18 04:00:00+00', TIMESTAMPTZ '2026-11-19 01:08:00+00', 3)"],
 }
 

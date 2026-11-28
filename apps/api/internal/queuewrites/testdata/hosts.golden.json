@@ -5411,5 +5411,4035 @@
         }
       ]
     }
+  },
+  "setup_create_without_a_host_list_answers_no_hosts": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": 0,
+          "hosts": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_an_empty_host_list_answers_no_hosts": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": 0,
+          "hosts": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_null_host_list": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": 0,
+          "hosts": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_one_trusted_host": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": 0,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "accepted_revision": "1",
+          "session_player_id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "source_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "5d892207-bd49-8aad-a039-ed8a8c12b7b9",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_trusted_host_with_no_level": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": 0,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "651d6454-f236-8077-9de3-04cc6e80c27a",
+          "present": false,
+          "revision": "1",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": null,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": null
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "0a700e16-9597-8af7-8f76-98e25d4cf3e5",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_hosts_beyond_the_slots_waits_on_the_waitlist": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": 0,
+          "hosts": {
+            "registered": 2,
+            "waitlisted": 1
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "2ec4a939-c7cc-827b-bbf6-29c96ec5c4e1",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "61d566c8-15c4-8a77-b9ea-0d6ff28054e0"
+        },
+        {
+          "id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "skill_level_id": 4,
+          "accepted_revision": "1",
+          "session_player_id": "2ec4a939-c7cc-827b-bbf6-29c96ec5c4e1",
+          "source_operation_id": "61d566c8-15c4-8a77-b9ea-0d6ff28054e0",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        },
+        {
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "accepted_revision": "1",
+          "session_player_id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "source_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [
+        {
+          "id": "b9ee14ac-abb8-8215-8364-398c51121735",
+          "added_at": "2026-11-19T04:00:00.002+00:00",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "demoted_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "skill_level_id": null,
+          "demoted_confirmed_at": null
+        }
+      ],
+      "session_waitlist (removed)": [],
+      "player_notifications": [
+        {
+          "body": "You're number 1. We'll tell you if a spot opens.",
+          "kind": "session",
+          "title": "You're on the waitlist for Saturday Smash",
+          "target": "/players/d4000000-0000-4000-8000-000000000001/sessions",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "source_id": "b9ee14ac-abb8-8215-8364-398c51121735",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "session_waitlist_entry"
+        }
+      ],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "533ae419-5a8a-8532-b01e-12023a4aa294",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00.002+00:00",
+          "name_snapshot": "Ann Reyes",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003"
+        },
+        {
+          "id": "5d892207-bd49-8aad-a039-ed8a8c12b7b9",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        },
+        {
+          "id": "398730a3-3a21-85de-bbc2-91fd8f43c8a8",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00.001+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_host_with_a_level_beyond_the_slots_waits_with_the_level": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": 0,
+          "hosts": {
+            "registered": 2,
+            "waitlisted": 1
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "6129af36-fbd3-8e41-b5ec-47ed3f07aad9",
+          "present": false,
+          "revision": "1",
+          "joined_at": "2026-11-19T04:00:00.001+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00.001+00:00",
+          "name_snapshot": "Kai Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000011",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": null,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00.001+00:00",
+          "assessment_operation_id": null
+        },
+        {
+          "id": "651d6454-f236-8077-9de3-04cc6e80c27a",
+          "present": false,
+          "revision": "1",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": null,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": null
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [
+        {
+          "id": "21b521a6-33c1-8a1b-bb8f-79bb248b1e37",
+          "added_at": "2026-11-19T04:00:00.002+00:00",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "demoted_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "demoted_confirmed_at": null
+        }
+      ],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "0a700e16-9597-8af7-8f76-98e25d4cf3e5",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Gus Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "5d892207-bd49-8aad-a039-ed8a8c12b7b9",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00.002+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        },
+        {
+          "id": "018df753-19d0-8aa6-9fc9-1854793aabaf",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00.001+00:00",
+          "name_snapshot": "Kai Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000011"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_an_untrusted_player": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "hosts": "Ben Santos is not a trusted host. Pick them again to add them to your trusted hosts."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_trusted_host_then_an_untrusted_player_places_nobody": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "hosts": "Ben Santos is not a trusted host. Pick them again to add them to your trusted hosts."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_duplicate_host_counts_it_once": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": 0,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "accepted_revision": "1",
+          "session_player_id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "source_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "5d892207-bd49-8aad-a039-ed8a8c12b7b9",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_host_whose_trust_ended": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "hosts": "Ivy Guest is not a trusted host. Pick them again to add them to your trusted hosts."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_deleted_saved_player": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "A host is no longer one of your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_an_unknown_player": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "A host is no longer one of your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_another_clubs_player": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "A host is no longer one of your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_host_list_that_is_not_a_list": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "Pick hosts from your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_host_that_is_not_an_id": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "Pick hosts from your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_host_that_is_not_text": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "Pick hosts from your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_an_id_in_capitals_is_not_found": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "A host is no longer one of your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_bad_host_list_and_a_bad_form_reads_the_hosts_first": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "Pick hosts from your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_hosts_needs_an_entitlement": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "entitlement_required",
+            "message": "This club does not have an active license."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_a_series_gives_every_date_the_hosts": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 3,
+          "skipped": 0,
+          "hosts": {
+            "registered": 2,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        },
+        {
+          "id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        },
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "28be461f-e5ac-8460-8d3a-8210d605668d",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "9cf069ee-09e7-8eb7-bfcc-ea919c216ba3"
+        },
+        {
+          "id": "2ec4a939-c7cc-827b-bbf6-29c96ec5c4e1",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "61d566c8-15c4-8a77-b9ea-0d6ff28054e0"
+        },
+        {
+          "id": "34414427-5dd8-809d-9e12-58ac456459f3",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "1ffcc4ea-9a2a-8925-a8b9-cf65fd24e4b2"
+        },
+        {
+          "id": "550fab41-13a4-8e2c-91e5-6878f4a614a8",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "8c3d0379-afd4-8188-9f9b-5b3ef50ec187"
+        },
+        {
+          "id": "d0bfabd6-e5e6-8669-8683-3424a63e9def",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "4dff1257-35b8-87f4-8444-653da7ee8e58"
+        },
+        {
+          "id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "skill_level_id": 4,
+          "accepted_revision": "1",
+          "session_player_id": "34414427-5dd8-809d-9e12-58ac456459f3",
+          "source_operation_id": "1ffcc4ea-9a2a-8925-a8b9-cf65fd24e4b2",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        },
+        {
+          "session_id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "accepted_revision": "1",
+          "session_player_id": "d0bfabd6-e5e6-8669-8683-3424a63e9def",
+          "source_operation_id": "4dff1257-35b8-87f4-8444-653da7ee8e58",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        },
+        {
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "skill_level_id": 4,
+          "accepted_revision": "1",
+          "session_player_id": "2ec4a939-c7cc-827b-bbf6-29c96ec5c4e1",
+          "source_operation_id": "61d566c8-15c4-8a77-b9ea-0d6ff28054e0",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        },
+        {
+          "session_id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "accepted_revision": "1",
+          "session_player_id": "550fab41-13a4-8e2c-91e5-6878f4a614a8",
+          "source_operation_id": "8c3d0379-afd4-8188-9f9b-5b3ef50ec187",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        },
+        {
+          "session_id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "skill_level_id": 4,
+          "accepted_revision": "1",
+          "session_player_id": "28be461f-e5ac-8460-8d3a-8210d605668d",
+          "source_operation_id": "9cf069ee-09e7-8eb7-bfcc-ea919c216ba3",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        },
+        {
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "accepted_revision": "1",
+          "session_player_id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "source_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "e9afb0a3-050b-8086-874f-451158c7d49f",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        },
+        {
+          "id": "e0ae53d9-eb17-8ba0-8852-39d176ce276d",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00.001+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008"
+        },
+        {
+          "id": "7cc43f07-ae32-83ff-a2f7-688e2fbe93e7",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        },
+        {
+          "id": "e6fc3aba-3c43-8483-ad1b-4e7d4aed2ff4",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00.001+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008"
+        },
+        {
+          "id": "5d892207-bd49-8aad-a039-ed8a8c12b7b9",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        },
+        {
+          "id": "398730a3-3a21-85de-bbc2-91fd8f43c8a8",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00.001+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_a_series_with_a_clashing_date_answers_the_first_date_made": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "created": 2,
+          "skipped": 1,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        },
+        {
+          "id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "550fab41-13a4-8e2c-91e5-6878f4a614a8",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "8c3d0379-afd4-8188-9f9b-5b3ef50ec187"
+        },
+        {
+          "id": "d0bfabd6-e5e6-8669-8683-3424a63e9def",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "4dff1257-35b8-87f4-8444-653da7ee8e58"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "accepted_revision": "1",
+          "session_player_id": "d0bfabd6-e5e6-8669-8683-3424a63e9def",
+          "source_operation_id": "4dff1257-35b8-87f4-8444-653da7ee8e58",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        },
+        {
+          "session_id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "accepted_revision": "1",
+          "session_player_id": "550fab41-13a4-8e2c-91e5-6878f4a614a8",
+          "source_operation_id": "8c3d0379-afd4-8188-9f9b-5b3ef50ec187",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "e9afb0a3-050b-8086-874f-451158c7d49f",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "c2cf78ad-3611-89bb-af0e-52df4c3209ce",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        },
+        {
+          "id": "7cc43f07-ae32-83ff-a2f7-688e2fbe93e7",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "c2e0662b-c857-8707-b913-af98c8c37764",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_that_clashes_places_no_host": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "schedule": "Time clash: Prep Open runs 1:00 AM–5:00 AM at . Pick another date or time."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_retry_answers_no_hosts": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": 0,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 0
+          }
+        }
+      },
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": null,
+          "hosts": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 2,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "accepted_revision": "1",
+          "session_player_id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "source_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "5d892207-bd49-8aad-a039-ed8a8c12b7b9",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_create_with_a_host_recomputes_a_calculated_minimum": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "firstSessionId": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "created": 1,
+          "skipped": 0,
+          "hosts": {
+            "registered": 2,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "state": "prepared",
+          "revision": "1",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [],
+      "session_players": [
+        {
+          "id": "2ec4a939-c7cc-827b-bbf6-29c96ec5c4e1",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "61d566c8-15c4-8a77-b9ea-0d6ff28054e0"
+        },
+        {
+          "id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "skill_level_id": 4,
+          "accepted_revision": "1",
+          "session_player_id": "2ec4a939-c7cc-827b-bbf6-29c96ec5c4e1",
+          "source_operation_id": "61d566c8-15c4-8a77-b9ea-0d6ff28054e0",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        },
+        {
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007",
+          "skill_level_id": 3,
+          "accepted_revision": "1",
+          "session_player_id": "e6bcd521-6943-81bb-90f3-632fa4c260b9",
+          "source_operation_id": "feb2e9a7-16ac-804b-b347-c5a02ed390a3",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "5d892207-bd49-8aad-a039-ed8a8c12b7b9",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        },
+        {
+          "id": "398730a3-3a21-85de-bbc2-91fd8f43c8a8",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "e8289c83-0600-8b58-bed1-d621d5ce4f50",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00.001+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_without_a_host_list_answers_no_hosts_and_keeps_the_hosts": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 40,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "6"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 40,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_with_a_null_host_list_keeps_the_hosts": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 40,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "6"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 40,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_with_the_same_hosts_changes_nothing": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 40,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "6"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": {
+            "registered": 0,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 40,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_with_an_empty_list_ends_every_host": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 40,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "6"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": {
+            "registered": 0,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 40,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "a5200000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "frozen_at": null,
+          "created_at": "2026-11-15T00:00:00+00:00",
+          "removed_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ],
+      "session_hosts (removed)": [
+        {
+          "id": "a5200000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-15T00:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-15T00:00:00+00:00",
+          "assigned_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ]
+    }
+  },
+  "setup_edit_adds_one_trusted_host": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 20,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "6"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "ced4d26c-928c-8cfc-9fa0-34feaa15fa3d",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "e2e54cd1-161b-8d74-bdc0-08826881c0bf"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "skill_level_id": 4,
+          "accepted_revision": "6",
+          "session_player_id": "ced4d26c-928c-8cfc-9fa0-34feaa15fa3d",
+          "source_operation_id": "e2e54cd1-161b-8d74-bdc0-08826881c0bf",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "8ee8f2bc-8753-8438-b3a9-ffe8ed340e3f",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_adds_a_host_and_removes_another": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 20,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "6"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 1
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "ced4d26c-928c-8cfc-9fa0-34feaa15fa3d",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "e2e54cd1-161b-8d74-bdc0-08826881c0bf"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "skill_level_id": 4,
+          "accepted_revision": "6",
+          "session_player_id": "ced4d26c-928c-8cfc-9fa0-34feaa15fa3d",
+          "source_operation_id": "e2e54cd1-161b-8d74-bdc0-08826881c0bf",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [
+        {
+          "id": "80f3fa2b-0441-8ef3-b3c6-b7b624e219f8",
+          "added_at": "2026-11-19T04:00:00.001+00:00",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "demoted_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "skill_level_id": null,
+          "demoted_confirmed_at": null
+        }
+      ],
+      "session_waitlist (removed)": [],
+      "player_notifications": [
+        {
+          "body": "You're number 1. We'll tell you if a spot opens.",
+          "kind": "session",
+          "title": "You're on the waitlist for Prep Open",
+          "target": "/players/d4000000-0000-4000-8000-000000000001/sessions",
+          "read_at": null,
+          "player_id": "d4000000-0000-4000-8000-000000000001",
+          "source_id": "80f3fa2b-0441-8ef3-b3c6-b7b624e219f8",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "source_type": "session_waitlist_entry"
+        }
+      ],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "31dc098c-347a-8add-8360-db7e5e4ad44b",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00.001+00:00",
+          "name_snapshot": "Ann Reyes",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003"
+        },
+        {
+          "id": "a5200000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "frozen_at": null,
+          "created_at": "2026-11-15T00:00:00+00:00",
+          "removed_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        },
+        {
+          "id": "8ee8f2bc-8753-8438-b3a9-ffe8ed340e3f",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008"
+        }
+      ],
+      "session_hosts (removed)": [
+        {
+          "id": "a5200000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-15T00:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-15T00:00:00+00:00",
+          "assigned_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ]
+    }
+  },
+  "setup_edit_removes_the_host_and_keeps_the_roster_place": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 20,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "6"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "70a3282a-e04a-8cf2-921a-7beb3c09f1b2",
+          "present": false,
+          "revision": "1",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ann Reyes",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": null,
+          "level_locked_at": null,
+          "player_id_at_entry": "d4000000-0000-4000-8000-000000000001",
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": null
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "31dc098c-347a-8add-8360-db7e5e4ad44b",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ann Reyes",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003"
+        },
+        {
+          "id": "a5200000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "frozen_at": null,
+          "created_at": "2026-11-15T00:00:00+00:00",
+          "removed_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ],
+      "session_hosts (removed)": [
+        {
+          "id": "a5200000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-15T00:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-15T00:00:00+00:00",
+          "assigned_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ]
+    }
+  },
+  "setup_edit_lists_players_already_on_the_roster_and_the_waitlist_makes_no_second_registration": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000002",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Full",
+            "notes": "",
+            "scheduledStartAt": "2026-11-23T02:00:00.000Z",
+            "scheduledEndAt": "2026-11-23T03:30:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 6,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-full",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "9007199254740994"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": {
+            "registered": 0,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000002",
+          "state": "prepared",
+          "revision": "9007199254740994",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 6,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000002",
+          "state": "prepared",
+          "revision": "9007199254740993",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 3,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "31dc098c-347a-8add-8360-db7e5e4ad44b",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00.001+00:00",
+          "name_snapshot": "Ann Reyes",
+          "club_player_id": "c6000000-0000-4000-8000-000000000003"
+        },
+        {
+          "id": "542b7451-0f11-8eea-b4ac-1ea9fe885ef3",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_with_an_untrusted_player": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "hosts": "Ben Santos is not a trusted host. Pick them again to add them to your trusted hosts."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_with_an_untrusted_player_ends_no_host": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "hosts": "Ben Santos is not a trusted host. Pick them again to add them to your trusted hosts."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_with_a_deleted_saved_player": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "A host is no longer one of your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_with_an_unknown_player": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "A host is no longer one of your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_with_a_duplicate_host": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 20,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "6"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "ced4d26c-928c-8cfc-9fa0-34feaa15fa3d",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "e2e54cd1-161b-8d74-bdc0-08826881c0bf"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "skill_level_id": 4,
+          "accepted_revision": "6",
+          "session_player_id": "ced4d26c-928c-8cfc-9fa0-34feaa15fa3d",
+          "source_operation_id": "e2e54cd1-161b-8d74-bdc0-08826881c0bf",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "a5200000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "frozen_at": null,
+          "created_at": "2026-11-15T00:00:00+00:00",
+          "removed_at": "2026-11-19T04:00:00+00:00",
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        },
+        {
+          "id": "8ee8f2bc-8753-8438-b3a9-ffe8ed340e3f",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008"
+        }
+      ],
+      "session_hosts (removed)": [
+        {
+          "id": "a5200000-0000-4000-8000-000000000001",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-15T00:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-15T00:00:00+00:00",
+          "assigned_at": "2026-11-15T00:00:00+00:00",
+          "name_snapshot": "Hal Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000007"
+        }
+      ]
+    }
+  },
+  "setup_edit_with_a_host_list_that_is_not_a_list": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "Pick hosts from your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_with_a_host_that_is_not_an_id": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "Pick hosts from your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_reads_the_host_list_before_the_revision": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "Pick hosts from your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_reads_the_host_list_before_the_session_is_found": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "hosts": "Pick hosts from your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_hosts_with_a_stale_revision": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_a_host_takes_what_the_new_budget_leaves_open": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 20,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "6"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "ced4d26c-928c-8cfc-9fa0-34feaa15fa3d",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "e2e54cd1-161b-8d74-bdc0-08826881c0bf"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "skill_level_id": 4,
+          "accepted_revision": "6",
+          "session_player_id": "ced4d26c-928c-8cfc-9fa0-34feaa15fa3d",
+          "source_operation_id": "e2e54cd1-161b-8d74-bdc0-08826881c0bf",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "8ee8f2bc-8753-8438-b3a9-ffe8ed340e3f",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_with_hosts_needs_an_entitlement": {
+    "steps": [
+      {
+        "status": 403,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "entitlement_required",
+            "message": "This club does not have an active license."
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_retry_of_the_same_command_places_the_host_once": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 20,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "6"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": {
+            "registered": 1,
+            "waitlisted": 0
+          }
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "session": {
+            "id": "a3000000-0000-4000-8000-000000000001",
+            "clubId": "c9000000-0000-4000-8000-000000000001",
+            "title": "Prep Open",
+            "notes": "",
+            "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+            "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+            "venueId": "a5000000-0000-4000-8000-000000000001",
+            "venueName": "Smash Hall",
+            "venueAddress": "Cebu City",
+            "state": "prepared",
+            "invalidReason": null,
+            "cancelledAt": null,
+            "cancelReason": null,
+            "sessionMode": "fair",
+            "allowSingles": true,
+            "allowDoubles": true,
+            "minimumGames": 20,
+            "minimumIsCalculated": true,
+            "playersPerCourt": 2,
+            "expectedPlayers": null,
+            "startedAt": null,
+            "plannedBeforeStart": null,
+            "finalizedAt": null,
+            "seriesId": null,
+            "publicSlug": "prep-open",
+            "acceptJoinRequests": true,
+            "alwaysRequireRequest": false,
+            "courtFillMode": "manual",
+            "requestFormats": {
+              "doubles": true,
+              "singles": false,
+              "fun_1v2": false,
+              "fun_3v3": false,
+              "fun_4v4": false,
+              "fun_5v5": false
+            },
+            "recordGames": true,
+            "levelRestriction": {
+              "kind": "all"
+            },
+            "revision": "7"
+          },
+          "movedToWaitlist": 0,
+          "movedFromWaitlist": 0,
+          "hosts": {
+            "registered": 0,
+            "waitlisted": 0
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "7",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "ced4d26c-928c-8cfc-9fa0-34feaa15fa3d",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 4,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "e2e54cd1-161b-8d74-bdc0-08826881c0bf"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008",
+          "skill_level_id": 4,
+          "accepted_revision": "6",
+          "session_player_id": "ced4d26c-928c-8cfc-9fa0-34feaa15fa3d",
+          "source_operation_id": "e2e54cd1-161b-8d74-bdc0-08826881c0bf",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [
+        {
+          "id": "8ee8f2bc-8753-8438-b3a9-ffe8ed340e3f",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "frozen_at": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "assigned_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Ivy Guest",
+          "club_player_id": "c6000000-0000-4000-8000-000000000008"
+        }
+      ],
+      "session_hosts (removed)": []
+    }
+  },
+  "setup_edit_hosts_of_a_live_session_is_refused": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "state": "Only prepared sessions can be edited."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "club_trusted_hosts": [],
+      "club_trusted_hosts (removed)": [],
+      "session_hosts": [],
+      "session_hosts (removed)": []
+    }
   }
 }

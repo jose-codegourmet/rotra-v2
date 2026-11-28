@@ -26411,5 +26411,3456 @@
       "admin_audit_events": [],
       "admin_audit_events (removed)": []
     }
+  },
+  "add_new_with_a_social_link": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000141",
+              "op": "add",
+              "rosterEntry": {
+                "id": "9a851efb-bc9e-822a-a5a9-a480e0614944",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "1954dfd6-5f28-861a-8b71-df86c7c1ff4a",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": "unclaimed · RTR-PH-CEB-111926-0001",
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "9a851efb-bc9e-822a-a5a9-a480e0614944",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "1954dfd6-5f28-861a-8b71-df86c7c1ff4a",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "9a851efb-bc9e-822a-a5a9-a480e0614944",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Link Newbie",
+          "club_player_id": "1954dfd6-5f28-861a-8b71-df86c7c1ff4a",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b0000000-0000-4000-8000-000000000141"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "1954dfd6-5f28-861a-8b71-df86c7c1ff4a",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "9a851efb-bc9e-822a-a5a9-a480e0614944",
+          "source_operation_id": "b0000000-0000-4000-8000-000000000141",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "1954dfd6-5f28-861a-8b71-df86c7c1ff4a",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "1954dfd6-5f28-861a-8b71-df86c7c1ff4a"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_without_a_scheme": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000142",
+              "op": "add",
+              "rosterEntry": {
+                "id": "bd4086f0-ab80-828c-967a-d66342ffe46f",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "ce0b0978-73e6-8808-b019-ee65f47dc5b8",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": "unclaimed · RTR-PH-CEB-111926-0001",
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "bd4086f0-ab80-828c-967a-d66342ffe46f",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "ce0b0978-73e6-8808-b019-ee65f47dc5b8",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "bd4086f0-ab80-828c-967a-d66342ffe46f",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Link Newbie",
+          "club_player_id": "ce0b0978-73e6-8808-b019-ee65f47dc5b8",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b0000000-0000-4000-8000-000000000142"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "ce0b0978-73e6-8808-b019-ee65f47dc5b8",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "bd4086f0-ab80-828c-967a-d66342ffe46f",
+          "source_operation_id": "b0000000-0000-4000-8000-000000000142",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "ce0b0978-73e6-8808-b019-ee65f47dc5b8",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "ce0b0978-73e6-8808-b019-ee65f47dc5b8"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_an_instagram_link_and_a_nickname": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000143",
+              "op": "add",
+              "rosterEntry": {
+                "id": "4f167f60-5084-87b1-830b-5102be5a075d",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "94a65d0c-f48c-84cc-bc3c-422d20e95ce8",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": "Linky",
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": "unclaimed · RTR-PH-CEB-111926-0001",
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "4f167f60-5084-87b1-830b-5102be5a075d",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "94a65d0c-f48c-84cc-bc3c-422d20e95ce8",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": "Linky",
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "4f167f60-5084-87b1-830b-5102be5a075d",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Link Newbie",
+          "club_player_id": "94a65d0c-f48c-84cc-bc3c-422d20e95ce8",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b0000000-0000-4000-8000-000000000143"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "94a65d0c-f48c-84cc-bc3c-422d20e95ce8",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "4f167f60-5084-87b1-830b-5102be5a075d",
+          "source_operation_id": "b0000000-0000-4000-8000-000000000143",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "94a65d0c-f48c-84cc-bc3c-422d20e95ce8",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": "Linky",
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "94a65d0c-f48c-84cc-bc3c-422d20e95ce8"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_and_a_phone": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000144",
+              "op": "add",
+              "rosterEntry": {
+                "id": "e8fd3842-f8ec-86ee-b551-76ed6ada217d",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "5c5e608b-33a5-81c6-a9d6-aef1bbe65342",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": "unclaimed · RTR-PH-CEB-111926-0001",
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "e8fd3842-f8ec-86ee-b551-76ed6ada217d",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "5c5e608b-33a5-81c6-a9d6-aef1bbe65342",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "e8fd3842-f8ec-86ee-b551-76ed6ada217d",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Link Newbie",
+          "club_player_id": "5c5e608b-33a5-81c6-a9d6-aef1bbe65342",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b0000000-0000-4000-8000-000000000144"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "5c5e608b-33a5-81c6-a9d6-aef1bbe65342",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "e8fd3842-f8ec-86ee-b551-76ed6ada217d",
+          "source_operation_id": "b0000000-0000-4000-8000-000000000144",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "5c5e608b-33a5-81c6-a9d6-aef1bbe65342",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": "+639175550188",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "5c5e608b-33a5-81c6-a9d6-aef1bbe65342"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_and_a_new_email": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000145",
+              "op": "add",
+              "rosterEntry": {
+                "id": "bd4b4480-0cdf-8f6e-aa66-3ad42f9213c8",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6a4d1e5-2702-89d4-acd8-31e692a1883e",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": "unclaimed · RTR-PH-CEB-111926-0001",
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "bd4b4480-0cdf-8f6e-aa66-3ad42f9213c8",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6a4d1e5-2702-89d4-acd8-31e692a1883e",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "bd4b4480-0cdf-8f6e-aa66-3ad42f9213c8",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Link Newbie",
+          "club_player_id": "c6a4d1e5-2702-89d4-acd8-31e692a1883e",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b0000000-0000-4000-8000-000000000145"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "c6a4d1e5-2702-89d4-acd8-31e692a1883e",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "bd4b4480-0cdf-8f6e-aa66-3ad42f9213c8",
+          "source_operation_id": "b0000000-0000-4000-8000-000000000145",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "c6a4d1e5-2702-89d4-acd8-31e692a1883e",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "c6a4d1e5-2702-89d4-acd8-31e692a1883e"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": "link.newbie@example.test",
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_and_an_open_entrys_email": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000146",
+              "op": "add",
+              "rosterEntry": {
+                "id": "28858041-7cb2-876a-befc-5c2bc75b62f6",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "119a163f-4ddc-8a6f-b860-2c8e6dbb7194",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": "unclaimed · RTR-PH-CEB-111926-0001",
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "28858041-7cb2-876a-befc-5c2bc75b62f6",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "119a163f-4ddc-8a6f-b860-2c8e6dbb7194",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "28858041-7cb2-876a-befc-5c2bc75b62f6",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Link Newbie",
+          "club_player_id": "119a163f-4ddc-8a6f-b860-2c8e6dbb7194",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b0000000-0000-4000-8000-000000000146"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "119a163f-4ddc-8a6f-b860-2c8e6dbb7194",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "28858041-7cb2-876a-befc-5c2bc75b62f6",
+          "source_operation_id": "b0000000-0000-4000-8000-000000000146",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "119a163f-4ddc-8a6f-b860-2c8e6dbb7194",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "119a163f-4ddc-8a6f-b860-2c8e6dbb7194"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_and_a_bad_email": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "email": "Enter an email address, like name@example.com, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_of_an_open_entry_finds_that_person": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000148",
+              "op": "add",
+              "rosterEntry": {
+                "id": "e5ff0f43-5f45-8bc0-8429-9632fe4a4250",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "07ffadf8-79d8-89b8-b793-5048c67870a6",
+                "nameSnapshot": "Eve Open",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": "already on ROTRA · RTR-PH-CEB-102926-0009",
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "e5ff0f43-5f45-8bc0-8429-9632fe4a4250",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "07ffadf8-79d8-89b8-b793-5048c67870a6",
+                "nameSnapshot": "Eve Open",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "e5ff0f43-5f45-8bc0-8429-9632fe4a4250",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Eve Open",
+          "club_player_id": "07ffadf8-79d8-89b8-b793-5048c67870a6",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b0000000-0000-4000-8000-000000000148"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "07ffadf8-79d8-89b8-b793-5048c67870a6",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "e5ff0f43-5f45-8bc0-8429-9632fe4a4250",
+          "source_operation_id": "b0000000-0000-4000-8000-000000000148",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "07ffadf8-79d8-89b8-b793-5048c67870a6",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Eve Open",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0009",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "07ffadf8-79d8-89b8-b793-5048c67870a6"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_of_an_open_entry_wins_over_the_email": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000149",
+              "op": "add",
+              "rosterEntry": {
+                "id": "67a2a179-d420-806f-9607-60687a881cf1",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "4d81caec-4be3-8fde-9503-8cfaabe7c99f",
+                "nameSnapshot": "Eve Open",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": "already on ROTRA · RTR-PH-CEB-102926-0009",
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "67a2a179-d420-806f-9607-60687a881cf1",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "4d81caec-4be3-8fde-9503-8cfaabe7c99f",
+                "nameSnapshot": "Eve Open",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "67a2a179-d420-806f-9607-60687a881cf1",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Eve Open",
+          "club_player_id": "4d81caec-4be3-8fde-9503-8cfaabe7c99f",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b0000000-0000-4000-8000-000000000149"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "4d81caec-4be3-8fde-9503-8cfaabe7c99f",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "67a2a179-d420-806f-9607-60687a881cf1",
+          "source_operation_id": "b0000000-0000-4000-8000-000000000149",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "4d81caec-4be3-8fde-9503-8cfaabe7c99f",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Eve Open",
+          "shared_entry_rtr_id": "RTR-PH-CEB-102926-0009",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "4d81caec-4be3-8fde-9503-8cfaabe7c99f"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_the_club_already_saved": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "socialLink": "That social link is already Una Alonzo in your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_the_club_already_saved_and_an_email": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "socialLink": "That social link is already Una Alonzo in your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_of_an_unknown_provider": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "socialLink": "Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_bare_site_as_the_link": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "socialLink": "Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_text_that_is_not_a_link": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "socialLink": "Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_bad_link_and_a_phone": {
+    "steps": [
+      {
+        "status": 422,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "invalid",
+            "message": "Check the details and try again.",
+            "fields": {
+              "socialLink": "Enter a Facebook, Instagram, YouTube or LinkedIn profile link, or leave it empty."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_blank_link_is_a_guest": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000156",
+              "op": "add",
+              "rosterEntry": {
+                "id": "492d7ef5-75c5-8809-bd87-c8d79da7760b",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "ebf56602-b4e5-8ddd-8716-4d7468961bea",
+                "nameSnapshot": "Blank Link",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": null,
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "492d7ef5-75c5-8809-bd87-c8d79da7760b",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "ebf56602-b4e5-8ddd-8716-4d7468961bea",
+                "nameSnapshot": "Blank Link",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "6",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "492d7ef5-75c5-8809-bd87-c8d79da7760b",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Blank Link",
+          "club_player_id": "ebf56602-b4e5-8ddd-8716-4d7468961bea",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b0000000-0000-4000-8000-000000000156"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "ebf56602-b4e5-8ddd-8716-4d7468961bea",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "492d7ef5-75c5-8809-bd87-c8d79da7760b",
+          "source_operation_id": "b0000000-0000-4000-8000-000000000156",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "ebf56602-b4e5-8ddd-8716-4d7468961bea",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "1",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Blank Link",
+          "shared_entry_rtr_id": null,
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_to_the_waitlist": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000157",
+              "op": "add",
+              "rosterEntry": null,
+              "waitlist": {
+                "id": "3082ec40-3107-88cf-aa40-db32c72f5e85",
+                "sessionId": "a3000000-0000-4000-8000-000000000002",
+                "clubPlayerId": "541f9a6d-570b-82ee-a134-575def3a8671",
+                "level": "intermediate_low",
+                "addedAt": "2026-11-19T04:00:00.000Z",
+                "position": 2
+              },
+              "emailWords": "unclaimed · RTR-PH-CEB-111926-0001",
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000002",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "a7000000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000002",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000008",
+                "nameSnapshot": "Ivy Guest",
+                "nicknameSnapshot": "Ivy",
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T02:00:00.000Z",
+                "level": "intermediate_mid",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T02:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [
+              {
+                "id": "a3300000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000002",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+                "level": "intermediate_low",
+                "addedAt": "2026-11-16T00:00:00.000Z",
+                "position": 1
+              },
+              {
+                "id": "3082ec40-3107-88cf-aa40-db32c72f5e85",
+                "sessionId": "a3000000-0000-4000-8000-000000000002",
+                "clubPlayerId": "541f9a6d-570b-82ee-a134-575def3a8671",
+                "level": "intermediate_low",
+                "addedAt": "2026-11-19T04:00:00.000Z",
+                "position": 2
+              }
+            ],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000006",
+                "sessionId": "a3000000-0000-4000-8000-000000000002",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "from_waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:20:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000003",
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000007",
+                "sessionId": "a3000000-0000-4000-8000-000000000002",
+                "name": "Second Sam",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:30:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000002",
+          "state": "prepared",
+          "revision": "9007199254740994",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 3,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000002",
+          "state": "prepared",
+          "revision": "9007199254740993",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 3,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [
+        {
+          "id": "3082ec40-3107-88cf-aa40-db32c72f5e85",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "demoted_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000002",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "541f9a6d-570b-82ee-a134-575def3a8671",
+          "skill_level_id": 3,
+          "demoted_confirmed_at": null
+        }
+      ],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "541f9a6d-570b-82ee-a134-575def3a8671",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Waiter",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "541f9a6d-570b-82ee-a134-575def3a8671"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_retry_same_operation": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000088",
+              "op": "add",
+              "rosterEntry": {
+                "id": "7652b88d-8e15-8d20-bab8-cc51643b3ccb",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "ecba9bff-3257-8f86-9d2b-7e361100551b",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": "unclaimed · RTR-PH-CEB-111926-0001",
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "7652b88d-8e15-8d20-bab8-cc51643b3ccb",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "ecba9bff-3257-8f86-9d2b-7e361100551b",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        },
+        "db": {
+          "queue_sessions": [
+            {
+              "id": "a3000000-0000-4000-8000-000000000001",
+              "state": "prepared",
+              "revision": "6",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "minimum_games": 20,
+              "queue_revision": "1"
+            }
+          ],
+          "queue_sessions (removed)": [
+            {
+              "id": "a3000000-0000-4000-8000-000000000001",
+              "state": "prepared",
+              "revision": "5",
+              "updated_at": "2026-11-10T00:00:00+00:00",
+              "minimum_games": 0,
+              "queue_revision": "1"
+            }
+          ],
+          "session_players": [
+            {
+              "id": "7652b88d-8e15-8d20-bab8-cc51643b3ccb",
+              "present": false,
+              "revision": "2",
+              "joined_at": "2026-11-19T04:00:00+00:00",
+              "created_at": "2026-11-19T04:00:00+00:00",
+              "no_show_at": null,
+              "session_id": "a3000000-0000-4000-8000-000000000001",
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "released_at": null,
+              "confirmed_at": "2026-11-19T04:00:00+00:00",
+              "name_snapshot": "Link Newbie",
+              "club_player_id": "ecba9bff-3257-8f86-9d2b-7e361100551b",
+              "over_budget_at": null,
+              "release_reason": null,
+              "skill_level_id": 3,
+              "level_locked_at": null,
+              "player_id_at_entry": null,
+              "present_changed_at": "2026-11-19T04:00:00+00:00",
+              "assessment_operation_id": "b0000000-0000-4000-8000-000000000088"
+            }
+          ],
+          "session_players (removed)": [],
+          "club_assessments": [
+            {
+              "session_id": "a3000000-0000-4000-8000-000000000001",
+              "assessed_at": "2026-11-19T04:00:00+00:00",
+              "received_at": "2026-11-19T04:00:00+00:00",
+              "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+              "club_player_id": "ecba9bff-3257-8f86-9d2b-7e361100551b",
+              "skill_level_id": 3,
+              "accepted_revision": "5",
+              "session_player_id": "7652b88d-8e15-8d20-bab8-cc51643b3ccb",
+              "source_operation_id": "b0000000-0000-4000-8000-000000000088",
+              "player_id_at_assessment": null,
+              "supersedes_operation_id": null
+            }
+          ],
+          "club_assessments (removed)": [],
+          "session_waitlist": [],
+          "session_waitlist (removed)": [],
+          "session_join_requests": [],
+          "session_join_requests (removed)": [],
+          "club_players": [
+            {
+              "id": "ecba9bff-3257-8f86-9d2b-7e361100551b",
+              "club_id": "c9000000-0000-4000-8000-000000000001",
+              "added_at": "2026-11-19T04:00:00+00:00",
+              "nickname": null,
+              "revision": "2",
+              "player_id": null,
+              "created_at": "2026-11-19T04:00:00+00:00",
+              "removed_at": null,
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "display_name": "Link Newbie",
+              "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+              "linked_to_club_player_id": null
+            }
+          ],
+          "club_players (removed)": [],
+          "club_player_private_inputs": [
+            {
+              "email": null,
+              "state": "pending",
+              "club_id": "c9000000-0000-4000-8000-000000000001",
+              "revision": "1",
+              "created_at": "2026-11-19T04:00:00+00:00",
+              "phone_e164": null,
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "captured_at": "2026-11-19T04:00:00+00:00",
+              "club_player_id": "ecba9bff-3257-8f86-9d2b-7e361100551b"
+            }
+          ],
+          "club_player_private_inputs (removed)": [],
+          "shared_player_entries": [
+            {
+              "email": null,
+              "rtr_id": "RTR-PH-CEB-111926-0001",
+              "revision": "1",
+              "sequence": 1,
+              "city_code": "CEB",
+              "sync_date": "2026-11-19",
+              "created_at": "2026-11-19T04:00:00+00:00",
+              "retired_at": null,
+              "updated_at": "2026-11-19T04:00:00+00:00",
+              "allocated_at": "2026-11-19T04:00:00+00:00",
+              "country_code": "PH",
+              "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+              "claimed_player_id": null
+            }
+          ],
+          "shared_player_entries (removed)": [],
+          "player_id_counters": [
+            {
+              "city_code": "CEB",
+              "sync_date": "2026-11-19",
+              "country_code": "PH",
+              "last_sequence": 1
+            }
+          ],
+          "player_id_counters (removed)": [],
+          "player_notifications": [],
+          "player_notifications (removed)": [],
+          "session_match_requests": [],
+          "session_match_requests (removed)": [],
+          "admin_audit_events": [],
+          "admin_audit_events (removed)": []
+        }
+      },
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "results": [
+            {
+              "operationId": "b0000000-0000-4000-8000-000000000088",
+              "op": "add",
+              "rosterEntry": {
+                "id": "7652b88d-8e15-8d20-bab8-cc51643b3ccb",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "ecba9bff-3257-8f86-9d2b-7e361100551b",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2"
+              },
+              "waitlist": null,
+              "emailWords": null,
+              "request": null
+            }
+          ],
+          "roster": {
+            "capacity": 2,
+            "roster": [
+              {
+                "id": "a7000000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "c6000000-0000-4000-8000-000000000007",
+                "nameSnapshot": "Hal Guest",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-15T01:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-15T01:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              },
+              {
+                "id": "7652b88d-8e15-8d20-bab8-cc51643b3ccb",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "clubPlayerId": "ecba9bff-3257-8f86-9d2b-7e361100551b",
+                "nameSnapshot": "Link Newbie",
+                "nicknameSnapshot": null,
+                "clubNickname": null,
+                "present": false,
+                "presentChangedAt": "2026-11-19T04:00:00.000Z",
+                "level": "intermediate_low",
+                "levelLockedAt": null,
+                "confirmedAt": "2026-11-19T04:00:00.000Z",
+                "gamesAdjustment": 0,
+                "handicapSpots": [],
+                "selfCheckedInAt": null,
+                "leftAt": null,
+                "revision": "2",
+                "hasPlayedAtClubBefore": false
+              }
+            ],
+            "noShows": [],
+            "waitlist": [],
+            "joinRequests": [
+              {
+                "id": "a3400000-0000-4000-8000-000000000003",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Waiting Wade",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "advanced",
+                "placement": "waitlist",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:00:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000002",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Ann Reyes",
+                "nickname": null,
+                "phoneE164": null,
+                "statedBand": "unsure",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:05:00.000Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": "d4000000-0000-4000-8000-000000000001",
+                "picture": null,
+                "pictureName": "Ann Reyes"
+              },
+              {
+                "id": "a3400000-0000-4000-8000-000000000001",
+                "sessionId": "a3000000-0000-4000-8000-000000000001",
+                "name": "Walk In Wendy",
+                "nickname": "Wen",
+                "phoneE164": "+639175550801",
+                "statedBand": "beginner",
+                "placement": "slot",
+                "status": "pending",
+                "requestedAt": "2026-11-19T02:10:00.123Z",
+                "decidedAt": null,
+                "clubPlayerId": null,
+                "playerId": null,
+                "picture": null,
+                "pictureName": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "7",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "minimum_games": 20,
+          "queue_revision": "1"
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000001",
+          "state": "prepared",
+          "revision": "5",
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "minimum_games": 0,
+          "queue_revision": "1"
+        }
+      ],
+      "session_players": [
+        {
+          "id": "7652b88d-8e15-8d20-bab8-cc51643b3ccb",
+          "present": false,
+          "revision": "2",
+          "joined_at": "2026-11-19T04:00:00+00:00",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "no_show_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "released_at": null,
+          "confirmed_at": "2026-11-19T04:00:00+00:00",
+          "name_snapshot": "Link Newbie",
+          "club_player_id": "ecba9bff-3257-8f86-9d2b-7e361100551b",
+          "over_budget_at": null,
+          "release_reason": null,
+          "skill_level_id": 3,
+          "level_locked_at": null,
+          "player_id_at_entry": null,
+          "present_changed_at": "2026-11-19T04:00:00+00:00",
+          "assessment_operation_id": "b0000000-0000-4000-8000-000000000088"
+        }
+      ],
+      "session_players (removed)": [],
+      "club_assessments": [
+        {
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "assessed_at": "2026-11-19T04:00:00+00:00",
+          "received_at": "2026-11-19T04:00:00+00:00",
+          "actor_club_id": "c9000000-0000-4000-8000-000000000001",
+          "club_player_id": "ecba9bff-3257-8f86-9d2b-7e361100551b",
+          "skill_level_id": 3,
+          "accepted_revision": "5",
+          "session_player_id": "7652b88d-8e15-8d20-bab8-cc51643b3ccb",
+          "source_operation_id": "b0000000-0000-4000-8000-000000000088",
+          "player_id_at_assessment": null,
+          "supersedes_operation_id": null
+        }
+      ],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [
+        {
+          "id": "ecba9bff-3257-8f86-9d2b-7e361100551b",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "added_at": "2026-11-19T04:00:00+00:00",
+          "nickname": null,
+          "revision": "2",
+          "player_id": null,
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "removed_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "display_name": "Link Newbie",
+          "shared_entry_rtr_id": "RTR-PH-CEB-111926-0001",
+          "linked_to_club_player_id": null
+        }
+      ],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [
+        {
+          "email": null,
+          "state": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "phone_e164": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "captured_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": "ecba9bff-3257-8f86-9d2b-7e361100551b"
+        }
+      ],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [
+        {
+          "email": null,
+          "rtr_id": "RTR-PH-CEB-111926-0001",
+          "revision": "1",
+          "sequence": 1,
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "retired_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "allocated_at": "2026-11-19T04:00:00+00:00",
+          "country_code": "PH",
+          "creating_club_id": "c9000000-0000-4000-8000-000000000001",
+          "claimed_player_id": null
+        }
+      ],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [
+        {
+          "city_code": "CEB",
+          "sync_date": "2026-11-19",
+          "country_code": "PH",
+          "last_sequence": 1
+        }
+      ],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
+  },
+  "add_new_with_a_link_twice_under_two_operations": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "socialLink": "That social link is already Link Newbie in your saved players."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": []
+    }
   }
 }

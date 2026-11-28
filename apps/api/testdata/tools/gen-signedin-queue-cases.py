@@ -103,6 +103,20 @@ case("details-club5-no-row", f"/api/club/players/{CP(1)}", club=5)
 case("details-club4-edge", f"/api/club/players/{CP(1)}", club=4)
 case("details-club1-expired", f"/api/club/players/{CP(21)}", club=1, scenario=expired)
 case("details-club1-experience-later", f"/api/club/players/{CP(21)}", club=1, now="2027-02-01T04:00:00.000Z")
+# The `level` and `picture` fields of the Edit details read (club_players.avatar_ref / avatar_previous_ref, saved_skill_level_id / saved_level_at)
+for _label, _n, _sets in [
+    ("character-picture", 24, "avatar_ref = 'character:smash-cat'"),
+    ("photo-picture", 24, "avatar_ref = 'https://img.example.test/ned.jpg'"),
+    ("photo-picture-with-a-previous-photo", 24, "avatar_ref = 'https://img.example.test/ned.jpg', avatar_previous_ref = 'https://img.example.test/old.jpg'"),
+    ("initials-with-a-previous-photo", 24, "avatar_previous_ref = 'https://img.example.test/old.jpg'"),
+    ("previous-picture-that-is-not-a-photo", 24, "avatar_ref = 'character:smash-cat', avatar_previous_ref = 'character:old-cat'"),
+    ("picture-that-is-neither", 24, "avatar_ref = 'ned.png'"),
+    ("saved-level", 24, "saved_skill_level_id = 4, saved_level_at = TIMESTAMPTZ '2026-11-10 00:00:00+00'"),
+    ("saved-level-newer-than-the-assessment", 11, "saved_skill_level_id = 2, saved_level_at = TIMESTAMPTZ '2026-12-01 00:00:00+00'"),
+    ("saved-level-older-than-the-assessment", 11, "saved_skill_level_id = 2, saved_level_at = TIMESTAMPTZ '2020-01-01 00:00:00+00'"),
+]:
+    case(f"details-club1-{_label}", f"/api/club/players/{CP(_n)}", club=1,
+         scenario=scenario(f"details_{_label.replace('-', '_')}", "UPDATE club_players SET %s WHERE id = '%s'" % (_sets, CP(_n))))
 
 # delete impact: 1 Alice (live in the active session, none waiting), 3 Bob (two waiting matches), 4 Carla (on court),
 # 5 Erin (released), 16 Dan (a no show), 21 Cory (waiting), 25 Nia (not in the session)

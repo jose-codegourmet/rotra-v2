@@ -2658,6 +2658,253 @@
       }
     }
   },
+  "details-club1-character-picture": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "details": {
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+        "identity": "guest",
+        "fullName": "No Phone Ned",
+        "nickname": null,
+        "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "character",
+          "reference": "character:smash-cat",
+          "characterId": "smash-cat",
+          "previousSrc": null
+        },
+        "profile": null
+      }
+    }
+  },
+  "details-club1-photo-picture": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "details": {
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+        "identity": "guest",
+        "fullName": "No Phone Ned",
+        "nickname": null,
+        "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "photo",
+          "reference": "https://img.example.test/ned.jpg",
+          "characterId": null,
+          "previousSrc": null
+        },
+        "profile": null
+      }
+    }
+  },
+  "details-club1-photo-picture-with-a-previous-photo": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "details": {
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+        "identity": "guest",
+        "fullName": "No Phone Ned",
+        "nickname": null,
+        "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "photo",
+          "reference": "https://img.example.test/ned.jpg",
+          "characterId": null,
+          "previousSrc": "https://img.example.test/old.jpg"
+        },
+        "profile": null
+      }
+    }
+  },
+  "details-club1-initials-with-a-previous-photo": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "details": {
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+        "identity": "guest",
+        "fullName": "No Phone Ned",
+        "nickname": null,
+        "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": "https://img.example.test/old.jpg"
+        },
+        "profile": null
+      }
+    }
+  },
+  "details-club1-previous-picture-that-is-not-a-photo": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "details": {
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+        "identity": "guest",
+        "fullName": "No Phone Ned",
+        "nickname": null,
+        "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "character",
+          "reference": "character:smash-cat",
+          "characterId": "smash-cat",
+          "previousSrc": null
+        },
+        "profile": null
+      }
+    }
+  },
+  "details-club1-picture-that-is-neither": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "details": {
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+        "identity": "guest",
+        "fullName": "No Phone Ned",
+        "nickname": null,
+        "phoneOnFile": false,
+        "level": null,
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
+        "profile": null
+      }
+    }
+  },
+  "details-club1-saved-level": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "details": {
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000024",
+        "identity": "guest",
+        "fullName": "No Phone Ned",
+        "nickname": null,
+        "phoneOnFile": false,
+        "level": "intermediate_mid",
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
+        "profile": null
+      }
+    }
+  },
+  "details-club1-saved-level-newer-than-the-assessment": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "details": {
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+        "identity": "unclaimed",
+        "fullName": "Una Alonzo",
+        "nickname": null,
+        "phoneOnFile": true,
+        "level": "beginner_high",
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
+        "profile": {
+          "email": "una@example.test",
+          "playingStyle": "",
+          "experienceYears": null,
+          "experienceMonths": null,
+          "socialLinks": {
+            "facebook": "",
+            "instagram": "",
+            "youtube": "",
+            "linkedin": ""
+          }
+        }
+      }
+    }
+  },
+  "details-club1-saved-level-older-than-the-assessment": {
+    "status": 200,
+    "headers": {
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Cookie"
+    },
+    "body": {
+      "details": {
+        "clubPlayerId": "c6000000-0000-4000-8000-000000000011",
+        "identity": "unclaimed",
+        "fullName": "Una Alonzo",
+        "nickname": null,
+        "phoneOnFile": true,
+        "level": "beginner_high",
+        "picture": {
+          "kind": "initials",
+          "reference": null,
+          "characterId": null,
+          "previousSrc": null
+        },
+        "profile": {
+          "email": "una@example.test",
+          "playingStyle": "",
+          "experienceYears": null,
+          "experienceMonths": null,
+          "socialLinks": {
+            "facebook": "",
+            "instagram": "",
+            "youtube": "",
+            "linkedin": ""
+          }
+        }
+      }
+    }
+  },
   "delete-impact-club1-alice": {
     "status": 200,
     "headers": {

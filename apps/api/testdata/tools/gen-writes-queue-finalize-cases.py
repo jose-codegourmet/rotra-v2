@@ -246,6 +246,47 @@ SCEN['policy_arrives_late'] = SCEN['played'] + [
 CLEAN_TRIGGER = ["DROP TRIGGER IF EXISTS capture_policy_arrives_late ON projection_jobs"]
 SCEN['base'] = SCEN['base'] + CLEAN_TRIGGER
 
+
+# Shuttle tubes at Session done (D-2026-11-26-01): the plan lines of the night's cost estimate come off the club's inventory.
+IT = lambda n: f'b1000000-0000-4000-8000-0000000000{n:02d}'
+T0 = "TIMESTAMPTZ '2026-11-01 00:00:00+00'"
+
+
+def inventory(*items):
+    """items: (n, name, stock, revision, removed)."""
+    rows = ', '.join(f"('{IT(n)}', '{CLUB1}', '{name}', 'shuttlecocks', 'tube', {stock}, 100000, 'PHP', {T('2026-11-05 00:00:00') if removed else 'NULL'}, {T0}, {T0}, {rev})"
+                     for n, name, stock, rev, removed in items)
+    return ["INSERT INTO inventory_items (id, club_id, name, category, unit, stock, unit_cost_minor, currency, removed_at, created_at, updated_at, revision) VALUES " + rows]
+
+
+def plan(*lines, session=S3):
+    """A cost estimate for the session with plan lines: (item number, tubes)."""
+    out = [f"INSERT INTO session_cost_estimates (session_id, club_id, court_fee_per_court_hour_minor, entrance_fee_per_head_minor, payment_mode, custom_fee_per_head_minor, currency, created_at, updated_at, revision) "
+           f"VALUES ('{session}', '{CLUB1}', 0, 0, 'break_even', NULL, 'PHP', {T0}, {T0}, 1)"]
+    for pos, (item, tubes) in enumerate(lines):
+        out.append(f"INSERT INTO session_shuttle_plan_lines (id, club_id, session_id, inventory_item_id, tubes, position) VALUES ('b3000000-0000-4000-8000-0000000000{pos:02d}', '{CLUB1}', '{session}', '{IT(item)}', {tubes}, {pos})")
+    return out
+
+
+INV = inventory((1, 'Yonex AS-50', 12, 1, False), (2, 'Victor Gold', 6, 3, False), (3, 'Net post', 2, 1, False), (4, 'Old shuttles', 3, 2, True), (5, 'Empty tube', 0, 1, False))
+SCEN['tubes_one_line'] = SCEN['played'] + INV + plan((1, 3))
+SCEN['tubes_several_lines'] = SCEN['played'] + INV + plan((1, 2), (2, 4), (3, 1))
+SCEN['tubes_same_item_on_two_lines'] = SCEN['played'] + INV + plan((1, 2), (2, 1), (1, 4))
+SCEN['tubes_more_than_stock'] = SCEN['played'] + INV + plan((2, 9), (1, 3))
+SCEN['tubes_exactly_the_stock'] = SCEN['played'] + INV + plan((3, 2))
+SCEN['tubes_from_empty_stock'] = SCEN['played'] + INV + plan((5, 2))
+SCEN['tubes_removed_item'] = SCEN['played'] + INV + plan((4, 2), (1, 1))
+SCEN['tubes_no_plan'] = SCEN['played'] + INV
+SCEN['tubes_empty_plan'] = SCEN['played'] + INV + plan()
+SCEN['tubes_no_inventory'] = SCEN['played'] + plan()
+SCEN['tubes_record_off'] = SCEN['record_off'] + INV + plan((1, 3), (2, 2))
+SCEN['tubes_no_matches'] = SCEN['no_matches'] + INV + plan((1, 3))
+SCEN['tubes_blocked'] = SCEN['b_active'] + INV + plan((1, 3))
+SCEN['tubes_invalid_session'] = SCEN['s3_invalid'] + INV + plan((1, 3))
+SCEN['tubes_prepared_session'] = SCEN['s3_prepared'] + INV + plan((1, 3))
+SCEN['tubes_finalized_already'] = SCEN['finalized_already'] + INV + plan((1, 3))
+SCEN['tubes_on_court_fails'] = SCEN['night_on_court'] + INV + plan((1, 3))
+
 cases = []
 
 
@@ -356,10 +397,35 @@ case('get_a_stale_running_job_after_the_lease', [status(S4, now=at(0)), status(S
 case('get_a_failed_job_after_its_backoff', status(S4, now='2026-11-19T05:30:00.000Z'), 'd_history_failed_waiting')
 case('post_a_failed_job_before_its_backoff_is_retried_at_once', fin(S4, now=at(0)), 'd_history_failed_waiting')
 
+# Session done deducts the planned shuttle tubes (D-2026-11-26-01).
+case('post_deducts_the_planned_tubes_of_one_line', fin(), 'tubes_one_line')
+case('post_deducts_every_plan_line', fin(), 'tubes_several_lines')
+case('post_sums_the_lines_of_one_item', fin(), 'tubes_same_item_on_two_lines')
+case('post_never_takes_the_stock_below_zero', fin(), 'tubes_more_than_stock')
+case('post_takes_exactly_the_stock_to_zero', fin(), 'tubes_exactly_the_stock')
+case('post_an_empty_item_stays_at_zero_and_its_revision_moves', fin(), 'tubes_from_empty_stock')
+case('post_skips_a_removed_item', fin(), 'tubes_removed_item')
+case('post_with_no_plan_leaves_the_inventory', fin(), 'tubes_no_plan')
+case('post_with_an_estimate_and_no_lines_leaves_the_inventory', fin(), 'tubes_empty_plan')
+case('post_with_no_inventory_and_no_lines', fin(), 'tubes_no_inventory')
+case('post_with_record_games_off_still_deducts', fin(), 'tubes_record_off')
+case('post_a_session_with_no_matches_still_deducts', fin(), 'tubes_no_matches')
+case('post_a_blocked_session_deducts_nothing', fin(), 'tubes_blocked')
+case('post_an_invalid_session_deducts_nothing', fin(), 'tubes_invalid_session')
+case('post_a_prepared_session_deducts_nothing', fin(), 'tubes_prepared_session')
+case('post_a_finalized_session_deducts_nothing_again', fin(), 'tubes_finalized_already')
+case('post_a_failed_commit_deducts_nothing', fin(), 'tubes_on_court_fails', allow500=True)
+case('post_again_with_the_same_command_deducts_once', [fin(), fin()], 'tubes_one_line')
+case('post_again_with_another_command_deducts_once', [fin(), fin(cmd=CMD2)], 'tubes_several_lines')
+
 SNAPSHOT = [s for s in BASE['snapshot'] if s['name'] in ('matches', 'match_court_usage', 'active_court_holds', 'active_player_holds', 'session_match_requests', 'session_drop_out_notices')]
 SNAPSHOT += [
     {'name': 'session_players_handicap', 'sql': "SELECT id, handicap_spots, revision::text AS revision FROM session_players WHERE session_id = 'a3000000-0000-4000-8000-000000000003' ORDER BY id"},
     {'name': 'queue_sessions', 'sql': "SELECT id, state, revision::text AS revision, queue_revision::text AS queue_revision, finalized_at, record_games, updated_at FROM queue_sessions ORDER BY id"},
+    {'name': 'inventory_items', 'sql': "SELECT id, club_id, name, category::text AS category, unit, stock, unit_cost_minor, currency, removed_at, "
+     "CASE WHEN created_at > TIMESTAMPTZ '2026-11-19 12:00:00+00' THEN 'database now()' ELSE created_at::text END AS created_at, "
+     "CASE WHEN updated_at > TIMESTAMPTZ '2026-11-19 12:00:00+00' THEN 'database now()' ELSE updated_at::text END AS updated_at, revision::text AS revision "
+     "FROM inventory_items ORDER BY id"},
     {'name': 'club_session_reservations', 'sql': "SELECT club_id, session_id, acquired_at FROM club_session_reservations ORDER BY session_id"},
     {'name': 'session_finalizations', 'sql': "SELECT session_id, club_id, command_id, state, stage, failed_stage, failure_code, stream_manifest, encode(manifest_digest, 'hex') AS manifest_digest, accepted_session_revision::text AS accepted_session_revision, policy_version_id, started_at, committed_at, completed_at, encode(facts_digest, 'hex') AS facts_digest, updated_at, revision::text AS revision FROM session_finalizations ORDER BY session_id"},
     {'name': 'player_match_facts', 'redact': ['id'], 'sql': "SELECT id, club_id, session_id, match_id, session_player_id, club_player_id, player_id_at_finalization, played_at, format, team, winning_team, full_participation, standard_match, skill_level_snapshot_id, ARRAY(SELECT x FROM unnest(partner_entry_ids) x ORDER BY x) AS partner_entry_ids, ARRAY(SELECT x FROM unnest(opponent_entry_ids) x ORDER BY x) AS opponent_entry_ids, team_a_score, team_b_score, fact_version, created_at FROM player_match_facts ORDER BY session_id, match_id, session_player_id"},

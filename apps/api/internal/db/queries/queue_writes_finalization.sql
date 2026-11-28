@@ -203,3 +203,17 @@ ORDER BY 1;
 -- name: GetSessionRecordGames :one
 -- statusDto: Record games (D-2026-11-20-02) of the session a finalization is for; false = not ranked.
 SELECT record_games FROM queue_sessions WHERE id = @id;
+
+-- name: DeductPlannedShuttles :exec
+-- deductPlannedShuttles (D-2026-11-26-01): Session done takes each shuttle plan line's planned tubes off its inventory item, never below zero.
+-- One statement (a - / + tap racing Session done is never lost); the tubes of an item planned on several lines are summed; a removed item or
+-- another club's is skipped; updated_at is the database clock (raw SQL in the TypeScript).
+UPDATE inventory_items AS i
+SET stock = GREATEST(i.stock - p.tubes, 0), revision = i.revision + 1, updated_at = now()
+FROM (
+  SELECT inventory_item_id, SUM(tubes)::int AS tubes
+  FROM session_shuttle_plan_lines
+  WHERE club_id = @club_id AND session_id = @session_id
+  GROUP BY inventory_item_id
+) AS p
+WHERE i.id = p.inventory_item_id AND i.club_id = @club_id AND i.removed_at IS NULL;

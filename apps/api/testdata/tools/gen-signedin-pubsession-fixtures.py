@@ -530,6 +530,11 @@ for scen in ('big_beginners', 'big_beginners_intermediate', 'big_per_level', 'bi
     for p in (('alice', 'ben', 'dan', 'eli', 'nia') if sess != 'live' else ('alice', 'ben')):
         case(f'access_{p}_{scen}', pub(sess, '/access'), p, scenario=scen)
         case(f'night_{p}_{scen}', pub(sess, '/my-night'), p, scenario=scen)
+# Slot transfers (task 5.5): the Player's own pending transfer on Big Night (a prepared session) in the my-night read, in the MySlotTransfer shape.
+for scen, people in (('big_transfer_rtr', ('alice', 'ben')), ('big_transfer_link', ('alice',)), ('big_transfer_link_claimed', ('alice',)),
+                     ('big_transfer_rejected', ('alice',)), ('big_transfer_other_entry', ('alice',))):
+    for p in people:
+        case(f'night_{p}_{scen}', pub('big', '/my-night'), p, scenario=scen)
 case('access_google_gate', pub('live', '/access'), 'alice', scenario='google_gate', now='2027-01-01T04:00:00.000Z')
 case('night_google_gate', pub('live', '/my-night'), 'alice', scenario='google_gate', now='2027-01-01T04:00:00.000Z')
 case('compare_google_gate', f'/api/players/{P[2]}/compare', 'alice', origin=None, scenario='google_gate', now='2027-01-01T04:00:00.000Z')
@@ -581,7 +586,29 @@ LEVELS = [f"UPDATE club_players SET saved_skill_level_id = {lvl}, saved_level_at
 reset = [
     "INSERT INTO feature_flags (key, name, description, value, updated_at) VALUES ('player_google_sign_in', 'Google sign-in for players', 'x', false, now()) ON CONFLICT DO NOTHING",
     "UPDATE feature_flags SET value = false WHERE key = 'player_google_sign_in'",
+    "DELETE FROM session_slot_transfers",  # the slot transfer scenarios add rows of their own
 ]
+def transfer_row(n, sender_entry, sender_cp, sender_player, recipient, status='pending', link=False, claimed=False):
+    """A session_slot_transfers row on Big Night; a link carries a digest (never read) and a claimed one has its claimant."""
+    digest = "decode('%s', 'hex')" % ('0b' * 32) if link else 'NULL'
+    who = q(recipient) if recipient else 'NULL'
+    decided = "TIMESTAMPTZ '2026-11-19 02:30:00+00'" if status != 'pending' else 'NULL'
+    claimed_at = "TIMESTAMPTZ '2026-11-19 01:40:00+00'" if claimed else 'NULL'
+    return ("INSERT INTO session_slot_transfers (id, club_id, session_id, sender_session_player_id, sender_club_player_id, sender_player_id, recipient_player_id, "
+            "link_token_digest, claimed_at, status, requested_at, decided_at) VALUES "
+            f"({q(uid('f1', n))}, {q(C1)}, {q(S['big'])}, {q(sender_entry)}, {q(sender_cp)}, {q(sender_player)}, {who}, {digest}, "
+            f"{claimed_at}, '{status}', TIMESTAMPTZ '2026-11-19 01:30:00+00', {decided})")
+
+
+_A = (E[('big', 'A')], CP[(C1, 'A')], P[1])
+_G = (E[('big', 'g1')], CP[(C1, 'g1')], P[3])
+TRANSFER_SCENARIOS = {
+    'big_transfer_rtr': [transfer_row(1, *_A, P[2])],
+    'big_transfer_link': [transfer_row(1, *_A, None, link=True)],
+    'big_transfer_link_claimed': [transfer_row(1, *_A, P[2], link=True, claimed=True)],
+    'big_transfer_rejected': [transfer_row(1, *_A, P[2], status='rejected')],
+    'big_transfer_other_entry': [transfer_row(1, *_G, P[2])],
+}
 out = {
     'now': NOW,
     'subjects': {k: v for k, v in ((name, SUBJ[n]) for name, n in who.items())},
@@ -593,7 +620,8 @@ out = {
                   'big_per_level': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 2, intermediate_slots = 1, advanced_slots = 1 WHERE id = '{S['big']}'"],
                   'big_per_level_no_slots': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'slots_per_band', beginner_slots = 4, intermediate_slots = 0, advanced_slots = 0 WHERE id = '{S['big']}'"],
                   'wait_beginners': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = '{S['wait']}'"],
-                  'live_beginners': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = '{S['live']}'"]},
+                  'live_beginners': [*LEVELS, f"UPDATE queue_sessions SET level_restriction = 'beginners' WHERE id = '{S['live']}'"],
+                  **TRANSFER_SCENARIOS},
     'approved': ['rank-test-v1'],
     'cases': cases,
 }

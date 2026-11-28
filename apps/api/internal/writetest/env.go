@@ -415,6 +415,10 @@ func (e *Env) Reseed(t testing.TB, seed string, scenario []string) {
 		e.RelinkClubs(t)
 	}
 	e.Setup(t, scenario)
+	// A scenario may add a registered player of its own (the slot transfer cases add Hugh): it signs in too.
+	if e.Players && len(scenario) > 0 {
+		e.RelinkPlayers(t)
+	}
 }
 
 // ReadSeed reads a seed file of dir.

@@ -16988,6 +16988,383 @@
       }
     }
   },
+  "night_alice_big_transfer_rtr": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:9000",
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Origin, Cookie"
+    },
+    "body": {
+      "playerId": "d1000000-0000-4000-8000-000000000001",
+      "status": "confirmed",
+      "stage": "before-start",
+      "waitlistPosition": null,
+      "startsAt": 1795255200000,
+      "present": false,
+      "checkedIn": false,
+      "hasLeft": false,
+      "cantMakeItSent": true,
+      "canTransfer": true,
+      "slotTransfer": {
+        "id": "f1000000-0000-4000-8000-000000000001",
+        "recipientName": "Ben Cruz",
+        "recipientRtrId": "RTR-PH-CEB-102926-0002",
+        "viaLink": false,
+        "at": "2026-11-19T01:30:00.000Z"
+      },
+      "offline": false,
+      "games": 0,
+      "won": 0,
+      "lost": 0,
+      "minimum": 0,
+      "inQueue": {
+        "position": 2,
+        "partners": [
+          {
+            "name": "G***",
+            "level": "intermediate_low",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "G***",
+            "level": "beginner_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          },
+          {
+            "name": "G***",
+            "level": "intermediate_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          }
+        ],
+        "matchLabel": "with G*** vs G***, G***"
+      },
+      "onCourt": null,
+      "joinRequest": null,
+      "isClubMember": true,
+      "levelBlock": null,
+      "canInvite": true,
+      "inviteCode": "alice0001",
+      "matchRequest": null
+    }
+  },
+  "night_ben_big_transfer_rtr": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:9000",
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Origin, Cookie"
+    },
+    "body": {
+      "playerId": "d1000000-0000-4000-8000-000000000002",
+      "status": "none",
+      "stage": null,
+      "waitlistPosition": null,
+      "startsAt": 1795255200000,
+      "present": false,
+      "checkedIn": false,
+      "hasLeft": false,
+      "cantMakeItSent": false,
+      "canTransfer": false,
+      "slotTransfer": null,
+      "offline": false,
+      "games": 0,
+      "won": 0,
+      "lost": 0,
+      "minimum": 0,
+      "inQueue": null,
+      "onCourt": null,
+      "joinRequest": null,
+      "isClubMember": false,
+      "levelBlock": {
+        "reason": "This session has no intermediate slots.",
+        "level": "intermediate_low"
+      },
+      "canInvite": false,
+      "inviteCode": null,
+      "matchRequest": null
+    }
+  },
+  "night_alice_big_transfer_link": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:9000",
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Origin, Cookie"
+    },
+    "body": {
+      "playerId": "d1000000-0000-4000-8000-000000000001",
+      "status": "confirmed",
+      "stage": "before-start",
+      "waitlistPosition": null,
+      "startsAt": 1795255200000,
+      "present": false,
+      "checkedIn": false,
+      "hasLeft": false,
+      "cantMakeItSent": true,
+      "canTransfer": true,
+      "slotTransfer": {
+        "id": "f1000000-0000-4000-8000-000000000001",
+        "recipientName": null,
+        "recipientRtrId": null,
+        "viaLink": true,
+        "at": "2026-11-19T01:30:00.000Z"
+      },
+      "offline": false,
+      "games": 0,
+      "won": 0,
+      "lost": 0,
+      "minimum": 0,
+      "inQueue": {
+        "position": 2,
+        "partners": [
+          {
+            "name": "G***",
+            "level": "intermediate_low",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "G***",
+            "level": "beginner_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          },
+          {
+            "name": "G***",
+            "level": "intermediate_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          }
+        ],
+        "matchLabel": "with G*** vs G***, G***"
+      },
+      "onCourt": null,
+      "joinRequest": null,
+      "isClubMember": true,
+      "levelBlock": null,
+      "canInvite": true,
+      "inviteCode": "alice0001",
+      "matchRequest": null
+    }
+  },
+  "night_alice_big_transfer_link_claimed": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:9000",
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Origin, Cookie"
+    },
+    "body": {
+      "playerId": "d1000000-0000-4000-8000-000000000001",
+      "status": "confirmed",
+      "stage": "before-start",
+      "waitlistPosition": null,
+      "startsAt": 1795255200000,
+      "present": false,
+      "checkedIn": false,
+      "hasLeft": false,
+      "cantMakeItSent": true,
+      "canTransfer": true,
+      "slotTransfer": {
+        "id": "f1000000-0000-4000-8000-000000000001",
+        "recipientName": "Ben Cruz",
+        "recipientRtrId": "RTR-PH-CEB-102926-0002",
+        "viaLink": true,
+        "at": "2026-11-19T01:30:00.000Z"
+      },
+      "offline": false,
+      "games": 0,
+      "won": 0,
+      "lost": 0,
+      "minimum": 0,
+      "inQueue": {
+        "position": 2,
+        "partners": [
+          {
+            "name": "G***",
+            "level": "intermediate_low",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "G***",
+            "level": "beginner_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          },
+          {
+            "name": "G***",
+            "level": "intermediate_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          }
+        ],
+        "matchLabel": "with G*** vs G***, G***"
+      },
+      "onCourt": null,
+      "joinRequest": null,
+      "isClubMember": true,
+      "levelBlock": null,
+      "canInvite": true,
+      "inviteCode": "alice0001",
+      "matchRequest": null
+    }
+  },
+  "night_alice_big_transfer_rejected": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:9000",
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Origin, Cookie"
+    },
+    "body": {
+      "playerId": "d1000000-0000-4000-8000-000000000001",
+      "status": "confirmed",
+      "stage": "before-start",
+      "waitlistPosition": null,
+      "startsAt": 1795255200000,
+      "present": false,
+      "checkedIn": false,
+      "hasLeft": false,
+      "cantMakeItSent": true,
+      "canTransfer": true,
+      "slotTransfer": null,
+      "offline": false,
+      "games": 0,
+      "won": 0,
+      "lost": 0,
+      "minimum": 0,
+      "inQueue": {
+        "position": 2,
+        "partners": [
+          {
+            "name": "G***",
+            "level": "intermediate_low",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "G***",
+            "level": "beginner_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          },
+          {
+            "name": "G***",
+            "level": "intermediate_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          }
+        ],
+        "matchLabel": "with G*** vs G***, G***"
+      },
+      "onCourt": null,
+      "joinRequest": null,
+      "isClubMember": true,
+      "levelBlock": null,
+      "canInvite": true,
+      "inviteCode": "alice0001",
+      "matchRequest": null
+    }
+  },
+  "night_alice_big_transfer_other_entry": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:9000",
+      "cache-control": "private, no-store",
+      "content-type": "application/json",
+      "vary": "Origin, Cookie"
+    },
+    "body": {
+      "playerId": "d1000000-0000-4000-8000-000000000001",
+      "status": "confirmed",
+      "stage": "before-start",
+      "waitlistPosition": null,
+      "startsAt": 1795255200000,
+      "present": false,
+      "checkedIn": false,
+      "hasLeft": false,
+      "cantMakeItSent": true,
+      "canTransfer": true,
+      "slotTransfer": null,
+      "offline": false,
+      "games": 0,
+      "won": 0,
+      "lost": 0,
+      "minimum": 0,
+      "inQueue": {
+        "position": 2,
+        "partners": [
+          {
+            "name": "G***",
+            "level": "intermediate_low",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "G***",
+            "level": "beginner_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          },
+          {
+            "name": "G***",
+            "level": "intermediate_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          }
+        ],
+        "matchLabel": "with G*** vs G***, G***"
+      },
+      "onCourt": null,
+      "joinRequest": null,
+      "isClubMember": true,
+      "levelBlock": null,
+      "canInvite": true,
+      "inviteCode": "alice0001",
+      "matchRequest": null
+    }
+  },
   "access_google_gate": {
     "status": 403,
     "headers": {

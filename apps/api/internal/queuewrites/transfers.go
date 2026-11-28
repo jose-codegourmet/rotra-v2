@@ -19,8 +19,8 @@ import (
 
 // This file ports the Queue Master's slot transfer decisions that end in a rejection: Reject and Reject and refund
 // (apps/queue/src/app/api/sessions/{id}/requests/transfers/{transferId}/{reject,refund}, rejectSlotTransfer and
-// rejectAndRefundSlotTransfer in packages/db/src/queue/slot-transfers.ts). Approve and the Player's seven slot-transfer routes are not
-// ported (task 5.5). ROTRA moves no money: a refund is a record that the Queue Master handed the cash back outside ROTRA.
+// rejectAndRefundSlotTransfer in packages/db/src/queue/slot-transfers.ts). Approve and the Player's seven slot-transfer routes are in
+// slot_transfer.go (task 5.5). ROTRA moves no money: a refund is a record that the Queue Master handed the cash back outside ROTRA.
 
 func (s *server) registerTransfers(rt *signedin.Router) {
 	club := store.AudienceClub

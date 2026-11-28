@@ -121,12 +121,14 @@ async function answer(apiDir, step, subject, label, { redact = step.redact ?? []
   }
   let hits = []
   if (!step.allow500) expect(res.status, label).not.toBe(500)
+  // Saved before anything is redacted, as writetest.Replay does: a generated value (a transfer link's token) is redacted in the golden but
+  // is what the next step must send.
+  const saved = savePaths(body, step.save ?? {}, label)
   try {
     hits = redactPaths(body, redact, optional)
   } catch (error) {
     throw new Error(`${label}: ${error.message} (status ${res.status}, body ${text.slice(0, 200)})`)
   }
-  const saved = savePaths(body, step.save ?? {}, label)
   sortUnordered(body, step.unordered ?? [])
   const ignored = (step.ignoreHeaders ?? []).map((h) => h.toLowerCase())
   const headers = Object.fromEntries([...res.headers.entries()].filter(([k]) => !ignored.includes(k.toLowerCase())).sort())

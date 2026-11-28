@@ -244,6 +244,42 @@
      ]
     }
    ]
+  },
+  {
+   "name": "sign_out_from_the_player_origin",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9001",
+      "Content-Type": "application/json"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ],
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "preflight_sign_out_from_the_player_origin",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "OPTIONS",
+     "path": "/api/public-sessions/live-now/sign-out",
+     "who": null,
+     "headers": {
+      "Origin": "http://localhost:9001"
+     },
+     "ignoreHeaders": [
+      "set-cookie"
+     ]
+    }
+   ]
   }
  ]
 }

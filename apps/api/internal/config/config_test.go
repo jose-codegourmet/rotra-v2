@@ -172,6 +172,19 @@ func TestLoadProxySecretAndOrigins(t *testing.T) {
 	}
 }
 
+func TestLoadPlayerOrigins(t *testing.T) {
+	cfg, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x", "ROTRA_PLAYER_ORIGINS": "https://rotra.club, http://localhost:9001"}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(cfg.PlayerOrigins) != 2 || cfg.PlayerOrigins[1] != "http://localhost:9001" || len(cfg.QueueOrigins) != 0 {
+		t.Fatalf("player %v queue %v", cfg.PlayerOrigins, cfg.QueueOrigins)
+	}
+	if _, err := Load(lookup(map[string]string{"DATABASE_URL": "postgres://x", "ROTRA_PLAYER_ORIGINS": "*"})); err == nil || !strings.Contains(err.Error(), "ROTRA_PLAYER_ORIGINS") {
+		t.Errorf("want a ROTRA_PLAYER_ORIGINS error, got %v", err)
+	}
+}
+
 func TestLoadQueueOriginsAreSeparate(t *testing.T) {
 	cfg, err := Load(lookup(map[string]string{
 		"DATABASE_URL": "postgres://x", "ROTRA_ALLOWED_ORIGINS": "https://a.club",

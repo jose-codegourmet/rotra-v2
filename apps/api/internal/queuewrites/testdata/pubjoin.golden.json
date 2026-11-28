@@ -6816,5 +6816,118 @@
       "session_invite_codes": [],
       "session_invite_codes (removed)": []
     }
+  },
+  "join_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "requestId": "<redacted>",
+          "message": "Request sent"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [
+        {
+          "id": "<redacted>",
+          "name": "Gil Gomez",
+          "status": "pending",
+          "nickname": "G",
+          "revision": "1",
+          "placement": "slot",
+          "player_id": "d4000000-0000-4000-8000-000000000006",
+          "created_at": "2026-11-19T04:00:00+00:00",
+          "decided_at": null,
+          "phone_e164": null,
+          "session_id": "a3000000-0000-4000-8000-000000000001",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "stated_band": "unsure",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "club_player_id": null,
+          "invite_code_id": null,
+          "decided_by_device_id": null
+        }
+      ],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "session_invite_codes": [],
+      "session_invite_codes (removed)": []
+    }
+  },
+  "preflight_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 204,
+        "headers": {
+          "access-control-allow-headers": "Content-Type",
+          "access-control-allow-methods": "POST",
+          "access-control-max-age": "600",
+          "cache-control": "private, no-store",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "__raw": ""
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "session_invite_codes": [],
+      "session_invite_codes (removed)": []
+    }
   }
 }

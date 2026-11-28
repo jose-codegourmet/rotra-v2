@@ -6746,5 +6746,99 @@
       "session_courts": [],
       "session_courts (removed)": []
     }
+  },
+  "ask_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 201,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "matchRequestId": "b5000000-0000-4000-8000-000000000001",
+          "message": "Match request sent"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": [],
+      "club_player_private_inputs": [],
+      "club_player_private_inputs (removed)": [],
+      "shared_player_entries": [],
+      "shared_player_entries (removed)": [],
+      "player_id_counters": [],
+      "player_id_counters (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_match_requests": [
+        {
+          "id": "b5000000-0000-4000-8000-000000000001",
+          "format": "doubles",
+          "status": "open",
+          "match_id": null,
+          "revision": "1",
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000003",
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "session_player_id": "a7000000-0000-4000-8000-000000000022"
+        }
+      ],
+      "session_match_requests (removed)": [],
+      "admin_audit_events": [],
+      "admin_audit_events (removed)": [],
+      "matches": [],
+      "matches (removed)": [],
+      "match_participations": [],
+      "match_participations (removed)": [],
+      "match_court_usage": [],
+      "match_court_usage (removed)": [],
+      "active_court_holds": [],
+      "active_court_holds (removed)": [],
+      "active_player_holds": [],
+      "active_player_holds (removed)": [],
+      "session_match_request_spots": [
+        {
+          "side": "partner",
+          "slot_no": 0,
+          "request_id": "b5000000-0000-4000-8000-000000000001",
+          "session_player_id": null
+        },
+        {
+          "side": "opponent",
+          "slot_no": 0,
+          "request_id": "b5000000-0000-4000-8000-000000000001",
+          "session_player_id": null
+        },
+        {
+          "side": "opponent",
+          "slot_no": 1,
+          "request_id": "b5000000-0000-4000-8000-000000000001",
+          "session_player_id": null
+        }
+      ],
+      "session_match_request_spots (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "match_decisions": [],
+      "match_decisions (removed)": [],
+      "sync_conflicts": [],
+      "sync_conflicts (removed)": [],
+      "session_courts": [],
+      "session_courts (removed)": []
+    }
   }
 }

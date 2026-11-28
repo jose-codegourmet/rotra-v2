@@ -51,6 +51,9 @@ RAND_JOIN = {'session_join_requests': ['id'], 'session_players': ['id', 'assessm
 case('join_signed_out', join(1, who=None))
 case('join_without_an_origin', join(1, headers={}))
 case('join_from_another_origin', join(1, headers={'Origin': 'http://localhost:9999'}))
+# The session page lives on the Player app (D-2026-11-28-01): its own origin calls same-origin, with no CORS headers.
+case('join_from_the_player_origin', join(1, who=GIL, headers={'Origin': 'http://localhost:9001', 'Content-Type': 'application/json'}, **JOIN_ID), redact=RAND_JOIN)
+case('preflight_from_the_player_origin', {'method': 'OPTIONS', 'path': '/api/public-sessions/prep-open/join', 'who': None, 'headers': {'Origin': 'http://localhost:9001'}})
 case('join_not_json_is_forbidden', join(1, headers={'Origin': ORIGIN, 'Content-Type': 'text/plain'}))
 case('join_without_a_content_type_is_forbidden', join(1, headers={'Origin': ORIGIN, 'Content-Type': ''}))
 case('join_a_content_type_with_a_charset_is_fine', join(1, who=GIL, headers={'Origin': ORIGIN, 'Content-Type': 'application/json; charset=utf-8'}, **JOIN_ID), redact=RAND_JOIN)

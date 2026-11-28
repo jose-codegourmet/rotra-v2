@@ -58,6 +58,8 @@ type Deps struct {
 	Now func() time.Time
 	// QueueOrigins are the exact Queue app origins that may call the Player routes of a public session (ROTRA_QUEUE_ORIGINS).
 	QueueOrigins []string
+	// PlayerOrigins are the Player app's own origins: the session page's same-origin calls (D-2026-11-28-01).
+	PlayerOrigins []string
 	// VisitorReceiptSecret is ROTRA_VISITOR_RECEIPT_SECRET: the key of the visitor's join request receipt. Empty leaves the visitor routes answering
 	// 503 where they need it, as the Route Handlers do. It is never logged.
 	VisitorReceiptSecret string
@@ -72,7 +74,8 @@ type server struct {
 	log  *slog.Logger
 	now  func() time.Time
 	// queueOrigins are the origins the Player routes of a public session answer to.
-	queueOrigins []string
+	queueOrigins  []string
+	playerOrigins []string
 	// visitorSecret is Deps.VisitorReceiptSecret.
 	visitorSecret string
 	// playerSignOut is Deps.PlayerSignOut.
@@ -84,7 +87,7 @@ func Routes(d Deps) (func(*signedin.Router), error) {
 	if d.Pool == nil || d.Auth == nil {
 		return nil, errors.New("queuewrites: routes need a pool and an authenticator")
 	}
-	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, visitorSecret: d.VisitorReceiptSecret, playerSignOut: d.PlayerSignOut}
+	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, playerOrigins: d.PlayerOrigins, visitorSecret: d.VisitorReceiptSecret, playerSignOut: d.PlayerSignOut}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}

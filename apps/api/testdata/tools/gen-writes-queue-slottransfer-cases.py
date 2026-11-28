@@ -179,6 +179,10 @@ for name, mk in (('request', lambda **k: request(**k)), ('lookup', lambda **k: l
         case(f'{name}_signed_out', mk(who=None), 'p6')
     case(f'{name}_without_an_origin', mk(headers={}), 'p6')
     case(f'{name}_from_another_origin', mk(headers={'Origin': 'http://localhost:9999'}), 'p6')
+    player = mk(headers={'Origin': 'http://localhost:9001', 'Content-Type': 'application/json'})
+    if name == 'link':  # it succeeds: the token is random
+        player['redact'] = ['token']
+    case(f'{name}_from_the_player_origin', player, 'p6')
     case(f'{name}_not_json_is_forbidden', mk(headers={'Origin': ORIGIN, 'Content-Type': 'text/plain'}), 'p6')
     case(f'{name}_without_a_content_type_is_forbidden', mk(headers={'Origin': ORIGIN, 'Content-Type': ''}), 'p6')
     case(f'{name}_body_not_json', {**base, 'body': None, 'rawBody': 'nope'}, 'p6')

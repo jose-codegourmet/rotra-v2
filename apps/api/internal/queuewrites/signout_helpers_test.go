@@ -20,7 +20,7 @@ func buildSignOut(pool *pgxpool.Pool, svc *session.Service, _ *store.Store, log 
 	if err != nil {
 		panic(err)
 	}
-	routes, err := queuewrites.Routes(queuewrites.Deps{Pool: pool, Auth: svc.Authenticator(), Logger: log, Now: now, QueueOrigins: []string{"http://localhost:9000"}, PlayerSignOut: signOut})
+	routes, err := queuewrites.Routes(queuewrites.Deps{Pool: pool, Auth: svc.Authenticator(), Logger: log, Now: now, QueueOrigins: []string{"http://localhost:9000"}, PlayerOrigins: []string{"http://localhost:9001"}, PlayerSignOut: signOut})
 	if err != nil {
 		panic(err)
 	}

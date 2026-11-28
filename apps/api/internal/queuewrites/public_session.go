@@ -119,8 +119,12 @@ func (c *corsWriter) forbidden() {
 func (s *server) fromQueueOrigin(inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cw := &corsWriter{ResponseWriter: w}
-		cw.cors(r, s.queueOrigins)
-		if !cw.allowed || !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
+		// The session page on the Player app calls same-origin (D-2026-11-28-01): no CORS headers, the JSON check still applies.
+		same := signedin.SameOrigin(r, s.playerOrigins)
+		if !same {
+			cw.cors(r, s.queueOrigins)
+		}
+		if (!same && !cw.allowed) || !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
 			cw.forbidden()
 			return
 		}
@@ -128,11 +132,14 @@ func (s *server) fromQueueOrigin(inner http.Handler) http.Handler {
 	})
 }
 
-// preflight is the OPTIONS of the JSON POSTs: the paired Queue origin only.
+// preflight is the OPTIONS of the JSON POSTs: the paired Queue origin, or the Player app's own pages (no CORS headers).
 func (s *server) preflight(w http.ResponseWriter, r *http.Request) {
 	cw := &corsWriter{ResponseWriter: w}
-	cw.cors(r, s.queueOrigins)
-	if !cw.allowed {
+	same := signedin.SameOrigin(r, s.playerOrigins)
+	if !same {
+		cw.cors(r, s.queueOrigins)
+	}
+	if !same && !cw.allowed {
 		cw.forbidden()
 		return
 	}

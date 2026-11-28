@@ -41,6 +41,9 @@ type Config struct {
 	// QueueOrigins is ROTRA_QUEUE_ORIGINS: exact Queue app origins that may call the credentialed Player stats read.
 	// Kept apart from AllowedOrigins so one list never grants the other's access.
 	QueueOrigins []string
+	// PlayerOrigins is ROTRA_PLAYER_ORIGINS: the Player app's own exact origins. The public session page lives on the
+	// Player app (D-2026-11-28-01), so its calls to the Player routes of a session are same-origin (queueCorsHeaders).
+	PlayerOrigins []string
 	// VisitorReceiptSecret is ROTRA_VISITOR_RECEIPT_SECRET: the key of the receipt a Queue visitor holds for their join request (an HMAC of the request
 	// id, kept in an httpOnly cookie). It is read as the environment gives it, with no trimming, so a receipt the TypeScript issued still matches. Empty
 	// means unset: the visitor routes answer 503 where they need it. Never log it: the config is never printed whole.
@@ -263,6 +266,9 @@ func Load(lookup func(string) (string, bool)) (Config, error) {
 		return Config{}, err2
 	}
 	if cfg.QueueOrigins, err2 = originList(get, "ROTRA_QUEUE_ORIGINS"); err2 != nil {
+		return Config{}, err2
+	}
+	if cfg.PlayerOrigins, err2 = originList(get, "ROTRA_PLAYER_ORIGINS"); err2 != nil {
 		return Config{}, err2
 	}
 	return cfg, nil

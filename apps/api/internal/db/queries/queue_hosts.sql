@@ -69,3 +69,11 @@ UPDATE session_players
 SET released_at = NULL, release_reason = NULL, no_show_at = NULL, confirmed_at = @at, present = false, present_changed_at = @at,
     over_budget_at = NULL, revision = revision + 1, updated_at = @now
 WHERE id = @id;
+
+-- name: InsertHostSessionPlayer :exec
+-- sessionPlayer.create of a host with no saved level (assignSessionHostsIn): the slot is taken at @at (the n-th new host of the save is stamped n
+-- milliseconds after the first), the row itself is created and touched at @now.
+INSERT INTO session_players (id, club_id, session_id, club_player_id, player_id_at_entry, name_snapshot, present, present_changed_at,
+                             confirmed_at, joined_at, created_at, updated_at)
+VALUES (@id, @club_id, @session_id, @club_player_id, @player_id_at_entry, @name_snapshot, false, @at,
+        @at, @at, @now, @now);

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -17,7 +18,7 @@ import (
 
 // This file ports the club's trusted hosts and a Queue Session's hosts (D-2026-11-22-01): packages/db/src/queue/club-hosts.ts and session-hosts.ts, and the
 // Route Handlers under apps/queue/src/app/api/club/trusted-hosts and apps/queue/src/app/api/sessions/{sessionId}/hosts. The two GETs are in signedin.
-// The setup save's hostClubPlayerIds (assignSessionHostsIn for a whole list) and the freeze of a finished session's hosts are not ported here.
+// The setup save's hostClubPlayerIds (assignSessionHostsIn for a whole list) is assignHosts below; the freeze of a finished session's hosts is not ported here.
 
 func (s *server) registerHosts(rt *signedin.Router) {
 	club := store.AudienceClub
@@ -203,7 +204,12 @@ func (s *server) addSessionHost(r *http.Request, club pgtype.UUID) (writes.Resul
 				return nil, writes.Fail(httpapi.ErrConflict, map[string]string{"hosts": name + " is already a host."})
 			}
 		}
-		registration, err := t.assignHost(player)
+		ids := make([]string, 0, len(current)+1)
+		for _, id := range current {
+			ids = append(ids, id.String())
+		}
+		ids = append(ids, player.ID.String())
+		registration, err := t.assignHosts(ids, randomID().String(), t.stamp())
 		if err != nil {
 			return nil, err
 		}
@@ -243,14 +249,85 @@ func (s *server) removeSessionHost(r *http.Request, club pgtype.UUID) (writes.Re
 	return writes.Result{Body: out}, nil
 }
 
-// assignHost is assignSessionHostsIn for one host who is not one yet: they must be a current trusted host; they get a host row and, unless they already
+// hostIdsInput is hostIdsInput: `hostClubPlayerIds` of a setup payload. Left out or null = unchanged (ok false); anything else must be a list of ids in the
+// 8-4-4-4-12 form, or the save is refused; repeats are dropped (the first of each stays). The ids stay as the caller wrote them: the TypeScript compares them as text.
+func hostIdsInput(v any) (ids []string, ok bool, err error) {
+	if v == nil {
+		return nil, false, nil
+	}
+	list, isList := v.([]any)
+	if !isList {
+		return nil, false, writes.Fail(httpapi.ErrInvalid, map[string]string{"hosts": "Pick hosts from your saved players."})
+	}
+	seen := map[string]bool{}
+	ids = []string{}
+	for _, item := range list {
+		text, isText := item.(string)
+		if !isText || !strictUUID.MatchString(text) {
+			return nil, false, writes.Fail(httpapi.ErrInvalid, map[string]string{"hosts": "Pick hosts from your saved players."})
+		}
+		if !seen[text] {
+			seen[text] = true
+			ids = append(ids, text)
+		}
+	}
+	return ids, true, nil
+}
+
+// assignHosts is assignSessionHostsIn: ids is the full list of the session's hosts after the save, in the order picked (as text). A current host no longer
+// listed ends their host row (their roster or waitlist place stays). Each newly listed one goes through assignOneHost, the n-th of them stamped n
+// milliseconds after now. operationID is the repeat-safe id the new rows' ids come from.
+func (t *txn) assignHosts(ids []string, operationID string, now pgtype.Timestamptz) (hostRegistration, error) {
+	var result hostRegistration
+	current, err := t.q.ListQueueCurrentHostPlayers(t.ctx, sqlcgen.ListQueueCurrentHostPlayersParams{ClubID: t.club, SessionID: t.sess.ID})
+	if err != nil {
+		return result, err
+	}
+	listed := map[string]bool{}
+	for _, id := range ids {
+		listed[id] = true
+	}
+	held := map[string]bool{}
+	for _, id := range current {
+		held[id.String()] = true
+		if listed[id.String()] {
+			continue
+		}
+		if _, err := t.q.EndQueueSessionHost(t.ctx, sqlcgen.EndQueueSessionHostParams{Now: now, ClubID: t.club, SessionID: t.sess.ID, ClubPlayerID: id}); err != nil {
+			return result, err
+		}
+	}
+	index := 0
+	for _, id := range ids {
+		if held[id] {
+			continue
+		}
+		at := pgtype.Timestamptz{Time: now.Time.Add(time.Duration(index) * time.Millisecond), Valid: true}
+		index++
+		uid, _ := writes.ParseUUID(id)
+		player, err := t.q.GetQueueHostPlayer(t.ctx, sqlcgen.GetQueueHostPlayerParams{ClubID: t.club, ID: uid})
+		// A saved player found by an id written in capitals is not the one the TypeScript matches (it compares the text), so none is found.
+		if errors.Is(err, pgx.ErrNoRows) || (err == nil && (player.RemovedAt.Valid || player.ID.String() != id)) {
+			return result, writes.Fail(httpapi.ErrInvalid, map[string]string{"hosts": "A host is no longer one of your saved players."})
+		}
+		if err != nil {
+			return result, err
+		}
+		one, err := t.assignOneHost(player, operationID, at)
+		if err != nil {
+			return result, err
+		}
+		result.Registered += one.Registered
+		result.Waitlisted += one.Waitlisted
+	}
+	return result, nil
+}
+
+// assignOneHost is the body of assignSessionHostsIn's loop for one new host: they must be a current trusted host; they get a host row and, unless they already
 // hold a live slot or a waitlist place, a place by the preparation rule (a slot while one is open, otherwise the end of the waitlist). Their latest saved
 // level comes with them through place; a saved player with none is placed with no level, to be set in Roster and levels, and no assessment is written.
-func (t *txn) assignHost(player sqlcgen.GetQueueHostPlayerRow) (hostRegistration, error) {
+func (t *txn) assignOneHost(player sqlcgen.GetQueueHostPlayerRow, operationID string, at pgtype.Timestamptz) (hostRegistration, error) {
 	var result hostRegistration
-	if player.RemovedAt.Valid {
-		return result, writes.Fail(httpapi.ErrInvalid, map[string]string{"hosts": "A host is no longer one of your saved players."})
-	}
 	trusted, err := t.q.IsQueueClubPlayerTrusted(t.ctx, sqlcgen.IsQueueClubPlayerTrustedParams{ClubID: t.club, ClubPlayerID: player.ID})
 	if err != nil {
 		return result, err
@@ -278,11 +355,9 @@ func (t *txn) assignHost(player sqlcgen.GetQueueHostPlayerRow) (hostRegistration
 	if t.sess.State == sqlcgen.QueueSessionStateActive && !registered && !hasLevel {
 		return result, writes.Fail(httpapi.ErrInvalid, map[string]string{"hosts": player.DisplayName + " has no saved level. Add them as a player with a level first, then add them as a host."})
 	}
-	operationID := randomID().String()
-	at := t.stamp()
 	if err := t.q.InsertQueueSessionHost(t.ctx, sqlcgen.InsertQueueSessionHostParams{
 		ID: derivedID(operationID, "host:"+player.ID.String()), ClubID: t.club, SessionID: t.sess.ID, ClubPlayerID: player.ID, At: at,
-		NameSnapshot: hostName(player.DisplayName, player.FullName), Now: at,
+		NameSnapshot: hostName(player.DisplayName, player.FullName), Now: t.stamp(),
 	}); err != nil {
 		return result, err
 	}
@@ -321,9 +396,9 @@ func (t *txn) assignHost(player sqlcgen.GetQueueHostPlayerRow) (hostRegistration
 			if err := t.q.ReactivateHostSessionPlayer(t.ctx, sqlcgen.ReactivateHostSessionPlayerParams{At: at, Now: t.stamp(), ID: entry.ID}); err != nil {
 				return result, err
 			}
-		} else if _, err := t.q.InsertSessionPlayer(t.ctx, sqlcgen.InsertSessionPlayerParams{
+		} else if err := t.q.InsertHostSessionPlayer(t.ctx, sqlcgen.InsertHostSessionPlayerParams{
 			ID: derivedID(placeID, "entry"), ClubID: t.club, SessionID: t.sess.ID, ClubPlayerID: player.ID, PlayerIDAtEntry: clubPlayer.PlayerID,
-			NameSnapshot: clubPlayer.DisplayName, Present: false, Now: at,
+			NameSnapshot: clubPlayer.DisplayName, At: at, Now: t.stamp(),
 		}); err != nil {
 			return result, err
 		}

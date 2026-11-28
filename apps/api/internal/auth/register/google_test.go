@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -198,6 +199,85 @@ func TestGoogleRegistrationJoinsTheClubRecordsThatShareThePhone(t *testing.T) {
 	}
 	if n := count(t, e, `SELECT count(*) FROM club_players WHERE id = 'e7000000-0000-4000-8000-0000000000a1' AND player_id IS NOT NULL`); n != 1 {
 		t.Fatal("the club's record with this phone joined the new account")
+	}
+}
+
+// sharedByTwoClubs is a Google email that two clubs saved (one open shared entry, one record in each club): the seed's "shared_entry" scenario of the
+// register cases, with the held account's email.
+func sharedByTwoClubs(t *testing.T) []string {
+	t.Helper()
+	raw, err := os.ReadFile(testdata + "/register.cases.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var doc struct {
+		Scenarios map[string][]string `json:"scenarios"`
+	}
+	if err := json.Unmarshal(raw, &doc); err != nil {
+		t.Fatal(err)
+	}
+	out := make([]string, 0, len(doc.Scenarios["shared_entry"]))
+	for _, q := range doc.Scenarios["shared_entry"] {
+		out = append(out, strings.ReplaceAll(q, "shared@example.test", "gina@example.test"))
+	}
+	return out
+}
+
+// The identity card picked when several clubs saved the Google email (D-2026-11-16-04) is read by the Route Handler and passed on, and
+// claimSharedEntry (shared-entry.ts) ignores it: "the pick only seeded the form; a stale pick never blocks the join". So the registration
+// is the same with no pick, with a pick of either club's record, and with a pick that names no record, a text that is no id, or a value
+// that is no text (the Route Handler reads that as no pick).
+func TestGoogleRegistrationIgnoresTheIdentityCardPicked(t *testing.T) {
+	const (
+		smashRecord = "e7000000-0000-4000-8000-0000000000b1"
+		otherRecord = "e7000000-0000-4000-8000-0000000000b2"
+	)
+	picks := []struct {
+		name string
+		pick any // nil leaves the field out
+	}{
+		{"none", nil},
+		{"null", json.RawMessage("null")},
+		{"the record of the club the link is from", smashRecord},
+		{"the record of the other club", otherRecord},
+		{"an id of no record", "e7000000-0000-4000-8000-0000000000ff"},
+		{"a text that is no id", "not-an-id"},
+		{"an empty text", ""},
+		{"a number", 7},
+		{"a list", []string{smashRecord}},
+	}
+	for _, p := range picks {
+		t.Run(p.name, func(t *testing.T) {
+			e := newGoogleEnv(t, true, sharedByTwoClubs(t)...)
+			req := googleRequest(smash, held("gina@example.test"), nil)
+			if p.pick != nil {
+				var body map[string]any
+				if err := json.Unmarshal([]byte(req.Body), &body); err != nil {
+					t.Fatal(err)
+				}
+				body["identityRecordId"] = p.pick
+				raw, _ := json.Marshal(body)
+				req.Body = string(raw)
+			}
+			w := e.Do(req)
+			got := decode(t, w)
+			if w.Code != 200 || got["status"] != "registered" {
+				t.Fatalf("%d %s", w.Code, w.Body)
+			}
+			if got["rtrId"] != "RTR-PH-CEB-102926-0041" {
+				t.Fatalf("the entry's RTR ID stays: %v", got["rtrId"])
+			}
+			joined, _ := got["joinedClubs"].([]any)
+			if len(joined) != 2 {
+				t.Fatalf("both clubs that saved the email joined: %v", got["joinedClubs"])
+			}
+			if n := count(t, e, `SELECT count(*) FROM club_players WHERE shared_entry_id = '5e000000-0000-4000-8000-000000000001' AND player_id IS NOT NULL`); n != 2 {
+				t.Fatalf("both records linked to the new account: %d", n)
+			}
+			if n := count(t, e, `SELECT count(*) FROM shared_player_entries WHERE id = '5e000000-0000-4000-8000-000000000001' AND claimed_player_id IS NOT NULL AND email IS NULL`); n != 1 {
+				t.Fatal("the entry is claimed and its email cleared")
+			}
+		})
 	}
 }
 

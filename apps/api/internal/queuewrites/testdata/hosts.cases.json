@@ -2035,6 +2035,1854 @@
      "who": "c7000000-0000-4000-8000-000000000001"
     }
    ]
+  },
+  {
+   "name": "setup_create_without_a_host_list_answers_no_hosts",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_an_empty_host_list_answers_no_hosts",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_null_host_list",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": null
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_one_trusted_host",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_trusted_host_with_no_level",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000001"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_hosts_beyond_the_slots_waits_on_the_waitlist",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000008",
+        "c6000000-0000-4000-8000-000000000003"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_host_with_a_level_beyond_the_slots_waits_with_the_level",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000001",
+        "c6000000-0000-4000-8000-000000000011",
+        "c6000000-0000-4000-8000-000000000007"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_an_untrusted_player",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000004"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_trusted_host_then_an_untrusted_player_places_nobody",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000004"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_duplicate_host_counts_it_once",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000007"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_host_whose_trust_ended",
+   "scenario": "trusted_ivy_ended",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000008"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_deleted_saved_player",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000006"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_an_unknown_player",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-0000000000ff"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_another_clubs_player",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000030"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_host_list_that_is_not_a_list",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": "x"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_host_that_is_not_an_id",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "m"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_host_that_is_not_text",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        7
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_an_id_in_capitals_is_not_found",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "C6000000-0000-4000-8000-000000000007"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_bad_host_list_and_a_bad_form_reads_the_hosts_first",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": "x"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_hosts_needs_an_entitlement",
+   "scenario": "hosts_lapsed",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000020"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_a_series_gives_every_date_the_hosts",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "repeat": "weekly",
+       "occurrences": 3,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000008"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_a_series_with_a_clashing_date_answers_the_first_date_made",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:30:00.000Z",
+       "scheduledEndAt": "2026-11-20T03:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "repeat": "weekly",
+       "occurrences": 3,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_that_clashes_places_no_host",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T02:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T03:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_retry_answers_no_hosts",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007"
+       ]
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 2,
+       "minimumIsCalculated": false,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_create_with_a_host_recomputes_a_calculated_minimum",
+   "scenario": "trusted",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/sessions",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "cmd-1",
+      "input": {
+       "title": "Saturday Smash",
+       "notes": "Bring shuttles",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-12-05T01:00:00.000Z",
+       "scheduledEndAt": "2026-12-05T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000008"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_without_a_host_list_answers_no_hosts_and_keeps_the_hosts",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_a_null_host_list_keeps_the_hosts",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": null
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_the_same_hosts_changes_nothing",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_an_empty_list_ends_every_host",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_adds_one_trusted_host",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000008"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_adds_a_host_and_removes_another",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000008",
+        "c6000000-0000-4000-8000-000000000003"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_removes_the_host_and_keeps_the_roster_place",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000003"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_lists_players_already_on_the_roster_and_the_waitlist_makes_no_second_registration",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000002",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "9007199254740993",
+      "input": {
+       "title": "Prep Full",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-23T02:00:00.000Z",
+       "scheduledEndAt": "2026-11-23T03:30:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000002",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000003"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_an_untrusted_player",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000004"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_an_untrusted_player_ends_no_host",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000004"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_a_deleted_saved_player",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000006"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_an_unknown_player",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-0000000000ff"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_a_duplicate_host",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000008",
+        "c6000000-0000-4000-8000-000000000008"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_a_host_list_that_is_not_a_list",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": {
+        "a": 1
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_a_host_that_is_not_an_id",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "m"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_reads_the_host_list_before_the_revision",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "1",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": "x"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_reads_the_host_list_before_the_session_is_found",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-0000000000ff",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": "x"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_hosts_with_a_stale_revision",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "4",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000008"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_a_host_takes_what_the_new_budget_leaves_open",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        },
+        {
+         "label": "Court 2"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000008"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_with_hosts_needs_an_entitlement",
+   "scenario": "hosts_lapsed",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000007",
+     "who": "c7000000-0000-4000-8000-000000000002",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "1",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000020"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_retry_of_the_same_command_places_the_host_once",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "5",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000008"
+       ]
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000001",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "6",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007",
+        "c6000000-0000-4000-8000-000000000008"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "setup_edit_hosts_of_a_live_session_is_refused",
+   "scenario": "hosts",
+   "steps": [
+    {
+     "method": "PATCH",
+     "path": "/api/sessions/a3000000-0000-4000-8000-000000000003",
+     "who": "c7000000-0000-4000-8000-000000000001",
+     "body": {
+      "commandId": "edit-1",
+      "expectedRevision": "12",
+      "input": {
+       "title": "Prep Open",
+       "notes": "",
+       "venueId": "a5000000-0000-4000-8000-000000000001",
+       "scheduledStartAt": "2026-11-20T01:00:00.000Z",
+       "scheduledEndAt": "2026-11-20T05:00:00.000Z",
+       "sessionMode": "fair",
+       "allowSingles": true,
+       "allowDoubles": true,
+       "minimumGames": 0,
+       "minimumIsCalculated": true,
+       "expectedPlayers": null,
+       "courts": [
+        {
+         "id": "a2c00000-0000-4000-8000-000000000001",
+         "label": "Court 1"
+        }
+       ],
+       "playersPerCourt": 2,
+       "hostClubPlayerIds": [
+        "c6000000-0000-4000-8000-000000000007"
+       ]
+      }
+     }
+    }
+   ]
   }
  ]
 }

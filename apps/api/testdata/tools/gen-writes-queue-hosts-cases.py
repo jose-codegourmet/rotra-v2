@@ -237,6 +237,95 @@ case('host_remove_on_a_lapsed_live_session_started_under_a_term', remove_host(S[
 case('host_remove_on_a_live_session', remove_host(S[3], CP(HAL)), scenario='hosts_s3_with_hal')
 case('host_remove_recomputes_a_calculated_minimum', remove_host(S[1], CP(HAL)), scenario='hosts')
 
+# ---------------------------------------------------------------- the setup save's hostClubPlayerIds (Create session, Edit preparation)
+# assignSessionHostsIn for a whole list: the ids a new host's rows come from are derived from the command id, so nothing is redacted.
+V1 = 'a5000000-0000-4000-8000-000000000001'
+CT1 = 'a2c00000-0000-4000-8000-000000000001'
+CT2 = 'a2c00000-0000-4000-8000-000000000002'
+START, END = '2026-12-05T01:00:00.000Z', '2026-12-05T05:00:00.000Z'
+
+
+def form(**kw):
+    f = {'title': 'Saturday Smash', 'notes': 'Bring shuttles', 'venueId': V1, 'scheduledStartAt': START, 'scheduledEndAt': END, 'sessionMode': 'fair',
+         'allowSingles': True, 'allowDoubles': True, 'minimumGames': 2, 'minimumIsCalculated': False, 'expectedPlayers': None,
+         'courts': [{'label': 'Court 1'}, {'label': 'Court 2'}]}
+    f.update(kw)
+    return f
+
+
+def s1_form(**kw):
+    base = dict(title='Prep Open', notes='', scheduledStartAt='2026-11-20T01:00:00.000Z', scheduledEndAt='2026-11-20T05:00:00.000Z',
+                minimumGames=0, minimumIsCalculated=True, playersPerCourt=2, courts=[{'id': CT1, 'label': 'Court 1'}])
+    base.update(kw)
+    return form(**base)
+
+
+def create(n, input_, who=SMASH, **kw):
+    return req('POST', '/api/sessions', {'commandId': f'cmd-{n}', 'input': input_}, who=who, **kw)
+
+
+def edit(input_, n=1, revision='5', session=S[1], who=SMASH, **kw):
+    return req('PATCH', f'/api/sessions/{session}', {'commandId': f'edit-{n}', 'expectedRevision': revision, 'input': input_}, who=who, **kw)
+
+
+case('setup_create_without_a_host_list_answers_no_hosts', create(1, form()), scenario='trusted')
+case('setup_create_with_an_empty_host_list_answers_no_hosts', create(1, form(hostClubPlayerIds=[])), scenario='trusted')
+case('setup_create_with_a_null_host_list', create(1, form(hostClubPlayerIds=None)), scenario='trusted')
+case('setup_create_with_one_trusted_host', create(1, form(hostClubPlayerIds=[CP(HAL)])), scenario='trusted')
+case('setup_create_with_a_trusted_host_with_no_level', create(1, form(hostClubPlayerIds=[CP(GUS)])), scenario='trusted')
+case('setup_create_with_hosts_beyond_the_slots_waits_on_the_waitlist',
+     create(1, form(playersPerCourt=2, courts=[{'label': 'Court 1'}], hostClubPlayerIds=[CP(HAL), CP(IVY), CP(ANN)])), scenario='trusted')
+case('setup_create_with_a_host_with_a_level_beyond_the_slots_waits_with_the_level',
+     create(1, form(playersPerCourt=2, courts=[{'label': 'Court 1'}], hostClubPlayerIds=[CP(GUS), CP(KAI), CP(HAL)])), scenario='trusted')
+case('setup_create_with_an_untrusted_player', create(1, form(hostClubPlayerIds=[CP(BEN)])), scenario='trusted')
+case('setup_create_with_a_trusted_host_then_an_untrusted_player_places_nobody', create(1, form(hostClubPlayerIds=[CP(HAL), CP(BEN)])), scenario='trusted')
+case('setup_create_with_a_duplicate_host_counts_it_once', create(1, form(hostClubPlayerIds=[CP(HAL), CP(HAL)])), scenario='trusted')
+case('setup_create_with_a_host_whose_trust_ended', create(1, form(hostClubPlayerIds=[CP(IVY)])), scenario='trusted_ivy_ended')
+case('setup_create_with_a_deleted_saved_player', create(1, form(hostClubPlayerIds=[CP(REX)])), scenario='trusted')
+case('setup_create_with_an_unknown_player', create(1, form(hostClubPlayerIds=[UNKNOWN_CP])), scenario='trusted')
+case('setup_create_with_another_clubs_player', create(1, form(hostClubPlayerIds=[CP(OLGA)])), scenario='trusted')
+case('setup_create_with_a_host_list_that_is_not_a_list', create(1, form(hostClubPlayerIds='x')), scenario='trusted')
+case('setup_create_with_a_host_that_is_not_an_id', create(1, form(hostClubPlayerIds=[CP(HAL), 'm'])), scenario='trusted')
+case('setup_create_with_a_host_that_is_not_text', create(1, form(hostClubPlayerIds=[7])), scenario='trusted')
+case('setup_create_with_an_id_in_capitals_is_not_found', create(1, form(hostClubPlayerIds=[CP(HAL).upper()])), scenario='trusted')
+case('setup_create_with_a_bad_host_list_and_a_bad_form_reads_the_hosts_first', create(1, form(title='', hostClubPlayerIds='x')), scenario='trusted')
+case('setup_create_with_hosts_needs_an_entitlement', create(1, form(hostClubPlayerIds=[CP(20)]), who=LAPSED), scenario='hosts_lapsed')
+case('setup_create_a_series_gives_every_date_the_hosts', create(1, form(repeat='weekly', occurrences=3, hostClubPlayerIds=[CP(HAL), CP(IVY)])), scenario='trusted')
+case('setup_create_a_series_with_a_clashing_date_answers_the_first_date_made',
+     create(1, form(repeat='weekly', occurrences=3, scheduledStartAt='2026-11-20T01:30:00.000Z', scheduledEndAt='2026-11-20T03:00:00.000Z', venueId=V1, hostClubPlayerIds=[CP(HAL)])), scenario='trusted')
+case('setup_create_that_clashes_places_no_host',
+     create(1, form(scheduledStartAt='2026-11-20T02:00:00.000Z', scheduledEndAt='2026-11-20T03:00:00.000Z', hostClubPlayerIds=[CP(HAL)])), scenario='trusted')
+case('setup_create_retry_answers_no_hosts', [create(1, form(hostClubPlayerIds=[CP(HAL)])), create(1, form(hostClubPlayerIds=[CP(HAL)]))], scenario='trusted')
+case('setup_create_with_a_host_recomputes_a_calculated_minimum',
+     create(1, form(minimumIsCalculated=True, minimumGames=0, hostClubPlayerIds=[CP(HAL), CP(IVY)])), scenario='trusted')
+
+case('setup_edit_without_a_host_list_answers_no_hosts_and_keeps_the_hosts', edit(s1_form()), scenario='hosts')
+case('setup_edit_with_a_null_host_list_keeps_the_hosts', edit(s1_form(hostClubPlayerIds=None)), scenario='hosts')
+case('setup_edit_with_the_same_hosts_changes_nothing', edit(s1_form(hostClubPlayerIds=[CP(HAL)])), scenario='hosts')
+case('setup_edit_with_an_empty_list_ends_every_host', edit(s1_form(hostClubPlayerIds=[])), scenario='hosts')
+case('setup_edit_adds_one_trusted_host', edit(s1_form(hostClubPlayerIds=[CP(HAL), CP(IVY)])), scenario='hosts')
+case('setup_edit_adds_a_host_and_removes_another', edit(s1_form(hostClubPlayerIds=[CP(IVY), CP(ANN)])), scenario='hosts')
+case('setup_edit_removes_the_host_and_keeps_the_roster_place', edit(s1_form(hostClubPlayerIds=[CP(ANN)])), scenario='hosts')
+case('setup_edit_lists_players_already_on_the_roster_and_the_waitlist_makes_no_second_registration',
+     edit(s1_form(title='Prep Full', scheduledStartAt='2026-11-23T02:00:00.000Z', scheduledEndAt='2026-11-23T03:30:00.000Z', courts=[{'id': CT2, 'label': 'Court 1'}],
+                  hostClubPlayerIds=[CP(HAL), CP(ANN)]), session=S[2], revision='9007199254740993'), scenario='hosts')
+case('setup_edit_with_an_untrusted_player', edit(s1_form(hostClubPlayerIds=[CP(HAL), CP(BEN)])), scenario='hosts')
+case('setup_edit_with_an_untrusted_player_ends_no_host', edit(s1_form(hostClubPlayerIds=[CP(BEN)])), scenario='hosts')
+case('setup_edit_with_a_deleted_saved_player', edit(s1_form(hostClubPlayerIds=[CP(REX)])), scenario='hosts')
+case('setup_edit_with_an_unknown_player', edit(s1_form(hostClubPlayerIds=[UNKNOWN_CP])), scenario='hosts')
+case('setup_edit_with_a_duplicate_host', edit(s1_form(hostClubPlayerIds=[CP(IVY), CP(IVY)])), scenario='hosts')
+case('setup_edit_with_a_host_list_that_is_not_a_list', edit(s1_form(hostClubPlayerIds={'a': 1})), scenario='hosts')
+case('setup_edit_with_a_host_that_is_not_an_id', edit(s1_form(hostClubPlayerIds=['m'])), scenario='hosts')
+case('setup_edit_reads_the_host_list_before_the_revision', edit(s1_form(hostClubPlayerIds='x'), revision='1'), scenario='hosts')
+case('setup_edit_reads_the_host_list_before_the_session_is_found', edit(s1_form(hostClubPlayerIds='x'), session=UNKNOWN_S), scenario='hosts')
+case('setup_edit_hosts_with_a_stale_revision', edit(s1_form(hostClubPlayerIds=[CP(IVY)]), revision='4'), scenario='hosts')
+case('setup_edit_a_host_takes_what_the_new_budget_leaves_open',
+     edit(s1_form(courts=[{'id': CT1, 'label': 'Court 1'}, {'label': 'Court 2'}], hostClubPlayerIds=[CP(HAL), CP(IVY)])), scenario='hosts')
+case('setup_edit_with_hosts_needs_an_entitlement', edit(s1_form(hostClubPlayerIds=[CP(20)]), session=S[7], revision='1', who=LAPSED), scenario='hosts_lapsed')
+case('setup_edit_retry_of_the_same_command_places_the_host_once',
+     [edit(s1_form(hostClubPlayerIds=[CP(HAL), CP(IVY)]), n=1), edit(s1_form(hostClubPlayerIds=[CP(HAL), CP(IVY)]), n=1, revision='6')], scenario='hosts')
+case('setup_edit_hosts_of_a_live_session_is_refused', edit(s1_form(hostClubPlayerIds=[CP(HAL)]), session=S[3], revision='12'), scenario='hosts')
+
 # More scenarios the cases above name.
 SCEN['trusted_moved_out'] = TRUSTED + ["UPDATE club_players SET removed_at = TIMESTAMPTZ '2026-11-18 00:00:00+00', linked_to_club_player_id = '" + CP(ANN) + "' WHERE id = '" + CP(KAI) + "'"]
 SCEN['trusted_same_instant'] = [trusted_sql(2, CLUB1, ANN, 11), trusted_sql(1, CLUB1, HAL, 11)]

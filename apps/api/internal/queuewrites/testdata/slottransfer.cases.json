@@ -5436,6 +5436,139 @@
      "id"
     ]
    }
+  },
+  {
+   "name": "request_from_the_player_origin",
+   "scenario": "p6",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/noon-break/slot-transfer",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9001",
+      "Content-Type": "application/json"
+     },
+     "body": {
+      "transferId": "a3d10000-0000-4000-8000-000000000001",
+      "rtrId": "RTR-PH-CEB-102926-0006"
+     }
+    }
+   ]
+  },
+  {
+   "name": "lookup_from_the_player_origin",
+   "scenario": "p6",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/noon-break/slot-transfer/lookup",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9001",
+      "Content-Type": "application/json"
+     },
+     "body": {
+      "rtrId": "RTR-PH-CEB-102926-0006"
+     }
+    }
+   ]
+  },
+  {
+   "name": "withdraw_from_the_player_origin",
+   "scenario": "p6",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/noon-break/slot-transfer/withdraw",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9001",
+      "Content-Type": "application/json"
+     },
+     "body": {}
+    }
+   ]
+  },
+  {
+   "name": "link_from_the_player_origin",
+   "scenario": "p6",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/noon-break/slot-transfer/link",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9001",
+      "Content-Type": "application/json"
+     },
+     "body": {
+      "transferId": "a3d10000-0000-4000-8000-000000000002"
+     },
+     "redact": [
+      "token"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "link_read_from_the_player_origin",
+   "scenario": "p6",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/noon-break/slot-transfer/link/read",
+     "who": "f4000000-0000-4000-8000-000000000001",
+     "headers": {
+      "Origin": "http://localhost:9001",
+      "Content-Type": "application/json"
+     },
+     "body": {
+      "token": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+     }
+    }
+   ]
+  },
+  {
+   "name": "link_claim_from_the_player_origin",
+   "scenario": "p6",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/noon-break/slot-transfer/link/claim",
+     "who": "f4000000-0000-4000-8000-000000000006",
+     "headers": {
+      "Origin": "http://localhost:9001",
+      "Content-Type": "application/json"
+     },
+     "body": {
+      "token": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+     }
+    }
+   ],
+   "redact": {
+    "club_players": [
+     "id"
+    ]
+   }
+  },
+  {
+   "name": "link_withdraw_from_the_player_origin",
+   "scenario": "p6",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/noon-break/slot-transfer/link/withdraw",
+     "who": "f4000000-0000-4000-8000-000000000006",
+     "headers": {
+      "Origin": "http://localhost:9001",
+      "Content-Type": "application/json"
+     },
+     "body": {
+      "token": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+     }
+    }
+   ]
   }
  ]
 }

@@ -16,6 +16,11 @@ export type SessionGamesProps = {
   onOpenGame?: (gameId: string) => void
   /** Between the session head and the games: the Share performance / result / games row */
   actions?: ReactNode
+  /**
+   * Open Session page in a new tab. Off in the Player app, where the page lives (D-2026-11-28-01);
+   * on in Admin, which leaves its own app to show it.
+   */
+  newTab?: boolean
 }
 export function SessionGames({
   session,
@@ -24,6 +29,7 @@ export function SessionGames({
   onShareGame,
   onOpenGame,
   actions,
+  newTab = false,
 }: SessionGamesProps) {
   return (
     <section className="flex flex-col gap-1">
@@ -44,7 +50,10 @@ export function SessionGames({
         </div>
         {session.sessionPageUrl ? (
           <Button asChild variant="ghost" size="xs">
-            <a href={session.sessionPageUrl} target="_blank" rel="noopener noreferrer">
+            <a
+              href={session.sessionPageUrl}
+              {...(newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
               Session page <Icon name="external" />
             </a>
           </Button>

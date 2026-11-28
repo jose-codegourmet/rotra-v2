@@ -88,6 +88,7 @@ case('preflight_match_request_from_another_origin', {'method': 'OPTIONS', 'path'
 case('ask_signed_out', ask(who=None))
 case('ask_without_an_origin', ask(headers={}))
 case('ask_from_another_origin', ask(headers={'Origin': 'http://localhost:9999'}))
+case('ask_from_the_player_origin', ask(mr(), headers={'Origin': 'http://localhost:9001', 'Content-Type': 'application/json'}))
 case('ask_not_json_is_forbidden', ask(headers={'Origin': ORIGIN, 'Content-Type': 'text/plain'}))
 case('ask_a_player_who_is_not_on_the_roster', ask(mr(), who=GIL))
 case('ask_for_doubles_with_anyone', ask(mr()))

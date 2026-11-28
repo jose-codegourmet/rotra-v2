@@ -31,6 +31,8 @@ type Deps struct {
 	ApprovedAlgorithms []string
 	// QueueOrigins are the exact Queue origins that may call the credentialed stats read (the paired Queue pages).
 	QueueOrigins []string
+	// PlayerOrigins are the Player app's own origins: the session page's same-origin calls (D-2026-11-28-01).
+	PlayerOrigins []string
 	// PasswordResets lists the Admin's password-reset requests (the recovery service). Nil leaves that route out.
 	PasswordResets PasswordResetReader
 	// Routes add more handlers to the shared router before it is mounted: the write packages (adminwrites, ...)
@@ -42,14 +44,15 @@ type Deps struct {
 }
 
 type server struct {
-	pool         *pgxpool.Pool
-	auth         *session.Authenticator
-	log          *slog.Logger
-	now          func() time.Time
-	queueOrigins []string
-	approved     []string
-	viewer       *publicreads.ViewerReads
-	resets       PasswordResetReader
+	pool          *pgxpool.Pool
+	auth          *session.Authenticator
+	log           *slog.Logger
+	now           func() time.Time
+	queueOrigins  []string
+	playerOrigins []string
+	approved      []string
+	viewer        *publicreads.ViewerReads
+	resets        PasswordResetReader
 	// driveFinalization runs the jobs of a committed Session done before the status read; nil runs none.
 	driveFinalization func(ctx context.Context, club, session pgtype.UUID)
 }
@@ -60,7 +63,7 @@ func Register(d Deps) (func(*http.ServeMux), error) {
 	if d.Pool == nil || d.Auth == nil {
 		return nil, errors.New("signedin: routes need a pool and an authenticator")
 	}
-	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, approved: d.ApprovedAlgorithms, resets: d.PasswordResets, driveFinalization: d.DriveFinalization}
+	s := &server{pool: d.Pool, auth: d.Auth, log: d.Logger, now: d.Now, queueOrigins: d.QueueOrigins, playerOrigins: d.PlayerOrigins, approved: d.ApprovedAlgorithms, resets: d.PasswordResets, driveFinalization: d.DriveFinalization}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}

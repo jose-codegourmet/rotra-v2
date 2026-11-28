@@ -186,7 +186,7 @@ func run() error {
 		if err != nil {
 			return err
 		}
-		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, QueueOrigins: cfg.QueueOrigins, VisitorReceiptSecret: cfg.VisitorReceiptSecret, PlayerSignOut: playerSignOut, Now: now})
+		queueWrites, err := queuewrites.Routes(queuewrites.Deps{Pool: pool.Raw(), Auth: svc.Authenticator(), Logger: log, QueueOrigins: cfg.QueueOrigins, PlayerOrigins: cfg.PlayerOrigins, VisitorReceiptSecret: cfg.VisitorReceiptSecret, PlayerSignOut: playerSignOut, Now: now})
 		if err != nil {
 			return err
 		}
@@ -202,7 +202,7 @@ func run() error {
 			Pool:   pool.Raw(), Auth: svc.Authenticator(), Logger: log, Now: now,
 			// The viewer-aware public reads share the public-read budget; the stats read allows the same exact app origins
 			// as the stream routes (the paired Queue pages).
-			Limiter: publicLimiter, QueueOrigins: cfg.QueueOrigins, DriveFinalization: driveFinalization,
+			Limiter: publicLimiter, QueueOrigins: cfg.QueueOrigins, PlayerOrigins: cfg.PlayerOrigins, DriveFinalization: driveFinalization,
 			// The Admin list of password-reset requests is the recovery service's read.
 			PasswordResets: recoveryService,
 		})

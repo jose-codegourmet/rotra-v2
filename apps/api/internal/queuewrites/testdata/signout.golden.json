@@ -267,5 +267,43 @@
       "queue_sessions": [],
       "queue_sessions (removed)": []
     }
+  },
+  "sign_out_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": null
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
+  },
+  "preflight_sign_out_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 204,
+        "headers": {
+          "access-control-allow-headers": "Content-Type",
+          "access-control-allow-methods": "POST",
+          "access-control-max-age": "600",
+          "cache-control": "private, no-store",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "__raw": ""
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": []
+    }
   }
 }

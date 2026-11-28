@@ -1,6 +1,6 @@
 # Queue Edit player: only four fields; pencil on Roster and levels
 
-Status: IN MOCK APP
+Status: IN MOCK APP — PR #1170
 Date: 2026-11-27
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `SHEETS.editLive`, `openEditLive`, `saveEditLive`, `rvEdit` (`rvCard`, `rvRow`)

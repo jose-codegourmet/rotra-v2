@@ -89,18 +89,31 @@ func TestMyLeaderboardMyProfileAndStatsNeedAPlayerPass(t *testing.T) {
 }
 
 // The stats read is a credentialed call from the paired Queue origin: every answer carries its CORS headers, and
-// any other origin (or none) is refused before the pass is looked at.
+// any other origin is refused before the pass is looked at. The Player app's own pages call it same-origin
+// (D-2026-11-28-01): the Player origin, or a GET with no Origin that the browser does not mark cross-site.
 func TestStatsReadAllowsOnlyTheQueueOrigin(t *testing.T) {
 	e := profileEnv(t)
 	const path = "/api/rtr-ids/RTR-PH-CEB-102926-0002/stats"
 	bearer := e.accessPass(t, bobSubject)
-	for _, origin := range []string{"", "https://evil.example", "http://localhost:9001", queueOrigin + "/"} {
+	for _, origin := range []string{"https://evil.example", "http://localhost:9002", queueOrigin + "/", playerOrigin + "/"} {
 		w := e.do(req{path: path, app: "player", bearer: bearer, origin: origin})
 		if w.Code != 403 || w.Body.String() != `{"error":{"code":"forbidden"}}` {
 			t.Errorf("origin %q: %d %s", origin, w.Code, w.Body.String())
 		}
 		if w.Header().Get("Access-Control-Allow-Origin") != "" || w.Header().Get("Vary") != "Origin, Cookie" {
 			t.Errorf("origin %q: headers %v", origin, w.Header())
+		}
+	}
+	for _, site := range []string{"cross-site", "same-site", "none"} {
+		if w := e.do(req{path: path, app: "player", bearer: bearer, fetchSite: site}); w.Code != 403 {
+			t.Errorf("no Origin, Sec-Fetch-Site %s: %d", site, w.Code)
+		}
+	}
+	for _, r := range []req{{origin: playerOrigin}, {}, {fetchSite: "same-origin"}} {
+		r.path, r.app, r.bearer = path, "player", bearer
+		w := e.do(r)
+		if w.Code != 200 || w.Header().Get("Access-Control-Allow-Origin") != "" || w.Header().Get("Vary") != "Origin, Cookie" {
+			t.Errorf("same origin %+v: %d %v", r, w.Code, w.Header())
 		}
 	}
 	w := e.do(req{path: path, app: "player", bearer: bearer, origin: queueOrigin})

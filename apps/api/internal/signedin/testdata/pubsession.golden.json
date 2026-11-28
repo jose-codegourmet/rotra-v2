@@ -8246,29 +8246,845 @@
     }
   },
   "access_no_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
     "body": {
-      "error": {
-        "code": "forbidden"
-      }
+      "playerId": "d1000000-0000-4000-8000-000000000001",
+      "name": "Alice Reyes",
+      "nickname": "Ace",
+      "rtrId": "RTR-PH-CEB-102926-0001",
+      "pictureUrl": "https://example.test/p1.png",
+      "inSession": true,
+      "waitlistPosition": null,
+      "joinRequest": null,
+      "isClubMember": true,
+      "levelBlock": null,
+      "fullRoster": true,
+      "participants": [
+        {
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "name": "Alice Reyes",
+          "masked": false,
+          "nickname": "Ace",
+          "rtrId": "RTR-PH-CEB-102926-0001",
+          "isViewer": true,
+          "profile": "registered",
+          "pictureUrl": "https://example.test/p1.png",
+          "skillGroup": "intermediate",
+          "levelLabel": "Intermediate Mid"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "Ben Cruz",
+          "masked": false,
+          "nickname": "Benny",
+          "rtrId": "RTR-PH-CEB-102926-0002",
+          "isViewer": false,
+          "profile": "registered",
+          "pictureUrl": "https://example.test/p2.png",
+          "skillGroup": "intermediate",
+          "levelLabel": "Intermediate Low"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "C*** D***",
+          "masked": true,
+          "nickname": null,
+          "rtrId": null,
+          "isViewer": false,
+          "profile": "private",
+          "pictureUrl": "https://example.test/p3.png",
+          "skillGroup": "advanced",
+          "levelLabel": "Advanced Mid"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "Dan Evans",
+          "masked": false,
+          "nickname": null,
+          "rtrId": "RTR-PH-CEB-102926-0004",
+          "isViewer": false,
+          "profile": "registered",
+          "pictureUrl": "https://example.test/p4.png",
+          "skillGroup": "beginner",
+          "levelLabel": "Beginner Low"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "Eli Fox",
+          "masked": false,
+          "nickname": "Eli",
+          "rtrId": "RTR-PH-CEB-102926-0005",
+          "isViewer": false,
+          "profile": "registered",
+          "pictureUrl": "https://example.test/p5.png",
+          "skillGroup": null,
+          "levelLabel": null
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "Fay Go",
+          "masked": false,
+          "nickname": null,
+          "rtrId": "RTR-PH-CEB-102926-0006",
+          "isViewer": false,
+          "profile": "registered",
+          "pictureUrl": "https://example.test/p6.png",
+          "skillGroup": "advanced",
+          "levelLabel": "Advanced High"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "Gio Hizon",
+          "masked": false,
+          "nickname": "Gi",
+          "rtrId": "RTR-PH-CEB-102926-0007",
+          "isViewer": false,
+          "profile": "unclaimed",
+          "pictureUrl": "https://example.test/p7.png",
+          "skillGroup": "beginner",
+          "levelLabel": "Beginner High"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "H*** I*** S***",
+          "masked": true,
+          "nickname": null,
+          "rtrId": null,
+          "isViewer": false,
+          "profile": "guest",
+          "pictureUrl": null,
+          "skillGroup": null,
+          "levelLabel": null
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "I*** J***",
+          "masked": true,
+          "nickname": null,
+          "rtrId": null,
+          "isViewer": false,
+          "profile": "guest",
+          "pictureUrl": null,
+          "skillGroup": "intermediate",
+          "levelLabel": "Intermediate High"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "J*** K***",
+          "masked": true,
+          "nickname": null,
+          "rtrId": null,
+          "isViewer": false,
+          "profile": "guest",
+          "pictureUrl": null,
+          "skillGroup": null,
+          "levelLabel": null
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "K*** L***",
+          "masked": true,
+          "nickname": null,
+          "rtrId": null,
+          "isViewer": false,
+          "profile": "guest",
+          "pictureUrl": null,
+          "skillGroup": "beginner",
+          "levelLabel": "Beginner Mid"
+        }
+      ],
+      "waitlist": [],
+      "hosts": [],
+      "courtsNow": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000001",
+          "label": "Court 1",
+          "courtLabels": [
+            "Court 1"
+          ],
+          "merged": false,
+          "status": "playing",
+          "teamA": [
+            {
+              "name": "Alice",
+              "level": "intermediate_mid",
+              "pictureUrl": "https://example.test/p1.png",
+              "masked": false,
+              "isViewer": true,
+              "participant": 0
+            },
+            {
+              "name": "Ben",
+              "level": "intermediate_low",
+              "pictureUrl": "https://example.test/p2.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 1
+            }
+          ],
+          "teamB": [
+            {
+              "name": "Dan",
+              "level": "beginner_low",
+              "pictureUrl": "https://example.test/p4.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 3
+            },
+            {
+              "name": "Fay",
+              "level": "advanced_high",
+              "pictureUrl": "https://example.test/p6.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 5
+            }
+          ],
+          "startedAt": 1795059000000,
+          "freeSince": null
+        },
+        {
+          "id": "a6000000-0000-4000-8000-000000000002",
+          "label": "Court 2",
+          "courtLabels": [
+            "Court 2"
+          ],
+          "merged": false,
+          "status": "getting-ready",
+          "teamA": [
+            {
+              "name": "Gio",
+              "level": "beginner_high",
+              "pictureUrl": "https://example.test/p7.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 6
+            },
+            {
+              "name": "H***",
+              "level": null,
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 7
+            }
+          ],
+          "teamB": [
+            {
+              "name": "I***",
+              "level": "intermediate_high",
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 8
+            },
+            {
+              "name": "J***",
+              "level": null,
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 9
+            }
+          ],
+          "startedAt": null,
+          "freeSince": null
+        },
+        {
+          "id": "a6000000-0000-4000-8000-000000000003",
+          "label": "Court 3 + Court 4",
+          "courtLabels": [
+            "Court 3",
+            "Court 4"
+          ],
+          "merged": true,
+          "status": "playing",
+          "teamA": [
+            {
+              "name": "C***",
+              "level": "advanced_mid",
+              "pictureUrl": "https://example.test/p3.png",
+              "masked": true,
+              "isViewer": false,
+              "participant": 2
+            }
+          ],
+          "teamB": [
+            {
+              "name": "K***",
+              "level": "beginner_mid",
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 10
+            }
+          ],
+          "startedAt": 1795059300000,
+          "freeSince": null
+        }
+      ],
+      "queue": [
+        {
+          "matchNo": 6,
+          "format": "doubles",
+          "label": "Genderless Doubles",
+          "teamA": [
+            {
+              "name": "Alice",
+              "level": "intermediate_mid",
+              "pictureUrl": "https://example.test/p1.png",
+              "masked": false,
+              "isViewer": true,
+              "participant": 0
+            },
+            {
+              "name": "C***",
+              "level": "advanced_mid",
+              "pictureUrl": "https://example.test/p3.png",
+              "masked": true,
+              "isViewer": false,
+              "participant": 2
+            }
+          ],
+          "teamB": [
+            {
+              "name": "Eli",
+              "level": null,
+              "pictureUrl": "https://example.test/p5.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 4
+            },
+            {
+              "name": "J***",
+              "level": null,
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 9
+            }
+          ]
+        },
+        {
+          "matchNo": 4,
+          "format": "doubles",
+          "label": "Genderless Doubles",
+          "teamA": [
+            {
+              "name": "Eli",
+              "level": null,
+              "pictureUrl": "https://example.test/p5.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 4
+            },
+            {
+              "name": "I***",
+              "level": "intermediate_high",
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 8
+            }
+          ],
+          "teamB": [
+            {
+              "name": "Ben",
+              "level": "intermediate_low",
+              "pictureUrl": "https://example.test/p2.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 1
+            },
+            {
+              "name": "H***",
+              "level": null,
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 7
+            }
+          ]
+        },
+        {
+          "matchNo": 5,
+          "format": "doubles",
+          "label": "Genderless Doubles",
+          "teamA": [
+            {
+              "name": "Eli",
+              "level": null,
+              "pictureUrl": "https://example.test/p5.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 4
+            },
+            {
+              "name": "Alice",
+              "level": "intermediate_mid",
+              "pictureUrl": "https://example.test/p1.png",
+              "masked": false,
+              "isViewer": true,
+              "participant": 0
+            }
+          ],
+          "teamB": [
+            {
+              "name": "Fay",
+              "level": "advanced_high",
+              "pictureUrl": "https://example.test/p6.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 5
+            },
+            {
+              "name": "Dan",
+              "level": "beginner_low",
+              "pictureUrl": "https://example.test/p4.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 3
+            }
+          ]
+        }
+      ]
     }
   },
   "access_other_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
     "body": {
-      "error": {
-        "code": "forbidden"
-      }
+      "playerId": "d1000000-0000-4000-8000-000000000001",
+      "name": "Alice Reyes",
+      "nickname": "Ace",
+      "rtrId": "RTR-PH-CEB-102926-0001",
+      "pictureUrl": "https://example.test/p1.png",
+      "inSession": true,
+      "waitlistPosition": null,
+      "joinRequest": null,
+      "isClubMember": true,
+      "levelBlock": null,
+      "fullRoster": true,
+      "participants": [
+        {
+          "bannerKey": "night",
+          "bannerImageUrl": null,
+          "name": "Alice Reyes",
+          "masked": false,
+          "nickname": "Ace",
+          "rtrId": "RTR-PH-CEB-102926-0001",
+          "isViewer": true,
+          "profile": "registered",
+          "pictureUrl": "https://example.test/p1.png",
+          "skillGroup": "intermediate",
+          "levelLabel": "Intermediate Mid"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "Ben Cruz",
+          "masked": false,
+          "nickname": "Benny",
+          "rtrId": "RTR-PH-CEB-102926-0002",
+          "isViewer": false,
+          "profile": "registered",
+          "pictureUrl": "https://example.test/p2.png",
+          "skillGroup": "intermediate",
+          "levelLabel": "Intermediate Low"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "C*** D***",
+          "masked": true,
+          "nickname": null,
+          "rtrId": null,
+          "isViewer": false,
+          "profile": "private",
+          "pictureUrl": "https://example.test/p3.png",
+          "skillGroup": "advanced",
+          "levelLabel": "Advanced Mid"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "Dan Evans",
+          "masked": false,
+          "nickname": null,
+          "rtrId": "RTR-PH-CEB-102926-0004",
+          "isViewer": false,
+          "profile": "registered",
+          "pictureUrl": "https://example.test/p4.png",
+          "skillGroup": "beginner",
+          "levelLabel": "Beginner Low"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "Eli Fox",
+          "masked": false,
+          "nickname": "Eli",
+          "rtrId": "RTR-PH-CEB-102926-0005",
+          "isViewer": false,
+          "profile": "registered",
+          "pictureUrl": "https://example.test/p5.png",
+          "skillGroup": null,
+          "levelLabel": null
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "Fay Go",
+          "masked": false,
+          "nickname": null,
+          "rtrId": "RTR-PH-CEB-102926-0006",
+          "isViewer": false,
+          "profile": "registered",
+          "pictureUrl": "https://example.test/p6.png",
+          "skillGroup": "advanced",
+          "levelLabel": "Advanced High"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "Gio Hizon",
+          "masked": false,
+          "nickname": "Gi",
+          "rtrId": "RTR-PH-CEB-102926-0007",
+          "isViewer": false,
+          "profile": "unclaimed",
+          "pictureUrl": "https://example.test/p7.png",
+          "skillGroup": "beginner",
+          "levelLabel": "Beginner High"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "H*** I*** S***",
+          "masked": true,
+          "nickname": null,
+          "rtrId": null,
+          "isViewer": false,
+          "profile": "guest",
+          "pictureUrl": null,
+          "skillGroup": null,
+          "levelLabel": null
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "I*** J***",
+          "masked": true,
+          "nickname": null,
+          "rtrId": null,
+          "isViewer": false,
+          "profile": "guest",
+          "pictureUrl": null,
+          "skillGroup": "intermediate",
+          "levelLabel": "Intermediate High"
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "J*** K***",
+          "masked": true,
+          "nickname": null,
+          "rtrId": null,
+          "isViewer": false,
+          "profile": "guest",
+          "pictureUrl": null,
+          "skillGroup": null,
+          "levelLabel": null
+        },
+        {
+          "bannerKey": "court",
+          "bannerImageUrl": null,
+          "name": "K*** L***",
+          "masked": true,
+          "nickname": null,
+          "rtrId": null,
+          "isViewer": false,
+          "profile": "guest",
+          "pictureUrl": null,
+          "skillGroup": "beginner",
+          "levelLabel": "Beginner Mid"
+        }
+      ],
+      "waitlist": [],
+      "hosts": [],
+      "courtsNow": [
+        {
+          "id": "a6000000-0000-4000-8000-000000000001",
+          "label": "Court 1",
+          "courtLabels": [
+            "Court 1"
+          ],
+          "merged": false,
+          "status": "playing",
+          "teamA": [
+            {
+              "name": "Alice",
+              "level": "intermediate_mid",
+              "pictureUrl": "https://example.test/p1.png",
+              "masked": false,
+              "isViewer": true,
+              "participant": 0
+            },
+            {
+              "name": "Ben",
+              "level": "intermediate_low",
+              "pictureUrl": "https://example.test/p2.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 1
+            }
+          ],
+          "teamB": [
+            {
+              "name": "Dan",
+              "level": "beginner_low",
+              "pictureUrl": "https://example.test/p4.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 3
+            },
+            {
+              "name": "Fay",
+              "level": "advanced_high",
+              "pictureUrl": "https://example.test/p6.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 5
+            }
+          ],
+          "startedAt": 1795059000000,
+          "freeSince": null
+        },
+        {
+          "id": "a6000000-0000-4000-8000-000000000002",
+          "label": "Court 2",
+          "courtLabels": [
+            "Court 2"
+          ],
+          "merged": false,
+          "status": "getting-ready",
+          "teamA": [
+            {
+              "name": "Gio",
+              "level": "beginner_high",
+              "pictureUrl": "https://example.test/p7.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 6
+            },
+            {
+              "name": "H***",
+              "level": null,
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 7
+            }
+          ],
+          "teamB": [
+            {
+              "name": "I***",
+              "level": "intermediate_high",
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 8
+            },
+            {
+              "name": "J***",
+              "level": null,
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 9
+            }
+          ],
+          "startedAt": null,
+          "freeSince": null
+        },
+        {
+          "id": "a6000000-0000-4000-8000-000000000003",
+          "label": "Court 3 + Court 4",
+          "courtLabels": [
+            "Court 3",
+            "Court 4"
+          ],
+          "merged": true,
+          "status": "playing",
+          "teamA": [
+            {
+              "name": "C***",
+              "level": "advanced_mid",
+              "pictureUrl": "https://example.test/p3.png",
+              "masked": true,
+              "isViewer": false,
+              "participant": 2
+            }
+          ],
+          "teamB": [
+            {
+              "name": "K***",
+              "level": "beginner_mid",
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 10
+            }
+          ],
+          "startedAt": 1795059300000,
+          "freeSince": null
+        }
+      ],
+      "queue": [
+        {
+          "matchNo": 6,
+          "format": "doubles",
+          "label": "Genderless Doubles",
+          "teamA": [
+            {
+              "name": "Alice",
+              "level": "intermediate_mid",
+              "pictureUrl": "https://example.test/p1.png",
+              "masked": false,
+              "isViewer": true,
+              "participant": 0
+            },
+            {
+              "name": "C***",
+              "level": "advanced_mid",
+              "pictureUrl": "https://example.test/p3.png",
+              "masked": true,
+              "isViewer": false,
+              "participant": 2
+            }
+          ],
+          "teamB": [
+            {
+              "name": "Eli",
+              "level": null,
+              "pictureUrl": "https://example.test/p5.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 4
+            },
+            {
+              "name": "J***",
+              "level": null,
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 9
+            }
+          ]
+        },
+        {
+          "matchNo": 4,
+          "format": "doubles",
+          "label": "Genderless Doubles",
+          "teamA": [
+            {
+              "name": "Eli",
+              "level": null,
+              "pictureUrl": "https://example.test/p5.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 4
+            },
+            {
+              "name": "I***",
+              "level": "intermediate_high",
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 8
+            }
+          ],
+          "teamB": [
+            {
+              "name": "Ben",
+              "level": "intermediate_low",
+              "pictureUrl": "https://example.test/p2.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 1
+            },
+            {
+              "name": "H***",
+              "level": null,
+              "pictureUrl": null,
+              "masked": true,
+              "isViewer": false,
+              "participant": 7
+            }
+          ]
+        },
+        {
+          "matchNo": 5,
+          "format": "doubles",
+          "label": "Genderless Doubles",
+          "teamA": [
+            {
+              "name": "Eli",
+              "level": null,
+              "pictureUrl": "https://example.test/p5.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 4
+            },
+            {
+              "name": "Alice",
+              "level": "intermediate_mid",
+              "pictureUrl": "https://example.test/p1.png",
+              "masked": false,
+              "isViewer": true,
+              "participant": 0
+            }
+          ],
+          "teamB": [
+            {
+              "name": "Fay",
+              "level": "advanced_high",
+              "pictureUrl": "https://example.test/p6.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 5
+            },
+            {
+              "name": "Dan",
+              "level": "beginner_low",
+              "pictureUrl": "https://example.test/p4.png",
+              "masked": false,
+              "isViewer": false,
+              "participant": 3
+            }
+          ]
+        }
+      ]
     }
   },
   "access_evil_origin": {
@@ -8317,28 +9133,230 @@
     }
   },
   "my-night_no_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
     "body": {
-      "error": {
-        "code": "forbidden"
+      "playerId": "d1000000-0000-4000-8000-000000000001",
+      "status": "confirmed",
+      "stage": "live-present",
+      "waitlistPosition": null,
+      "startsAt": 1795057200000,
+      "present": true,
+      "checkedIn": true,
+      "hasLeft": false,
+      "cantMakeItSent": false,
+      "canTransfer": false,
+      "slotTransfer": null,
+      "offline": false,
+      "games": 2,
+      "won": 2,
+      "lost": 0,
+      "minimum": 4,
+      "inQueue": {
+        "position": 1,
+        "partners": [
+          {
+            "name": "Eli",
+            "level": null,
+            "pictureUrl": "https://example.test/p5.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "Fay",
+            "level": "advanced_high",
+            "pictureUrl": "https://example.test/p6.png",
+            "masked": false,
+            "isViewer": false
+          },
+          {
+            "name": "Dan",
+            "level": "beginner_low",
+            "pictureUrl": "https://example.test/p4.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "matchLabel": "with Eli vs Fay, Dan"
+      },
+      "onCourt": {
+        "courtLabel": "Court 1",
+        "started": true,
+        "partners": [
+          {
+            "name": "Ben",
+            "level": "intermediate_low",
+            "pictureUrl": "https://example.test/p2.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "Dan",
+            "level": "beginner_low",
+            "pictureUrl": "https://example.test/p4.png",
+            "masked": false,
+            "isViewer": false
+          },
+          {
+            "name": "Fay",
+            "level": "advanced_high",
+            "pictureUrl": "https://example.test/p6.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "matchLabel": "with Ben vs Dan, Fay"
+      },
+      "joinRequest": null,
+      "isClubMember": true,
+      "levelBlock": null,
+      "canInvite": false,
+      "inviteCode": null,
+      "matchRequest": {
+        "id": "b4000000-0000-4000-8000-000000000001",
+        "format": "doubles",
+        "at": "2026-11-19T03:50:00.000Z",
+        "partners": [
+          {
+            "name": "Ben",
+            "level": "intermediate_low",
+            "pictureUrl": "https://example.test/p2.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "I***",
+            "level": "intermediate_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          },
+          null
+        ]
       }
     }
   },
   "my-night_other_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
     "body": {
-      "error": {
-        "code": "forbidden"
+      "playerId": "d1000000-0000-4000-8000-000000000001",
+      "status": "confirmed",
+      "stage": "live-present",
+      "waitlistPosition": null,
+      "startsAt": 1795057200000,
+      "present": true,
+      "checkedIn": true,
+      "hasLeft": false,
+      "cantMakeItSent": false,
+      "canTransfer": false,
+      "slotTransfer": null,
+      "offline": false,
+      "games": 2,
+      "won": 2,
+      "lost": 0,
+      "minimum": 4,
+      "inQueue": {
+        "position": 1,
+        "partners": [
+          {
+            "name": "Eli",
+            "level": null,
+            "pictureUrl": "https://example.test/p5.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "Fay",
+            "level": "advanced_high",
+            "pictureUrl": "https://example.test/p6.png",
+            "masked": false,
+            "isViewer": false
+          },
+          {
+            "name": "Dan",
+            "level": "beginner_low",
+            "pictureUrl": "https://example.test/p4.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "matchLabel": "with Eli vs Fay, Dan"
+      },
+      "onCourt": {
+        "courtLabel": "Court 1",
+        "started": true,
+        "partners": [
+          {
+            "name": "Ben",
+            "level": "intermediate_low",
+            "pictureUrl": "https://example.test/p2.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "Dan",
+            "level": "beginner_low",
+            "pictureUrl": "https://example.test/p4.png",
+            "masked": false,
+            "isViewer": false
+          },
+          {
+            "name": "Fay",
+            "level": "advanced_high",
+            "pictureUrl": "https://example.test/p6.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "matchLabel": "with Ben vs Dan, Fay"
+      },
+      "joinRequest": null,
+      "isClubMember": true,
+      "levelBlock": null,
+      "canInvite": false,
+      "inviteCode": null,
+      "matchRequest": {
+        "id": "b4000000-0000-4000-8000-000000000001",
+        "format": "doubles",
+        "at": "2026-11-19T03:50:00.000Z",
+        "partners": [
+          {
+            "name": "Ben",
+            "level": "intermediate_low",
+            "pictureUrl": "https://example.test/p2.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "I***",
+            "level": "intermediate_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          },
+          null
+        ]
       }
     }
   },
@@ -8388,30 +9406,22 @@
     }
   },
   "match-history_no_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
-    "body": {
-      "error": {
-        "code": "forbidden"
-      }
-    }
+    "body": null
   },
   "match-history_other_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
-    "body": {
-      "error": {
-        "code": "forbidden"
-      }
-    }
+    "body": null
   },
   "match-history_evil_origin": {
     "status": 403,
@@ -8459,28 +9469,70 @@
     }
   },
   "match-request_no_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
     "body": {
-      "error": {
-        "code": "forbidden"
+      "matchRequest": {
+        "id": "b4000000-0000-4000-8000-000000000001",
+        "format": "doubles",
+        "at": "2026-11-19T03:50:00.000Z",
+        "partners": [
+          {
+            "name": "Ben",
+            "level": "intermediate_low",
+            "pictureUrl": "https://example.test/p2.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "I***",
+            "level": "intermediate_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          },
+          null
+        ]
       }
     }
   },
   "match-request_other_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
     "body": {
-      "error": {
-        "code": "forbidden"
+      "matchRequest": {
+        "id": "b4000000-0000-4000-8000-000000000001",
+        "format": "doubles",
+        "at": "2026-11-19T03:50:00.000Z",
+        "partners": [
+          {
+            "name": "Ben",
+            "level": "intermediate_low",
+            "pictureUrl": "https://example.test/p2.png",
+            "masked": false,
+            "isViewer": false
+          }
+        ],
+        "opponents": [
+          {
+            "name": "I***",
+            "level": "intermediate_high",
+            "pictureUrl": null,
+            "masked": true,
+            "isViewer": false
+          },
+          null
+        ]
       }
     }
   },
@@ -8530,29 +9582,203 @@
     }
   },
   "match-request_options_no_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
     "body": {
-      "error": {
-        "code": "forbidden"
-      }
+      "viewerRosterId": "b1000000-0000-4000-8000-000000000001",
+      "viewerPictureUrl": "https://example.test/p1.png",
+      "minimum": 4,
+      "allowedFormats": [
+        "doubles",
+        "singles",
+        "fun_1v2"
+      ],
+      "players": [
+        {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Ben Cruz",
+          "shortName": "Benny",
+          "pictureUrl": "https://example.test/p2.png",
+          "level": "intermediate_low",
+          "games": 2,
+          "playingOn": "Court 1",
+          "restMinutes": 20
+        },
+        {
+          "id": "b1000000-0000-4000-8000-000000000003",
+          "name": "C*** D***",
+          "shortName": "C***",
+          "pictureUrl": "https://example.test/p3.png",
+          "level": "advanced_mid",
+          "games": 0,
+          "playingOn": "Court 3 + Court 4",
+          "restMinutes": 60
+        },
+        {
+          "id": "b1000000-0000-4000-8000-000000000005",
+          "name": "Eli Fox",
+          "shortName": "Eli",
+          "pictureUrl": "https://example.test/p5.png",
+          "level": null,
+          "games": 1,
+          "playingOn": null,
+          "restMinutes": 35
+        },
+        {
+          "id": "b1000000-0000-4000-8000-000000000006",
+          "name": "Fay Go",
+          "shortName": "Fay",
+          "pictureUrl": "https://example.test/p6.png",
+          "level": "advanced_high",
+          "games": 0,
+          "playingOn": "Court 1",
+          "restMinutes": 57
+        },
+        {
+          "id": "b1000000-0000-4000-8000-000000000007",
+          "name": "G*** H***",
+          "shortName": "G***",
+          "pictureUrl": "https://example.test/p7.png",
+          "level": "beginner_high",
+          "games": 0,
+          "playingOn": "Court 2",
+          "restMinutes": 60
+        },
+        {
+          "id": "b1000000-0000-4000-8000-000000000009",
+          "name": "I*** J***",
+          "shortName": "I***",
+          "pictureUrl": null,
+          "level": "intermediate_high",
+          "games": 0,
+          "playingOn": "Court 2",
+          "restMinutes": 60
+        },
+        {
+          "id": "b1000000-0000-4000-8000-00000000000a",
+          "name": "J*** K***",
+          "shortName": "J***",
+          "pictureUrl": null,
+          "level": null,
+          "games": 0,
+          "playingOn": "Court 2",
+          "restMinutes": 60
+        },
+        {
+          "id": "b1000000-0000-4000-8000-00000000000b",
+          "name": "K*** L***",
+          "shortName": "K***",
+          "pictureUrl": null,
+          "level": "beginner_mid",
+          "games": 0,
+          "playingOn": "Court 3 + Court 4",
+          "restMinutes": 60
+        }
+      ]
     }
   },
   "match-request_options_other_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
     "body": {
-      "error": {
-        "code": "forbidden"
-      }
+      "viewerRosterId": "b1000000-0000-4000-8000-000000000001",
+      "viewerPictureUrl": "https://example.test/p1.png",
+      "minimum": 4,
+      "allowedFormats": [
+        "doubles",
+        "singles",
+        "fun_1v2"
+      ],
+      "players": [
+        {
+          "id": "b1000000-0000-4000-8000-000000000002",
+          "name": "Ben Cruz",
+          "shortName": "Benny",
+          "pictureUrl": "https://example.test/p2.png",
+          "level": "intermediate_low",
+          "games": 2,
+          "playingOn": "Court 1",
+          "restMinutes": 20
+        },
+        {
+          "id": "b1000000-0000-4000-8000-000000000003",
+          "name": "C*** D***",
+          "shortName": "C***",
+          "pictureUrl": "https://example.test/p3.png",
+          "level": "advanced_mid",
+          "games": 0,
+          "playingOn": "Court 3 + Court 4",
+          "restMinutes": 60
+        },
+        {
+          "id": "b1000000-0000-4000-8000-000000000005",
+          "name": "Eli Fox",
+          "shortName": "Eli",
+          "pictureUrl": "https://example.test/p5.png",
+          "level": null,
+          "games": 1,
+          "playingOn": null,
+          "restMinutes": 35
+        },
+        {
+          "id": "b1000000-0000-4000-8000-000000000006",
+          "name": "Fay Go",
+          "shortName": "Fay",
+          "pictureUrl": "https://example.test/p6.png",
+          "level": "advanced_high",
+          "games": 0,
+          "playingOn": "Court 1",
+          "restMinutes": 57
+        },
+        {
+          "id": "b1000000-0000-4000-8000-000000000007",
+          "name": "G*** H***",
+          "shortName": "G***",
+          "pictureUrl": "https://example.test/p7.png",
+          "level": "beginner_high",
+          "games": 0,
+          "playingOn": "Court 2",
+          "restMinutes": 60
+        },
+        {
+          "id": "b1000000-0000-4000-8000-000000000009",
+          "name": "I*** J***",
+          "shortName": "I***",
+          "pictureUrl": null,
+          "level": "intermediate_high",
+          "games": 0,
+          "playingOn": "Court 2",
+          "restMinutes": 60
+        },
+        {
+          "id": "b1000000-0000-4000-8000-00000000000a",
+          "name": "J*** K***",
+          "shortName": "J***",
+          "pictureUrl": null,
+          "level": null,
+          "games": 0,
+          "playingOn": "Court 2",
+          "restMinutes": 60
+        },
+        {
+          "id": "b1000000-0000-4000-8000-00000000000b",
+          "name": "K*** L***",
+          "shortName": "K***",
+          "pictureUrl": null,
+          "level": "beginner_mid",
+          "games": 0,
+          "playingOn": "Court 3 + Court 4",
+          "restMinutes": 60
+        }
+      ]
     }
   },
   "match-request_options_evil_origin": {

@@ -1,4 +1,4 @@
-import { pairedQueuePlayerOrigins } from '../app-origins'
+import { appOrigin, pairedQueuePlayerOrigins } from '../app-origins'
 import { isTransferLinkToken } from '../slot-transfer/slotTransfer.rules'
 
 /**
@@ -9,14 +9,18 @@ const PAIRED = pairedQueuePlayerOrigins()
 export const QUEUE_ORIGINS = PAIRED.queue
 export const PLAYER_ORIGINS = PAIRED.player
 
-/** Only a public session and its UI parameters (join, tab, invite, transfer) may cross the app boundary. */
-export function queueSessionUrl(value: string | undefined): string | null {
+/**
+ * Only a public session and its UI parameters (join, tab, invite, transfer) may cross the app
+ * boundary. The page lives on the Player app (D-2026-11-28-01); an older Queue `/s/<slug>` link is
+ * accepted and rewritten to its paired Player origin, so the result is always a Player URL.
+ */
+export function cleanSessionUrl(value: string | undefined): string | null {
   if (!value || value.includes('\\')) return null
   try {
     const url = new URL(value)
-    if (!QUEUE_ORIGINS.includes(url.origin) || !/^\/s\/[a-zA-Z0-9_-]+\/?$/.test(url.pathname))
-      return null
-    const clean = new URL(url.pathname, url.origin)
+    const origin = playerOrigin(url.origin)
+    if (!origin || !/^\/s\/[a-zA-Z0-9_-]+\/?$/.test(url.pathname)) return null
+    const clean = new URL(url.pathname, origin)
     if (url.searchParams.get('join') === '1') clean.searchParams.set('join', '1')
     const tab = url.searchParams.get('tab')
     if (tab === 'details' || tab === 'participants') clean.searchParams.set('tab', tab)
@@ -32,9 +36,14 @@ export function queueSessionUrl(value: string | undefined): string | null {
   }
 }
 
-export function playerOrigin(queueOrigin: string) {
-  return QUEUE_ORIGINS.includes(queueOrigin)
-    ? (PLAYER_ORIGINS[QUEUE_ORIGINS.indexOf(queueOrigin)] ?? null)
+/**
+ * The Player origin for a page's origin: itself on a Player origin (the session page, same-origin
+ * calls), the paired one on a Queue origin (the operator preview), else null.
+ */
+export function playerOrigin(origin: string) {
+  if (PLAYER_ORIGINS.includes(origin)) return origin
+  return QUEUE_ORIGINS.includes(origin)
+    ? (PLAYER_ORIGINS[QUEUE_ORIGINS.indexOf(origin)] ?? null)
     : null
 }
 
@@ -43,7 +52,7 @@ const MAX_AGE = 30 * 60_000
 
 /** UI context only; never auth tokens, credentials, identity or admission evidence. */
 export function rememberSessionReturn(value: string | undefined) {
-  const url = queueSessionUrl(value)
+  const url = cleanSessionUrl(value)
   if (!url || typeof sessionStorage === 'undefined') return
   try {
     sessionStorage.setItem(RETURN_KEY, JSON.stringify({ url, at: Date.now() }))
@@ -54,7 +63,7 @@ export function rememberSessionReturn(value: string | undefined) {
 
 /** Registration invitations opened in the same tab retain the pending session destination. */
 export function sessionReturn(value?: string) {
-  const explicit = queueSessionUrl(value)
+  const explicit = cleanSessionUrl(value)
   if (explicit) return explicit
   if (value !== undefined) return null
   if (typeof sessionStorage === 'undefined') return null
@@ -69,7 +78,7 @@ export function sessionReturn(value?: string) {
       sessionStorage.removeItem(RETURN_KEY)
       return null
     }
-    return queueSessionUrl(saved.url)
+    return cleanSessionUrl(saved.url)
   } catch {
     return null
   }
@@ -96,7 +105,7 @@ export function playerRegisterUrl(
   returnTo: string,
   options: { join?: boolean } = {},
 ) {
-  const back = queueSessionUrl(returnTo)
+  const back = cleanSessionUrl(returnTo)
   if (!back) return undefined
   const url = new URL(back)
   const origin = playerOrigin(url.origin)
@@ -109,11 +118,21 @@ export function playerRegisterUrl(
 }
 
 export function playerLoginUrl(returnTo: string) {
-  const back = queueSessionUrl(returnTo)
+  const back = cleanSessionUrl(returnTo)
   if (!back) return undefined
   const origin = playerOrigin(new URL(back).origin)
   if (!origin) return undefined
   const login = new URL('/login', origin)
   login.searchParams.set('next', back)
   return login.href
+}
+
+/**
+ * The origin session links are built on (share, invite, transfer, QR): the Player app, where the
+ * page lives (D-2026-11-28-01). On a Queue page (the operator preview) it is the paired Player
+ * origin, so a copied link never points at the Queue redirect.
+ */
+export function sessionLinkOrigin() {
+  const here = (globalThis as { location?: { origin?: string } }).location?.origin
+  return (here && playerOrigin(here)) || appOrigin('player')
 }

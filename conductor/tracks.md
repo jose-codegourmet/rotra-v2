@@ -26,7 +26,7 @@ Vercel project builds. `main` is merged into `go-stack` at least weekly; `go-sta
 | 14 | [ ] | [ship-and-retire_20261113](./tracks/ship-and-retire_20261113/) — Ship the Go stack and retire Supabase | chore | medium | staging-verification | 3 / 7 |
 | 15 | [ ] | [env-setup_20261121](./tracks/env-setup_20261121/) — Environment variables: what is missing and how to set it (run before 13) | chore | high | go-writes-queue | 3 / 9 |
 | 16 | [x] | [regression-go_20261125](./tracks/regression-go_20261125/) — Regression suite on the Go API and plain Postgres, no Supabase (run before 13) | chore | high | go-writes-queue, go-sign-in-catch-up | 22 / 22 |
-| 17 | [ ] | [go-main-catch-up_20261126](./tracks/go-main-catch-up_20261126/) — Catch Go up with `main`: Queue and Player behaviour added since 2026-11-23 (run before 13) | refactor | high | regression-go, go-sign-in-catch-up | 28 / 32 |
+| 17 | [x] | [go-main-catch-up_20261126](./tracks/go-main-catch-up_20261126/) — Catch Go up with `main`: Queue and Player behaviour added since 2026-11-23 (run before 13) | refactor | high | regression-go, go-sign-in-catch-up | 32 / 32 |
 
 ## Backlog
 

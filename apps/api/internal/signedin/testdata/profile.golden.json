@@ -26536,15 +26536,18 @@
     }
   },
   "stats_no_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
     "body": {
-      "error": {
-        "code": "forbidden"
+      "stats": {
+        "games": 7,
+        "wins": 3,
+        "losses": 4,
+        "winRate": 43
       }
     }
   },
@@ -26562,15 +26565,18 @@
     }
   },
   "stats_player_origin": {
-    "status": 403,
+    "status": 200,
     "headers": {
       "cache-control": "private, no-store",
       "content-type": "application/json",
       "vary": "Origin, Cookie"
     },
     "body": {
-      "error": {
-        "code": "forbidden"
+      "stats": {
+        "games": 7,
+        "wins": 3,
+        "losses": 4,
+        "winRate": 43
       }
     }
   },

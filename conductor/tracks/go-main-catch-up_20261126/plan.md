@@ -179,11 +179,13 @@ Ticket: none yet (proposal: one issue per phase under epic #869, titled `<seq> Â
   - **Done 2026-11-28.** After 2.2, 2.5, 2.10, 2.12, 4.2, 4.3 and the Record-off results read (#1195 to #1200): `go test ./...` on `go-stack` (`9ec9db4a`) has no failure, and `make check` passed (`check: OK`, exit 0). The scope job passed on every PR. The `go` CI job on GitHub is read from the run, not from here. Still open in the track: 5.2 (match making), 5.4 (shuttle tubes at Session done), 5.5 (the seven Player slot-transfer routes; done later the same day, see 5.5), 6.3 (not due).
 - [x] **6.2** Update `tracks.md` (row 17, BL-20 text: its fixes landed in #1114, this track carries the rest), the MVP status board and each ported route's docs
   - **Done 2026-11-27.** `tracks.md`: row 17 count, BL-20 resolved (fixes in #1114, the rest here), BL-24 status and the list of owner answers needed. `docs/mvp` and `docs/backend` hold no per-route page for the Go ports (the moved areas are in `docs/backend/environment-setup.md`, unchanged); nothing else to update until the swap.
-- [ ] **6.3** Merge `main` into `go-stack` again if more than a week has passed; log new gaps
+- [x] **6.3** Merge `main` into `go-stack` again if more than a week has passed; log new gaps
+  - **Done 2026-11-28** (early, on the owner's word). `main` at `c7003082` (#1194, #1204, #1205). One Go-visible change: #1204 moved the public session page to the Player app (D-2026-11-28-01), so `queueCorsHeaders` now also lets the Player app's own pages call (an `Origin` equal to the Player origin, or a GET with no `Origin` that the browser does not mark cross-site). Go: `signedin.SameOrigin` in both guards and the preflight, with the new `ROTRA_PLAYER_ORIGINS` setting (Go cannot know the one origin it is called on; it allows the configured Player origins). Goldens recaptured from the TypeScript: 12 signed-in read cases went from 403 to 200 (no Origin and the Player origin), and 12 Player-origin write cases were added (pubjoin, signout, pubmr, slottransfer). The Player session page reads its title from Go like the old Queue page did.
   - **Not due 2026-11-27** (the last merge was 2026-11-26, less than a week). `origin/main` is 20+ commits ahead; a merge brings no Go-visible change beyond the items in 5.6.
 
 ## Deviations log
 
 | Date | Task | Deviation | Reason | Resolution |
 |---|---|---|---|---|
+| 2026-11-28 | 6.3 | Same-origin calls are checked against `ROTRA_PLAYER_ORIGINS`, not the one origin the Route Handler serves | Go serves every app; it cannot see which Player origin it was called on | none; set the variable at staging verification |
 | 2026-11-26 | plan | Counts and routes come from `git diff`/`git log` of `origin/main` against the merge base (`25bacc46`) and the recapture patch; the Go-side gaps were found by grepping `apps/api` | Evidence for the plan, not a test run | Task 2.1 and 4.1 re-verify |

@@ -15,6 +15,7 @@ chat, a PR, a commit, a log or an `.env.example`. Values below are placeholders.
 | `ROTRA_AUTH_SIGNING_KEY` | Signing sign-in passes (B-27) | the API serves no auth routes: no sign-in | yes | **not set** |
 | `ROTRA_VISITOR_RECEIPT_SECRET` | Queue visitor join request and my-request | those routes answer 503 | yes | **not set** (must equal the Vercel value) |
 | `ROTRA_QUEUE_ORIGINS` | Credentialed Player stats read from the Queue app | no Queue origin is allowed | no | **not set** |
+| `ROTRA_PLAYER_ORIGINS` | The public session page on the Player app (D-2026-11-28-01): its same-origin POSTs to the Player routes of a session | those POSTs answer 403 (a GET with no `Origin` still works) | no | **not set** |
 | `RAILWAY_DEPLOYMENT_DRAINING_SECONDS` = `30` | Drain streams on deploy (B-44) | old copy is killed at once | no | **not set** |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_HEADERS` | Traces to Grafana (monitoring track) | telemetry off | headers: yes | **not set** (optional until monitoring) |
 | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_BASE` | Google sign-in for players (all three or none; [setup](google-sign-in-setup.md#in-the-go-api-track-go-sign-in-catch-up)) | Continue with Google answers "unavailable"; with only some of them, or a bad redirect base, Google stays off and the API logs a warning (it still starts) | secret: yes | **not set** (no Google OAuth client exists yet) |
@@ -50,6 +51,10 @@ together.
 
 **`ROTRA_QUEUE_ORIGINS`**: comma-separated exact Queue app origins, no `*`, path or trailing slash, for example
 `https://queue-beta.rotra.club`. Keep it apart from `ROTRA_ALLOWED_ORIGINS`.
+
+**`ROTRA_PLAYER_ORIGINS`**: the Player app's own exact origins, same format, for example `https://beta.rotra.club`. The
+session page moved to the Player app, so its calls to `/api/public-sessions/{slug}/*` and the stats read are same-origin:
+Go accepts an `Origin` from this list with no CORS headers, as the Route Handlers do for the origin they serve.
 
 **`RAILWAY_DEPLOYMENT_DRAINING_SECONDS`**: `30`.
 

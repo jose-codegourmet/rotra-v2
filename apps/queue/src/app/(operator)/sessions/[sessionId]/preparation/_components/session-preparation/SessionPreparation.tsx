@@ -4,6 +4,7 @@ import { useConnectivity } from '@rotra/data/connectivity/useConnectivity'
 import { REQUEST_FORMAT_PILL } from '@rotra/data/match/matchRequestDecisions'
 import { allowedRequestFormats } from '@rotra/data/match-request/rules'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
+import { sessionLinkOrigin } from '@rotra/data/public-session/context'
 import {
   estimateMinimum,
   sessionMinutes,
@@ -121,9 +122,9 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
   const [shareOpen, setShareOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [cancelOpen, setCancelOpen] = useState(false)
-  // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
+  // The public link is the Player origin + /s/<publicSlug> (D-2026-11-28-01), known in the browser.
   const [origin, setOrigin] = useState('')
-  useEffect(() => setOrigin(window.location.origin), [])
+  useEffect(() => setOrigin(sessionLinkOrigin()), [])
 
   const s = session.data
   const live = s?.state === 'active'
@@ -464,7 +465,7 @@ export function SessionPreparation({ sessionId }: { sessionId: string }) {
                   link={sessionLink}
                   pendingCount={pendingRequests}
                   onCopyLink={() => void copyLink()}
-                  onOpenAsGuest={() => router.push(publicHref)}
+                  onOpenAsGuest={() => window.location.assign(sessionLink)}
                   onPreviewPublicPage={() => router.push(`/sessions/${sessionId}/public-page`)}
                 />
                 <WhoCanJoinCard

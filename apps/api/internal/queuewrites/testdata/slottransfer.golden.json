@@ -18614,5 +18614,524 @@
       ],
       "club_players (removed)": []
     }
+  },
+  "request_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "transferId": "a3d10000-0000-4000-8000-000000000001",
+          "message": "Transfer to Gil Gomez sent · the QM decides"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000006",
+          "notes": null,
+          "state": "prepared",
+          "title": "Noon Break",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "venue_id": null,
+          "series_id": null,
+          "created_at": "2026-11-10T00:00:00+00:00",
+          "started_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "venue_name": null,
+          "public_slug": "noon-break",
+          "record_games": true,
+          "session_mode": "fair",
+          "allow_doubles": true,
+          "allow_singles": true,
+          "minimum_games": 0,
+          "venue_address": null,
+          "queue_revision": "1",
+          "court_fill_mode": "manual",
+          "request_formats": "{doubles}",
+          "expected_players": null,
+          "scheduled_end_at": "2026-11-22T04:30:00+00:00",
+          "players_per_court": 4,
+          "source_command_id": "e3000000-0000-4000-8000-000000000006",
+          "scheduled_start_at": "2026-11-22T03:00:00+00:00",
+          "accept_join_requests": true,
+          "minimum_is_calculated": true,
+          "start_license_term_id": null,
+          "always_require_request": false,
+          "planned_end_before_start_at": null,
+          "planned_start_before_start_at": null
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000006",
+          "notes": null,
+          "state": "prepared",
+          "title": "Noon Break",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "venue_id": null,
+          "series_id": null,
+          "created_at": "2026-11-10T00:00:00+00:00",
+          "started_at": null,
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "venue_name": null,
+          "public_slug": "noon-break",
+          "record_games": true,
+          "session_mode": "fair",
+          "allow_doubles": true,
+          "allow_singles": true,
+          "minimum_games": 0,
+          "venue_address": null,
+          "queue_revision": "1",
+          "court_fill_mode": "manual",
+          "request_formats": "{doubles}",
+          "expected_players": null,
+          "scheduled_end_at": "2026-11-22T04:30:00+00:00",
+          "players_per_court": 4,
+          "source_command_id": "e3000000-0000-4000-8000-000000000006",
+          "scheduled_start_at": "2026-11-22T03:00:00+00:00",
+          "accept_join_requests": true,
+          "minimum_is_calculated": true,
+          "start_license_term_id": null,
+          "always_require_request": false,
+          "planned_end_before_start_at": null,
+          "planned_start_before_start_at": null
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_players_free": [],
+      "session_players_free (removed)": [],
+      "session_payment_marks": [],
+      "session_payment_marks (removed)": [],
+      "session_payment_refunds": [],
+      "session_payment_refunds (removed)": [],
+      "session_slot_transfers": [
+        {
+          "id": "a3d10000-0000-4000-8000-000000000001",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "currency": null,
+          "via_link": false,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000006",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "waived_minor": null,
+          "amount_due_minor": null,
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "amount_paid_minor": null,
+          "prior_waived_minor": null,
+          "recipient_player_id": "d4000000-0000-4000-8000-000000000006",
+          "sender_club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "recipient_club_player_id": null,
+          "recipient_was_waitlisted": null,
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000041",
+          "recipient_session_player_id": null
+        }
+      ],
+      "session_slot_transfers (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "player_notifications_count": [],
+      "player_notifications_count (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": []
+    }
+  },
+  "lookup_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "playerId": "d4000000-0000-4000-8000-000000000006",
+          "fullName": "Gil Gomez",
+          "nickname": "G",
+          "rtrId": "RTR-PH-CEB-102926-0006",
+          "picture": null,
+          "waitlistPosition": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_players_free": [],
+      "session_players_free (removed)": [],
+      "session_payment_marks": [],
+      "session_payment_marks (removed)": [],
+      "session_payment_refunds": [],
+      "session_payment_refunds (removed)": [],
+      "session_slot_transfers": [],
+      "session_slot_transfers (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "player_notifications_count": [],
+      "player_notifications_count (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": []
+    }
+  },
+  "withdraw_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "player": "This transfer request is already closed."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_players_free": [],
+      "session_players_free (removed)": [],
+      "session_payment_marks": [],
+      "session_payment_marks (removed)": [],
+      "session_payment_refunds": [],
+      "session_payment_refunds (removed)": [],
+      "session_slot_transfers": [],
+      "session_slot_transfers (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "player_notifications_count": [],
+      "player_notifications_count (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": []
+    }
+  },
+  "link_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "transferId": "a3d10000-0000-4000-8000-000000000002",
+          "token": "<redacted>",
+          "message": "Transfer link ready · share it with the new player"
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000006",
+          "notes": null,
+          "state": "prepared",
+          "title": "Noon Break",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "2",
+          "venue_id": null,
+          "series_id": null,
+          "created_at": "2026-11-10T00:00:00+00:00",
+          "started_at": null,
+          "updated_at": "2026-11-19T04:00:00+00:00",
+          "venue_name": null,
+          "public_slug": "noon-break",
+          "record_games": true,
+          "session_mode": "fair",
+          "allow_doubles": true,
+          "allow_singles": true,
+          "minimum_games": 0,
+          "venue_address": null,
+          "queue_revision": "1",
+          "court_fill_mode": "manual",
+          "request_formats": "{doubles}",
+          "expected_players": null,
+          "scheduled_end_at": "2026-11-22T04:30:00+00:00",
+          "players_per_court": 4,
+          "source_command_id": "e3000000-0000-4000-8000-000000000006",
+          "scheduled_start_at": "2026-11-22T03:00:00+00:00",
+          "accept_join_requests": true,
+          "minimum_is_calculated": true,
+          "start_license_term_id": null,
+          "always_require_request": false,
+          "planned_end_before_start_at": null,
+          "planned_start_before_start_at": null
+        }
+      ],
+      "queue_sessions (removed)": [
+        {
+          "id": "a3000000-0000-4000-8000-000000000006",
+          "notes": null,
+          "state": "prepared",
+          "title": "Noon Break",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "revision": "1",
+          "venue_id": null,
+          "series_id": null,
+          "created_at": "2026-11-10T00:00:00+00:00",
+          "started_at": null,
+          "updated_at": "2026-11-10T00:00:00+00:00",
+          "venue_name": null,
+          "public_slug": "noon-break",
+          "record_games": true,
+          "session_mode": "fair",
+          "allow_doubles": true,
+          "allow_singles": true,
+          "minimum_games": 0,
+          "venue_address": null,
+          "queue_revision": "1",
+          "court_fill_mode": "manual",
+          "request_formats": "{doubles}",
+          "expected_players": null,
+          "scheduled_end_at": "2026-11-22T04:30:00+00:00",
+          "players_per_court": 4,
+          "source_command_id": "e3000000-0000-4000-8000-000000000006",
+          "scheduled_start_at": "2026-11-22T03:00:00+00:00",
+          "accept_join_requests": true,
+          "minimum_is_calculated": true,
+          "start_license_term_id": null,
+          "always_require_request": false,
+          "planned_end_before_start_at": null,
+          "planned_start_before_start_at": null
+        }
+      ],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_players_free": [],
+      "session_players_free (removed)": [],
+      "session_payment_marks": [],
+      "session_payment_marks (removed)": [],
+      "session_payment_refunds": [],
+      "session_payment_refunds (removed)": [],
+      "session_slot_transfers": [
+        {
+          "id": "a3d10000-0000-4000-8000-000000000002",
+          "status": "pending",
+          "club_id": "c9000000-0000-4000-8000-000000000001",
+          "currency": null,
+          "via_link": true,
+          "claimed_at": null,
+          "decided_at": null,
+          "session_id": "a3000000-0000-4000-8000-000000000006",
+          "requested_at": "2026-11-19T04:00:00+00:00",
+          "waived_minor": null,
+          "amount_due_minor": null,
+          "sender_player_id": "d4000000-0000-4000-8000-000000000001",
+          "amount_paid_minor": null,
+          "prior_waived_minor": null,
+          "recipient_player_id": null,
+          "sender_club_player_id": "c6000000-0000-4000-8000-000000000003",
+          "recipient_club_player_id": null,
+          "recipient_was_waitlisted": null,
+          "sender_session_player_id": "a7000000-0000-4000-8000-000000000041",
+          "recipient_session_player_id": null
+        }
+      ],
+      "session_slot_transfers (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "player_notifications_count": [],
+      "player_notifications_count (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": []
+    }
+  },
+  "link_read_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 200,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "state": "closed",
+          "senderName": null,
+          "claimBlock": null
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_players_free": [],
+      "session_players_free (removed)": [],
+      "session_payment_marks": [],
+      "session_payment_marks (removed)": [],
+      "session_payment_refunds": [],
+      "session_payment_refunds (removed)": [],
+      "session_slot_transfers": [],
+      "session_slot_transfers (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "player_notifications_count": [],
+      "player_notifications_count (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": []
+    }
+  },
+  "link_claim_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "transfer": "This transfer link no longer works. Ask the sender for a new link."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_players_free": [],
+      "session_players_free (removed)": [],
+      "session_payment_marks": [],
+      "session_payment_marks (removed)": [],
+      "session_payment_refunds": [],
+      "session_payment_refunds (removed)": [],
+      "session_slot_transfers": [],
+      "session_slot_transfers (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "player_notifications_count": [],
+      "player_notifications_count (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": []
+    }
+  },
+  "link_withdraw_from_the_player_origin": {
+    "steps": [
+      {
+        "status": 409,
+        "headers": {
+          "cache-control": "private, no-store",
+          "content-type": "application/json",
+          "vary": "Origin, Cookie"
+        },
+        "body": {
+          "error": {
+            "code": "conflict",
+            "message": "This changed since you loaded it. Refresh and try again.",
+            "fields": {
+              "transfer": "Your claim on this slot is already closed."
+            }
+          }
+        }
+      }
+    ],
+    "db": {
+      "queue_sessions": [],
+      "queue_sessions (removed)": [],
+      "session_players": [],
+      "session_players (removed)": [],
+      "club_assessments": [],
+      "club_assessments (removed)": [],
+      "session_waitlist": [],
+      "session_waitlist (removed)": [],
+      "player_notifications": [],
+      "player_notifications (removed)": [],
+      "session_players_free": [],
+      "session_players_free (removed)": [],
+      "session_payment_marks": [],
+      "session_payment_marks (removed)": [],
+      "session_payment_refunds": [],
+      "session_payment_refunds (removed)": [],
+      "session_slot_transfers": [],
+      "session_slot_transfers (removed)": [],
+      "session_drop_out_notices": [],
+      "session_drop_out_notices (removed)": [],
+      "player_notifications_count": [],
+      "player_notifications_count (removed)": [],
+      "session_join_requests": [],
+      "session_join_requests (removed)": [],
+      "club_players": [],
+      "club_players (removed)": []
+    }
   }
 }

@@ -65,6 +65,10 @@ func (s *server) rtrStats() http.Handler {
 func (s *server) fromQueueOrigin(inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
+		if SameOrigin(r, s.playerOrigins) {
+			inner.ServeHTTP(&corsWriter{ResponseWriter: w}, r)
+			return
+		}
 		allowed := origin != "" && slices.Contains(s.queueOrigins, origin)
 		cw := &corsWriter{ResponseWriter: w, origin: origin, allowed: allowed}
 		if !allowed {
@@ -77,6 +81,21 @@ func (s *server) fromQueueOrigin(inner http.Handler) http.Handler {
 		}
 		inner.ServeHTTP(cw, r)
 	})
+}
+
+// SameOrigin is sameOrigin of queueCorsHeaders: a call from the Player app's own pages (D-2026-11-28-01). A POST always
+// carries Origin, so it must be one of the Player origins. A same-origin GET may send no Origin; it passes unless the
+// browser marks it cross-site (Sec-Fetch-Site), and a cross-site page could not read the answer anyway (no CORS headers
+// are set for it). The TypeScript compares with the one origin it serves; Go allows the configured Player origins.
+func SameOrigin(r *http.Request, playerOrigins []string) bool {
+	if origin := r.Header.Get("Origin"); origin != "" {
+		return slices.Contains(playerOrigins, origin)
+	}
+	if r.Method != http.MethodGet && r.Method != http.MethodHead {
+		return false
+	}
+	site := r.Header.Values("Sec-Fetch-Site")
+	return len(site) == 0 || site[0] == "same-origin"
 }
 
 // corsWriter adds the CORS headers of the paired Queue origin to every response, whatever writes it, and makes the

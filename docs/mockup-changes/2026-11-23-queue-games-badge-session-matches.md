@@ -1,6 +1,6 @@
 # Queue app: the games badge on a face opens that player's matches this session
 
-Status: TICKETED — #1061
+Status: IN MOCK APP — #1061
 Date: 2026-11-23
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console Courts (Playing and Getting ready court faces), Main Queue tile faces, Generate Queue draft tiles (`draftTile`); new sheet `sessionGames`; `historyMatch(s, m, hl)`

@@ -70,6 +70,9 @@ type env struct {
 // queueOrigin is the paired Queue origin the stats read allows.
 const queueOrigin = "http://localhost:9000"
 
+// playerOrigin is the Player app's own origin: the session page's same-origin calls (D-2026-11-28-01).
+const playerOrigin = "http://localhost:9001"
+
 func newEnv(t *testing.T, now time.Time) *env {
 	t.Helper()
 	pool := testpg.NewMigratedPool(t, 20)
@@ -118,7 +121,7 @@ func newEnv(t *testing.T, now time.Time) *env {
 		register, err := signedin.Register(signedin.Deps{
 			Pool: pool, Auth: e.svc.Authenticator(), Logger: log, Now: e.clk.Now, PasswordResets: reader,
 			Limiter:            httpapi.NewRateLimiter(1_000_000, nil), // the limit has its own tests
-			ApprovedAlgorithms: approved, QueueOrigins: []string{queueOrigin},
+			ApprovedAlgorithms: approved, QueueOrigins: []string{queueOrigin}, PlayerOrigins: []string{playerOrigin},
 		})
 		if err != nil {
 			t.Fatal(err)
@@ -237,6 +240,7 @@ type req struct {
 	bearer    string
 	noSecret  bool
 	origin    string
+	fetchSite string
 	approved  bool
 }
 
@@ -254,6 +258,9 @@ func (e *env) do(r req) *httptest.ResponseRecorder {
 	}
 	if r.origin != "" {
 		hr.Header.Set("Origin", r.origin)
+	}
+	if r.fetchSite != "" {
+		hr.Header.Set("Sec-Fetch-Site", r.fetchSite)
 	}
 	w := httptest.NewRecorder()
 	h := e.handler

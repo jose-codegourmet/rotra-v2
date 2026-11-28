@@ -4,16 +4,16 @@
   "type": "refactor",
   "priority": "high",
   "order": 17,
-  "status": "pending",
+  "status": "complete",
   "created": "2026-11-26",
-  "updated": "2026-11-26",
+  "updated": "2026-11-28",
   "depends_on": "regression-go, go-sign-in-catch-up",
   "phases": {
     "total": 6,
-    "completed": 0
+    "completed": 6
   },
   "tasks": {
-    "total": 29,
-    "completed": 0
+    "total": 32,
+    "completed": 32
   }
 }

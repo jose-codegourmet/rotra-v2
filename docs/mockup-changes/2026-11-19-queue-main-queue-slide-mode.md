@@ -1,6 +1,6 @@
 # Queue app: Main Queue cards slide sideways by default, with a grid mode switch
 
-Status: TICKETED — #1061
+Status: IN MOCK APP — #1061
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `queuePane()`, `setupQueueSlide()`, actions `qView`, `qsStep`

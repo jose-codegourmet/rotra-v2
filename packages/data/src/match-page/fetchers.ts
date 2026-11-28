@@ -72,7 +72,7 @@ function resolveRealPage(page: MatchPage): MatchPage {
     ...page,
     session: {
       ...page.session,
-      sessionPageUrl: url?.startsWith('/') ? `${appOrigin('queue')}${url}` : (url ?? null),
+      sessionPageUrl: url?.startsWith('/') ? `${appOrigin('player')}${url}` : (url ?? null),
     },
     teamA: page.teamA.map(player),
     teamB: page.teamB.map(player),

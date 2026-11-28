@@ -1,6 +1,6 @@
 # Queue Payments: a player can play free
 
-Status: IN MOCK APP
+Status: IN MOCK APP — PR #1171
 Date: 2026-11-27
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `paymentsPanel`, `payAmount` sheet, `duePerHead`, `financeCalc`

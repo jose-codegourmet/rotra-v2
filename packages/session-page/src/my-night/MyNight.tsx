@@ -1,6 +1,7 @@
 'use client'
 
 import { useCancelMatchRequest } from '@rotra/data/match-request/useCancelMatchRequest'
+import { sessionLinkOrigin } from '@rotra/data/public-session/context'
 import type { MyNight as MyNightData } from '@rotra/data/public-session/types'
 import { useLeaveSession } from '@rotra/data/public-session/useLeaveSession'
 import { useMoveMeToWaitlist } from '@rotra/data/public-session/useMoveMeToWaitlist'
@@ -186,7 +187,7 @@ export function MyNight({
               onSuccess: (done) => {
                 toast(done.message)
                 openTransfer(false)
-                setLink(transferLinkUrl(location.origin, slug, done.data.token))
+                setLink(transferLinkUrl(sessionLinkOrigin(), slug, done.data.token))
               },
             },
           )

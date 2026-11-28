@@ -2,6 +2,7 @@
 
 import { useClub } from '@rotra/data/club'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
+import { sessionLinkOrigin } from '@rotra/data/public-session/context'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
 import { SessionJoinQr } from '@rotra/ui/session-join-qr'
 import { ShareSessionDialog } from '@rotra/ui/share-session-dialog'
@@ -35,9 +36,9 @@ export function ShareSession({ sessionId, open, onOpenChange }: ShareSessionProp
   const club = useClub(clubId)
   const [qrOpen, setQrOpen] = useState(false)
   const [postOpen, setPostOpen] = useState(false)
-  // The public link is origin + /s/<publicSlug>; the origin is only known in the browser.
+  // The public link is the Player origin + /s/<publicSlug> (D-2026-11-28-01), known in the browser.
   const [origin, setOrigin] = useState('')
-  useEffect(() => setOrigin(window.location.origin), [])
+  useEffect(() => setOrigin(sessionLinkOrigin()), [])
 
   const s = session.data
   if (!s) return null

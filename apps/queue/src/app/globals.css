@@ -3,6 +3,7 @@
 
 /* Components live in @rotra/ui; Tailwind must see their class names */
 @source "../../../../packages/ui/src";
+@source "../../../../packages/session-page/src";
 
 /* Fixed scale on iPhone/iPad (#719): no pinch-zoom in standalone mode, no OS text inflation */
 html {

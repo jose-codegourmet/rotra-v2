@@ -1,6 +1,6 @@
 # Go catch-up with `main`: summary for ship-and-retire
 
-**Written:** 2026-11-28 · **Track:** [go-main-catch-up_20261126](./plan.md) (28 of 32 tasks done; the rest is below)
+**Written:** 2026-11-28 · **Track:** [go-main-catch-up_20261126](./plan.md) (32 of 32 tasks done)
 **For:** [ship-and-retire_20261113](../ship-and-retire_20261113/plan.md) · **State:** `go-stack` at `5a3aebb1`, last `main` merge `0da79301` (2026-11-27)
 
 ## What is true now
@@ -31,6 +31,7 @@ The new routes live under prefixes that already move to Go (`/api/sessions`, `/a
 
 1. `POST /api/register` and `POST /api/register/google` (Admin link) are new Go routes. `docs/backend/google-sign-in-setup.md` says `/api/register` is not in the moved areas and that club-invite Google registration moves with an exact-path entry; decide whether the Admin-link registration moves with them.
 2. The Player slot-transfer routes are now in Go, so slot transfer no longer needs to stay in TypeScript past the swap.
+3. The public session page now lives on the Player app (D-2026-11-28-01). Set `ROTRA_PLAYER_ORIGINS` on the Go service to the Player app's origins, or the page's POSTs (join, I'm here, match request, slot transfer, sign-out) answer 403.
 
 ## Left in TypeScript (decided, not forgotten)
 
@@ -53,8 +54,7 @@ The new routes live under prefixes that already move to Go (`/api/sessions`, `/a
 
 ## Still open in the track
 
-- **6.3:** merge `main` into `go-stack` again (due about 2026-12-03). The last merge was recorded as ancestry only (no tree change), so it should be small.
-- Nothing else needs an owner answer.
+- Nothing. 6.3 was done on 2026-11-28 (`main` at `c7003082`); later `main` changes need a new merge.
 
 ## For ship-and-retire
 

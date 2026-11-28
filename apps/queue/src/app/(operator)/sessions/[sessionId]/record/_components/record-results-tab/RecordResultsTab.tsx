@@ -5,8 +5,10 @@ import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { groupStandings } from '@rotra/data/match/match.rules'
 import { useLiveStandings } from '@rotra/data/match/useLiveStandings'
+import { sessionLinkOrigin } from '@rotra/data/public-session/context'
 import type { SessionRecordSummary } from '@rotra/data/queue-session/types'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { SessionPodium } from '@rotra/session-page/session-podium'
 import { Button } from '@rotra/ui/button'
 import { Icon } from '@rotra/ui/icon'
 import { InvalidSessionNotice } from '@rotra/ui/invalid-session-notice'
@@ -22,7 +24,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { QueryError } from '@/app/(operator)/_components/query-error/QueryError'
 import { PlayerProfile } from '@/app/(operator)/sessions/[sessionId]/_components/player-profile/PlayerProfile'
-import { SessionPodium } from '@/app/(operator)/sessions/[sessionId]/_components/session-podium/SessionPodium'
 import { ExportImagesSheetContainer } from '@/app/(operator)/sessions/[sessionId]/results/_components/export-images-sheet/ExportImagesSheetContainer'
 
 export type RecordResultsTabProps = {
@@ -94,7 +95,7 @@ export function RecordResultsTab({ sessionId, record }: RecordResultsTabProps) {
   const slug = session.data?.publicSlug
   const link =
     slug && typeof location !== 'undefined'
-      ? `${location.origin}/s/${encodeURIComponent(slug)}`
+      ? `${sessionLinkOrigin()}/s/${encodeURIComponent(slug)}`
       : ''
   const copyLink = async () => {
     try {

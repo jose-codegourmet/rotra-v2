@@ -2,7 +2,7 @@
 import { useSession } from '@rotra/data/auth/use-session'
 import { foundingCities } from '@rotra/data/fixtures/founding-cities'
 import { MockError } from '@rotra/data/mock/errors'
-import { queueSessionUrl } from '@rotra/data/player/mySessions'
+import { publicSessionUrl } from '@rotra/data/player/mySessions'
 import {
   useGuestRegistration,
   useGuestRegistrationClub,
@@ -100,7 +100,7 @@ function EmailRegistration({ clubId, returnTo, sessionSlug, inviteCode }: GuestR
                 // The explicit way back first: a transfer link (#1012) returns to its own
                 // `?transfer=` page; otherwise the session page itself.
                 window.location.assign(
-                  sessionReturn(returnTo) ?? queueSessionUrl(result.sessionSlug ?? ''),
+                  sessionReturn(returnTo) ?? publicSessionUrl(result.sessionSlug ?? ''),
                 )
             : undefined
         }

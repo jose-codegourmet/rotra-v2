@@ -330,8 +330,6 @@ function MatchPageContent({
                 {page.session.sessionPageUrl ? (
                   <a
                     href={page.session.sessionPageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="font-extrabold text-accent no-underline focus-visible:outline-2 focus-visible:outline-accent"
                   >
                     {page.session.title}

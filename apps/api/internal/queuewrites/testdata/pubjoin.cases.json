@@ -2364,6 +2364,59 @@
      }
     }
    ]
+  },
+  {
+   "name": "join_from_the_player_origin",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "POST",
+     "path": "/api/public-sessions/prep-open/join",
+     "who": "f4000000-0000-4000-8000-000000000006",
+     "headers": {
+      "Origin": "http://localhost:9001",
+      "Content-Type": "application/json"
+     },
+     "body": {},
+     "redact": [
+      "requestId"
+     ]
+    }
+   ],
+   "redact": {
+    "session_join_requests": [
+     "id"
+    ],
+    "session_players": [
+     "id",
+     "assessment_operation_id"
+    ],
+    "session_waitlist": [
+     "id"
+    ],
+    "club_assessments": [
+     "source_operation_id",
+     "supersedes_operation_id",
+     "session_player_id"
+    ],
+    "player_notifications": [
+     "source_id"
+    ]
+   }
+  },
+  {
+   "name": "preflight_from_the_player_origin",
+   "scenario": "base",
+   "steps": [
+    {
+     "method": "OPTIONS",
+     "path": "/api/public-sessions/prep-open/join",
+     "who": null,
+     "headers": {
+      "Origin": "http://localhost:9001"
+     }
+    }
+   ]
   }
  ]
 }

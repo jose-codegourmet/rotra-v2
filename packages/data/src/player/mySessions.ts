@@ -8,12 +8,9 @@ import { readMockState } from '../mock/store'
 import { isRealDataMode } from '../real/mode'
 import { realGetMySessions } from '../real/my-sessions'
 import { playerProjection } from './projection'
-/** The ROTRA Queue app's origin, as seen from the Player app (localhost in local work). */
-export function queueAppOrigin() {
-  return appOrigin('queue')
-}
-/** A public session page on the Queue app, for links the Player app renders. */
-export const queueSessionUrl = (slug: string) => `${queueAppOrigin()}/s/${encodeURIComponent(slug)}`
+/** A public session page, which lives on the Player app (D-2026-11-28-01), for links any app renders. */
+export const publicSessionUrl = (slug: string) =>
+  `${appOrigin('player')}/s/${encodeURIComponent(slug)}`
 export type MySession = {
   id: string
   title: string
@@ -44,7 +41,7 @@ async function realMySessions(signal?: AbortSignal) {
     id: s.id,
     title: s.title,
     subtitle: `${date(s.start)} · ${time(s.start)}–${time(s.end)} · ${s.clubName}`,
-    href: queueSessionUrl(s.slug),
+    href: publicSessionUrl(s.slug),
     status: s.status,
     startsAt: s.start,
     waitlistPosition: s.waitlistPosition ?? undefined,
@@ -92,7 +89,7 @@ export async function getMySessions(signal?: AbortSignal) {
           id: s.id,
           title: s.title,
           subtitle: `${date(s.scheduledStartAt)} · ${time(s.scheduledStartAt)}–${time(s.scheduledEndAt)} · ${club?.name ?? ''}`,
-          href: queueSessionUrl(s.publicSlug),
+          href: publicSessionUrl(s.publicSlug),
           status: roster
             ? s.state === 'active'
               ? ('live' as const)
@@ -115,14 +112,14 @@ export async function getMySessions(signal?: AbortSignal) {
         id: 'my-thursday',
         title: 'Thursday Open Play',
         subtitle: `${date(Date.now() + 3 * 86400000)} · 7:00–10:00 PM · Lahug Smash Club`,
-        href: queueSessionUrl('s-thu-open'),
+        href: publicSessionUrl('s-thu-open'),
         status: 'confirmed',
       },
       {
         id: 'my-friday',
         title: 'Friday Night Smash',
         subtitle: `${date(Date.now() + 5 * 86400000)} · 8:00–11:00 PM · IT Park Badminton Club`,
-        href: queueSessionUrl('s-fri-smash'),
+        href: publicSessionUrl('s-fri-smash'),
         status: 'waitlist',
         waitlistPosition: 2,
       },

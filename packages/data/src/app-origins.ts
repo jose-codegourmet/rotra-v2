@@ -50,9 +50,9 @@ export function configuredOrigin(app: RotraApp) {
 export function appOrigin(app: RotraApp): string {
   const explicit = configuredOrigin(app)
   if (explicit) return explicit
-  return typeof location !== 'undefined' && location.hostname === 'localhost'
-    ? LOCAL[app]
-    : PRODUCTION[app]
+  // globalThis: server-only packages (@rotra/db) type-check this file without the DOM library.
+  const here = (globalThis as { location?: { hostname?: string } }).location
+  return here?.hostname === 'localhost' ? LOCAL[app] : PRODUCTION[app]
 }
 
 /**

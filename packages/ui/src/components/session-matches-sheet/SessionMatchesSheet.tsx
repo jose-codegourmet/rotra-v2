@@ -36,7 +36,7 @@ export type SessionMatchesSheetProps = {
  * with the date block, the date, the club and the counted record (“counted” under it); then
  * “Your matches · N” / “NAME's matches · N” and every match row of that session, fun games marked
  * “Fun game · not counted”; a not ranked session carries a **Not ranked** chip after the club and
- * its games count in the record. Footer: Close, Share performance (own) and Session page (new tab;
+ * its games count in the record. Footer: Close, Share performance (own) and Session page (same tab;
  * hidden when the session page is no longer available).
  */
 export function SessionMatchesSheet({
@@ -66,7 +66,7 @@ export function SessionMatchesSheet({
           ) : null}
           {session?.sessionPageUrl ? (
             <Button asChild variant="primary">
-              <a href={session.sessionPageUrl} target="_blank" rel="noopener noreferrer">
+              <a href={session.sessionPageUrl}>
                 Session page <Icon name="external" />
               </a>
             </Button>

@@ -1,5 +1,6 @@
 'use client'
 
+import { sessionLinkOrigin } from '@rotra/data/public-session/context'
 import { useSessionInviteCode } from '@rotra/data/public-session/useSessionInviteCode'
 import { Button } from '@rotra/ui/button'
 import { CopyField } from '@rotra/ui/copy-field'
@@ -64,7 +65,7 @@ export function SessionInviteSheet({
   const code = invite.data?.code
   const link =
     code && typeof location !== 'undefined'
-      ? `${location.origin}/s/${encodeURIComponent(slug)}?invite=${encodeURIComponent(code)}`
+      ? `${sessionLinkOrigin()}/s/${encodeURIComponent(slug)}?invite=${encodeURIComponent(code)}`
       : null
 
   return (

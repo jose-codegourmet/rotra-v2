@@ -1,6 +1,6 @@
 import { clubJoinHref } from '../club-page/clubPage.rules'
 import type { ClubPage, ClubPageMember, ClubPageSessionStatus } from '../club-page/clubPage.types'
-import { queueSessionUrl } from '../player/mySessions'
+import { publicSessionUrl } from '../player/mySessions'
 import { RealRequestError, realRequest } from './client'
 
 type ClubPageDto = {
@@ -52,7 +52,7 @@ export async function realGetClubPage(
       members: page.members,
       sessions: page.sessions.map(({ slug, ...s }) => ({
         ...s,
-        href: slug ? queueSessionUrl(slug) : null,
+        href: slug ? publicSessionUrl(slug) : null,
       })),
     }
   } catch (error) {

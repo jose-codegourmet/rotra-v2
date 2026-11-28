@@ -2,7 +2,7 @@ import { getSession } from '../auth/fetchers'
 import { requireOnline } from '../mock/bridge'
 import { delay } from '../mock/latency'
 import { readMockState } from '../mock/store'
-import { queueSessionUrl } from '../player/mySessions'
+import { publicSessionUrl } from '../player/mySessions'
 import { resolveMockProfileBanner } from '../profile-banner/fetchers'
 import { realGetClubPage } from '../real/club-page'
 import { isRealDataMode } from '../real/mode'
@@ -79,7 +79,7 @@ export async function getClubPage(clubId: string, signal?: AbortSignal): Promise
           startsAt: s.scheduledStartAt,
           endsAt: s.scheduledEndAt,
           status,
-          href: kept ? queueSessionUrl(s.publicSlug) : null,
+          href: kept ? publicSessionUrl(s.publicSlug) : null,
         },
       ]
     })

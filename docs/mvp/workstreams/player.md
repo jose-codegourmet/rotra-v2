@@ -80,6 +80,7 @@ password recovery through Admin-reviewed requests (#491).
 - [D-2026-11-26-02](../decisions/2026-11-26.md#d-2026-11-26-02) — signed-in navigation gets a pixel-style session button (Play, Ready, Next up) and a new Settings page (mockup only).
 - [D-2026-11-26-03](../decisions/2026-11-26.md#d-2026-11-26-03) — the Game page is the court beside a VS card; stats show only for a tapped player (mockup only).
 - [D-2026-11-26-04](../decisions/2026-11-26.md#d-2026-11-26-04) — the Weekly Performance summary sits in one box with a won/lost bar (mockup only).
+- [D-2026-11-28-01](../decisions/2026-11-28.md#d-2026-11-28-01) — the public session page is served by the Player app at `/s/[slug]`; Queue's `/s/[slug]` redirects there; links open in the same tab (in source, not browser-checked).
 
 ## Blocking open decisions
 

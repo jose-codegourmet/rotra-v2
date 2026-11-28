@@ -20,6 +20,8 @@ export type ParticipantProfileProps = {
   /** The signed-in Player (mock: the Player session; real: the Player app's access read) */
   viewerPlayerId: string | null
   onClose: () => void
+  /** Open ROTRA profile in a new tab: the Queue Master's preview only (D-2026-11-28-01) */
+  newTab?: boolean
 }
 
 /**
@@ -36,6 +38,7 @@ export function ParticipantProfile({
   participant,
   viewerPlayerId,
   onClose,
+  newTab = false,
 }: ParticipantProfileProps) {
   const photo = usePhotoViewer()
   const [sharing, setSharing] = useState(false)
@@ -83,6 +86,7 @@ export function ParticipantProfile({
       <ParticipantProfileSheet
         open={!sharing}
         onOpenChange={onOpenChange}
+        newTab={newTab}
         name={participant.name}
         nickname={participant.nickname}
         photoUrl={photoUrl}

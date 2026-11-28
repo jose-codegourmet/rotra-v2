@@ -10,7 +10,13 @@ const nextConfig: NextConfig = {
         : {},
   },
   // Workspace packages ship TypeScript source, not built files
-  transpilePackages: ['@rotra/ui', '@rotra/data', '@rotra/schema', '@rotra/db'],
+  transpilePackages: [
+    '@rotra/ui',
+    '@rotra/data',
+    '@rotra/schema',
+    '@rotra/db',
+    '@rotra/session-page',
+  ],
 }
 
 export default nextConfig

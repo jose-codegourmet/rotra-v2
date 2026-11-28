@@ -11,6 +11,8 @@ export type ClubCardProps = {
   open: boolean
   onClose: () => void
   club: { id: string; name: string; initials: string; logoUrl: string | null }
+  /** Open club page in a new tab: the Queue Master's preview only (D-2026-11-28-01) */
+  newTab?: boolean
 }
 
 const dayLabel = (at: number) =>
@@ -24,10 +26,10 @@ const dayLabel = (at: number) =>
 /**
  * D-CLUB-PROFILE on the session page (2026-11-13-club-profile-card): the organizer line opens the
  * club's profile card. The default banner, the logo, ROTRA club and Happening now, About (Members,
- * Sessions in YEAR, Next up); Open club page opens the Player app's club page in a new tab. The
+ * Sessions in YEAR, Next up); Open club page opens the Player app's club page (same tab on the visitor page, new tab in the preview). The
  * counts come from the public club page read; until it loads they read “—”.
  */
-export function ClubCard({ open, onClose, club }: ClubCardProps) {
+export function ClubCard({ open, onClose, club, newTab = false }: ClubCardProps) {
   const page = useClubPage(open ? club.id : '')
   const year = statsYear(Date.now())
   const data = page.data
@@ -74,7 +76,7 @@ export function ClubCard({ open, onClose, club }: ClubCardProps) {
       action={{
         label: 'Open club page',
         href: `${appOrigin('player')}/clubs/${encodeURIComponent(club.id)}`,
-        newTab: true,
+        newTab,
       }}
     />
   )

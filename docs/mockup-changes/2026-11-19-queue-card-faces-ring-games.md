@@ -1,6 +1,6 @@
 # Queue app: Main Queue card pictures show the level ring and games played
 
-Status: TICKETED — #1062
+Status: IN MOCK APP — #1062
 Date: 2026-11-19
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `queueCard()` faces (`.qf`, `.pf-g`)

@@ -157,6 +157,7 @@ Decisions: [D-05](../decisions/2026-11-07.md#d-2026-11-07-05), [D-06](../decisio
 - [D-2026-11-26-08](../decisions/2026-11-26.md#d-2026-11-26-08) — free court flow (Court N is free: pick or generate), Suggested match with Reshuffle and Replace, stacked dialogs go back one level (mockup only).
 - [D-2026-11-26-09](../decisions/2026-11-26.md#d-2026-11-26-09) — player labels read club nickname › nickname › full name on every Queue Master screen (mockup only).
 - [D-2026-11-26-10](../decisions/2026-11-26.md#d-2026-11-26-10) — player status pill as icons with a legend, Edit player as a corner circle, In queue and Playing filters (mockup only).
+- [D-2026-11-28-01](../decisions/2026-11-28.md#d-2026-11-28-01) — the public session page is served by the Player app at `/s/[slug]`; Queue's `/s/[slug]` redirects there; links open in the same tab (in source, not browser-checked).
 
 ## Blocking open decisions
 

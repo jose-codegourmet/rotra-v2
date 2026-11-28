@@ -306,7 +306,7 @@ export async function gamesPlayed(page: Page, name: string) {
   return Number(/(\d+) games? played/.exec(label)?.[1] ?? Number.NaN)
 }
 
-/** Preparation › Overview › Session link: the public session page URL (Queue app, /s/<slug>). */
+/** Preparation › Overview › Session link: the public session page URL (Player app, /s/<slug>; D-2026-11-28-01). */
 export async function sessionLink(page: Page, sessionId: string) {
   await page.goto(`${appUrl('queue')}/sessions/${sessionId}/preparation`)
   const link = page.getByRole('textbox', { name: 'Session link', ...exact })

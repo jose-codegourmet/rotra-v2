@@ -1,5 +1,6 @@
 'use client'
 
+import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import {
   activeMatchFor,
   countedGames,
@@ -18,6 +19,7 @@ import { useSessionRoster } from '@rotra/data/session-roster/useSessionRoster'
 import { MatchLineupForm } from '@rotra/ui/forms/match-lineup-form'
 import type { MatchLineupFormValues } from '@rotra/ui/forms/match-lineup-form/schema'
 import type { PlayerPickerCandidate } from '@rotra/ui/player-picker-sheet'
+import { profilePictureSrc } from '@rotra/ui/profile-picture'
 import { toast } from '@rotra/ui/toaster'
 import { useRef, useState } from 'react'
 import { useWinChanceDialog } from '@/app/(operator)/sessions/[sessionId]/_components/win-chance/useWinChanceDialog'
@@ -59,6 +61,7 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
   const session = useQueueSession(sessionId)
   const roster = useSessionRoster(sessionId)
   const matches = useSessionMatches(sessionId)
+  const clubPlayers = useClubPlayers()
   const addMatch = useAddMatch()
   const updateLineup = useUpdateMatchLineup()
   const winChanceDialog = useWinChanceDialog(roster.data?.roster, matches.data)
@@ -95,6 +98,18 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
     state: editing?.state,
   })
 
+  // The club player's profile picture, the same source the console cards use
+  const photoOf = (clubPlayerId: string) => {
+    const clubPlayer = clubPlayers.data?.players.find((item) => item.id === clubPlayerId)
+    return clubPlayer
+      ? profilePictureSrc(
+          clubPlayer.picture,
+          clubPlayer.playerId ?? clubPlayer.id,
+          clubPlayer.pictureName ?? clubPlayer.fullName,
+        )
+      : undefined
+  }
+
   const players: PlayerPickerCandidate[] = pickerOrder(
     roster.data.roster,
     all,
@@ -105,6 +120,7 @@ export function MatchLineup({ sessionId, now, request, onClose, onSaved }: Match
     return {
       id: p.id,
       name: p.nameSnapshot,
+      photoUrl: photoOf(p.clubPlayerId),
       // The name stack (D-2026-11-26-09): club nickname, the account nickname, then the full name.
       nickname: p.nicknameSnapshot ?? null,
       clubNickname: p.clubNickname ?? null,

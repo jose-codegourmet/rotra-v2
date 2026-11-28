@@ -1,6 +1,6 @@
 # Queue Payments: the Free tab always shows
 
-Status: IN MOCK APP
+Status: IN MOCK APP — PR #1169
 Date: 2026-11-27
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › `paymentsPanel`

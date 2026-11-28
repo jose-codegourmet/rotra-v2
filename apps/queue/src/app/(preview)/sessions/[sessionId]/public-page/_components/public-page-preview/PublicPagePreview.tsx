@@ -1,12 +1,13 @@
 'use client'
 
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
+import { sessionLinkOrigin } from '@rotra/data/public-session/context'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
+import { PublicSession } from '@rotra/session-page/public-session'
 import { PublicPreviewBanner } from '@rotra/ui/public-preview-banner'
 import { toast } from '@rotra/ui/toaster'
 import { notFound, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { PublicSession } from '@/app/(public)/s/[slug]/_components/public-session/PublicSession'
 import { sessionHref } from '@/lib/dates'
 
 export type PublicPagePreviewProps = { sessionId: string }
@@ -21,9 +22,9 @@ export type PublicPagePreviewProps = { sessionId: string }
 export function PublicPagePreview({ sessionId }: PublicPagePreviewProps) {
   const router = useRouter()
   const session = useQueueSession(sessionId)
-  // The origin is only known in the browser.
+  // The Player origin (D-2026-11-28-01) is only known in the browser.
   const [origin, setOrigin] = useState('')
-  useEffect(() => setOrigin(window.location.origin), [])
+  useEffect(() => setOrigin(sessionLinkOrigin()), [])
 
   if (session.isError && isPermissionRefusal(session.error)) notFound()
 

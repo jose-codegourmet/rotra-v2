@@ -9,7 +9,7 @@ import { MockError, NotConnectedError } from '../mock/errors'
 import { delay } from '../mock/latency'
 import { type MockState, mockStore, readMockState } from '../mock/store'
 import { applyPersonalProfile } from '../player/fetchers'
-import { queueSessionUrl } from '../player/mySessions'
+import { publicSessionUrl } from '../player/mySessions'
 import { allocateMockRtrId } from '../player/unclaimed'
 import { finishClaim } from '../player-account/fetchers'
 import { getGuestRegistrationClub } from '../player-account/guestRegistration'
@@ -513,7 +513,7 @@ function inviteCard(
         venueName: session.venueName,
       },
       inviter,
-      continueUrl: `${queueSessionUrl(session.publicSlug)}${query}`,
+      continueUrl: `${publicSessionUrl(session.publicSlug)}${query}`,
     },
     club,
     session,
@@ -546,7 +546,7 @@ export async function getInviteLanding(
     // the server found (it named the inviter) goes on to the request, as in mock mode.
     if (landing.card.kind === 'session') {
       const code = landing.card.inviter ? (link.sessionInviteCode ?? '').trim().toLowerCase() : ''
-      landing.card.continueUrl = `${queueSessionUrl(landing.card.session.slug)}?join=1${
+      landing.card.continueUrl = `${publicSessionUrl(landing.card.session.slug)}?join=1${
         code ? `&invite=${encodeURIComponent(code)}` : ''
       }`
     }

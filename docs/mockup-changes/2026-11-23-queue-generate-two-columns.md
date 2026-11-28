@@ -1,6 +1,6 @@
 # Queue app: Generate Queue in two columns on wide screens
 
-Status: TICKETED — #1061
+Status: IN MOCK APP — #1061
 Date: 2026-11-23
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › console Generate Queue (`autoWorkspace`; CSS `.gq-cols`, `.gq-main`, `.gq-side`, `.gq-drafts`)

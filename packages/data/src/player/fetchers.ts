@@ -69,9 +69,9 @@ export async function getPlayerGames(
     })
     return (await realGetPlayerGames(playerId, signal)).map((session) => ({
       ...session,
-      // The server sends the public session page as a path on the Queue app; link it there.
+      // The server sends the public session page as a path; it lives on the Player app (D-2026-11-28-01).
       sessionPageUrl: session.sessionPageUrl?.startsWith('/')
-        ? `${appOrigin('queue')}${session.sessionPageUrl}`
+        ? `${appOrigin('player')}${session.sessionPageUrl}`
         : (session.sessionPageUrl ?? null),
       games: session.games.map((game) => ({
         ...game,

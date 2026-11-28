@@ -183,7 +183,7 @@ export function AdminPlayerHistory({
             {blocks.length ? (
               blocks
                 .slice((current - 1) * 10, current * 10)
-                .map((s) => <SessionGames key={s.id} session={s} />)
+                .map((s) => <SessionGames key={s.id} session={s} newTab />)
             ) : (
               <p>No games yet</p>
             )}

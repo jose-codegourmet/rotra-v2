@@ -83,8 +83,11 @@ The Queue, Player and Admin services export OpenTelemetry traces to Grafana Clou
 | Player Information | `apps/player` | [rotra-player.html](../apps/mockup/player-app/rotra-player.html) | [Player Information](business_logic/product/player-information/README.md) |
 | Admin | `apps/admin` | [rotra-admin.html](../apps/mockup/admin-app/rotra-admin.html) | [Admin](business_logic/product/admin/README.md) |
 
-The Queue app also serves the **public session page** (session link): no sign-in, separate audience,
-its own route group. World is v2: no app, no routes.
+The **public session page** (session link) is part of the Queue product but is served by the Player
+app at `/s/[slug]` ([D-2026-11-28-01](mvp/decisions/2026-11-28.md#d-2026-11-28-01)): no sign-in,
+separate audience, its own route group, no Player top bar. Queue keeps `/s/[slug]` as a permanent
+redirect for links already shared. Its containers live in `@rotra/session-page`, which the Player page
+and Queue's operator preview both render. World is v2: no app, no routes.
 
 ---
 
@@ -94,6 +97,7 @@ its own route group. World is v2: no app, no routes.
 apps/*  ──►  @rotra/ui  ──►  @rotra/schema
    │             │  (import type only)
    │             └──────────►  @rotra/data (types)
+   ├──────►  @rotra/session-page  ──►  @rotra/ui, @rotra/data, @rotra/schema
    ├──────►  @rotra/data  ──►  @rotra/schema
    ├──────►  @rotra/schema
    └──────►  @rotra/config        (everything may use config)
@@ -107,6 +111,7 @@ apps/*  ──►  @rotra/ui  ──►  @rotra/schema
 | A package never imports from an app | No cycles |
 | `@rotra/db` is imported only by server code (route handlers) | Prisma never reaches a client bundle |
 | `@rotra/api-proxy` is server-only (`proxy.ts`, server pages, route handlers, `@rotra/db`); it imports no other workspace package | The proxy secret and data mode never reach a client bundle, and it outlives `@rotra/db` (B-51) |
+| `@rotra/session-page` holds only the public session page's containers (hooks + `@rotra/ui` pieces); apps import it, it never imports an app or `@rotra/db` | The Player page and Queue's operator preview render one copy ([D-2026-11-28-01](mvp/decisions/2026-11-28.md#d-2026-11-28-01)) |
 
 **Imports go through `package.json` `exports` subpaths**, one per component or module, e.g.
 `@rotra/ui/match-card`, `@rotra/data/queue-session`, `@rotra/schema/phone`. There are no `index.ts`
@@ -165,7 +170,7 @@ apps/queue/src/
 │   │           └── session-console/
 │   │               ├── SessionConsole.tsx       'use client' container: hooks + @rotra/ui pieces
 │   │               └── SessionConsole.meta.ts
-│   └── (public)/s/[slug]/page.tsx       Public session page (no sign-in)
+│   └── (public)/s/[slug]/page.tsx       Redirect to the Player app's public session page
 ├── providers/                           QueryClientProvider, Redux Provider, ThemeProvider, Toaster
 ├── store/                               Redux Toolkit: auth + UI chrome only
 │   └── slices/<name>Slice.ts
@@ -186,7 +191,7 @@ Route paths above illustrate the pattern; the real route list comes from the scr
 
 Three routes export `generateMetadata` (title, description, Open Graph `website` with `siteName`
 ROTRA, Twitter `summary`) so a pasted link previews the page instead of the app title (#720):
-`apps/queue/src/app/(public)/s/[slug]/page.tsx` (session title), `apps/player/src/app/(auth)/register/[clubId]/page.tsx`
+`apps/player/src/app/(public)/s/[slug]/page.tsx` (session title), `apps/player/src/app/(auth)/register/[clubId]/page.tsx`
 (club name; `?k=` is never read) and `apps/player/src/app/(auth)/claim/[token]/page.tsx` (one copy
 for both the profile invite and the claim-play link, never a person's name). The copy lives in each
 `page.tsx`. Real mode reads the name through the same `@rotra/db` service the route's Route Handler

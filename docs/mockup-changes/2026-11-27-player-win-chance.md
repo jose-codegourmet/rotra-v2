@@ -1,6 +1,6 @@
 # Player app: Win chance on finished games, with a breakdown dialog
 
-Status: NEW
+Status: IN MOCK APP — PR #1175
 Date: 2026-11-27
 App: player
 Mockup: apps/mockup/player-app/rotra-player.html › `wcGame`, `wcPlayer`, `gameRow` (pills), `viewMatch` (team chips), `SHEETS_WINCHANCE`

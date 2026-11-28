@@ -168,6 +168,9 @@ importers:
       '@rotra/schema':
         specifier: workspace:*
         version: link:../../packages/schema
+      '@rotra/session-page':
+        specifier: workspace:*
+        version: link:../../packages/session-page
       '@rotra/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -238,6 +241,9 @@ importers:
       '@rotra/schema':
         specifier: workspace:*
         version: link:../../packages/schema
+      '@rotra/session-page':
+        specifier: workspace:*
+        version: link:../../packages/session-page
       '@rotra/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -421,6 +427,34 @@ importers:
       vitest:
         specifier: ^5.0.5
         version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@24.12.3)(vite@8.3.5(@types/node@24.12.3)(esbuild@0.28.2)(jiti@2.7.0))
+
+  packages/session-page:
+    dependencies:
+      '@rotra/data':
+        specifier: workspace:*
+        version: link:../data
+      '@rotra/schema':
+        specifier: workspace:*
+        version: link:../schema
+      '@rotra/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.105.0(@types/react@19.2.14)(react@19.2.9)
+    devDependencies:
+      '@rotra/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/react':
+        specifier: ~19.2.14
+        version: 19.2.14
+      react:
+        specifier: ~19.2.9
+        version: 19.2.9
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
   packages/ui:
     dependencies:

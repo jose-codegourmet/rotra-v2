@@ -60,6 +60,11 @@ export type ParticipantProfileSheetProps = {
    * and the footer has no Share profile and no Open ROTRA profile.
    */
   unclaimed?: boolean
+  /**
+   * Open ROTRA profile in a new tab (default). The session page on the Player app passes false
+   * (D-2026-11-28-01); the Queue Master's preview and the framed card keep the new tab.
+   */
+  newTab?: boolean
 }
 
 /**
@@ -91,6 +96,7 @@ export function ParticipantProfileSheet({
   profileHref,
   onShare,
   unclaimed = false,
+  newTab = true,
 }: ParticipantProfileSheetProps) {
   return (
     <Sheet
@@ -111,9 +117,13 @@ export function ParticipantProfileSheet({
             <Button asChild variant="primary">
               <a
                 href={profileHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open ROTRA profile in a new tab"
+                {...(newTab
+                  ? {
+                      target: '_blank',
+                      rel: 'noopener noreferrer',
+                      'aria-label': 'Open ROTRA profile in a new tab',
+                    }
+                  : {})}
               >
                 Open ROTRA profile
                 <Icon name="external" size={16} />

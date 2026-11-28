@@ -4,6 +4,7 @@ import { useClub } from '@rotra/data/club'
 import { useClubPlayers } from '@rotra/data/club-player/useClubPlayers'
 import { DEMO_CLUB_ID } from '@rotra/data/fixtures/clubs'
 import { isPermissionRefusal } from '@rotra/data/mock/errors'
+import { sessionLinkOrigin } from '@rotra/data/public-session/context'
 import { useFinalizationStatus } from '@rotra/data/queue-session/useFinalizationStatus'
 import { useFinalizeSession } from '@rotra/data/queue-session/useFinalizeSession'
 import { useQueueSession } from '@rotra/data/queue-session/useQueueSession'
@@ -272,9 +273,9 @@ export function SessionResults({ sessionId }: SessionResultsProps) {
             sessionTitle={s.title}
             dateLabel={date(s.scheduledStartAt)}
             club={frame.club}
-            link={`${location.origin}/s/${encodeURIComponent(s.publicSlug)}`}
+            link={`${sessionLinkOrigin()}/s/${encodeURIComponent(s.publicSlug)}`}
             onCopy={() =>
-              void copySessionLink(`${location.origin}/s/${encodeURIComponent(s.publicSlug)}`)
+              void copySessionLink(`${sessionLinkOrigin()}/s/${encodeURIComponent(s.publicSlug)}`)
             }
             onError={(message) => toast.error(message)}
             onDownloaded={(item) => toast(`${item.label} image downloaded`)}

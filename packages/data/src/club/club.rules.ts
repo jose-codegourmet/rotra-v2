@@ -4,6 +4,7 @@ import {
 } from '@rotra/schema/club-price'
 import { formatPeso } from '@rotra/schema/money'
 import type { ClubAccessState } from '../license/license.types'
+import { sessionLinkOrigin } from '../public-session/context'
 import { sessionLinkUrl } from '../session-roster/sessionRoster.rules'
 import type { AdminClubAccessFilter, Club } from './club.types'
 
@@ -155,8 +156,6 @@ function fillKeys(template: string, values: Record<string, string>): string {
  * Unknown placeholders stay as written. Mock and real mode both build the post here.
  */
 /** The page origin in the browser; empty on the server (the post is composed in the browser). */
-const browserOrigin = () =>
-  (globalThis as { location?: { origin?: string } }).location?.origin ?? ''
 export function composeFacebookPost(input: {
   club: PostInput['club'] & { postTemplate: string | null }
   draft?: { template?: string; description?: string; courtRules?: string }
@@ -178,7 +177,9 @@ export function composeFacebookPost(input: {
     roster,
     waitlist,
     openSlots: Math.max(0, courts.length * session.playersPerCourt - roster.length),
-    joinUrl: session.publicSlug ? sessionLinkUrl(session.publicSlug, browserOrigin()) : undefined,
+    joinUrl: session.publicSlug
+      ? sessionLinkUrl(session.publicSlug, sessionLinkOrigin())
+      : undefined,
     mode: session.sessionMode,
     minimum: session.minimumGames,
   })

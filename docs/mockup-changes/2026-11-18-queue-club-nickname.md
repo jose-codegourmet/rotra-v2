@@ -1,6 +1,6 @@
 # Queue app: a club nickname the Queue Master sets for a registered player, shown on Queue Master screens only
 
-Status: TICKETED — #900
+Status: IN MOCK APP — #900
 Date: 2026-11-18
 App: queue
 Mockup: apps/mockup/queue-app/rotra-queue.html › sheets `profile`, `clubNick` (new); Saved players card; `short()`, `acctShort()`, `clubNickOf()`; Saved players, Add player and Main Queue search; seed player Miguel Santos

@@ -77,6 +77,7 @@ apps/landingpage/        rotra.club marketing site: Next.js 16 static export (on
 packages/
   ui/                     every visual component and form + the one Storybook (see its AGENTS.md)
   data/                   types, fixtures, mock store, fetchers, query keys, hooks
+  session-page/           the public session page's containers (Player page + Queue preview)
   schema/                 shared Zod fields (email, phone, date, money, password)
   config/                 tsconfig + Tailwind 4 tokens (theme.css; see its AGENTS.md)
   api-proxy/              server-only proxy code the apps share (Go forwarding, data mode check)
